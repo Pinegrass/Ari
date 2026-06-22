@@ -17,7 +17,7 @@ export type TabParamList = {
 export type MainStackParamList = {
   Tabs: NavigatorScreenParams<TabParamList>;
   AddTransaction:
-    | { type?: 'expense' | 'income' }
+    | { type?: 'expense' | 'income'; prefill?: { amount?: number; description?: string; category?: string } }
     | {
         editTransaction: {
           id: string;
@@ -30,6 +30,7 @@ export type MainStackParamList = {
         };
       }
     | undefined;
+  ShareCapture: { text: string };
   // Accountant feature
   Accountant: undefined;
   SmartLedger: undefined;

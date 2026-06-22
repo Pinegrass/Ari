@@ -50,6 +50,9 @@ export interface LocalTxn {
   deleted: boolean;
   retryCount: number;
   lastError: string | null;
+  isRecurring?: boolean;
+  recurrenceRule?: 'monthly' | 'weekly' | 'biweekly' | 'quarterly' | 'yearly';
+  parentRecurringId?: string;
 }
 
 export interface CreateInput {
@@ -64,6 +67,9 @@ export interface CreateInput {
   rawInput?: string | null;
   parseSource?: 'local' | 'fuzzy' | 'ai' | 'aa';
   confidence?: number | null;
+  isRecurring?: boolean;
+  recurrenceRule?: 'monthly' | 'weekly' | 'biweekly' | 'quarterly' | 'yearly';
+  parentRecurringId?: string;
 }
 
 export interface UpdateInput {
@@ -127,6 +133,9 @@ function toTxn(r: LocalTxn): Transaction {
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,
     syncStatus: r.syncStatus,
+    ...(r.isRecurring !== undefined && { isRecurring: r.isRecurring }),
+    ...(r.recurrenceRule !== undefined && { recurrenceRule: r.recurrenceRule }),
+    ...(r.parentRecurringId !== undefined && { parentRecurringId: r.parentRecurringId }),
   };
 }
 
@@ -161,6 +170,9 @@ function fromServer(t: Transaction): LocalTxn {
     deleted: false,
     retryCount: 0,
     lastError: null,
+    ...(t.isRecurring !== undefined && { isRecurring: t.isRecurring }),
+    ...(t.recurrenceRule !== undefined && { recurrenceRule: t.recurrenceRule }),
+    ...(t.parentRecurringId !== undefined && { parentRecurringId: t.parentRecurringId }),
   };
 }
 
@@ -235,6 +247,9 @@ export const localStore = {
         deleted: false,
         retryCount: 0,
         lastError: null,
+        ...(input.isRecurring !== undefined && { isRecurring: input.isRecurring }),
+        ...(input.recurrenceRule !== undefined && { recurrenceRule: input.recurrenceRule }),
+        ...(input.parentRecurringId !== undefined && { parentRecurringId: input.parentRecurringId }),
       };
       rows.push(record);
       await persist(rows);

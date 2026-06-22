@@ -23,6 +23,7 @@ import PaywallScreen from '../screens/PaywallScreen';
 import GroupsListScreen from '../screens/GroupsListScreen';
 import GroupDetailScreen from '../screens/GroupDetailScreen';
 import AddSharedExpenseScreen from '../screens/AddSharedExpenseScreen';
+import ShareCaptureScreen from '../screens/ShareCaptureScreen';
 import Icon from '../components/ui/Icon';
 import type { IconName } from '../components/ui/Icon';
 import { color, font } from '../theme/tokens';
@@ -181,6 +182,11 @@ export default function MainNavigator() {
         name="AddSharedExpense"
         component={AddSharedExpenseScreen}
         options={{ presentation: 'modal', cardStyle: { backgroundColor: 'transparent' } }}
+      />
+      <Stack.Screen
+        name="ShareCapture"
+        component={ShareCaptureScreen}
+        options={{ presentation: 'transparentModal', cardStyle: { backgroundColor: 'transparent' } }}
       />
     </Stack.Navigator>
   );

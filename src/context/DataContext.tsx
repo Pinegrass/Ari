@@ -5,6 +5,7 @@ import React, {
   useCallback,
   useEffect,
 } from 'react';
+import { AppState, type AppStateStatus } from 'react-native';
 import { ApiError } from '../api/client';
 import * as txnApi from '../api/transactions';
 import * as budgetApi from '../api/budgets';
@@ -16,6 +17,7 @@ import { getCurrentMonth } from '../utils/dateHelpers';
 import { useOfflineCache } from '../hooks/useOfflineCache';
 import { localStore } from '../lib/localStore';
 import { flushPending as engineFlush, startAutoFlush } from '../lib/syncEngine';
+import { checkAndGenerateDue } from '../lib/recurringEngine';
 import { track, bucketAmount } from '../lib/analytics';
 import { addBreadcrumb } from '../config/sentry';
 import type {
@@ -60,6 +62,8 @@ interface DataContextValue {
     merchant?: string | null;
     rawInput?: string;
     entryType?: 'manual' | 'voice' | 'aa_sync';
+    isRecurring?: boolean;
+    recurrenceRule?: Transaction['recurrenceRule'];
   }) => Promise<void>;
   deleteTransaction: (id: string) => Promise<void>;
   updateTransaction: (
@@ -142,6 +146,19 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     if (changed) await refreshFromLocal();
   }, [refreshFromLocal]);
 
+  const runRecurringCheck = useCallback(async () => {
+    try {
+      const current = await localStore.getAll();
+      const newInstances = await checkAndGenerateDue(current);
+      if (newInstances.length > 0) {
+        setTransactions(await localStore.getAll());
+      }
+    } catch (err) {
+      // Recurring generation is best-effort — never block the load path.
+      addBreadcrumb('recurring', `checkAndGenerateDue failed: ${err}`, 'warning');
+    }
+  }, []);
+
   const fetchTransactions = useCallback(async () => {
     try {
       // First run on this device: seed the local store from the server's full
@@ -156,17 +173,28 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         }
       }
       await refreshFromLocal();
+      // Generate any due recurring instances (idempotent — safe to call often).
+      void runRecurringCheck();
       void syncTransactions();
     } catch (err) {
       handleError(err);
     }
-  }, [handleError, refreshFromLocal, syncTransactions]);
+  }, [handleError, refreshFromLocal, syncTransactions, runRecurringCheck]);
 
   // Start the recurring background flush once for the provider's lifetime.
   useEffect(
     () => startAutoFlush(() => void refreshFromLocal()),
     [refreshFromLocal]
   );
+
+  // On app foreground, also check for newly-due recurring instances.
+  useEffect(() => {
+    const onAppState = (state: AppStateStatus) => {
+      if (state === 'active') void runRecurringCheck();
+    };
+    const sub = AppState.addEventListener('change', onAppState);
+    return () => sub.remove();
+  }, [runRecurringCheck]);
 
   const fetchSummary = useCallback(async () => {
     try {
@@ -275,6 +303,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       merchant?: string | null;
       rawInput?: string;
       entryType?: 'manual' | 'voice' | 'aa_sync';
+      isRecurring?: boolean;
+      recurrenceRule?: Transaction['recurrenceRule'];
     }) => {
       // Offline-first: write to the local store first so the UI updates
       // instantly and the entry survives an app kill, with no network in the
@@ -291,6 +321,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         rawInput: data.rawInput ?? null,
         parseSource: data.parseSource ?? 'local',
         confidence: data.confidence ?? null,
+        ...(data.isRecurring !== undefined && { isRecurring: data.isRecurring }),
+        ...(data.recurrenceRule !== undefined && { recurrenceRule: data.recurrenceRule }),
       });
       setTransactions(await localStore.getAll());
 

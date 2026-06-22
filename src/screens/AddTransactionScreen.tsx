@@ -8,6 +8,8 @@ import {
   Modal,
   Platform,
   StyleSheet,
+  Switch,
+  ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -26,7 +28,7 @@ import ConfidenceConfirmSheet from '../components/ConfidenceConfirmSheet';
 import { todayISO, toLocalISODate, formatSectionDate } from '../utils/dateHelpers';
 import { useHaptics } from '../hooks/useHaptics';
 import { useVoiceInput } from '../hooks/useVoiceInput';
-import type { Category, TransactionType } from '../types';
+import type { Category, Transaction, TransactionType } from '../types';
 
 type Props = StackScreenProps<MainStackParamList, 'AddTransaction'>;
 
@@ -44,10 +46,11 @@ const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'del'] as co
  */
 export default function AddTransactionScreen({ navigation, route }: Props) {
   const params = route.params as
-    | { type?: 'expense' | 'income' }
+    | { type?: 'expense' | 'income'; prefill?: { amount?: number; description?: string; category?: string } }
     | { editTransaction: { id: string; type: 'expense' | 'income'; amount: number; category: string; description: string; note: string; date: string } }
     | undefined;
   const editTxn = params && 'editTransaction' in params ? params.editTransaction : null;
+  const prefill = params && !('editTransaction' in params) ? (params as { prefill?: { amount?: number; description?: string; category?: string } }).prefill : undefined;
   const isEdit = !!editTxn;
   const initialType: TransactionType = editTxn?.type ?? (params as { type?: 'expense' | 'income' } | undefined)?.type ?? 'expense';
 
@@ -59,10 +62,18 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
   }, [userCategories.length, fetchUserCategories]);
 
   const [type, setType] = useState<TransactionType>(initialType);
-  const [amount, setAmount] = useState(editTxn ? String(editTxn.amount) : ''); // digits only, '' renders as 0
-  const [description, setDescription] = useState(editTxn?.description ?? '');
-  const [category, setCategory] = useState(editTxn?.category ?? (initialType === 'expense' ? 'food' : 'salary'));
+  const [amount, setAmount] = useState(
+    editTxn ? String(editTxn.amount) : prefill?.amount != null ? String(prefill.amount) : ''
+  );
+  const [description, setDescription] = useState(editTxn?.description ?? prefill?.description ?? '');
+  const [note, setNote] = useState(editTxn?.note ?? '');
+  const [category, setCategory] = useState(
+    editTxn?.category ?? prefill?.category ?? (initialType === 'expense' ? 'food' : 'salary')
+  );
   const [date, setDate] = useState(editTxn?.date ?? todayISO());
+  // Recurring — only applies to new entries, not edits.
+  const [isRecurring, setIsRecurring] = React.useState(false);
+  const [recurrenceRule, setRecurrenceRule] = React.useState<Transaction['recurrenceRule']>('monthly');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
@@ -230,7 +241,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
           amount: numericAmount,
           category,
           description: description.trim(),
-          note: editTxn.note,
+          note: note.trim(),
           date,
         });
       } else {
@@ -239,13 +250,14 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
           amount: numericAmount,
           category,
           description: description.trim(),
-          note: '',
+          note: note.trim(),
           date,
           parseSource,
           confidence,
           merchant: merchantName,
           rawInput,
           entryType,
+          ...(isRecurring && { isRecurring: true, recurrenceRule }),
         });
       }
       haptics.success();
@@ -358,6 +370,52 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
         </TouchableOpacity>
       </View>
 
+      {/* Recurring toggle — new entries only */}
+      {!isEdit && (
+        <View>
+          <View style={styles.recurringRow}>
+            <Text style={styles.recurringLabel}>Repeat</Text>
+            <Switch
+              value={isRecurring}
+              onValueChange={(v) => { haptics.light(); setIsRecurring(v); }}
+              trackColor={{ false: color.line, true: color.forest2 }}
+              thumbColor={color.cream}
+              accessibilityLabel="Repeat this transaction"
+            />
+          </View>
+          {isRecurring && (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.rulePills}
+            >
+              {([
+                { value: 'monthly', label: 'Monthly' },
+                { value: 'weekly', label: 'Weekly' },
+                { value: 'biweekly', label: 'Biweekly' },
+                { value: 'quarterly', label: 'Quarterly' },
+                { value: 'yearly', label: 'Yearly' },
+              ] as const).map((opt) => {
+                const active = recurrenceRule === opt.value;
+                return (
+                  <TouchableOpacity
+                    key={opt.value}
+                    style={[styles.rulePill, active && styles.rulePillActive]}
+                    onPress={() => { haptics.light(); setRecurrenceRule(opt.value); }}
+                    accessibilityRole="button"
+                    accessibilityLabel={opt.label}
+                  >
+                    <Text style={[styles.rulePillText, active && styles.rulePillTextActive]}>
+                      {opt.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          )}
+        </View>
+      )}
+
       {/* Keypad */}
       <View style={styles.keypad}>
         {KEYS.map((k, i) => (
@@ -411,8 +469,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
                 placeholderTextColor={color.inkFaint}
                 autoFocus
                 editable={!voice.isListening}
-                returnKeyType="done"
-                onSubmitEditing={() => setShowNote(false)}
+                returnKeyType="next"
               />
               {voice.isAvailable && (
                 <TouchableOpacity
@@ -434,6 +491,15 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
               )}
             </View>
             {!!voice.error && <Text style={styles.error}>{voice.error}</Text>}
+            <TextInput
+              style={[styles.noteInput, styles.noteInputExtra]}
+              value={note}
+              onChangeText={setNote}
+              placeholder="Extra note (optional)"
+              placeholderTextColor={color.inkFaint}
+              returnKeyType="done"
+              onSubmitEditing={() => setShowNote(false)}
+            />
             <TouchableOpacity style={styles.sheetDone} onPress={() => setShowNote(false)}>
               <Text style={styles.sheetDoneText}>Done</Text>
             </TouchableOpacity>
@@ -618,6 +684,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: color.ink,
   },
+  noteInputExtra: {
+    flex: 0,
+    marginTop: 10,
+  },
   mic: {
     width: 44,
     height: 44,
@@ -637,4 +707,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   sheetDoneText: { fontFamily: font.bodySemi, fontSize: 15, color: color.cream },
+  recurringRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: color.card,
+    borderWidth: 1,
+    borderColor: color.line,
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginBottom: 6,
+  },
+  recurringLabel: { fontFamily: font.bodyMed, fontSize: 14, color: color.ink },
+  rulePills: { paddingHorizontal: 2, gap: 8, paddingBottom: 6 },
+  rulePill: {
+    borderWidth: 1,
+    borderColor: color.line,
+    backgroundColor: color.cream2,
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+  },
+  rulePillActive: { backgroundColor: color.forest, borderColor: color.forest },
+  rulePillText: { fontFamily: font.bodyMed, fontSize: 13, color: color.ink },
+  rulePillTextActive: { color: color.cream },
 });

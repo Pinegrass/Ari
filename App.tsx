@@ -15,7 +15,7 @@ import {
   Inter_600SemiBold,
   Inter_700Bold,
 } from '@expo-google-fonts/inter';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Sentry from '@sentry/react-native';
@@ -27,6 +27,32 @@ import { AuthProvider } from './src/context/AuthContext';
 import { DataProvider } from './src/context/DataContext';
 import { PrivacyProvider } from './src/context/PrivacyContext';
 import RootNavigator from './src/navigation/RootNavigator';
+import { getInitialSharedText, addShareIntentListener } from './src/lib/shareIntentHandler';
+import type { RootStackParamList } from './src/navigation/navigationTypes';
+
+const navigationRef = createNavigationContainerRef<RootStackParamList>();
+
+// Pending share text buffered before the navigator is ready. Drained in onReady.
+let _pendingShareText: string | null = null;
+
+function navigateToShare(text: string) {
+  if (!navigationRef.isReady()) {
+    // Navigator not mounted yet — buffer and drain once it's ready.
+    _pendingShareText = text;
+    return;
+  }
+  try {
+    // Navigate into the nested Main stack. Works only when user is logged in;
+    // silently ignored if Auth is the active root (share intent is dropped on
+    // unauthenticated cold-start — acceptable MVP behaviour).
+    (navigationRef as any).navigate('Main', {
+      screen: 'ShareCapture',
+      params: { text },
+    });
+  } catch {
+    // Navigator not on Main (e.g. still on Auth) — drop silently.
+  }
+}
 
 // Initialize Sentry + PostHog early so the very first render can fire events.
 // `app_opened` here represents a true cold start (process boot). Warm
@@ -113,6 +139,19 @@ function App() {
   // user is never interrupted mid-session by a reload.
   useEffect(() => registerOtaReloadHandler(), []);
 
+  // Share-intent: receive text/plain shared from other apps (e.g. bank SMS).
+  // Cold-start: the initial URL is checked once after mount.
+  // Warm-start: the Linking listener fires for subsequent shares.
+  // Requires the intentFilters in app.json + a new native build to activate the
+  // Android share sheet entry; the JS-side handler is OTA-safe.
+  useEffect(() => {
+    getInitialSharedText().then((text) => {
+      if (text) navigateToShare(text);
+    });
+    const sub = addShareIntentListener(navigateToShare);
+    return () => sub.remove();
+  }, []);
+
   // Native splash stays up until fonts resolve; brief null avoids a FOUT.
   if (!fontsLoaded) return null;
 
@@ -120,7 +159,15 @@ function App() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ErrorBoundary>
         <SafeAreaProvider>
-          <NavigationContainer>
+          <NavigationContainer
+            ref={navigationRef}
+            onReady={() => {
+              if (_pendingShareText) {
+                navigateToShare(_pendingShareText);
+                _pendingShareText = null;
+              }
+            }}
+          >
             <AuthProvider>
               <DataProvider>
                 <PrivacyProvider>
