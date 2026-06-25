@@ -1,6 +1,6 @@
 # Ari — Play Console Store Listing
 
-**v1.0.0 launch copy. Reviewed for Play Store compliance: no "lending/loan/EMI/NBFC/investment-advice" language.**
+**v1.1.0 — Sprint 4 refresh. Reviewed for Play Store compliance: no "lending/loan/EMI/NBFC/investment-advice" language.**
 
 ---
 
@@ -9,14 +9,14 @@
 | Field | Value | Notes |
 |---|---|---|
 | App name | `Ari — AI Money Coach` | 21 chars (Play limit: 30) |
-| Default language | `English (United States)` | Add Hindi in v1.1 |
+| Default language | `English (United States)` | Add Hindi in v1.2 |
 | App or game | App | |
 | Free or paid | Free | Premium gated off in v1 |
 | Category | Finance | Subcategory: Personal Finance |
 | Tags | budget, expense tracker, money manager, savings tracker, tax calculator | Up to 5 |
 | Email | starhunter7@gmail.com | Public contact |
 | Phone | (optional) | Skip for v1 |
-| Website | https://web-production-7c65f.up.railway.app | Custom domain v1.1 |
+| Website | https://web-production-7c65f.up.railway.app | Custom domain v1.2 |
 | Privacy Policy URL | https://web-production-7c65f.up.railway.app/privacy | DPDP-compliant, live |
 
 ---
@@ -24,9 +24,9 @@
 ## Short description (80 chars max)
 
 ```
-AI-powered personal finance with smart budgets, savings goals and spending insights
+Track spending, set budgets, and get AI money coaching — built for India
 ```
-*(79 chars, fits exactly)*
+*(72 chars)*
 
 ---
 
@@ -35,13 +35,14 @@ AI-powered personal finance with smart budgets, savings goals and spending insig
 ```
 Take control of your money with Ari — an AI-powered personal finance app built for India.
 
-Ari helps you understand where your money goes, plan smarter budgets, and build savings habits that actually stick. Designed for salaried professionals and freelancers, Ari combines simple expense tracking with an intelligent AI coach (Tomo) that answers your money questions in plain English.
+Ari helps you understand where your money goes, plan smarter budgets, and build savings habits that actually stick. Designed for salaried professionals and freelancers, Ari combines fast expense logging with an intelligent AI coach (Tomo) that answers your money questions in plain English.
 
-✦ TRACK EXPENSES IN SECONDS
-• Voice input — just say "spent 350 on groceries" and Ari logs it
+✦ LOG EXPENSES IN SECONDS
+• Tap a number — the keypad-first Add screen gets you to Done in under 3 seconds
+• Voice input — say "spent 350 on groceries" and Ari logs it
+• Share any bank SMS or payment alert directly to Ari — it reads the amount and merchant automatically
 • Smart merchant detection — Swiggy, Zomato, Uber, Amazon, IRCTC and more recognised automatically
-• Custom categories with your own emoji and colour
-• Quick-add templates for your most common transactions
+• Recurring transactions — set Monthly, Weekly, or Quarterly repeats once and forget
 
 ✦ MEET TOMO, YOUR AI MONEY COACH
 • Ask anything about your spending: "Where can I cut back this month?"
@@ -66,15 +67,20 @@ Ari helps you understand where your money goes, plan smarter budgets, and build 
 • Built with the latest FY 2025-26 slabs
 • For estimation only — file with your CA or tax professional
 
-✦ DAILY HEATMAP & WEEKLY BRIEF
+✦ DAILY HEATMAP & REPORTS
 • See your spending pattern at a glance
-• Weekly summary of where your money went
+• Monthly P&L report — income vs expenses vs net savings
+• Category trend charts over 3 or 6 months
 • Identify spending spikes early
 
 ✦ INDIA-FIRST DESIGN
 • Indian Rupee (₹) formatting throughout
 • UPI deep-link settlement for shared expenses
 • Built by an Indian solo founder for Indian users
+
+✦ WORKS OFFLINE
+• Add transactions without a data connection — Ari syncs when you're back online
+• Your data is never lost even if the server is unreachable
 
 ✦ PRIVATE BY DEFAULT
 • Private Mode hides amounts and pauses analytics with one tap
@@ -90,27 +96,39 @@ DPDP COMPLIANT: Ari complies with India's Digital Personal Data Protection Act 2
 Note: Ari is a personal finance tracker and AI coaching tool. It does not provide investment, tax, or legal advice. For specific financial decisions, please consult a SEBI-registered investment adviser or qualified Chartered Accountant.
 ```
 
-*(Approximately 2,500 chars — fits with room to spare)*
+*(Approximately 2,900 chars — fits with room to spare)*
 
 ---
 
 ## What's new (release notes — 500 chars max)
 
 ```
-Welcome to Ari v1.0.0!
+Ari v1.1.0
 
-✦ Voice input — log expenses by speaking
-✦ Tomo AI money coach answers your finance questions
-✦ Smart merchant detection for Indian apps
-✦ Tax estimator (FY 2025-26) — compare Old vs New regime
-✦ Savings goals, custom budgets, daily heatmap
-✦ Private Mode + encrypted on-device storage
-✦ Free forever — no ads, no subscription
-
-Found a bug or have feedback? Tap Settings → Send Feedback. We read every message.
+✦ Recurring transactions — set Monthly, Weekly or Quarterly repeats once
+✦ Share bank alerts to Ari — it reads the amount and merchant automatically
+✦ New forest-on-cream design — easier on the eyes in daylight
+✦ Faster expense entry with the new keypad-first Add screen
+✦ Works offline — transactions sync when you're back online
+✦ Edit transactions — change amount, category or date after saving
 ```
 
-*(~440 chars)*
+*(~460 chars)*
+
+---
+
+## Screenshot set (v1.1.0 — 8 screens, forest-on-cream UI)
+
+Screenshots should be taken from the new forest-on-cream build. Order:
+
+1. **Dashboard** — cream bg, forest hero block with balance, recent transactions list
+2. **Add transaction (keypad)** — keypad-first screen with Quick Amounts row
+3. **Share-to-Ari** — bottom sheet showing parsed amount + merchant from a shared bank SMS
+4. **Tomo chat** — forest user bubble, Tomo response to "Where can I cut back this month?"
+5. **Budgets** — category budget bars with clay progress fill
+6. **Savings goals** — 2 goals with progress rings and target dates
+7. **Tax estimator** — Old vs New regime comparison, FY 2025-26 slabs
+8. **Recurring transactions** — Add screen with Repeat toggle + rule pills
 
 ---
 
@@ -183,51 +201,17 @@ Expected rating: **Everyone (3+)** or equivalent regional rating.
 
 ---
 
-## Required assets — what you still need to design
+## Submission checklist (v1.1.0)
 
-### App icon
-- ✅ Already in `assets/icon.png` — verify it's 512×512 PNG, no alpha, no rounded corners (Play applies the rounding)
-
-### Feature graphic (REQUIRED)
-- **Size**: 1024×500 px
-- **Format**: PNG or JPG, no transparency
-- **Recommended content**: Ari logo + tagline "Personal finance, simplified" + abstract gradient background using brand colours (#0A0A0A → #00C896)
-- **Avoid**: localized text (you'll have to redo for every language); device frames; screenshot collages (Play frowns on these)
-
-### Phone screenshots (REQUIRED — minimum 4, maximum 8)
-- **Size**: 1080×1920 px (portrait) preferred. Min side 320px, max side 3840px. 16:9 or 9:16 ratio.
-- **Format**: PNG or JPG, no alpha
-- **Recommended set (8 screenshots in this order)**:
-  1. **Dashboard** — show balance card, recent transactions, current month bar chart
-  2. **Add transaction with voice input** — show the mic active state with "spent 350 on groceries" text
-  3. **Tomo chat** — show a real Tomo response to "Where can I cut back this month?"
-  4. **Budgets** — show 4-5 category budget bars with progress
-  5. **Savings goals** — show 2 goals with progress rings
-  6. **Tax estimator** — show Old vs New regime comparison
-  7. **Daily heatmap** — show the calendar heatmap view
-  8. **Settings + Privacy Mode toggle** — show the privacy controls
-
-### Optional (but increases conversion)
-- **Tablet screenshots**: 7" and 10" — skip for v1 (you set `supportsTablet: false`)
-- **Promo video**: 30-120 sec YouTube link — skip for v1
-
----
-
-## Submission checklist
-
-- [ ] Filled in App name, short description, full description above
-- [ ] Uploaded app icon (auto from AAB)
-- [ ] Uploaded feature graphic
-- [ ] Uploaded 4-8 phone screenshots
-- [ ] Pasted Privacy Policy URL
-- [ ] Filled Data Safety form per table above
-- [ ] Filled App Content questionnaire per table above
-- [ ] Filled IARC content rating questionnaire (expect Everyone rating)
-- [ ] Set Target audience: 18+
-- [ ] Selected category: Finance > Personal Finance
-- [ ] Set release name: `1.0.0 (1)` (matches versionCode)
-- [ ] Pasted "What's new" release notes
-- [ ] Selected countries: India only (for v1)
-- [ ] Submitted to Internal Testing track first
-- [ ] Walked smoke test path on real device
-- [ ] Promoted to Production
+- [ ] Updated short description, full description, and What's New above
+- [ ] Uploaded 8 new forest-on-cream screenshots (see set above)
+- [ ] Feature graphic — update with new cream/forest palette if time allows
+- [ ] Pasted Privacy Policy URL (unchanged)
+- [ ] Data Safety form — no changes needed from v1.0
+- [ ] App Content — no changes needed from v1.0
+- [ ] Set release name: `1.1.0 (6)` (versionCode 6 via autoIncrement)
+- [ ] Upload new AAB (vc6, v1.1.0)
+- [ ] Submit to Internal Testing → smoke test on device
+- [ ] Promote to Production
+- [ ] Expand rollout: 20% India → 100% India
+- [ ] Push OTA update to `production` branch after QA pass
