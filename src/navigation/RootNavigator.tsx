@@ -8,7 +8,7 @@ import AuthNavigator from './AuthNavigator';
 import MainNavigator from './MainNavigator';
 import OnboardingScreen from '../screens/OnboardingScreen';
 import Icon from '../components/ui/Icon';
-import { Colors } from '../constants/colors';
+import { color, font } from '../theme/tokens';
 import type { RootStackParamList } from './navigationTypes';
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -17,7 +17,7 @@ const ONBOARDING_KEY = 'ari_onboarding_done';
 function BiometricLockScreen({ onRetry }: { onRetry: () => void }) {
   return (
     <View style={lockStyles.container}>
-      <Icon name="lock" size={64} color={Colors.textMuted} />
+      <Icon name="lock" size={64} color={color.inkFaint} />
       <Text style={lockStyles.title}>Ari is Locked</Text>
       <Text style={lockStyles.subtitle}>Authenticate to continue</Text>
       <TouchableOpacity style={lockStyles.btn} onPress={onRetry} activeOpacity={0.85}>
@@ -30,21 +30,21 @@ function BiometricLockScreen({ onRetry }: { onRetry: () => void }) {
 const lockStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: color.cream,
     justifyContent: 'center',
     alignItems: 'center',
     gap: 12,
   },
   emoji: { fontSize: 64, marginBottom: 8 },
-  title: { fontSize: 24, fontWeight: '800', color: Colors.textPrimary },
-  subtitle: { fontSize: 15, color: Colors.textSecondary, marginBottom: 24 },
+  title: { fontSize: 24, fontFamily: font.displayBold, color: color.ink },
+  subtitle: { fontSize: 15, fontFamily: font.body, color: color.inkSoft, marginBottom: 24 },
   btn: {
-    backgroundColor: Colors.primary,
+    backgroundColor: color.forest,
     paddingHorizontal: 32,
     paddingVertical: 14,
     borderRadius: 14,
   },
-  btnText: { fontSize: 16, fontWeight: '700', color: Colors.background },
+  btnText: { fontSize: 16, fontFamily: font.bodyBold, color: color.cream },
 });
 
 export default function RootNavigator() {
@@ -70,12 +70,12 @@ export default function RootNavigator() {
       <View
         style={{
           flex: 1,
-          backgroundColor: Colors.background,
+          backgroundColor: color.cream,
           justifyContent: 'center',
           alignItems: 'center',
         }}
       >
-        <ActivityIndicator size="large" color={Colors.primary} />
+        <ActivityIndicator size="large" color={color.forest} />
       </View>
     );
   }
