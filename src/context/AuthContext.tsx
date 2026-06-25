@@ -15,7 +15,7 @@ import { signOutGoogle } from '../lib/socialAuth';
 import { secureStorage } from '../lib/secureStorage';
 import { localStore } from '../lib/localStore';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { addBreadcrumb, captureError } from '../config/sentry';
+import { addBreadcrumb, captureError, setUserContext, clearUserContext } from '../config/sentry';
 import type { User, RegisterPayload } from '../types';
 
 interface AuthContextValue {
@@ -231,6 +231,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await secureStorage.setItem('ari_token', token);
     await adoptSessionIntoSupabase(token, refresh_token);
     setUserAndCache(u);
+    setUserContext({ id: u.id, email: u.email, name: u.name });
     identifyUser(u.id, { tier: u.tier ?? 'free', age_group: u.ageGroup });
     track('login_success');
     addBreadcrumb('auth', 'login: success');
@@ -244,6 +245,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await secureStorage.setItem('ari_token', token);
     await adoptSessionIntoSupabase(token, refresh_token);
     setUserAndCache(u);
+    setUserContext({ id: u.id, email: u.email, name: u.name });
     identifyUser(u.id, { tier: u.tier ?? 'free', age_group: u.ageGroup });
     track('register_success');
     addBreadcrumb('auth', 'register: success');
@@ -276,12 +278,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       /* noop */
     }
     setUser(null);
+    clearUserContext();
     resetAnalytics();
     addBreadcrumb('auth', 'logout: complete');
   }, []);
 
   const refreshFromSession = useCallback(async (u: User) => {
     setUserAndCache(u);
+    setUserContext({ id: u.id, email: u.email, name: u.name });
     identifyUser(u.id, { tier: u.tier ?? 'free', age_group: u.ageGroup });
     attemptPushRegister();
   }, [setUserAndCache]);
