@@ -69,3 +69,17 @@ supabase/.temp/
 credentials.json
 *.p12
 *.pem
+
+# Build artifacts
+*.aab
+*.apk
+
+# OTA update run artifacts
+ota-update*.json
+ota-update*.err
+
+# QA screenshots
+.qa-shots/
+
+# Stray device database files
+*.db
