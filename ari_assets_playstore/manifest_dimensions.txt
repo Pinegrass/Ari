@@ -1,0 +1,9 @@
+ari_feature_graphic_generated.png 1794x876
+ari_screenshot_01_dashboard.png 941x1672
+ari_screenshot_02_voice_input.png 941x1672
+ari_screenshot_03_tomo_chat.png 941x1672
+ari_screenshot_04_budgets.png 941x1672
+ari_screenshot_05_savings_goals.png 941x1672
+ari_screenshot_06_tax_estimator.png 941x1672
+ari_screenshot_07_daily_heatmap.png 941x1672
+ari_screenshot_08_privacy_settings.png 941x1672
