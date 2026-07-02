@@ -47,7 +47,7 @@ cd backend && git push origin master
 - **Styling**: StyleSheet.create (no external CSS-in-JS)
 - **New Architecture**: Enabled (Fabric + TurboModules) — required by Reanimated 4.x. Razorpay autolinking disabled via `react-native.config.js` (paywall flag-gated off in v1)
 - **Edge-to-edge**: Enabled on Android
-- **OTA Updates**: expo-updates configured (runtimeVersion: appVersion). Wired and live — `App.tsx` calls `checkAndApplyUpdate()` on launch (`src/lib/otaUpdates.ts`: `checkForUpdateAsync` → `fetchUpdateAsync` → `reloadAsync`). Shipped in v1.0.1 (versionCode 5).
+- **OTA Updates**: expo-updates configured (runtimeVersion policy: **fingerprint** — switched from appVersion for the v1.0.2 native build; live vc5 builds still run appVersion/1.0.1). Wired and live — checks on launch + foreground (`src/hooks/useOTAUpdates.ts` → `src/lib/otaUpdates.ts`), `UpdateToast` when staged, applies on background/next launch, manual check in Settings → About. Full strategy: `docs/ota-strategy.md`.
 - **Auth/Backend client**: Supabase (`@supabase/supabase-js`) for the auth session + token refresh; Google Sign-In via `@react-native-google-signin/google-signin`
 
 ### Backend
@@ -59,7 +59,7 @@ cd backend && git push origin master
 - **WSGI**: Gunicorn with 2 workers
 
 ### Repo Structure
-- Frontend: local only (no git remote) at `C:\Users\Augustus Rex\Projects\Workex\Ari`
+- Frontend: `github.com/ejjy/Ari` (working branch **master**; `main` has diverged — never PR/merge into it) at `C:\Users\Augustus Rex\Projects\Workex\Ari`
 - Backend: `github.com/ejjy/ari-backend` (master branch) at `Ari/backend/`
 - Backend is a separate git repo nested inside the frontend directory
 
