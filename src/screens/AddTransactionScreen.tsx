@@ -10,6 +10,7 @@ import {
   StyleSheet,
   Switch,
   ScrollView,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -455,77 +456,101 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
       {/* Note sheet — also carries the voice mic (D1) */}
       <Modal visible={showNote} transparent animationType="slide" onRequestClose={() => setShowNote(false)}>
         <View style={styles.sheetBackdrop}>
-          <View style={styles.sheet}>
-            <Text style={styles.sheetTitle}>What was this for?</Text>
-            <View style={styles.noteRow}>
-              <TextInput
-                style={styles.noteInput}
-                value={description}
-                onChangeText={(t) => {
-                  setEntryType('manual');
-                  handleDescriptionChange(t);
-                }}
-                placeholder={voice.isListening ? 'Listening…' : 'e.g. groceries, auto, electricity'}
-                placeholderTextColor={color.inkFaint}
-                autoFocus
-                editable={!voice.isListening}
-                returnKeyType="next"
-              />
-              {voice.isAvailable && (
-                <TouchableOpacity
-                  style={[styles.mic, voice.isListening && styles.micActive]}
-                  onPress={() => {
-                    haptics.light();
-                    if (voice.isListening) voice.stop();
-                    else voice.start();
-                  }}
-                  accessibilityLabel={voice.isListening ? 'Stop voice' : 'Start voice'}
-                  accessibilityRole="button"
-                >
-                  <Icon
-                    name={voice.isListening ? 'mic-off' : 'mic'}
-                    size={18}
-                    color={voice.isListening ? color.card : color.forest}
+          <KeyboardAvoidingView
+            style={styles.sheetWrapper}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+          >
+            <ScrollView
+              contentContainerStyle={styles.sheetScroll}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={styles.sheet}>
+                <Text style={styles.sheetTitle}>What was this for?</Text>
+                <View style={styles.noteRow}>
+                  <TextInput
+                    style={styles.noteInput}
+                    value={description}
+                    onChangeText={(t) => {
+                      setEntryType('manual');
+                      handleDescriptionChange(t);
+                    }}
+                    placeholder={voice.isListening ? 'Listening…' : 'e.g. groceries, auto, electricity'}
+                    placeholderTextColor={color.inkFaint}
+                    autoFocus
+                    editable={!voice.isListening}
+                    returnKeyType="next"
                   />
+                  {voice.isAvailable && (
+                    <TouchableOpacity
+                      style={[styles.mic, voice.isListening && styles.micActive]}
+                      onPress={() => {
+                        haptics.light();
+                        if (voice.isListening) voice.stop();
+                        else voice.start();
+                      }}
+                      accessibilityLabel={voice.isListening ? 'Stop voice' : 'Start voice'}
+                      accessibilityRole="button"
+                    >
+                      <Icon
+                        name={voice.isListening ? 'mic-off' : 'mic'}
+                        size={18}
+                        color={voice.isListening ? color.card : color.forest}
+                      />
+                    </TouchableOpacity>
+                  )}
+                </View>
+                {!!voice.error && <Text style={styles.error}>{voice.error}</Text>}
+                <TextInput
+                  style={[styles.noteInput, styles.noteInputExtra]}
+                  value={note}
+                  onChangeText={setNote}
+                  placeholder="Extra note (optional)"
+                  placeholderTextColor={color.inkFaint}
+                  returnKeyType="done"
+                  onSubmitEditing={() => setShowNote(false)}
+                />
+                <TouchableOpacity style={styles.sheetDone} onPress={() => setShowNote(false)}>
+                  <Text style={styles.sheetDoneText}>Done</Text>
                 </TouchableOpacity>
-              )}
-            </View>
-            {!!voice.error && <Text style={styles.error}>{voice.error}</Text>}
-            <TextInput
-              style={[styles.noteInput, styles.noteInputExtra]}
-              value={note}
-              onChangeText={setNote}
-              placeholder="Extra note (optional)"
-              placeholderTextColor={color.inkFaint}
-              returnKeyType="done"
-              onSubmitEditing={() => setShowNote(false)}
-            />
-            <TouchableOpacity style={styles.sheetDone} onPress={() => setShowNote(false)}>
-              <Text style={styles.sheetDoneText}>Done</Text>
-            </TouchableOpacity>
-          </View>
+              </View>
+            </ScrollView>
+          </KeyboardAvoidingView>
         </View>
       </Modal>
 
       {/* Category sheet */}
       <Modal visible={showCategory} transparent animationType="slide" onRequestClose={() => setShowCategory(false)}>
         <View style={styles.sheetBackdrop}>
-          <View style={styles.sheet}>
-            <Text style={styles.sheetTitle}>Category</Text>
-            <CategoryPicker
-              selected={category}
-              type={type}
-              onSelect={(c) => {
-                setCategory(c);
-                setParseSource(undefined); // user override clears the AI guess mark
-                setShowCategory(false);
-              }}
-              customCategories={userCategories}
-            />
-            <TouchableOpacity style={styles.sheetDone} onPress={() => setShowCategory(false)}>
-              <Text style={styles.sheetDoneText}>Done</Text>
-            </TouchableOpacity>
-          </View>
+          <KeyboardAvoidingView
+            style={styles.sheetWrapper}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+          >
+            <ScrollView
+              contentContainerStyle={styles.sheetScroll}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={styles.sheet}>
+                <Text style={styles.sheetTitle}>Category</Text>
+                <CategoryPicker
+                  selected={category}
+                  type={type}
+                  onSelect={(c) => {
+                    setCategory(c);
+                    setParseSource(undefined); // user override clears the AI guess mark
+                    setShowCategory(false);
+                  }}
+                  customCategories={userCategories}
+                />
+                <TouchableOpacity style={styles.sheetDone} onPress={() => setShowCategory(false)}>
+                  <Text style={styles.sheetDoneText}>Done</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </KeyboardAvoidingView>
         </View>
       </Modal>
 
@@ -663,6 +688,8 @@ const styles = StyleSheet.create({
   },
   toastText: { fontFamily: font.bodySemi, fontSize: 13.5, color: color.cream },
   sheetBackdrop: { flex: 1, backgroundColor: 'rgba(21,42,30,0.35)', justifyContent: 'flex-end' },
+  sheetWrapper: { width: '100%' },
+  sheetScroll: { flexGrow: 1, justifyContent: 'flex-end' },
   sheet: {
     backgroundColor: color.cream,
     borderTopLeftRadius: 24,

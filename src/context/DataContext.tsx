@@ -12,6 +12,7 @@ import * as budgetApi from '../api/budgets';
 import * as tomoApi from '../api/tomo';
 import * as goalsApi from '../api/savingsGoals';
 import * as catApi from '../api/categories';
+import * as reportsApi from '../api/reports';
 import type { UserCategoryData } from '../api/categories';
 import { getCurrentMonth } from '../utils/dateHelpers';
 import { useOfflineCache } from '../hooks/useOfflineCache';
@@ -39,11 +40,13 @@ interface DataContextValue {
   chatHistory: ChatMessage[];
   savingsGoals: SavingsGoal[];
   userCategories: UserCategoryData[];
+  dailyData: reportsApi.DailyAnalytics | null;
   loadingData: boolean;
   refreshing: boolean;
   tomoLoading: boolean;
   fetchTransactions: () => Promise<void>;
   fetchSummary: () => Promise<void>;
+  fetchDailyData: (month?: string) => Promise<void>;
   fetchAll: () => Promise<void>;
   fetchBudgets: () => Promise<void>;
   fetchNudge: () => Promise<void>;
@@ -113,6 +116,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [insights, setInsights] = useState<Insight[]>([]);
   const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>([]);
   const [userCategories, setUserCategories] = useState<UserCategoryData[]>([]);
+  const [dailyData, setDailyData] = useState<reportsApi.DailyAnalytics | null>(null);
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([
     INITIAL_TOMO_MESSAGE,
   ]);
@@ -208,6 +212,20 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     }
   }, [handleError, fetchWithCache]);
 
+  const fetchDailyData = useCallback(
+    async (month = getCurrentMonth()) => {
+      try {
+        const data = await fetchWithCache(`daily_${month}`, () =>
+          reportsApi.getDailyAnalytics(month)
+        );
+        setDailyData(data);
+      } catch (err) {
+        handleError(err);
+      }
+    },
+    [handleError, fetchWithCache]
+  );
+
   const fetchBudgets = useCallback(async () => {
     try {
       const month = getCurrentMonth();
@@ -259,6 +277,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       const results = await Promise.allSettled([
         fetchTransactions(),
         fetchSummary(),
+        fetchDailyData(),
         fetchUserCategories(),
       ]);
       results.forEach((r) => {
@@ -269,7 +288,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLoadingData(false);
     }
-  }, [fetchTransactions, fetchSummary, fetchUserCategories]);
+  }, [fetchTransactions, fetchSummary, fetchDailyData, fetchUserCategories]);
 
   const refresh = useCallback(async () => {
     setRefreshing(true);
@@ -277,6 +296,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       const results = await Promise.allSettled([
         fetchTransactions(),
         fetchSummary(),
+        fetchDailyData(),
         fetchNudge(),
         fetchInsights(),
       ]);
@@ -288,7 +308,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setRefreshing(false);
     }
-  }, [fetchTransactions, fetchSummary, fetchNudge, fetchInsights]);
+  }, [fetchTransactions, fetchSummary, fetchDailyData, fetchNudge, fetchInsights]);
 
   const addTransaction = useCallback(
     async (data: {
@@ -599,11 +619,13 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         chatHistory,
         savingsGoals,
         userCategories,
+        dailyData,
         loadingData,
         refreshing,
         tomoLoading,
         fetchTransactions,
         fetchSummary,
+        fetchDailyData,
         fetchAll,
         fetchBudgets,
         fetchNudge,

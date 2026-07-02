@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
   ScrollView,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import type { RouteProp } from '@react-navigation/native';
 import { color, font } from '../theme/tokens';
@@ -24,7 +24,6 @@ type Props = {
 
 export default function ShareCaptureScreen({ navigation, route }: Props) {
   const { text } = route.params;
-  const insets = useSafeAreaInsets();
   const { addTransaction } = useData();
 
   const [loading, setLoading] = useState(true);
@@ -83,7 +82,7 @@ export default function ShareCaptureScreen({ navigation, route }: Props) {
   };
 
   return (
-    <View style={[styles.backdrop, { paddingBottom: insets.bottom }]}>
+    <SafeAreaView style={styles.backdrop} edges={['top', 'bottom']}>
       <TouchableOpacity style={styles.dimmer} activeOpacity={1} onPress={navigation.goBack} />
       <View style={styles.sheet}>
         <View style={styles.handle} />
@@ -154,7 +153,7 @@ export default function ShareCaptureScreen({ navigation, route }: Props) {
           <Text style={styles.cancelText}>Dismiss</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 

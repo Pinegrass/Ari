@@ -8,23 +8,27 @@ import {
   RefreshControl,
   StyleSheet,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import type { CompositeNavigationProp } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useData } from '../context/DataContext';
 import TransactionItem from '../components/TransactionItem';
 import DeleteConfirmSheet from '../components/DeleteConfirmSheet';
 import EmptyState from '../components/ui/EmptyState';
 import AnimatedFAB from '../components/ui/AnimatedFAB';
+import AnimatedEntry from '../components/ui/AnimatedEntry';
 import Icon from '../components/ui/Icon';
+import TrendLineChart from '../components/trends/TrendLineChart';
+import CategoryComparison from '../components/trends/CategoryComparison';
+import InsightCard from '../components/trends/InsightCard';
 import { color, font, type as ftype } from '../theme/tokens';
 import { groupTransactionsByDate } from '../utils/dateHelpers';
 import { usePrivacy } from '../context/PrivacyContext';
 import { useHaptics } from '../hooks/useHaptics';
-import type { Transaction } from '../types';
+import * as reportsApi from '../api/reports';
+import type { Transaction, PnlReport } from '../types';
 import type { TabParamList, MainStackParamList } from '../navigation/navigationTypes';
 
 type Nav = CompositeNavigationProp<
@@ -33,12 +37,21 @@ type Nav = CompositeNavigationProp<
 >;
 
 type FilterType = 'all' | 'expense' | 'income';
+type PeriodType = 1 | 6 | 12;
+
+const PERIODS: { value: PeriodType; label: string }[] = [
+  { value: 1, label: 'This month' },
+  { value: 6, label: '6 months' },
+  { value: 12, label: '1 year' },
+];
 
 export default function TransactionsScreen() {
   const navigation = useNavigation<Nav>();
   const {
     transactions,
     summary,
+    insights,
+    nudge,
     refreshing,
     deleteTransaction,
     fetchTransactions,
@@ -53,12 +66,28 @@ export default function TransactionsScreen() {
   const [filter, setFilter] = useState<FilterType>('all');
   const [toDelete, setToDelete] = useState<Transaction | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [period, setPeriod] = useState<PeriodType>(6);
+  const [pnl, setPnl] = useState<PnlReport | null>(null);
+  const [pnlLoading, setPnlLoading] = useState(false);
+
+  const loadPnl = useCallback(async (months: PeriodType) => {
+    setPnlLoading(true);
+    try {
+      const data = await reportsApi.getPnlReport(months);
+      setPnl(data);
+    } catch {
+      setPnl(null);
+    } finally {
+      setPnlLoading(false);
+    }
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
       fetchTransactions();
       fetchSummary();
-    }, [fetchTransactions, fetchSummary])
+      loadPnl(period);
+    }, [fetchTransactions, fetchSummary, loadPnl, period])
   );
 
   const filtered = useMemo(() => {
@@ -78,6 +107,8 @@ export default function TransactionsScreen() {
 
   const income = summary?.income ?? 0;
   const expenses = summary?.expenses ?? 0;
+  const savings = income - expenses;
+  const savingsRate = income > 0 ? Math.round((savings / income) * 100) : 0;
 
   const handleDeleteConfirm = async () => {
     if (!toDelete) return;
@@ -99,6 +130,12 @@ export default function TransactionsScreen() {
       haptics.warning();
       setToDelete(txn);
     }
+  };
+
+  const handlePeriodChange = (p: PeriodType) => {
+    haptics.light();
+    setPeriod(p);
+    loadPnl(p);
   };
 
   return (
@@ -142,63 +179,128 @@ export default function TransactionsScreen() {
         ListHeaderComponent={
           <View>
             {/* Header */}
-            <Text style={styles.screenTitle}>Trends</Text>
+            <AnimatedEntry delay={0}>
+              <Text style={styles.screenTitle}>Trends</Text>
+            </AnimatedEntry>
 
-            {/* Summary Pills */}
-            <View style={styles.pills}>
-              <View style={[styles.pill, styles.incomePill]}>
-                <Text style={styles.pillLabel}>↑ Income</Text>
-                <Text style={styles.pillIncome}>{formatAmount(income)}</Text>
+            {/* Period selector */}
+            <AnimatedEntry delay={40}>
+              <View style={styles.periodRow}>
+                {PERIODS.map((p) => (
+                  <TouchableOpacity
+                    key={p.value}
+                    onPress={() => handlePeriodChange(p.value)}
+                    style={[styles.periodBtn, period === p.value && styles.periodBtnActive]}
+                    activeOpacity={0.75}
+                  >
+                    <Text
+                      style={[
+                        styles.periodText,
+                        period === p.value && styles.periodTextActive,
+                      ]}
+                    >
+                      {p.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
               </View>
-              <View style={[styles.pill, styles.expensePill]}>
-                <Text style={styles.pillLabel}>↓ Expenses</Text>
-                <Text style={styles.pillExpense}>{formatAmount(expenses)}</Text>
+            </AnimatedEntry>
+
+            {/* Summary cards */}
+            <AnimatedEntry delay={80}>
+              <View style={styles.summaryGrid}>
+                <View style={styles.summaryCard}>
+                  <Text style={styles.summaryLabel}>Income</Text>
+                  <Text style={[styles.summaryAmount, styles.incomeText]}>{formatAmount(income)}</Text>
+                </View>
+                <View style={styles.summaryCard}>
+                  <Text style={styles.summaryLabel}>Expenses</Text>
+                  <Text style={[styles.summaryAmount, styles.expenseText]}>{formatAmount(expenses)}</Text>
+                </View>
+                <View style={styles.summaryCard}>
+                  <Text style={styles.summaryLabel}>Saved</Text>
+                  <Text style={[styles.summaryAmount, savings >= 0 ? styles.incomeText : styles.expenseText]}>
+                    {formatAmount(Math.abs(savings))}
+                  </Text>
+                </View>
+                <View style={styles.summaryCard}>
+                  <Text style={styles.summaryLabel}>Saved %</Text>
+                  <Text style={[styles.summaryAmount, savingsRate >= 20 ? styles.incomeText : styles.expenseText]}>
+                    {savingsRate}%
+                  </Text>
+                </View>
               </View>
-            </View>
+            </AnimatedEntry>
+
+            {/* Trend chart */}
+            <AnimatedEntry delay={120}>
+              <TrendLineChart report={pnl} loading={pnlLoading} />
+            </AnimatedEntry>
+
+            {/* Category comparison */}
+            <AnimatedEntry delay={160}>
+              <CategoryComparison categories={summary?.categories ?? {}} />
+            </AnimatedEntry>
+
+            {/* Anomaly / AI callouts */}
+            <AnimatedEntry delay={200}>
+              <InsightCard nudge={nudge} />
+              {insights.slice(0, 2).map((insight, idx) => (
+                <InsightCard key={idx} insight={insight} />
+              ))}
+            </AnimatedEntry>
 
             {/* Search */}
-            <View style={styles.searchRow}>
-              <Icon name="search" size={16} color={color.inkFaint} />
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Search transactions..."
-                placeholderTextColor={color.inkFaint}
-                value={search}
-                onChangeText={setSearch}
-                selectionColor={color.forest}
-                accessibilityLabel="Search transactions"
-              />
-              {search.length > 0 && (
-                <TouchableOpacity
-                  onPress={() => setSearch('')}
-                  accessibilityLabel="Clear search"
-                  accessibilityRole="button"
-                >
-                  <Icon name="x" size={18} color={color.inkSoft} />
-                </TouchableOpacity>
-              )}
-            </View>
+            <AnimatedEntry delay={240}>
+              <View style={styles.searchRow}>
+                <Icon name="search" size={16} color={color.inkFaint} />
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search transactions..."
+                  placeholderTextColor={color.inkFaint}
+                  value={search}
+                  onChangeText={setSearch}
+                  selectionColor={color.forest}
+                  accessibilityLabel="Search transactions"
+                />
+                {search.length > 0 && (
+                  <TouchableOpacity
+                    onPress={() => setSearch('')}
+                    accessibilityLabel="Clear search"
+                    accessibilityRole="button"
+                  >
+                    <Icon name="x" size={18} color={color.inkSoft} />
+                  </TouchableOpacity>
+                )}
+              </View>
+            </AnimatedEntry>
 
             {/* Filter Tabs */}
-            <View style={styles.filters}>
-              {(['all', 'expense', 'income'] as FilterType[]).map((f) => (
-                <TouchableOpacity
-                  key={f}
-                  onPress={() => setFilter(f)}
-                  style={[styles.filterBtn, filter === f && styles.filterBtnActive]}
-                  activeOpacity={0.75}
-                >
-                  <Text
-                    style={[
-                      styles.filterText,
-                      filter === f && styles.filterTextActive,
-                    ]}
+            <AnimatedEntry delay={280}>
+              <View style={styles.filters}>
+                {(['all', 'expense', 'income'] as FilterType[]).map((f) => (
+                  <TouchableOpacity
+                    key={f}
+                    onPress={() => setFilter(f)}
+                    style={[styles.filterBtn, filter === f && styles.filterBtnActive]}
+                    activeOpacity={0.75}
                   >
-                    {f === 'all' ? 'All' : f === 'expense' ? 'Expenses' : 'Income'}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+                    <Text
+                      style={[
+                        styles.filterText,
+                        filter === f && styles.filterTextActive,
+                      ]}
+                    >
+                      {f === 'all' ? 'All' : f === 'expense' ? 'Expenses' : 'Income'}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </AnimatedEntry>
+
+            <AnimatedEntry delay={320}>
+              <Text style={styles.listHeading}>Recent transactions</Text>
+            </AnimatedEntry>
           </View>
         }
         ListEmptyComponent={
@@ -250,20 +352,41 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 16,
   },
-  pills: { flexDirection: 'row', gap: 10, marginBottom: 16 },
-  pill: {
+  periodRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 16,
+  },
+  periodBtn: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: color.cream2,
+    borderWidth: 1,
+    borderColor: color.line,
+  },
+  periodBtnActive: { backgroundColor: color.forest, borderColor: color.forest },
+  periodText: { fontFamily: font.bodyMed, fontSize: 12, color: color.inkSoft },
+  periodTextActive: { color: color.cream, fontFamily: font.bodySemi },
+  summaryGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 16,
+  },
+  summaryCard: {
     flex: 1,
+    minWidth: '45%',
     padding: 14,
     borderRadius: 14,
     borderWidth: 1,
     borderColor: color.line,
     backgroundColor: color.card,
   },
-  incomePill: {},
-  expensePill: {},
-  pillLabel: { fontFamily: font.body, fontSize: 11, color: color.inkSoft, marginBottom: 4 },
-  pillIncome: { fontFamily: font.bodySemi, fontSize: 16, color: color.forest2 },
-  pillExpense: { fontFamily: font.bodySemi, fontSize: 16, color: color.clay },
+  summaryLabel: { fontFamily: font.body, fontSize: 11, color: color.inkSoft, marginBottom: 4 },
+  summaryAmount: { fontFamily: font.displaySemi, fontSize: 18, color: color.ink },
+  incomeText: { color: color.forest2 },
+  expenseText: { color: color.clay },
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -273,6 +396,7 @@ const styles = StyleSheet.create({
     borderColor: color.line,
     paddingHorizontal: 12,
     marginBottom: 12,
+    marginTop: 8,
     gap: 8,
   },
   searchIcon: { fontSize: 16 },
@@ -289,6 +413,13 @@ const styles = StyleSheet.create({
   filterBtnActive: { backgroundColor: color.forest, borderColor: color.forest },
   filterText: { fontFamily: font.bodyMed, fontSize: 13, color: color.inkSoft },
   filterTextActive: { color: color.cream, fontFamily: font.bodySemi },
+  listHeading: {
+    fontFamily: font.displaySemi,
+    fontSize: ftype.sectionHead,
+    color: color.forestDeep,
+    marginTop: 8,
+    marginBottom: 10,
+  },
   dateHeader: {
     fontFamily: font.bodySemi,
     fontSize: 11,

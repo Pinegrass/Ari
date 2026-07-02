@@ -11,3 +11,13 @@ export const getCategoryTrend = (category: string, months = 6) =>
     total: number;
     average: number;
   }>(`/reports/category-trends?category=${category}&months=${months}`);
+
+export interface DailyAnalytics {
+  month: string;
+  days: Record<string, number>;
+  max: number;
+  total: number;
+}
+
+export const getDailyAnalytics = (month: string) =>
+  apiRequest<DailyAnalytics>(`/analytics/daily?month=${month}`);

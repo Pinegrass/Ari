@@ -17,6 +17,9 @@ import { useData } from '../context/DataContext';
 import BalanceCard from '../components/BalanceCard';
 import CoachingBriefCard from '../components/CoachingBriefCard';
 import TransactionItem from '../components/TransactionItem';
+import ThisMonthSummary from '../components/dashboard/ThisMonthSummary';
+import MonthSpendChart from '../components/dashboard/MonthSpendChart';
+import CategoryBreakdown from '../components/dashboard/CategoryBreakdown';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import EmptyState from '../components/ui/EmptyState';
 import AnimatedEntry from '../components/ui/AnimatedEntry';
@@ -48,7 +51,7 @@ export default function DashboardScreen() {
   const navigation = useNavigation<Nav>();
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
-  const { transactions, loadingData, refreshing, fetchAll, refresh } = useData();
+  const { transactions, summary, dailyData, loadingData, refreshing, fetchAll, refresh } = useData();
   const haptics = useHaptics();
 
   useFocusEffect(
@@ -143,6 +146,21 @@ export default function DashboardScreen() {
         </AnimatedEntry>
 
         <AnimatedEntry delay={260}>
+          <ThisMonthSummary
+            income={summary?.income ?? 0}
+            expenses={summary?.expenses ?? 0}
+          />
+        </AnimatedEntry>
+
+        <AnimatedEntry delay={320}>
+          <MonthSpendChart data={dailyData} loading={loadingData} />
+        </AnimatedEntry>
+
+        <AnimatedEntry delay={380}>
+          <CategoryBreakdown categories={summary?.categories ?? {}} />
+        </AnimatedEntry>
+
+        <AnimatedEntry delay={440}>
           <View style={styles.secHead}>
             <Text style={styles.secTitle}>Recent</Text>
             <TouchableOpacity
