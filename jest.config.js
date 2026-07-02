@@ -7,6 +7,8 @@ module.exports = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
+  // Agent worktrees carry a full copy of the repo; without this Jest runs every suite twice.
+  testPathIgnorePatterns: ['/node_modules/', '/.claude/'],
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
     '!src/**/*.d.ts',
