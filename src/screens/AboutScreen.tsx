@@ -5,19 +5,39 @@ import {
   TouchableOpacity,
   ScrollView,
   Linking,
+  ActivityIndicator,
   StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Constants from 'expo-constants';
 import { color, font } from '../theme/tokens';
 import AnimatedEntry from '../components/ui/AnimatedEntry';
 import Icon from '../components/ui/Icon';
 import type { IconName } from '../components/ui/Icon';
+import { useOTAUpdates } from '../hooks/useOTAUpdates';
 
 interface Props {
   onBack: () => void;
 }
 
+const APP_VERSION = Constants.expoConfig?.version ?? '1.0.0';
+
+function statusColor(status: ReturnType<typeof useOTAUpdates>['status']) {
+  switch (status) {
+    case 'staged':
+    case 'uptodate':
+      return color.forest;
+    case 'error':
+      return color.clay;
+    default:
+      return color.inkFaint;
+  }
+}
+
 export default function AboutScreen({ onBack }: Props) {
+  const { status, message, runtimeVersion, channel, checkManually } = useOTAUpdates();
+  const isBusy = status === 'checking' || status === 'downloading';
+
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
@@ -38,9 +58,32 @@ export default function AboutScreen({ onBack }: Props) {
               <Icon name="sprout" size={40} color={color.forest} />
             </View>
             <Text style={styles.appName}>Ari</Text>
-            <Text style={styles.version}>Version 1.0.0</Text>
+            <Text style={styles.version}>Version {APP_VERSION}</Text>
+            {runtimeVersion && (
+              <Text style={styles.meta}>Runtime: {runtimeVersion}</Text>
+            )}
+            {channel && <Text style={styles.meta}>Channel: {channel}</Text>}
             <Text style={styles.tagline}>Your Money, Your Future</Text>
           </View>
+        </AnimatedEntry>
+
+        <AnimatedEntry delay={150}>
+          <TouchableOpacity
+            style={[styles.checkBtn, isBusy && styles.checkBtnDisabled]}
+            onPress={checkManually}
+            disabled={isBusy}
+            accessibilityRole="button"
+            accessibilityLabel="Check for updates"
+          >
+            {isBusy ? (
+              <ActivityIndicator color={color.cream} />
+            ) : (
+              <Text style={styles.checkBtnText}>Check for updates</Text>
+            )}
+          </TouchableOpacity>
+          {message ? (
+            <Text style={[styles.statusText, { color: statusColor(status) }]}>{message}</Text>
+          ) : null}
         </AnimatedEntry>
 
         <AnimatedEntry delay={200}>
@@ -126,8 +169,24 @@ const styles = StyleSheet.create({
     letterSpacing: -1,
     marginBottom: 4,
   },
-  version: { fontSize: 14, color: color.inkFaint, marginBottom: 8, fontFamily: font.body },
-  tagline: { fontSize: 15, color: color.inkSoft, fontFamily: font.body },
+  version: { fontSize: 14, color: color.inkFaint, marginBottom: 4, fontFamily: font.body },
+  meta: { fontSize: 11, color: color.inkFaint, fontFamily: font.bodyMed, marginBottom: 2 },
+  tagline: { fontSize: 15, color: color.inkSoft, fontFamily: font.body, marginTop: 8 },
+  checkBtn: {
+    backgroundColor: color.forest,
+    borderRadius: 14,
+    paddingVertical: 14,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  checkBtnDisabled: { opacity: 0.6 },
+  checkBtnText: { fontFamily: font.bodySemi, fontSize: 15, color: color.cream },
+  statusText: {
+    fontFamily: font.bodyMed,
+    fontSize: 12,
+    textAlign: 'center',
+    marginBottom: 10,
+  },
   card: {
     backgroundColor: color.card,
     borderRadius: 16,

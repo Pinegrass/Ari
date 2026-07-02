@@ -3,7 +3,7 @@
     "name": "Ari",
     "slug": "ari",
     "owner": "pinegrass-tech",
-    "version": "1.1.0",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -16,7 +16,11 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.pinegrass.ari"
+      "bundleIdentifier": "com.pinegrass.ari",
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "Ari uses Face ID to secure your app access.",
+        "NSUserNotificationUsageDescription": "Ari sends you daily reminders and budget alerts."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -73,7 +77,7 @@
       "url": "https://u.expo.dev/ae18eabf-124f-4b0a-a09e-a2a40dfb473b"
     },
     "runtimeVersion": {
-      "policy": "appVersion"
+      "policy": "fingerprint"
     },
     "extra": {
       "eas": {

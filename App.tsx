@@ -23,6 +23,7 @@ import { initSentry } from './src/config/sentry';
 import { initAnalytics, track } from './src/lib/analytics';
 import { checkAndApplyUpdate, registerOtaReloadHandler } from './src/lib/otaUpdates';
 import ErrorBoundary from './src/components/ErrorBoundary';
+import UpdateToast from './src/components/UpdateToast';
 import { AuthProvider } from './src/context/AuthContext';
 import { DataProvider } from './src/context/DataContext';
 import { PrivacyProvider } from './src/context/PrivacyContext';
@@ -173,6 +174,7 @@ function App() {
                 <PrivacyProvider>
                   <StatusBar style="dark" />
                   <RootNavigator />
+                  <UpdateToast />
                 </PrivacyProvider>
               </DataProvider>
             </AuthProvider>

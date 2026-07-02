@@ -166,7 +166,13 @@ export type AnalyticsEvent =
   | 'brief_dismissed'
   | 'private_mode_toggled'
   | 'aa_consent_started'
-  | 'aa_consent_completed';
+  | 'aa_consent_completed'
+  | 'ota_check_started'
+  | 'ota_check_uptodate'
+  | 'ota_update_available'
+  | 'ota_update_staged'
+  | 'ota_check_failed'
+  | 'ota_update_applied';
 
 export function track(event: AnalyticsEvent, props: Record<string, unknown> = {}): void {
   if (!client || _privacyOptOut) return;
