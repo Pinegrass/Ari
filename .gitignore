@@ -83,3 +83,4 @@ ota-update*.err
 
 # Stray device database files
 *.db
+coverage/
