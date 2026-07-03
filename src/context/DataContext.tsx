@@ -79,7 +79,7 @@ interface DataContextValue {
       note?: string;
       date?: string;
     }
-  ) => Promise<void>;
+  ) => Promise<SaveOutcome>;
   saveBudget: (data: { category: string; limit: number; month: string }) => Promise<void>;
   deleteBudget: (id: string) => Promise<void>;
   createSavingsGoal: (data: {
@@ -478,7 +478,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         note?: string;
         date?: string;
       }
-    ) => {
+    ): Promise<SaveOutcome> => {
       // Read the current updatedAt BEFORE patching — it's the LWW baseline we
       // send to the server. After localStore.update() the field is nowISO().
       const existing = transactions.find((t) => t.id === id);
@@ -493,7 +493,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         note: patch.note,
         date: patch.date,
       });
-      if (!updated) return; // row disappeared — nothing to do
+      // Row disappeared (e.g. deleted concurrently) — nothing to edit. Not a
+      // failure the user needs to see; the screen just returns.
+      if (!updated) return { ok: true, queued: false };
       setTransactions(await localStore.getAll());
       track('transaction_edited', {
         type: patch.type,
@@ -502,8 +504,6 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       });
 
       // Inline flush: PUT with the pre-edit updatedAt as the LWW baseline.
-      // 409 (stale baseline) is handled by the sync engine's conflict pass;
-      // here we just mark the row failed so the tag surfaces.
       try {
         const server = await txnApi.updateTransaction(id, {
           ...patch,
@@ -515,16 +515,53 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         });
         setTransactions(await localStore.getAll());
         await fetchSummary();
+        return { ok: true, queued: false };
       } catch (err) {
         handleError(err);
-        if (err instanceof ApiError && err.status !== 401) {
-          await localStore.markFailed(
-            id,
-            err.message ?? 'Update failed'
-          );
+        const status = err instanceof ApiError ? err.status : null;
+        // 409 = stale LWW baseline: the sync engine's conflict pass reconciles
+        // it, so flag the row for that pass but keep the UI calm (not a
+        // user-facing failure).
+        if (status === 409) {
+          await localStore.markFailed(id, err instanceof ApiError ? err.message : 'Update conflict');
           setTransactions(await localStore.getAll());
+          track('transaction_save_failed', { reason: 'conflict', path: 'edit', queued: true, status });
+          return { ok: true, queued: true };
         }
-        // Do NOT rethrow — the local edit is durable; engine will reconcile.
+        // Any other 4xx (non-401) is a permanent rejection — the server will
+        // never accept this edit, so surface it instead of a false toast (B1,
+        // symmetric with addTransaction).
+        if (
+          err instanceof ApiError &&
+          status !== 401 &&
+          status !== null &&
+          status >= 400 &&
+          status < 500
+        ) {
+          await localStore.markFailed(id, err.message ?? 'Update failed');
+          setTransactions(await localStore.getAll());
+          track('transaction_save_failed', {
+            reason: 'rejected',
+            path: 'edit',
+            queued: false,
+            status,
+            type: patch.type,
+          });
+          return {
+            ok: false,
+            message: err.message || 'That change was rejected. Please check it and try again.',
+          };
+        }
+        // Network / 5xx / 401 → the row stays pending and the sync engine will
+        // retry it. The local edit is durable — the caller may confirm.
+        track('transaction_save_failed', {
+          reason: 'queued_retry',
+          path: 'edit',
+          queued: true,
+          status,
+          type: patch.type,
+        });
+        return { ok: true, queued: true };
       }
     },
     [fetchSummary, handleError, transactions]

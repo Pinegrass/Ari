@@ -237,7 +237,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
     setSaving(true);
     try {
       if (isEdit && editTxn) {
-        await updateTransaction(editTxn.id, {
+        const outcome = await updateTransaction(editTxn.id, {
           type,
           amount: numericAmount,
           category,
@@ -245,6 +245,12 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
           note: note.trim(),
           date,
         });
+        if (!outcome.ok) {
+          haptics.error();
+          setError(outcome.message);
+          setSaving(false);
+          return;
+        }
       } else {
         const outcome = await addTransaction({
           type,
