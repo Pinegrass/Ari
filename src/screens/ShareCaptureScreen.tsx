@@ -45,7 +45,7 @@ export default function ShareCaptureScreen({ navigation, route }: Props) {
     if (!parsed || amountUnknown) return;
     setSaving(true);
     try {
-      await addTransaction({
+      const outcome = await addTransaction({
         type: parsed.type,
         amount: Math.round(parsed.amount),
         category: parsed.category,
@@ -57,7 +57,13 @@ export default function ShareCaptureScreen({ navigation, route }: Props) {
         merchant: parsed.merchant,
         rawInput: text,
       });
+      if (!outcome.ok) {
+        setError(outcome.message);
+        return;
+      }
       navigation.goBack();
+    } catch {
+      setError("Couldn't save that entry. Please try again.");
     } finally {
       setSaving(false);
     }

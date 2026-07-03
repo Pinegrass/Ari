@@ -246,7 +246,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
           date,
         });
       } else {
-        await addTransaction({
+        const outcome = await addTransaction({
           type,
           amount: numericAmount,
           category,
@@ -260,6 +260,14 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
           entryType,
           ...(isRecurring && { isRecurring: true, recurrenceRule }),
         });
+        // A genuine failure (local write failed or server permanently rejected
+        // it) must never look like a save — surface it instead of the toast.
+        if (!outcome.ok) {
+          haptics.error();
+          setError(outcome.message);
+          setSaving(false);
+          return;
+        }
       }
       haptics.success();
       // Toast, then auto-return. DataContext write is local-first so this

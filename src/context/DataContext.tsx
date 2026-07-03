@@ -67,7 +67,7 @@ interface DataContextValue {
     entryType?: 'manual' | 'voice' | 'aa_sync';
     isRecurring?: boolean;
     recurrenceRule?: Transaction['recurrenceRule'];
-  }) => Promise<void>;
+  }) => Promise<SaveOutcome>;
   deleteTransaction: (id: string) => Promise<void>;
   updateTransaction: (
     id: string,
@@ -97,6 +97,19 @@ interface DataContextValue {
   clearChat: () => void;
   refresh: () => Promise<void>;
 }
+
+/**
+ * Result of a local-first transaction save (Sprint 0, B1). The write is durable
+ * the instant the local store accepts it, so `ok: true` covers both "synced to
+ * the server" and "safely queued for retry" — the success toast is honest in
+ * both. `ok: false` means the entry could NOT be durably kept (local write
+ * failed) or the server permanently rejected it (4xx validation, won't retry) —
+ * the caller MUST surface `message` instead of a success toast so no entry is
+ * ever silently dropped.
+ */
+export type SaveOutcome =
+  | { ok: true; queued: boolean }
+  | { ok: false; message: string };
 
 const DataContext = createContext<DataContextValue | null>(null);
 
@@ -325,25 +338,38 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       entryType?: 'manual' | 'voice' | 'aa_sync';
       isRecurring?: boolean;
       recurrenceRule?: Transaction['recurrenceRule'];
-    }) => {
+    }): Promise<SaveOutcome> => {
       // Offline-first: write to the local store first so the UI updates
       // instantly and the entry survives an app kill, with no network in the
-      // path of the user's Save tap.
-      const record = await localStore.create({
-        type: data.type as Transaction['type'],
-        amount: data.amount,
-        category: data.category,
-        description: data.description,
-        note: data.note,
-        date: data.date,
-        merchant: data.merchant ?? null,
-        entryType: data.entryType === 'voice' ? 'voice' : 'manual',
-        rawInput: data.rawInput ?? null,
-        parseSource: data.parseSource ?? 'local',
-        confidence: data.confidence ?? null,
-        ...(data.isRecurring !== undefined && { isRecurring: data.isRecurring }),
-        ...(data.recurrenceRule !== undefined && { recurrenceRule: data.recurrenceRule }),
-      });
+      // path of the user's Save tap. If even this fails the entry is truly
+      // lost, so surface it — never let the caller show a success toast (B1).
+      let record;
+      try {
+        record = await localStore.create({
+          type: data.type as Transaction['type'],
+          amount: data.amount,
+          category: data.category,
+          description: data.description,
+          note: data.note,
+          date: data.date,
+          merchant: data.merchant ?? null,
+          entryType: data.entryType === 'voice' ? 'voice' : 'manual',
+          rawInput: data.rawInput ?? null,
+          parseSource: data.parseSource ?? 'local',
+          confidence: data.confidence ?? null,
+          ...(data.isRecurring !== undefined && { isRecurring: data.isRecurring }),
+          ...(data.recurrenceRule !== undefined && { recurrenceRule: data.recurrenceRule }),
+        });
+      } catch (err) {
+        addBreadcrumb('data', `localStore.create failed: ${err}`, 'error');
+        track('transaction_save_failed', {
+          reason: 'local_write',
+          queued: false,
+          type: data.type,
+          category: data.category,
+        });
+        return { ok: false, message: "Couldn't save that entry. Please try again." };
+      }
       setTransactions(await localStore.getAll());
 
       // Habit-loop event — fire BEFORE the network round-trip so a slow or
@@ -373,20 +399,47 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         });
         setTransactions(await localStore.getAll());
         await fetchSummary();
+        return { ok: true, queued: false };
       } catch (err) {
-        // 401 → handleError deals with session expiry. 4xx (validation / auth)
-        // → mark the row failed so the UI shows a failed tag and stops retrying.
-        // Network / 5xx → row stays pending for engine retry; no UI noise yet.
         handleError(err);
-        if (err instanceof ApiError && err.status !== 401 && err.status >= 400 && err.status < 500) {
+        // A 4xx (other than 401 session-expiry) is a permanent rejection — the
+        // server will never accept this row, so the engine won't retry it.
+        // Mark it failed AND tell the caller so the user sees it didn't save
+        // instead of a false success toast (B1 — the silent-swallow bug).
+        if (
+          err instanceof ApiError &&
+          err.status !== 401 &&
+          err.status >= 400 &&
+          err.status < 500
+        ) {
           await localStore.markFailed(
             record.id,
             err.message ?? 'Validation error — tap to retry'
           );
           setTransactions(await localStore.getAll());
+          track('transaction_save_failed', {
+            reason: 'rejected',
+            queued: false,
+            status: err.status,
+            type: data.type,
+            category: data.category,
+          });
+          return {
+            ok: false,
+            message:
+              err.message || "That entry was rejected. Please check it and try again.",
+          };
         }
-        // Do NOT rethrow: the local write succeeded (offline-first contract).
-        // The caller's success-toast is correct — the entry is durably saved.
+        // Network / 5xx / 401 → the row stays pending and the sync engine will
+        // retry it. The entry is durably queued, so the caller may confirm the
+        // save — that's the offline-first contract. Flag it for observability.
+        track('transaction_save_failed', {
+          reason: 'queued_retry',
+          queued: true,
+          status: err instanceof ApiError ? err.status : null,
+          type: data.type,
+        });
+        return { ok: true, queued: true };
       }
     },
     [fetchSummary, handleError]

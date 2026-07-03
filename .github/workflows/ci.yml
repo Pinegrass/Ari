@@ -49,3 +49,18 @@ jobs:
           cache: npm
       - run: npm ci --legacy-peer-deps
       - run: npx expo lint 2>/dev/null || echo "Lint check complete"
+
+  security-audit:
+    name: Dependency Audit
+    runs-on: ubuntu-latest
+    # Non-blocking for now — advisories surface without failing the pipeline.
+    # Drop continue-on-error to enforce once the tree is clean.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci --legacy-peer-deps
+      - run: npm audit --audit-level=high

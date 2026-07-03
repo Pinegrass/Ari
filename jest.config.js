@@ -20,14 +20,15 @@ module.exports = {
     'src/hooks/**/*.ts',
     '!src/**/*.d.ts',
   ],
-  // Ratchet: set just below current actuals (45/52/38/46 as of 2026-07-03)
-  // to catch regressions. Raise these as coverage grows — never lower them.
+  // Ratchet: set just below current actuals (46.3/52.5/38.0/47.5 as of
+  // 2026-07-03, Sprint 0) to catch regressions. Raise these as coverage grows
+  // — never lower them.
   coverageThreshold: {
     global: {
-      branches: 50,
-      functions: 36,
-      lines: 43,
-      statements: 42,
+      branches: 52,
+      functions: 37,
+      lines: 47,
+      statements: 46,
     },
   },
 };

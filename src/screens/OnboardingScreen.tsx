@@ -9,7 +9,6 @@ import {
   StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { color, font } from '../theme/tokens';
 import Icon from '../components/ui/Icon';
 import type { IconName } from '../components/ui/Icon';
@@ -17,30 +16,26 @@ import { track } from '../lib/analytics';
 
 const { width } = Dimensions.get('window');
 
-const SLIDES: { icon: IconName; title: string; desc: string; gradient: readonly [string, string] }[] = [
+const SLIDES: { icon: IconName; title: string; desc: string }[] = [
   {
     icon: 'bar-chart',
     title: 'Track Every Rupee',
     desc: 'Add expenses in seconds with auto-categorization.\nSwiggy? Food. Uber? Transport. We get it.',
-    gradient: ['#0D2B2B', '#0A1A2A'],
   },
   {
     icon: 'bot',
     title: 'Meet Tomo, Your AI Coach',
     desc: 'Ask anything about your finances.\nTomo gives personalized advice based on your spending habits.',
-    gradient: ['#1A0D2B', '#0A1A2A'],
   },
   {
     icon: 'target',
     title: 'Budget Like a Pro',
     desc: 'Set spending limits per category.\nGet alerts before you overspend. Build habits that stick.',
-    gradient: ['#0D1A2B', '#0A1A2A'],
   },
   {
     icon: 'lightbulb',
     title: 'Smart Insights',
     desc: 'Get personalized nudges and monthly insights.\nAri learns your patterns and helps you improve.',
-    gradient: ['#0D2B1A', '#0A1A2A'],
   },
 ];
 
@@ -106,10 +101,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
   };
 
   return (
-    <LinearGradient
-      colors={[SLIDES[currentIndex].gradient[0], SLIDES[currentIndex].gradient[1], '#0A0A0A']}
-      style={styles.gradient}
-    >
+    <View style={styles.screen}>
       <SafeAreaView style={styles.safe}>
         {/* Skip button */}
         <TouchableOpacity style={styles.skipBtn} onPress={onComplete} accessibilityLabel="Skip onboarding" accessibilityRole="button">
@@ -167,12 +159,13 @@ export default function OnboardingScreen({ onComplete }: Props) {
           </TouchableOpacity>
         </View>
       </SafeAreaView>
-    </LinearGradient>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  gradient: { flex: 1 },
+  // Flat cream field — the Forest reskin has no gradients (theme/tokens rule 1).
+  screen: { flex: 1, backgroundColor: color.cream },
   safe: { flex: 1 },
   skipBtn: {
     alignSelf: 'flex-end',
