@@ -21,7 +21,7 @@ jest.mock('../../config/sentry', () => ({
 
 /** Let queued microtasks + a 0ms macrotask drain (async run() has await chains). */
 const drain = async () => {
-  for (let i = 0; i < 5; i++) await new Promise((r) => setImmediate(r));
+  for (let i = 0; i < 5; i++) await new Promise<void>((r) => setTimeout(r, 0));
 };
 
 jest.mock('@react-native-async-storage/async-storage', () => {
@@ -262,12 +262,13 @@ describe('syncEngine.startAutoFlush', () => {
 
   beforeEach(() => {
     removeMock = jest.fn();
-    appStateSpy = jest
-      .spyOn(AppState, 'addEventListener')
-      .mockImplementation((_e: string, cb: (s: string) => void) => {
-        stateHandler = cb;
-        return { remove: removeMock } as never;
-      });
+    appStateSpy = jest.spyOn(AppState, 'addEventListener').mockImplementation(((
+      _e: string,
+      cb: (s: string) => void,
+    ) => {
+      stateHandler = cb;
+      return { remove: removeMock };
+    }) as never);
   });
   afterEach(() => appStateSpy.mockRestore());
 
