@@ -32,7 +32,8 @@ import { DataProvider } from './src/context/DataContext';
 import { PrivacyProvider } from './src/context/PrivacyContext';
 import { ThemeProvider } from './src/context/ThemeContext';
 import RootNavigator from './src/navigation/RootNavigator';
-import { getInitialSharedText, addShareIntentListener } from './src/lib/shareIntentHandler';
+import { useShareIntent } from 'expo-share-intent';
+import { getInitialSharedText, addShareIntentListener, sharedTextFromIntent } from './src/lib/shareIntentHandler';
 import type { RootStackParamList } from './src/navigation/navigationTypes';
 
 const navigationRef = createNavigationContainerRef<RootStackParamList>();
@@ -136,6 +137,14 @@ function App() {
   const backgroundedAtRef = useRef<number | null>(null);
   const appStateRef = useRef<AppStateStatus>(AppState.currentState);
 
+  // Android share-sheet (ACTION_SEND text/plain) delivery. expo-share-intent's
+  // native module surfaces the shared text/url that expo-linking cannot see;
+  // the hook manages cold + warm start. We route it through the same
+  // navigateToShare path as the ari://share deep link below.
+  const { hasShareIntent, shareIntent, resetShareIntent } = useShareIntent({
+    resetOnBackground: true,
+  });
+
   useEffect(() => {
     const sub = AppState.addEventListener('change', (next: AppStateStatus) => {
       const prev = appStateRef.current;
@@ -216,6 +225,15 @@ function App() {
     const sub = addShareIntentListener(navigateToShare);
     return () => sub.remove();
   }, []);
+
+  // Route an incoming Android share-sheet payload to the capture screen, then
+  // clear it so a re-render / resume doesn't replay the same share.
+  useEffect(() => {
+    if (!hasShareIntent) return;
+    const text = sharedTextFromIntent(shareIntent);
+    if (text) navigateToShare(text);
+    resetShareIntent();
+  }, [hasShareIntent, shareIntent, resetShareIntent]);
 
   // Native splash stays up until fonts resolve; brief null avoids a FOUT.
   if (!fontsLoaded) return null;
