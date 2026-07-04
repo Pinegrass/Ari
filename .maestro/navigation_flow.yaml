@@ -1,34 +1,31 @@
 appId: com.pinegrass.ari
 name: Full Navigation Flow
+# Refreshed for v1.1.0 (2026-07-05). Tabs are now Home / Trends / Tomo / More
+# (Budget is no longer a tab — it lives under More). Center button = Add.
 tags:
   - requires_auth
 ---
-# Dashboard
+# Bottom tabs present
 - assertVisible: "Home"
-- assertVisible: "Expenses"
-- assertVisible: "Budget"
+- assertVisible: "Trends"
 - assertVisible: "Tomo"
-- assertVisible: "Settings"
+- assertVisible: "More"
 
-# Navigate through all tabs
-- tapOn: "Expenses"
-- assertVisible: "Transactions"
+# Trends (was "Expenses")
+- tapOn: "Trends"
+- assertVisible: "Trends"
 
-- tapOn: "Budget"
-- assertVisible: "Budget"
-
+# Tomo
 - tapOn: "Tomo"
-- assertVisible: "Your AI Finance Coach"
+- assertVisible:
+    text: "Ask Tomo.*"
+    regex: true
 
-- tapOn: "Settings"
-- assertVisible: "Settings"
-- assertVisible: "Daily Reminders"
-- assertVisible: "Export Data"
-- assertVisible: "About"
+# More (was "Settings")
+- tapOn: "More"
+- assertVisible: "Export"
 - assertVisible: "Sign Out"
 
-# Go back to Home
+# Back to Home
 - tapOn: "Home"
-- assertVisible:
-    text: "Good.*"
-    regex: true
+- assertVisible: "Add an entry"

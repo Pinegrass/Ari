@@ -11,7 +11,8 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "typecheck": "tsc --noEmit --skipLibCheck",
-    "lint": "npx expo lint"
+    "lint": "npx expo lint",
+    "e2e": "maestro test .maestro"
   },
   "dependencies": {
     "@expo-google-fonts/fraunces": "^0.4.1",

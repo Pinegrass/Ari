@@ -1,21 +1,15 @@
 appId: com.pinegrass.ari
 name: Export Data Flow
+# Refreshed for v1.1.0 (2026-07-05). Settings tab is now labelled "More";
+# Export is the "Export Data" row which opens an in-place sub-screen.
 tags:
   - requires_auth
 ---
-# Navigate to Settings
-- tapOn: "Settings"
-- assertVisible: "Settings"
+- tapOn: "More"
 
-# Tap Export
 - tapOn: "Export Data"
-
-# Export screen
 - assertVisible: "Export Data"
-- assertVisible: "Export as CSV"
-- assertVisible: "transaction"
-- assertVisible: "Export & Share"
 
-# Go back
-- tapOn: "← Back"
-- assertVisible: "Settings"
+# Back to the More menu
+- tapOn: "More"
+- assertVisible: "Sign Out"

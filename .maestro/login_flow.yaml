@@ -1,24 +1,25 @@
 appId: com.pinegrass.ari
 name: Login Flow
+# Refreshed for v1.1.0 (2026-07-05). The reskin removed the one-tap demo button
+# (login is now email + password) and changed the tab labels + Dashboard CTA.
 ---
-# Splash screen → Login
-- assertVisible: "Ari"
+- launchApp:
+    clearState: true
+# Splash / value screen
 - assertVisible: "Your Money, Your Future"
 - tapOn: "I already have an account"
 
-# Login screen
+# Login screen — fields matched by their placeholder text
 - assertVisible: "Welcome back!"
-- tapOn: "🎮 Try with demo account"
-
-# Should fill demo credentials
-- assertVisible: "demo@ari.app"
+- tapOn: "you@example.com"
+- inputText: "demo@ari.app"
+- tapOn: "Your password"
+- inputText: "demo123"
+- hideKeyboard
 - tapOn: "Sign In"
 
-# Should navigate to Dashboard
-- assertVisible:
-    text: "Good.*"
-    regex: true
-- assertVisible: "Add Expense"
-- assertVisible: "Add Income"
-- assertVisible: "Budgets"
-- assertVisible: "Ask Tomo"
+# Lands on the Home tab (bottom tabs: Home / Trends / Tomo / More)
+- assertVisible: "Home"
+- assertVisible: "Trends"
+- assertVisible: "Tomo"
+- assertVisible: "Add an entry"
