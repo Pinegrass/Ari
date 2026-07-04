@@ -20,6 +20,8 @@ import { AppState, type AppStateStatus } from 'react-native';
 import { localStore } from './localStore';
 import * as txnApi from '../api/transactions';
 import { ApiError } from '../api/client';
+import { addBreadcrumb, captureError } from '../config/sentry';
+import { track } from './analytics';
 import type { Transaction } from '../types';
 
 const SAFETY_INTERVAL_MS = 60_000;
@@ -120,8 +122,24 @@ export async function flushPending(): Promise<{ changed: boolean }> {
         changed = true;
       } catch (err) {
         const status = err instanceof ApiError ? err.status : 0;
-        await localStore.markFailed(r.id, err instanceof Error ? err.message : 'sync failed');
+        const msg = err instanceof Error ? err.message : 'sync failed';
+        await localStore.markFailed(r.id, msg);
         changed = true; // status flip is a change worth reflecting
+
+        // Telemetry — make silent sync rot visible (B6). Every failure leaves a
+        // breadcrumb + a metric; a row that has now exhausted its retries is a
+        // stuck write (usually a persistent 4xx) and is escalated to Sentry.
+        addBreadcrumb('sync', `flush failed op=${r.op} status=${status}`, 'warning');
+        track('sync_failed', { op: r.op, status });
+        if (r.retryCount + 1 >= GIVE_UP_AFTER) {
+          captureError(new Error(`sync row stuck after ${GIVE_UP_AFTER} tries: ${msg}`), {
+            area: 'sync',
+            op: r.op,
+            status: String(status),
+          });
+          track('sync_stuck', { op: r.op, status });
+        }
+
         if (status >= 400 && status < 500) {
           // Validation error on this row — skip it, keep draining the rest.
           continue;
@@ -145,6 +163,7 @@ export function startAutoFlush(onChange: () => void): () => void {
   let stopped = false;
   let failureStreak = 0;
   let retryTimer: ReturnType<typeof setTimeout> | null = null;
+  let lastDepth = -1;
 
   const run = async () => {
     if (stopped) return;
@@ -162,6 +181,15 @@ export function startAutoFlush(onChange: () => void): () => void {
     const remaining = (await localStore.getPending()).filter(
       (r) => !(r.syncStatus === 'failed' && r.retryCount >= GIVE_UP_AFTER)
     ).length;
+
+    // Queue-depth telemetry (B6). Emit only on change so a healthy idle app
+    // (depth 0) or a stable backlog doesn't spam analytics every 60s tick.
+    if (remaining !== lastDepth) {
+      lastDepth = remaining;
+      addBreadcrumb('sync', `queue depth ${remaining}`);
+      if (remaining > 0) track('sync_queue_depth', { depth: remaining });
+    }
+
     if (remaining > 0) {
       failureStreak = Math.min(failureStreak + 1, 8);
       const base = Math.min(BASE_BACKOFF_MS * 2 ** (failureStreak - 1), MAX_BACKOFF_MS);

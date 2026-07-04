@@ -20,16 +20,16 @@ module.exports = {
     'src/hooks/**/*.ts',
     '!src/**/*.d.ts',
   ],
-  // Ratchet: set just below current actuals (50.6/54.0/44.9/52.0 stmts/branch/
-  // funcs/lines as of 2026-07-04, Sprint 3 — bill reminders added billSchedule +
-  // bills unit suites) to catch regressions. Raise these as coverage grows —
-  // never lower them.
+  // Ratchet: set just below current actuals (56.4/58.5/50.2/57.8 stmts/branch/
+  // funcs/lines as of 2026-07-04, Sprint 4 — SSL pinning, UPI builder,
+  // upcoming-charges, and syncEngine hardening added unit suites). Raise these
+  // as coverage grows — never lower them.
   coverageThreshold: {
     global: {
-      branches: 53,
-      functions: 44,
-      lines: 51,
-      statements: 50,
+      branches: 58,
+      functions: 50,
+      lines: 57,
+      statements: 56,
     },
   },
 };
