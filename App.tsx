@@ -29,6 +29,7 @@ import UpdateToast from './src/components/UpdateToast';
 import { AuthProvider } from './src/context/AuthContext';
 import { DataProvider } from './src/context/DataContext';
 import { PrivacyProvider } from './src/context/PrivacyContext';
+import { ThemeProvider } from './src/context/ThemeContext';
 import RootNavigator from './src/navigation/RootNavigator';
 import { getInitialSharedText, addShareIntentListener } from './src/lib/shareIntentHandler';
 import type { RootStackParamList } from './src/navigation/navigationTypes';
@@ -228,15 +229,17 @@ function App() {
               }
             }}
           >
-            <AuthProvider>
-              <DataProvider>
-                <PrivacyProvider>
-                  <StatusBar style="dark" />
-                  <RootNavigator />
-                  <UpdateToast />
-                </PrivacyProvider>
-              </DataProvider>
-            </AuthProvider>
+            <ThemeProvider>
+              <AuthProvider>
+                <DataProvider>
+                  <PrivacyProvider>
+                    <StatusBar style="dark" />
+                    <RootNavigator />
+                    <UpdateToast />
+                  </PrivacyProvider>
+                </DataProvider>
+              </AuthProvider>
+            </ThemeProvider>
           </NavigationContainer>
         </SafeAreaProvider>
       </ErrorBoundary>
