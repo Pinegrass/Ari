@@ -182,7 +182,8 @@ export type AnalyticsEvent =
   | 'ota_update_available'
   | 'ota_update_staged'
   | 'ota_check_failed'
-  | 'ota_update_applied';
+  | 'ota_update_applied'
+  | 'ssl_pin_validation_failed';
 
 export function track(event: AnalyticsEvent, props: Record<string, unknown> = {}): void {
   if (!client || _privacyOptOut) return;

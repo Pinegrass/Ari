@@ -20,6 +20,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Sentry from '@sentry/react-native';
 import { initSentry } from './src/config/sentry';
+import { initSslPinning } from './src/lib/sslPinning';
 import * as Notifications from 'expo-notifications';
 import { initAnalytics, track } from './src/lib/analytics';
 import { checkAndApplyUpdate, registerOtaReloadHandler } from './src/lib/otaUpdates';
@@ -91,6 +92,13 @@ function navigateToShare(text: string) {
 // `app_opened` here represents a true cold start (process boot). Warm
 // foregrounding is tracked separately via the AppState listener below.
 initSentry();
+
+// Enable certificate pinning as early as possible so the OkHttp/URLSession
+// interceptor is installed before the first Supabase/API call. Fire-and-forget:
+// initSslPinning never throws (fail-open) and the pinned hosts aren't contacted
+// until after React mounts + the user acts. See docs/ssl-pinning-runbook.md.
+initSslPinning();
+
 initAnalytics().then(() => track('app_opened', { source: 'cold' }));
 
 // Fire-and-forget OTA check on cold start. Never blocks the splash: if a newer

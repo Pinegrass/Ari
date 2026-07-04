@@ -31,6 +31,17 @@ jest.mock('expo-linear-gradient', () => ({
   LinearGradient: 'LinearGradient',
 }));
 
+// Native SSL pinning module — absent in Jest (no native runtime). Default to
+// "available" so initSslPinning() exercises the happy path; individual tests
+// override as needed.
+jest.mock('react-native-ssl-public-key-pinning', () => ({
+  __esModule: true,
+  isSslPinningAvailable: jest.fn().mockReturnValue(true),
+  initializeSslPinning: jest.fn().mockResolvedValue(undefined),
+  disableSslPinning: jest.fn().mockResolvedValue(undefined),
+  addSslPinningErrorListener: jest.fn(() => ({ remove: jest.fn() })),
+}));
+
 jest.mock('@react-native-async-storage/async-storage', () => ({
   __esModule: true,
   default: {
