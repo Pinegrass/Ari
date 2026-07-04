@@ -20,6 +20,7 @@ import TransactionItem from '../components/TransactionItem';
 import ThisMonthSummary from '../components/dashboard/ThisMonthSummary';
 import MonthSpendChart from '../components/dashboard/MonthSpendChart';
 import CategoryBreakdown from '../components/dashboard/CategoryBreakdown';
+import UpcomingBillsCard from '../components/dashboard/UpcomingBillsCard';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import EmptyState from '../components/ui/EmptyState';
 import AnimatedEntry from '../components/ui/AnimatedEntry';
@@ -158,6 +159,10 @@ export default function DashboardScreen() {
 
         <AnimatedEntry delay={380}>
           <CategoryBreakdown categories={summary?.categories ?? {}} />
+        </AnimatedEntry>
+
+        <AnimatedEntry delay={410}>
+          <UpcomingBillsCard />
         </AnimatedEntry>
 
         <AnimatedEntry delay={440}>

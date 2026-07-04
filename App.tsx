@@ -20,8 +20,10 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Sentry from '@sentry/react-native';
 import { initSentry } from './src/config/sentry';
+import * as Notifications from 'expo-notifications';
 import { initAnalytics, track } from './src/lib/analytics';
 import { checkAndApplyUpdate, registerOtaReloadHandler } from './src/lib/otaUpdates';
+import { reconcileBillReminders, type BillNotificationData } from './src/lib/bills';
 import ErrorBoundary from './src/components/ErrorBoundary';
 import UpdateToast from './src/components/UpdateToast';
 import { AuthProvider } from './src/context/AuthContext';
@@ -35,6 +37,35 @@ const navigationRef = createNavigationContainerRef<RootStackParamList>();
 
 // Pending share text buffered before the navigator is ready. Drained in onReady.
 let _pendingShareText: string | null = null;
+// Pending bill-reminder tap buffered before the navigator is ready.
+let _pendingBillPrefill: BillNotificationData | null = null;
+
+/** A bill reminder was tapped — open fast entry with the bill prefilled. */
+function navigateToBillEntry(data: BillNotificationData) {
+  if (!navigationRef.isReady()) {
+    _pendingBillPrefill = data;
+    return;
+  }
+  try {
+    (navigationRef as any).navigate('Main', {
+      screen: 'AddTransaction',
+      params: {
+        type: 'expense',
+        prefill: { amount: data.amount, description: data.name, category: data.category },
+      },
+    });
+    track('bill_reminder_opened', {});
+  } catch {
+    // Navigator on Auth (logged out) — drop silently.
+  }
+}
+
+/** Pull a bill payload out of a notification response, or null if it isn't one. */
+function billDataFromResponse(response: Notifications.NotificationResponse | null): BillNotificationData | null {
+  const data = response?.notification?.request?.content?.data as { type?: string } | undefined;
+  if (data && data.type === 'bill_reminder') return data as unknown as BillNotificationData;
+  return null;
+}
 
 function navigateToShare(text: string) {
   if (!navigationRef.isReady()) {
@@ -66,6 +97,11 @@ initAnalytics().then(() => track('app_opened', { source: 'cold' }));
 // is next backgrounded (see registerOtaReloadHandler) or on the next cold
 // launch. All failures are silent no-ops.
 checkAndApplyUpdate();
+
+// Re-derive bill/EMI reminders from persisted bills on every cold start. Local
+// notifications don't survive a reinstall or an OS purge, so reconciling here
+// (idempotent: cancel-then-reschedule) is what makes reminders durable.
+reconcileBillReminders();
 
 function App() {
   // Forest-on-cream design system uses Fraunces (display) + Inter (body).
@@ -117,6 +153,10 @@ function App() {
         track('app_foregrounded', {
           background_duration_sec: backgroundDurationSec,
         });
+        // Reconcile bill reminders on resume too, so a monthly bill whose
+        // occurrence just fired gets its next month scheduled without waiting
+        // for a cold start.
+        reconcileBillReminders();
       }
 
       // active → background : measure session length. iOS fires 'inactive'
@@ -139,6 +179,21 @@ function App() {
   // Apply a staged OTA update when the app goes to background, so an active
   // user is never interrupted mid-session by a reload.
   useEffect(() => registerOtaReloadHandler(), []);
+
+  // Bill reminders: when the user taps a reminder, open fast entry prefilled.
+  // Cold-start taps (app launched by the notification) are read once; warm taps
+  // come through the response listener.
+  useEffect(() => {
+    Notifications.getLastNotificationResponseAsync().then((response) => {
+      const data = billDataFromResponse(response);
+      if (data) navigateToBillEntry(data);
+    });
+    const sub = Notifications.addNotificationResponseReceivedListener((response) => {
+      const data = billDataFromResponse(response);
+      if (data) navigateToBillEntry(data);
+    });
+    return () => sub.remove();
+  }, []);
 
   // Share-intent: receive text/plain shared from other apps (e.g. bank SMS).
   // Cold-start: the initial URL is checked once after mount.
@@ -166,6 +221,10 @@ function App() {
               if (_pendingShareText) {
                 navigateToShare(_pendingShareText);
                 _pendingShareText = null;
+              }
+              if (_pendingBillPrefill) {
+                navigateToBillEntry(_pendingBillPrefill);
+                _pendingBillPrefill = null;
               }
             }}
           >

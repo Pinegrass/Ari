@@ -7,8 +7,13 @@
 
 ---
 
-## 1. PRODUCT GAP: Edit transaction feature
+## 1. PRODUCT GAP: Edit transaction feature — ✅ SHIPPED
 
+- **Status (updated 2026-07-04, Sprint 3):** DONE. `PUT /transactions/:id`
+  (`backend/routes/transactions.py:219`), `updateTransaction` in
+  `src/api/transactions.ts` + `src/context/DataContext.tsx`, `AddTransactionScreen`
+  edit mode, and row-tap edit affordances on Dashboard + Transactions all exist and
+  ship. Backend pytest coverage for the PUT path added in Sprint 3 (Task 4).
 - **Source:** Sprint 1 Phase 3A smoke feedback (codebase audit revealed the feature
   does not exist when the 3A checklist asked to "edit a transaction").
 - **Description:** Users currently must **delete and re-add** to change a saved

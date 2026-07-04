@@ -41,6 +41,13 @@ const MODULES: ModuleItem[] = [
     subtitle: 'Monthly targets with rollover tracking',
   },
   {
+    key: 'Bills',
+    icon: 'bell',
+    iconColor: color.clay,
+    title: 'Bills & reminders',
+    subtitle: 'Rent, EMI & bill due-date reminders',
+  },
+  {
     key: 'SavingsGoals',
     icon: 'flag',
     iconColor: color.forest,

@@ -18,6 +18,7 @@ import SavingsGoalsScreen from '../screens/accountant/SavingsGoalsScreen';
 import TaxEstimatorScreen from '../screens/accountant/TaxEstimatorScreen';
 import PnlReportScreen from '../screens/accountant/PnlReportScreen';
 import TodoNotesScreen from '../screens/TodoNotesScreen';
+import BillsScreen from '../screens/BillsScreen';
 import DailyHeatmapScreen from '../screens/DailyHeatmapScreen';
 import PaywallScreen from '../screens/PaywallScreen';
 import GroupsListScreen from '../screens/GroupsListScreen';
@@ -170,6 +171,7 @@ export default function MainNavigator() {
       <Stack.Screen name="TaxEstimator" component={TaxEstimatorScreen} />
       <Stack.Screen name="PnlReport" component={PnlReportScreen} />
       <Stack.Screen name="TodoNotes" component={TodoNotesScreen} />
+      <Stack.Screen name="Bills" component={BillsScreen} />
       <Stack.Screen name="DailyHeatmap" component={DailyHeatmapScreen} />
       <Stack.Screen
         name="Paywall"
