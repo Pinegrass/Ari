@@ -2,7 +2,7 @@
 
 **Objective:** Ship the v1.1.0 native build: everything that cannot go OTA — SSL pinning, widgets, share-import GA — plus accessibility, e2e coverage, sync hardening, and a staging gate for the backend. Exit with a Play-ready AAB and a re-graded scorecard.
 **Parent plan:** `docs/product-excellence-plan-2026-07.md` (§3, Sprint 4).
-**Prerequisite:** Sprint 3 closed. Read its final report/commits first and verify all gates before starting anything.
+**Prerequisite:** Sprint 3 closed (verified 2026-07-04: frontend master `b0c3cff`, backend `e6ed21b`, 303 FE tests + 73 BE pytest, coverage floor now 50/53/44/51). Read the Sprint 3 report and memory (`sprint-3-feel-the-speed`, `backend-pytest-sqlite-harness`) before starting.
 
 ---
 
@@ -10,7 +10,7 @@
 
 1. Frontend master: `npm test` / `npm run typecheck` / `npm run lint` green. Read the coverage floor from `jest.config.js` (Sprint 3 may have ratcheted it) — that floor is your baseline; raise it if your work grows actuals, never lower.
 2. Backend: `pytest -q` green. Confirm Railway prod healthy (`/api/health`).
-3. OTA fleet state: `npx eas channel:list` + rollout status. Live Play fleet is v1.0.1 (rtv "1.0.1", appVersion policy). Note which staged rollouts are pending — report to founder if anything is stuck below 100%.
+3. OTA fleet state: `npx eas channel:list` + rollout status. Live Play fleet is v1.0.1 (rtv "1.0.1", appVersion policy). **Known backlog going into this sprint:** the Sprint 0 update (group `47f8ed5c-…`) was still at 20% at Sprint 3 close, and the Sprint 3 OTA was correctly HELD and never published — live users have neither. Resolve with the founder at sprint start: promote Sprint 0 → publish Sprint 3 (pin procedure) → then proceed; don't let the v1.0.1 fleet fall three releases behind the v1.1.0 build.
 4. Read `docs/ota-strategy.md` and the repo rules in `docs/sprint-3-instructions.md` §"Repo rules" — all still apply (origin/main is junk; backend auto-deploys on push; bare gitlink advanced with plain `git add backend` after backend push; no `.gitmodules`).
 
 ## The dual-fleet reality (read before the build)
@@ -48,9 +48,16 @@ Misconfigured pinning = every install bricked for networking until a new native 
 ## Task 4 (D2 + D3) — Recurring surfacing + UPI settle-up
 
 JS work that rides the same release:
-- **D2:** "Upcoming charges" — surface `recurringEngine` projections (next 30 days) as a Dashboard card + a section in Trends; if Sprint 3's bill-reminders card exists, unify rather than duplicate (one "Upcoming" card, two data sources).
+- **D2:** "Upcoming charges" — surface `recurringEngine` projections (next 30 days). Sprint 3 shipped an "Upcoming bills" Dashboard card (bills come from `src/lib/bills.ts`, device-local AsyncStorage): **extend that card to merge both data sources** (bills + recurring projections) rather than adding a second card; add a fuller section in Trends.
 - **D3:** In group balances, a "Settle now" button per member generating a UPI intent deep link (`upi://pay?pa=<vpa>&pn=<name>&am=<amount>&cu=INR`, URL-encoded) using the stored `upi_vpa`. Missing VPA → prompt to request it. Record settlement against the group on return/confirm (existing `/groups/*` settlement endpoints — verify before building new ones).
 - Unit tests: UPI URI builder (encoding, amount formatting) and upcoming-charges projection.
+
+## Task 4b (C4 completion) — Theme migration + dark mode decision
+
+Sprint 3 landed the groundwork honestly: `ThemeContext` + `useColors()` exist, choice persists, but only the Settings tab is migrated and dark mode is gated off (`DARK_ENABLED=false`) because no production dark palette exists.
+
+- Migrate the remaining 4 tab screens (+ AddTransaction modal) to `useColors()` — mechanical tokenization, no visual change in light mode.
+- Draft a dark palette derived from the forest-on-cream system and put it in front of the founder as screenshots (light vs dark side-by-side). **Flipping `DARK_ENABLED` requires founder sign-off on the palette** — if not granted in time, ship the migration and keep the gate closed; that's still a win (theme system done, palette becomes a flag-flip later).
 
 ## Task 5 (C2) — Accessibility pass
 
@@ -61,11 +68,13 @@ JS work that rides the same release:
 
 ## Task 6 (C5) — Maestro e2e suite
 
-- Maestro on Windows drives Android emulator flows. Set up `\.maestro/` with flows: login (demo creds) → add expense → edit it → delete it; budget create; tab navigation smoke; offline add → airplane-mode off → sync verify.
+- `.maestro/` flows EXIST but are stale — they predate the Sprint 2 reskin (selectors like "Add Expense"/"Save Transaction" no longer match). **Refresh them against the current UI on an emulator before writing new ones**; a flow that never ran green is worse than no flow.
+- Target flows: login (demo creds) → add expense → edit it → delete it; budget create; bill create → notification assert if feasible; tab navigation smoke; offline add → airplane-mode off → sync verify.
 - These are the coverage gate for screens (unit gate deliberately excludes them). Wire into CI if emulator-in-CI is feasible quickly; otherwise a documented local `npm run e2e` script is fine for now — don't burn days on CI emulators.
 
 ## Task 7 (B5) — Railway staging gate
 
+- ⚠️ Lesson from Sprint 3: backend code paths default to the `.env` prod `SUPABASE_DATABASE_URL` — the pytest harness had to force-pin SQLite to avoid touching prod. Apply the same paranoia to anything staging-related: verify which DB a process points at before running it.
 - Create a Railway **staging** service/environment deploying the backend's `staging` branch against a separate Supabase project or schema (NEVER prod data). `railway` CLI is linked; if service creation needs the dashboard, prepare everything else and hand the founder a 5-minute checklist.
 - New flow (document in `backend/CLAUDE.md`): feature → commit to `staging` branch → auto-deploy staging → verify → merge/push `master` (prod). Prod pushes stop being the first place code runs.
 - CI: backend workflow runs on both branches.
@@ -93,8 +102,9 @@ JS work that rides the same release:
 - [ ] Android widget on device; data provider unit-tested.
 - [ ] Share-import verified end-to-end on the preview APK.
 - [ ] Upcoming-charges card + UPI settle-up live; URI builder tested.
+- [ ] Theme: all 5 tabs + AddTransaction on `useColors()`; dark palette screenshots delivered to founder (gate flip only on sign-off).
 - [ ] Accessibility checklist complete; TalkBack smoke passed.
-- [ ] Maestro flows runnable via one command; core money paths covered.
+- [ ] Maestro flows refreshed (stale selectors fixed), runnable via one command, verified green on emulator; core money paths covered.
 - [ ] Railway staging gate live (or founder checklist handed over); flow documented.
 - [ ] syncEngine ≥70% lines; conflict policy doc; sync telemetry flowing.
 - [ ] v1.1.0 preview APK device-verified; production AAB built; founder handoff with release notes.
@@ -102,6 +112,9 @@ JS work that rides the same release:
 
 ## Founder decisions surfaced by this sprint
 
-1. Play staged-rollout % and timing for v1.1.0.
-2. iOS/TestFlight: provide macOS or approve EAS iOS build + App Store Connect setup.
-3. Staging Supabase project provisioning (if a new project is needed).
+1. **At sprint start:** clear the OTA queue — promote Sprint 0 (20% → 100%), then publish the held Sprint 3 OTA to the v1.0.1 fleet.
+2. Play staged-rollout % and timing for v1.1.0.
+3. iOS/TestFlight: provide macOS or approve EAS iOS build + App Store Connect setup.
+4. Staging Supabase project provisioning (if a new project is needed).
+5. Dark palette sign-off (Task 4b) — gate flip is your call.
+6. Standing: `EXPO_PUBLIC_POSTHOG_KEY` still unset — the entire Sprint 3 onboarding/bills funnel records nothing until it's set.
