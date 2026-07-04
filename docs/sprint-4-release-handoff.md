@@ -68,10 +68,20 @@ Halt/rollback trigger: any broad `ssl_pin_validation_failed` spike, or crash-fre
 - [ ] **Maestro:** `npm run e2e` on the emulator — fix any selector the run flags,
       then commit the confirmed-green set.
 
-## Build commands (when you're ready)
+## Preview APK — BUILDING (triggered 2026-07-05)
+
+- Build: https://expo.dev/accounts/pinegrass-tech/projects/ari/builds/517cd4d4-ee73-42c6-8e99-31ae7a8f5be1
+- versionCode 8 → **9** (EAS remote). APK link appears on that page when done (~20-30 min).
+- Note: EAS reported **91% of monthly build credits used** — mind the ceiling
+  before the production AAB build.
+- PostHog: `EXPO_PUBLIC_POSTHOG_KEY` **is** present in the EAS preview environment
+  (the build loaded it), so analytics is live in EAS builds — the "unset" note
+  only applies to local dev / OTA published without `--environment`.
+
+## Build commands (for reference / re-runs)
 
 ```bash
-# 1. Preview APK (internal) — for the checklist above. versionCode auto-bumps vc5->vc6.
+# 1. Preview APK (internal) — for the checklist above.
 npx eas build --platform android --profile preview
 
 # 2. After the checklist passes — production AAB for Play.
