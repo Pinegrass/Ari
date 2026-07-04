@@ -64,6 +64,24 @@
         {
           "androidIntentFilters": ["text/*"]
         }
+      ],
+      [
+        "react-native-android-widget",
+        {
+          "widgets": [
+            {
+              "name": "AriSpentToday",
+              "label": "Ari — Spent today",
+              "minWidth": "180dp",
+              "minHeight": "110dp",
+              "targetCellWidth": 2,
+              "targetCellHeight": 1,
+              "description": "Today's spend and this month's budget ring",
+              "previewImage": "./assets/adaptive-icon.png",
+              "updatePeriodMillis": 1800000
+            }
+          ]
+        }
       ]
     ],
     "updates": {

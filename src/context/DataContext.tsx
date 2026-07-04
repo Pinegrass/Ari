@@ -19,6 +19,7 @@ import { useOfflineCache } from '../hooks/useOfflineCache';
 import { localStore } from '../lib/localStore';
 import { flushPending as engineFlush, startAutoFlush } from '../lib/syncEngine';
 import { checkAndGenerateDue } from '../lib/recurringEngine';
+import { refreshAriWidget } from '../widgets/updateWidget';
 import { track, bucketAmount } from '../lib/analytics';
 import { addBreadcrumb } from '../config/sentry';
 import type {
@@ -212,6 +213,12 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     const sub = AppState.addEventListener('change', onAppState);
     return () => sub.remove();
   }, [runRecurringCheck]);
+
+  // Keep the Android home-screen widget (D6) in sync with every change to
+  // spend/budget. Guarded + no-op off Android, so this is safe everywhere.
+  useEffect(() => {
+    void refreshAriWidget(transactions, budgets);
+  }, [transactions, budgets]);
 
   const fetchSummary = useCallback(async () => {
     try {

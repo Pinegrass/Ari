@@ -1,6 +1,7 @@
 import 'react-native-gesture-handler';
 import React, { useEffect, useRef } from 'react';
 import { AppState, type AppStateStatus } from 'react-native';
+import * as Linking from 'expo-linking';
 import { StatusBar } from 'expo-status-bar';
 import {
   useFonts,
@@ -68,6 +69,23 @@ function billDataFromResponse(response: Notifications.NotificationResponse | nul
   const data = response?.notification?.request?.content?.data as { type?: string } | undefined;
   if (data && data.type === 'bill_reminder') return data as unknown as BillNotificationData;
   return null;
+}
+
+/** Widget tap (ari://add) — open fast entry. Buffered until the nav is ready. */
+let _pendingOpenAdd = false;
+function navigateToAdd() {
+  if (!navigationRef.isReady()) {
+    _pendingOpenAdd = true;
+    return;
+  }
+  try {
+    (navigationRef as any).navigate('Main', {
+      screen: 'AddTransaction',
+      params: { type: 'expense' },
+    });
+  } catch {
+    // Navigator on Auth (logged out) — drop silently.
+  }
 }
 
 function navigateToShare(text: string) {
@@ -235,6 +253,16 @@ function App() {
     resetShareIntent();
   }, [hasShareIntent, shareIntent, resetShareIntent]);
 
+  // Widget deep link: ari://add (home-screen widget tap) opens fast entry.
+  useEffect(() => {
+    const handle = (url: string | null) => {
+      if (url && url.startsWith('ari://add')) navigateToAdd();
+    };
+    Linking.getInitialURL().then(handle).catch(() => {});
+    const sub = Linking.addEventListener('url', ({ url }) => handle(url));
+    return () => sub.remove();
+  }, []);
+
   // Native splash stays up until fonts resolve; brief null avoids a FOUT.
   if (!fontsLoaded) return null;
 
@@ -252,6 +280,10 @@ function App() {
               if (_pendingBillPrefill) {
                 navigateToBillEntry(_pendingBillPrefill);
                 _pendingBillPrefill = null;
+              }
+              if (_pendingOpenAdd) {
+                navigateToAdd();
+                _pendingOpenAdd = false;
               }
             }}
           >
