@@ -20,15 +20,16 @@ module.exports = {
     'src/hooks/**/*.ts',
     '!src/**/*.d.ts',
   ],
-  // Ratchet: set just below current actuals (46.3/52.5/38.0/47.5 as of
-  // 2026-07-03, Sprint 0) to catch regressions. Raise these as coverage grows
-  // — never lower them.
+  // Ratchet: set just below current actuals (50.6/54.0/44.9/52.0 stmts/branch/
+  // funcs/lines as of 2026-07-04, Sprint 3 — bill reminders added billSchedule +
+  // bills unit suites) to catch regressions. Raise these as coverage grows —
+  // never lower them.
   coverageThreshold: {
     global: {
-      branches: 52,
-      functions: 37,
-      lines: 47,
-      statements: 46,
+      branches: 53,
+      functions: 44,
+      lines: 51,
+      statements: 50,
     },
   },
 };
