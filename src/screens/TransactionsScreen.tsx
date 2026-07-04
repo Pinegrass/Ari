@@ -25,7 +25,9 @@ import TrendLineChart from '../components/trends/TrendLineChart';
 import UpcomingChargesSection from '../components/trends/UpcomingChargesSection';
 import CategoryComparison from '../components/trends/CategoryComparison';
 import InsightCard from '../components/trends/InsightCard';
-import { color, font, type as ftype } from '../theme/tokens';
+import { font, type as ftype } from '../theme/tokens';
+import { useColors } from '../context/ThemeContext';
+import type { Palette } from '../theme/palettes';
 import { groupTransactionsByDate } from '../utils/dateHelpers';
 import { usePrivacy } from '../context/PrivacyContext';
 import { useHaptics } from '../hooks/useHaptics';
@@ -49,6 +51,8 @@ const PERIODS: { value: PeriodType; label: string }[] = [
 
 export default function TransactionsScreen() {
   const navigation = useNavigation<Nav>();
+  const c = useColors();
+  const styles = useMemo(() => makeStyles(c), [c]);
   const {
     transactions,
     summary,
@@ -175,8 +179,8 @@ export default function TransactionsScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={refresh}
-            tintColor={color.forest}
-            colors={[color.forest]}
+            tintColor={c.forest}
+            colors={[c.forest]}
           />
         }
         ListHeaderComponent={
@@ -261,14 +265,14 @@ export default function TransactionsScreen() {
             {/* Search */}
             <AnimatedEntry delay={240}>
               <View style={styles.searchRow}>
-                <Icon name="search" size={16} color={color.inkFaint} />
+                <Icon name="search" size={16} color={c.inkFaint} />
                 <TextInput
                   style={styles.searchInput}
                   placeholder="Search transactions..."
-                  placeholderTextColor={color.inkFaint}
+                  placeholderTextColor={c.inkFaint}
                   value={search}
                   onChangeText={setSearch}
-                  selectionColor={color.forest}
+                  selectionColor={c.forest}
                   accessibilityLabel="Search transactions"
                 />
                 {search.length > 0 && (
@@ -277,7 +281,7 @@ export default function TransactionsScreen() {
                     accessibilityLabel="Clear search"
                     accessibilityRole="button"
                   >
-                    <Icon name="x" size={18} color={color.inkSoft} />
+                    <Icon name="x" size={18} color={c.inkSoft} />
                   </TouchableOpacity>
                 )}
               </View>
@@ -356,13 +360,13 @@ export default function TransactionsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: color.cream },
+const makeStyles = (c: Palette) => StyleSheet.create({
+  safe: { flex: 1, backgroundColor: c.cream },
   listContent: { paddingHorizontal: 20 },
   screenTitle: {
     fontFamily: font.displayBold,
     fontSize: 26,
-    color: color.ink,
+    color: c.ink,
     marginTop: 8,
     marginBottom: 16,
   },
@@ -375,13 +379,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: color.cream2,
+    backgroundColor: c.cream2,
     borderWidth: 1,
-    borderColor: color.line,
+    borderColor: c.line,
   },
-  periodBtnActive: { backgroundColor: color.forest, borderColor: color.forest },
-  periodText: { fontFamily: font.bodyMed, fontSize: 12, color: color.inkSoft },
-  periodTextActive: { color: color.cream, fontFamily: font.bodySemi },
+  periodBtnActive: { backgroundColor: c.forest, borderColor: c.forest },
+  periodText: { fontFamily: font.bodyMed, fontSize: 12, color: c.inkSoft },
+  periodTextActive: { color: c.cream, fontFamily: font.bodySemi },
   summaryGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -394,50 +398,50 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: color.line,
-    backgroundColor: color.card,
+    borderColor: c.line,
+    backgroundColor: c.card,
   },
-  summaryLabel: { fontFamily: font.body, fontSize: 11, color: color.inkSoft, marginBottom: 4 },
-  summaryAmount: { fontFamily: font.displaySemi, fontSize: 18, color: color.ink },
-  incomeText: { color: color.forest2 },
-  expenseText: { color: color.clay },
+  summaryLabel: { fontFamily: font.body, fontSize: 11, color: c.inkSoft, marginBottom: 4 },
+  summaryAmount: { fontFamily: font.displaySemi, fontSize: 18, color: c.ink },
+  incomeText: { color: c.forest2 },
+  expenseText: { color: c.clay },
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: color.cream2,
+    backgroundColor: c.cream2,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: color.line,
+    borderColor: c.line,
     paddingHorizontal: 12,
     marginBottom: 12,
     marginTop: 8,
     gap: 8,
   },
   searchIcon: { fontSize: 16 },
-  searchInput: { flex: 1, paddingVertical: 12, fontFamily: font.body, fontSize: ftype.body, color: color.ink },
+  searchInput: { flex: 1, paddingVertical: 12, fontFamily: font.body, fontSize: ftype.body, color: c.ink },
   filters: { flexDirection: 'row', gap: 8, marginBottom: 20 },
   filterBtn: {
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: color.cream2,
+    backgroundColor: c.cream2,
     borderWidth: 1,
-    borderColor: color.line,
+    borderColor: c.line,
   },
-  filterBtnActive: { backgroundColor: color.forest, borderColor: color.forest },
-  filterText: { fontFamily: font.bodyMed, fontSize: 13, color: color.inkSoft },
-  filterTextActive: { color: color.cream, fontFamily: font.bodySemi },
+  filterBtnActive: { backgroundColor: c.forest, borderColor: c.forest },
+  filterText: { fontFamily: font.bodyMed, fontSize: 13, color: c.inkSoft },
+  filterTextActive: { color: c.cream, fontFamily: font.bodySemi },
   listHeading: {
     fontFamily: font.displaySemi,
     fontSize: ftype.sectionHead,
-    color: color.forestDeep,
+    color: c.forestDeep,
     marginTop: 8,
     marginBottom: 10,
   },
   dateHeader: {
     fontFamily: font.bodySemi,
     fontSize: 11,
-    color: color.inkFaint,
+    color: c.inkFaint,
     letterSpacing: 0.8,
     marginBottom: 8,
     marginTop: 4,

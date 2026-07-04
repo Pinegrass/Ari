@@ -24,7 +24,9 @@ import UpcomingBillsCard from '../components/dashboard/UpcomingBillsCard';
 import { SkeletonList } from '../components/ui/Skeleton';
 import EmptyState from '../components/ui/EmptyState';
 import AnimatedEntry from '../components/ui/AnimatedEntry';
-import { color, font, type } from '../theme/tokens';
+import { font, type } from '../theme/tokens';
+import { useColors } from '../context/ThemeContext';
+import type { Palette } from '../theme/palettes';
 import { todayISO } from '../utils/dateHelpers';
 import { useHaptics } from '../hooks/useHaptics';
 import type { TabParamList, MainStackParamList } from '../navigation/navigationTypes';
@@ -54,6 +56,8 @@ export default function DashboardScreen() {
   const insets = useSafeAreaInsets();
   const { transactions, summary, dailyData, loadingData, refreshing, fetchAll, refresh } = useData();
   const haptics = useHaptics();
+  const c = useColors();
+  const styles = useMemo(() => makeStyles(c), [c]);
 
   useFocusEffect(
     useCallback(() => {
@@ -106,8 +110,8 @@ export default function DashboardScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={refresh}
-            tintColor={color.forest}
-            colors={[color.forest]}
+            tintColor={c.forest}
+            colors={[c.forest]}
           />
         }
       >
@@ -216,29 +220,29 @@ export default function DashboardScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: color.cream },
+const makeStyles = (c: Palette) => StyleSheet.create({
+  safe: { flex: 1, backgroundColor: c.cream },
   container: { paddingHorizontal: 22, paddingTop: 8 },
   eyebrow: {
     fontFamily: font.bodyBold,
     fontSize: type.eyebrow,
     letterSpacing: 1.8,
     textTransform: 'uppercase',
-    color: color.moss,
+    color: c.moss,
   },
   greet: {
     fontFamily: font.display,
     fontSize: type.greeting,
     letterSpacing: -0.3,
     marginTop: 5,
-    color: color.forestDeep,
+    color: c.forestDeep,
   },
   addCta: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 12,
-    backgroundColor: color.forest2,
+    backgroundColor: c.forest2,
     borderRadius: 20,
     paddingVertical: 19,
   },
@@ -255,12 +259,12 @@ const styles = StyleSheet.create({
     fontFamily: font.body,
     fontSize: 16,
     lineHeight: 19,
-    color: color.cream,
+    color: c.cream,
   },
   addCtaText: {
     fontFamily: font.bodySemi,
     fontSize: type.screenTitle,
-    color: color.cream,
+    color: c.cream,
   },
   secHead: {
     flexDirection: 'row',
@@ -273,11 +277,11 @@ const styles = StyleSheet.create({
   secTitle: {
     fontFamily: font.displaySemi,
     fontSize: type.sectionHead,
-    color: color.forestDeep,
+    color: c.forestDeep,
   },
   seeAll: {
     fontFamily: font.bodySemi,
     fontSize: 12.5,
-    color: color.moss,
+    color: c.moss,
   },
 });

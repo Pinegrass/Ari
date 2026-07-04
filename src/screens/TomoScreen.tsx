@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -15,7 +15,9 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useData } from '../context/DataContext';
 import ChatBubble from '../components/ChatBubble';
 import Icon from '../components/ui/Icon';
-import { color, font } from '../theme/tokens';
+import { font } from '../theme/tokens';
+import { useColors } from '../context/ThemeContext';
+import type { Palette } from '../theme/palettes';
 import { useHaptics } from '../hooks/useHaptics';
 
 const QUICK_PROMPTS = [
@@ -28,6 +30,8 @@ const QUICK_PROMPTS = [
 ];
 
 function TypingIndicator() {
+  const c = useColors();
+  const typing = useMemo(() => makeTyping(c), [c]);
   const dot1 = useRef(new Animated.Value(0)).current;
   const dot2 = useRef(new Animated.Value(0)).current;
   const dot3 = useRef(new Animated.Value(0)).current;
@@ -52,7 +56,7 @@ function TypingIndicator() {
 
   return (
     <View style={typing.row}>
-      <View style={typing.avatar}><Icon name="bot" size={16} color={color.forest} /></View>
+      <View style={typing.avatar}><Icon name="bot" size={16} color={c.forest} /></View>
       <View style={typing.bubble}>
         {[dot1, dot2, dot3].map((dot, i) => (
           <Animated.View
@@ -65,25 +69,27 @@ function TypingIndicator() {
   );
 }
 
-const typing = StyleSheet.create({
+const makeTyping = (c: Palette) => StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'flex-end', marginBottom: 12, paddingHorizontal: 16, gap: 8 },
   avatar: {
     width: 32, height: 32, borderRadius: 16,
-    backgroundColor: color.cream2, alignItems: 'center', justifyContent: 'center',
-    borderWidth: 1, borderColor: color.line,
+    backgroundColor: c.cream2, alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1, borderColor: c.line,
   },
   bubble: {
     flexDirection: 'row', gap: 4,
-    backgroundColor: color.card, borderRadius: 18, borderBottomLeftRadius: 4,
+    backgroundColor: c.card, borderRadius: 18, borderBottomLeftRadius: 4,
     paddingHorizontal: 16, paddingVertical: 14,
-    borderWidth: 1, borderColor: color.line, alignItems: 'center',
+    borderWidth: 1, borderColor: c.line, alignItems: 'center',
   },
-  dot: { width: 7, height: 7, borderRadius: 3.5, backgroundColor: color.inkSoft },
+  dot: { width: 7, height: 7, borderRadius: 3.5, backgroundColor: c.inkSoft },
 });
 
 export default function TomoScreen() {
   const { chatHistory, tomoLoading, askTomo, clearChat } = useData();
   const haptics = useHaptics();
+  const c = useColors();
+  const styles = useMemo(() => makeStyles(c), [c]);
   const listRef = useRef<FlatList>(null);
   const [input, setInput] = useState('');
 
@@ -115,7 +121,7 @@ export default function TomoScreen() {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <View style={styles.avatarBox}><Icon name="bot" size={22} color={color.forest} /></View>
+            <View style={styles.avatarBox}><Icon name="bot" size={22} color={c.forest} /></View>
             <View>
               <Text style={styles.headerName}>Tomo</Text>
               <Text style={styles.headerSub}>Your AI Finance Coach</Text>
@@ -171,10 +177,10 @@ export default function TomoScreen() {
             value={input}
             onChangeText={setInput}
             placeholder="Ask Tomo anything..."
-            placeholderTextColor={color.inkFaint}
+            placeholderTextColor={c.inkFaint}
             returnKeyType="send"
             onSubmitEditing={() => handleSend()}
-            selectionColor={color.forest}
+            selectionColor={c.forest}
             multiline
           />
           <TouchableOpacity
@@ -185,7 +191,7 @@ export default function TomoScreen() {
             accessibilityRole="button"
             accessibilityLabel="Send message"
           >
-            <Icon name="send" size={18} color={color.cream} />
+            <Icon name="send" size={18} color={c.cream} />
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -193,48 +199,48 @@ export default function TomoScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: color.cream },
+const makeStyles = (c: Palette) => StyleSheet.create({
+  safe: { flex: 1, backgroundColor: c.cream },
   header: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     paddingHorizontal: 20, paddingVertical: 12,
-    borderBottomWidth: 1, borderColor: color.line,
-    backgroundColor: color.card,
+    borderBottomWidth: 1, borderColor: c.line,
+    backgroundColor: c.card,
   },
   headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   avatarBox: {
     width: 44, height: 44, borderRadius: 22,
-    backgroundColor: color.cream2, alignItems: 'center', justifyContent: 'center',
-    borderWidth: 1, borderColor: color.line,
+    backgroundColor: c.cream2, alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1, borderColor: c.line,
   },
-  headerName: { fontFamily: font.bodySemi, fontSize: 16, color: color.ink },
-  headerSub: { fontFamily: font.body, fontSize: 12, color: color.inkSoft },
+  headerName: { fontFamily: font.bodySemi, fontSize: 16, color: c.ink },
+  headerSub: { fontFamily: font.body, fontSize: 12, color: c.inkSoft },
   clearBtn: { paddingHorizontal: 12, paddingVertical: 6 },
-  clearText: { fontFamily: font.body, fontSize: 14, color: color.inkFaint },
+  clearText: { fontFamily: font.body, fontSize: 14, color: c.inkFaint },
   listContent: { paddingTop: 16, paddingBottom: 16 },
   prompts: { paddingHorizontal: 16, gap: 8, marginTop: 16 },
-  promptsLabel: { fontFamily: font.bodySemi, fontSize: 12, color: color.inkFaint, marginBottom: 4 },
+  promptsLabel: { fontFamily: font.bodySemi, fontSize: 12, color: c.inkFaint, marginBottom: 4 },
   promptBtn: {
-    backgroundColor: color.card, borderRadius: 20,
-    borderWidth: 1, borderColor: color.line,
+    backgroundColor: c.card, borderRadius: 20,
+    borderWidth: 1, borderColor: c.line,
     paddingHorizontal: 16, paddingVertical: 10,
   },
-  promptText: { fontFamily: font.body, fontSize: 13, color: color.inkSoft },
+  promptText: { fontFamily: font.body, fontSize: 13, color: c.inkSoft },
   inputBar: {
     flexDirection: 'row', alignItems: 'flex-end', gap: 8,
     paddingHorizontal: 16, paddingVertical: 12,
-    borderTopWidth: 1, borderColor: color.line,
-    backgroundColor: color.card,
+    borderTopWidth: 1, borderColor: c.line,
+    backgroundColor: c.card,
   },
   input: {
-    flex: 1, backgroundColor: color.cream2,
+    flex: 1, backgroundColor: c.cream2,
     borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10,
-    fontFamily: font.body, fontSize: 14, color: color.ink, maxHeight: 100,
-    borderWidth: 1, borderColor: color.line,
+    fontFamily: font.body, fontSize: 14, color: c.ink, maxHeight: 100,
+    borderWidth: 1, borderColor: c.line,
   },
   sendBtn: {
     width: 44, height: 44, borderRadius: 22,
-    backgroundColor: color.forest, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: c.forest, alignItems: 'center', justifyContent: 'center',
   },
-  sendBtnDisabled: { backgroundColor: color.line },
+  sendBtnDisabled: { backgroundColor: c.line },
 });

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -21,7 +21,9 @@ import { useData } from '../context/DataContext';
 import { ApiError } from '../api/client';
 import CategoryPicker from '../components/CategoryPicker';
 import Icon from '../components/ui/Icon';
-import { color, font, type as ftype } from '../theme/tokens';
+import { font, type as ftype } from '../theme/tokens';
+import { useColors } from '../context/ThemeContext';
+import type { Palette } from '../theme/palettes';
 import { getCategoryDef } from '../constants/categories';
 import { autoDetectCategory } from '../utils/autoDetectCategory';
 import { parseMerchant } from '../utils/merchantParser';
@@ -58,6 +60,8 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
 
   const { addTransaction, updateTransaction, userCategories, fetchUserCategories } = useData();
   const haptics = useHaptics();
+  const c = useColors();
+  const styles = useMemo(() => makeStyles(c), [c]);
 
   useEffect(() => {
     if (userCategories.length === 0) fetchUserCategories();
@@ -353,7 +357,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
           {type === 'expense' ? 'Amount spent' : 'Amount received'}
         </Text>
         <View style={styles.amountRow}>
-          <Text style={[styles.amountValue, type === 'income' && { color: color.forest2 }]}>
+          <Text style={[styles.amountValue, type === 'income' && { color: c.forest2 }]}>
             <Text style={styles.rupee}>₹</Text>
             {displayAmount}
           </Text>
@@ -412,8 +416,8 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
             <Switch
               value={isRecurring}
               onValueChange={(v) => { haptics.light(); setIsRecurring(v); }}
-              trackColor={{ false: color.line, true: color.forest2 }}
-              thumbColor={color.cream}
+              trackColor={{ false: c.line, true: c.forest2 }}
+              thumbColor={c.cream}
               accessibilityLabel="Repeat this transaction"
             />
           </View>
@@ -510,7 +514,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
                       handleDescriptionChange(t);
                     }}
                     placeholder={voice.isListening ? 'Listening…' : 'e.g. groceries, auto, electricity'}
-                    placeholderTextColor={color.inkFaint}
+                    placeholderTextColor={c.inkFaint}
                     autoFocus
                     editable={!voice.isListening}
                     returnKeyType="next"
@@ -529,7 +533,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
                       <Icon
                         name={voice.isListening ? 'mic-off' : 'mic'}
                         size={18}
-                        color={voice.isListening ? color.card : color.forest}
+                        color={voice.isListening ? c.card : c.forest}
                       />
                     </TouchableOpacity>
                   )}
@@ -540,7 +544,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
                   value={note}
                   onChangeText={setNote}
                   placeholder="Extra note (optional)"
-                  placeholderTextColor={color.inkFaint}
+                  placeholderTextColor={c.inkFaint}
                   returnKeyType="done"
                   onSubmitEditing={() => setShowNote(false)}
                 />
@@ -613,8 +617,8 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: color.cream, paddingHorizontal: 22 },
+const makeStyles = (c: Palette) => StyleSheet.create({
+  safe: { flex: 1, backgroundColor: c.cream, paddingHorizontal: 22 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -626,62 +630,62 @@ const styles = StyleSheet.create({
     height: 38,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: color.lineStrong,
-    backgroundColor: color.card,
+    borderColor: c.lineStrong,
+    backgroundColor: c.card,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  closeText: { fontSize: 17, color: color.inkSoft },
-  title: { fontFamily: font.displaySemi, fontSize: ftype.screenTitle, color: color.forestDeep },
+  closeText: { fontSize: 17, color: c.inkSoft },
+  title: { fontFamily: font.displaySemi, fontSize: ftype.screenTitle, color: c.forestDeep },
   toggle: {
     flexDirection: 'row',
-    backgroundColor: color.cream2,
+    backgroundColor: c.cream2,
     borderRadius: 16,
     padding: 5,
     marginTop: 22,
     gap: 5,
     borderWidth: 1,
-    borderColor: color.line,
+    borderColor: c.line,
   },
   toggleBtn: { flex: 1, paddingVertical: 12, borderRadius: 12, alignItems: 'center' },
-  toggleOut: { backgroundColor: color.clay },
-  toggleIn: { backgroundColor: color.forest },
-  toggleLabel: { fontFamily: font.bodySemi, fontSize: 14.5, color: color.inkSoft },
-  toggleLabelOn: { color: color.card },
+  toggleOut: { backgroundColor: c.clay },
+  toggleIn: { backgroundColor: c.forest },
+  toggleLabel: { fontFamily: font.bodySemi, fontSize: 14.5, color: c.inkSoft },
+  toggleLabelOn: { color: c.card },
   amountBox: { alignItems: 'center', paddingTop: 28, paddingBottom: 4 },
   amountLabel: {
     fontFamily: font.bodyBold,
     fontSize: ftype.eyebrow,
     letterSpacing: 1.6,
     textTransform: 'uppercase',
-    color: color.inkFaint,
+    color: c.inkFaint,
   },
   amountRow: { flexDirection: 'row', alignItems: 'center', marginTop: 8 },
   amountValue: {
     fontFamily: font.display,
     fontSize: ftype.addAmount,
     letterSpacing: -1,
-    color: color.ink,
+    color: c.ink,
   },
-  rupee: { fontFamily: font.display, fontSize: 32, color: color.inkFaint },
-  caret: { width: 2, height: 44, backgroundColor: color.clay, marginLeft: 3 },
-  error: { fontFamily: font.bodyMed, fontSize: 12.5, color: color.clay, marginTop: 8 },
+  rupee: { fontFamily: font.display, fontSize: 32, color: c.inkFaint },
+  caret: { width: 2, height: 44, backgroundColor: c.clay, marginLeft: 3 },
+  error: { fontFamily: font.bodyMed, fontSize: 12.5, color: c.clay, marginTop: 8 },
   chips: { flexDirection: 'row', gap: 9, justifyContent: 'center', flexWrap: 'wrap', marginVertical: 6 },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: color.card,
+    backgroundColor: c.card,
     borderWidth: 1,
-    borderColor: color.line,
+    borderColor: c.line,
     borderRadius: 999,
     paddingVertical: 9,
     paddingHorizontal: 14,
   },
-  chipText: { fontFamily: font.bodySemi, fontSize: 12.5, color: color.inkSoft },
-  chipAuto: { backgroundColor: color.cream2, borderColor: color.lineStrong },
-  chipAutoText: { fontFamily: font.bodySemi, fontSize: 12.5, color: color.forest },
-  chipAi: { fontSize: 11, color: color.gold },
+  chipText: { fontFamily: font.bodySemi, fontSize: 12.5, color: c.inkSoft },
+  chipAuto: { backgroundColor: c.cream2, borderColor: c.lineStrong },
+  chipAutoText: { fontFamily: font.bodySemi, fontSize: 12.5, color: c.forest },
+  chipAi: { fontSize: 11, color: c.gold },
   keypad: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -690,59 +694,59 @@ const styles = StyleSheet.create({
   },
   key: {
     width: '31.5%',
-    backgroundColor: color.card,
+    backgroundColor: c.card,
     borderWidth: 1,
-    borderColor: color.line,
+    borderColor: c.line,
     borderRadius: 16,
     paddingVertical: 16,
     alignItems: 'center',
     marginBottom: 9,
   },
   keyEmpty: { backgroundColor: 'transparent', borderColor: 'transparent' },
-  keyText: { fontFamily: font.display, fontSize: 23, color: color.ink },
-  keyFn: { fontFamily: font.body, fontSize: 18, color: color.inkSoft },
+  keyText: { fontFamily: font.display, fontSize: 23, color: c.ink },
+  keyFn: { fontFamily: font.body, fontSize: 18, color: c.inkSoft },
   save: {
-    backgroundColor: color.forest,
+    backgroundColor: c.forest,
     borderRadius: 18,
     paddingVertical: 18,
     alignItems: 'center',
     marginTop: 4,
   },
   saveDisabled: { opacity: 0.45 },
-  saveText: { fontFamily: font.bodySemi, fontSize: ftype.screenTitle, color: color.cream },
+  saveText: { fontFamily: font.bodySemi, fontSize: ftype.screenTitle, color: c.cream },
   toast: {
     position: 'absolute',
     bottom: 96,
     left: '50%',
-    backgroundColor: color.forestDeep,
+    backgroundColor: c.forestDeep,
     paddingVertical: 13,
     paddingHorizontal: 22,
     borderRadius: 13,
   },
-  toastText: { fontFamily: font.bodySemi, fontSize: 13.5, color: color.cream },
+  toastText: { fontFamily: font.bodySemi, fontSize: 13.5, color: c.cream },
   sheetBackdrop: { flex: 1, backgroundColor: 'rgba(21,42,30,0.35)', justifyContent: 'flex-end' },
   sheetWrapper: { width: '100%' },
   sheetScroll: { flexGrow: 1, justifyContent: 'flex-end' },
   sheet: {
-    backgroundColor: color.cream,
+    backgroundColor: c.cream,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 22,
     paddingBottom: 34,
   },
-  sheetTitle: { fontFamily: font.displaySemi, fontSize: ftype.sectionHead, color: color.forestDeep, marginBottom: 14 },
+  sheetTitle: { fontFamily: font.displaySemi, fontSize: ftype.sectionHead, color: c.forestDeep, marginBottom: 14 },
   noteRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   noteInput: {
     flex: 1,
-    backgroundColor: color.card,
+    backgroundColor: c.card,
     borderWidth: 1,
-    borderColor: color.line,
+    borderColor: c.line,
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontFamily: font.body,
     fontSize: 14,
-    color: color.ink,
+    color: c.ink,
   },
   noteInputExtra: {
     flex: 0,
@@ -754,42 +758,42 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: color.card,
+    backgroundColor: c.card,
     borderWidth: 1,
-    borderColor: color.line,
+    borderColor: c.line,
   },
-  micActive: { backgroundColor: color.forest, borderColor: color.forest },
+  micActive: { backgroundColor: c.forest, borderColor: c.forest },
   sheetDone: {
     marginTop: 18,
-    backgroundColor: color.forest,
+    backgroundColor: c.forest,
     borderRadius: 14,
     paddingVertical: 14,
     alignItems: 'center',
   },
-  sheetDoneText: { fontFamily: font.bodySemi, fontSize: 15, color: color.cream },
+  sheetDoneText: { fontFamily: font.bodySemi, fontSize: 15, color: c.cream },
   recurringRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: color.card,
+    backgroundColor: c.card,
     borderWidth: 1,
-    borderColor: color.line,
+    borderColor: c.line,
     borderRadius: 14,
     paddingHorizontal: 16,
     paddingVertical: 12,
     marginBottom: 6,
   },
-  recurringLabel: { fontFamily: font.bodyMed, fontSize: 14, color: color.ink },
+  recurringLabel: { fontFamily: font.bodyMed, fontSize: 14, color: c.ink },
   rulePills: { paddingHorizontal: 2, gap: 8, paddingBottom: 6 },
   rulePill: {
     borderWidth: 1,
-    borderColor: color.line,
-    backgroundColor: color.cream2,
+    borderColor: c.line,
+    backgroundColor: c.cream2,
     borderRadius: 20,
     paddingHorizontal: 14,
     paddingVertical: 7,
   },
-  rulePillActive: { backgroundColor: color.forest, borderColor: color.forest },
-  rulePillText: { fontFamily: font.bodyMed, fontSize: 13, color: color.ink },
-  rulePillTextActive: { color: color.cream },
+  rulePillActive: { backgroundColor: c.forest, borderColor: c.forest },
+  rulePillText: { fontFamily: font.bodyMed, fontSize: 13, color: c.ink },
+  rulePillTextActive: { color: c.cream },
 });
