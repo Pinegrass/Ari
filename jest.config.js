@@ -20,16 +20,16 @@ module.exports = {
     'src/hooks/**/*.ts',
     '!src/**/*.d.ts',
   ],
-  // Ratchet: set just below current actuals (56.4/58.5/50.2/57.8 stmts/branch/
-  // funcs/lines as of 2026-07-04, Sprint 4 — SSL pinning, UPI builder,
-  // upcoming-charges, and syncEngine hardening added unit suites). Raise these
-  // as coverage grows — never lower them.
+  // Ratchet: set just below current actuals (57.3/59.1/51.0/58.5 stmts/branch/
+  // funcs/lines as of 2026-07-05, Sprint 4 final — SSL pinning, UPI builder,
+  // upcoming-charges, widget data, and syncEngine hardening added unit suites).
+  // Raise these as coverage grows — never lower them.
   coverageThreshold: {
     global: {
-      branches: 58,
+      branches: 59,
       functions: 50,
-      lines: 57,
-      statements: 56,
+      lines: 58,
+      statements: 57,
     },
   },
 };

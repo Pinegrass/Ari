@@ -15,6 +15,28 @@
   - `preview` builds listen to the `preview` channel.
   - `development` builds do not use OTA (they load from the dev server).
 
+## Dual-fleet reality (from v1.1.0, 2026-07-05)
+
+Shipping the v1.1.0 native build splits the fleet in two. Every OTA publish from
+now on **must state which fleet it targets**, and always pass `--environment
+preview|production` (the PostHog key is only injected via the EAS environment —
+the local `.env` has it commented, so omitting the flag silently drops analytics
+from the bundle).
+
+| Fleet | Runtime version | How to target it |
+|-------|-----------------|------------------|
+| **v1.0.1 (legacy)** | `appVersion` policy, rtv **"1.0.1"** | Served by the temporary-pin OTA procedure (sprint-3 doc Task 6.4) until Play adoption of v1.1.0 makes it negligible. `eas update` from repo state will NOT reach it. |
+| **v1.1.0 (current)** | `fingerprint` policy | `eas update --branch preview --environment preview` targets it correctly from repo state. |
+
+- The v1.0.1 fleet is frozen feature-wise except via the pin procedure; prefer
+  driving users to the Play update rather than maintaining two OTA streams.
+- v1.1.0 is the first `fingerprint`-runtime build. Its fingerprint changed vs
+  1.0.2 (added native modules: `react-native-ssl-public-key-pinning`,
+  `expo-share-intent`, `react-native-android-widget`), so it is a **store build**
+  — it cannot be delivered OTA to older installs.
+- Once v1.1.0 is on Play, JS-only fixes to it ship as normal
+  `eas update --branch preview --environment preview` (or `production`).
+
 ## What can be pushed OTA
 
 Safe to ship with `eas update`:
