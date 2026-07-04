@@ -33,24 +33,29 @@ export default function BalanceCard({ spentToday, moneyIn, moneyOut, netToday }:
       <View style={[styles.ring, styles.ringOuter]} pointerEvents="none" />
       <View style={[styles.ring, styles.ringInner]} pointerEvents="none" />
 
-      <Text style={styles.label}>Spent today</Text>
-      <Text style={styles.amount}>
-        <Text style={styles.rupee}>₹</Text>
-        {amt(spentToday)}
-      </Text>
+      {/* Read the label + amount as one unit under TalkBack. */}
+      <View accessible accessibilityRole="summary" accessibilityLabel={`Spent today, ${isPrivate ? 'hidden' : '₹' + amt(spentToday)}`}>
+        <Text style={styles.label}>Spent today</Text>
+        {/* adjustsFontSizeToFit keeps the hero number on one line at OS font
+            scales up to 1.3× instead of wrapping/clipping. */}
+        <Text style={styles.amount} numberOfLines={1} adjustsFontSizeToFit>
+          <Text style={styles.rupee}>₹</Text>
+          {amt(spentToday)}
+        </Text>
+      </View>
 
       <View style={styles.pills}>
-        <View style={styles.pill}>
+        <View style={styles.pill} accessible accessibilityLabel={`Money out ₹${amt(moneyOut)}`}>
           <Text style={styles.pillKey}>Money out</Text>
-          <Text style={[styles.pillVal, styles.pillValClay]}>₹{amt(moneyOut)}</Text>
+          <Text style={[styles.pillVal, styles.pillValClay]} numberOfLines={1} adjustsFontSizeToFit>₹{amt(moneyOut)}</Text>
         </View>
-        <View style={styles.pill}>
+        <View style={styles.pill} accessible accessibilityLabel={`Money in ₹${amt(moneyIn)}`}>
           <Text style={styles.pillKey}>Money in</Text>
-          <Text style={styles.pillVal}>₹{amt(moneyIn)}</Text>
+          <Text style={styles.pillVal} numberOfLines={1} adjustsFontSizeToFit>₹{amt(moneyIn)}</Text>
         </View>
-        <View style={styles.pill}>
+        <View style={styles.pill} accessible accessibilityLabel={`Net today ${signed(netToday)}`}>
           <Text style={styles.pillKey}>Net today</Text>
-          <Text style={styles.pillVal}>{signed(netToday)}</Text>
+          <Text style={styles.pillVal} numberOfLines={1} adjustsFontSizeToFit>{signed(netToday)}</Text>
         </View>
       </View>
     </View>
@@ -112,6 +117,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   pill: {
+    flex: 1,
     gap: 2,
   },
   pillKey: {

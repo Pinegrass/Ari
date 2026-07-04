@@ -296,6 +296,9 @@ export default function TransactionsScreen() {
                     onPress={() => setFilter(f)}
                     style={[styles.filterBtn, filter === f && styles.filterBtnActive]}
                     activeOpacity={0.75}
+                    accessibilityRole="tab"
+                    accessibilityState={{ selected: filter === f }}
+                    accessibilityLabel={`${f === 'all' ? 'All' : f === 'expense' ? 'Expenses' : 'Income'} filter`}
                   >
                     <Text
                       style={[

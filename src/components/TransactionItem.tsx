@@ -30,12 +30,18 @@ export default function TransactionItem({ transaction, onDelete, onEdit, showDel
     if (onEdit) onEdit(transaction);
   };
 
+  const a11yAmount = `${isExpense ? 'minus ' : 'plus '}${formatAmount(transaction.amount)}`;
+  const a11yLabel = `${transaction.description || cat.label}, ${cat.label}, ${a11yAmount}, ${formatSectionDate(transaction.date)}`;
+
   return (
     <TouchableOpacity
       style={styles.row}
       onLongPress={handleLongPress}
       delayLongPress={400}
       activeOpacity={onEdit ? 0.7 : 1}
+      accessibilityRole={onEdit ? 'button' : 'text'}
+      accessibilityLabel={a11yLabel}
+      accessibilityHint={onEdit ? 'Double tap and hold to edit' : undefined}
     >
       <View style={styles.iconBox}>
         <Text style={styles.icon}>{cat.emoji}</Text>
@@ -63,7 +69,7 @@ export default function TransactionItem({ transaction, onDelete, onEdit, showDel
         {showDelete && onDelete && (
           <TouchableOpacity
             onPress={() => onDelete(transaction.id)}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            hitSlop={{ top: 14, bottom: 14, left: 14, right: 14 }}
             accessibilityLabel="Delete transaction"
             accessibilityRole="button"
           >
