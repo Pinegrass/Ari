@@ -21,6 +21,8 @@ import { useHaptics } from '../hooks/useHaptics';
 import { useBiometric } from '../hooks/useBiometric';
 import { useNotifications } from '../hooks/useNotifications';
 import { usePrivacy } from '../context/PrivacyContext';
+import { useColors, useThemePreference } from '../context/ThemeContext';
+import type { ThemePreference } from '../theme/palettes';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import type { MainStackParamList } from '../navigation/navigationTypes';
@@ -85,6 +87,12 @@ export default function SettingsScreen() {
     setReminderTime,
   } = useNotifications();
   const { isPrivate, togglePrivate } = usePrivacy();
+  const { preference: themePref, setPreference: setThemePref, darkEnabled } = useThemePreference();
+  // Sprint 3 groundwork: Settings is the proof screen that sources its base
+  // surfaces from the theme (useColors) rather than the static token import.
+  // While DARK_ENABLED is false this resolves to the light palette, so there's
+  // no visual change — the wiring is what ships. Other tab screens: Sprint 4.
+  const c = useColors();
   const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
   const [subScreen, setSubScreen] = useState<SubScreen>('main');
 
@@ -309,12 +317,12 @@ export default function SettingsScreen() {
   ];
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: c.cream }]} edges={['top']}>
       <ScrollView
         contentContainerStyle={[styles.container, { paddingBottom: Math.max(insets.bottom, 20) + 20 }]}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.screenTitle}>Settings</Text>
+        <Text style={[styles.screenTitle, { color: c.ink }]}>Settings</Text>
 
         {/* Profile Card */}
         <AnimatedEntry delay={0}>
@@ -464,6 +472,56 @@ export default function SettingsScreen() {
                 thumbColor={isPrivate ? color.forest : color.inkFaint}
                 accessibilityLabel="Toggle private mode"
               />
+            </View>
+          </View>
+        </AnimatedEntry>
+
+        {/* Appearance (Sprint 3 groundwork — dark mode gated until Sprint 4) */}
+        <AnimatedEntry delay={180}>
+          <View style={styles.menuCard}>
+            <View style={styles.toggleRow}>
+              <View style={styles.menuIconWrap}>
+                <Icon name="moon" size={20} color={color.inkFaint} />
+              </View>
+              <View style={styles.menuText}>
+                <Text style={styles.menuLabel}>Appearance</Text>
+                <Text style={styles.menuSubtitle}>
+                  {darkEnabled ? 'Choose how Ari looks' : 'Dark mode is coming soon'}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.segment}>
+              {(['system', 'light', 'dark'] as ThemePreference[]).map((opt) => {
+                const isDark = opt === 'dark';
+                const disabled = isDark && !darkEnabled;
+                const active = themePref === opt;
+                return (
+                  <TouchableOpacity
+                    key={opt}
+                    style={[styles.segmentBtn, active && styles.segmentBtnActive]}
+                    disabled={disabled}
+                    activeOpacity={0.8}
+                    onPress={() => {
+                      haptics.light();
+                      setThemePref(opt);
+                    }}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: active, disabled }}
+                    accessibilityLabel={`${opt} appearance${disabled ? ', coming soon' : ''}`}
+                  >
+                    <Text
+                      style={[
+                        styles.segmentText,
+                        active && styles.segmentTextActive,
+                        disabled && styles.segmentTextDisabled,
+                      ]}
+                    >
+                      {opt === 'system' ? 'System' : opt === 'light' ? 'Light' : 'Dark'}
+                    </Text>
+                    {disabled && <Text style={styles.soonBadge}>Soon</Text>}
+                  </TouchableOpacity>
+                );
+              })}
             </View>
           </View>
         </AnimatedEntry>
@@ -727,6 +785,38 @@ const styles = StyleSheet.create({
   menuLabel: { fontFamily: font.bodyMed, fontSize: 15, color: color.ink },
   menuSubtitle: { fontFamily: font.body, fontSize: 12, color: color.inkSoft, marginTop: 2 },
   separator: { height: 1, backgroundColor: color.line, marginLeft: 42 },
+  segment: {
+    flexDirection: 'row',
+    gap: 6,
+    backgroundColor: color.cream2,
+    borderRadius: 12,
+    padding: 4,
+    marginBottom: 14,
+  },
+  segmentBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 9,
+    borderRadius: 9,
+  },
+  segmentBtnActive: { backgroundColor: color.card, borderWidth: 1, borderColor: color.line },
+  segmentText: { fontFamily: font.bodyMed, fontSize: 13, color: color.inkSoft },
+  segmentTextActive: { color: color.ink, fontFamily: font.bodySemi },
+  segmentTextDisabled: { color: color.inkFaint },
+  soonBadge: {
+    fontFamily: font.bodySemi,
+    fontSize: 9,
+    color: color.clay,
+    backgroundColor: color.clayTint,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    borderRadius: 6,
+    overflow: 'hidden',
+    textTransform: 'uppercase',
+  },
   timeValue: {
     fontFamily: font.bodySemi,
     fontSize: 15, color: color.forest, paddingHorizontal: 4,

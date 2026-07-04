@@ -39,6 +39,7 @@ export type MainStackParamList = {
   TaxEstimator: undefined;
   PnlReport: undefined;
   TodoNotes: undefined;
+  Bills: undefined;
   DailyHeatmap: undefined;
   // `source` is the upstream surface that triggered the paywall — drives
   // funnel attribution in PostHog (paywall_viewed, pro_purchase_*).

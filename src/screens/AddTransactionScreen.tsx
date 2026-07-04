@@ -13,6 +13,7 @@ import {
   KeyboardAvoidingView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { MainStackParamList } from '../navigation/navigationTypes';
@@ -114,6 +115,24 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
     return () => {
       if (aiDebounceRef.current) clearTimeout(aiDebounceRef.current);
     };
+  }, []);
+
+  // Onboarding carry-over: the amount the user punched into the onboarding demo
+  // keypad becomes their genuine first saved expense (key set in
+  // OnboardingScreen). Only for a fresh, un-prefilled entry; consumed once so it
+  // never resurfaces on later adds.
+  useEffect(() => {
+    if (editTxn || prefill?.amount != null) return;
+    let active = true;
+    AsyncStorage.getItem('ari_onboarding_demo_amount').then((v) => {
+      AsyncStorage.removeItem('ari_onboarding_demo_amount').catch(() => {});
+      const n = v ? parseInt(v, 10) : NaN;
+      if (active && Number.isFinite(n) && n > 0) setAmount((cur) => cur || String(n));
+    });
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleTypeChange = (next: TransactionType) => {

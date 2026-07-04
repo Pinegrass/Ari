@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { BarChart } from 'react-native-gifted-charts';
 import { color, font, type as ftype } from '../../theme/tokens';
+import { Skeleton } from '../ui/Skeleton';
 import type { DailyAnalytics } from '../../api/reports';
 
 interface Props {
@@ -26,8 +27,9 @@ export default function MonthSpendChart({ data, loading }: Props) {
 
   if (loading) {
     return (
-      <View style={[styles.card, styles.center]}>
-        <ActivityIndicator color={color.forest} />
+      <View style={styles.card}>
+        <Text style={styles.title}>Daily spending</Text>
+        <Skeleton width="100%" height={140} radius={12} style={{ marginTop: 12 }} />
       </View>
     );
   }

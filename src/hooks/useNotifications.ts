@@ -8,6 +8,10 @@ const NOTIFICATIONS_ENABLED_KEY = 'ari_notifications_enabled';
 const REMINDER_TIME_KEY = 'ari_reminder_time'; // stored as "HH:MM" e.g. "20:00"
 const DEFAULT_HOUR = 20; // 8 PM — same default as before to preserve UX for existing users
 const DEFAULT_MINUTE = 0;
+// Stable identifier for the daily "log your expenses" reminder. We cancel by
+// this id rather than cancelAllScheduledNotificationsAsync() so bill/EMI
+// reminders (src/lib/bills.ts, namespaced "bill:...") are never collateral.
+const DAILY_REMINDER_ID = 'ari_daily_reminder';
 
 // Configure notification behavior
 Notifications.setNotificationHandler({
@@ -91,7 +95,9 @@ export function useNotifications() {
    */
   const scheduleDailyReminder = useCallback(
     async (hour: number = reminderHour, minute: number = reminderMinute) => {
-      await Notifications.cancelAllScheduledNotificationsAsync();
+      // Cancel only the previous daily reminder (by id) — leaves bill reminders
+      // scheduled. cancelScheduledNotificationAsync is a no-op if none exists.
+      await Notifications.cancelScheduledNotificationAsync(DAILY_REMINDER_ID).catch(() => {});
 
       const messages = [
         { title: "Hey! Did you log today's expenses? 📊", body: "Tomo is waiting to help you track your spending." },
@@ -103,6 +109,7 @@ export function useNotifications() {
       const msg = messages[Math.floor(Math.random() * messages.length)];
 
       await Notifications.scheduleNotificationAsync({
+        identifier: DAILY_REMINDER_ID,
         content: {
           title: msg.title,
           body: msg.body,
@@ -127,7 +134,8 @@ export function useNotifications() {
         setIsEnabled(true);
       }
     } else {
-      await Notifications.cancelAllScheduledNotificationsAsync();
+      // Turn off only the daily reminder — bill reminders stay scheduled.
+      await Notifications.cancelScheduledNotificationAsync(DAILY_REMINDER_ID).catch(() => {});
       await AsyncStorage.setItem(NOTIFICATIONS_ENABLED_KEY, 'false');
       setIsEnabled(false);
     }
