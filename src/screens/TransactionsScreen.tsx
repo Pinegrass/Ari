@@ -17,6 +17,7 @@ import { useData } from '../context/DataContext';
 import TransactionItem from '../components/TransactionItem';
 import DeleteConfirmSheet from '../components/DeleteConfirmSheet';
 import EmptyState from '../components/ui/EmptyState';
+import { SkeletonList } from '../components/ui/Skeleton';
 import AnimatedFAB from '../components/ui/AnimatedFAB';
 import AnimatedEntry from '../components/ui/AnimatedEntry';
 import Icon from '../components/ui/Icon';
@@ -53,6 +54,7 @@ export default function TransactionsScreen() {
     insights,
     nudge,
     refreshing,
+    loadingData,
     deleteTransaction,
     fetchTransactions,
     fetchSummary,
@@ -304,17 +306,23 @@ export default function TransactionsScreen() {
           </View>
         }
         ListEmptyComponent={
-          <EmptyState
-            emoji="💳"
-            title="No transactions found"
-            subtitle={
-              search || filter !== 'all'
-                ? 'Try changing your search or filter'
-                : 'Add your first transaction'
-            }
-            actionLabel={!search && filter === 'all' ? 'Add Transaction' : undefined}
-            onAction={() => navigation.navigate('AddTransaction', { type: 'expense' })}
-          />
+          loadingData && transactions.length === 0 ? (
+            <View style={{ paddingHorizontal: 4 }}>
+              <SkeletonList count={5} />
+            </View>
+          ) : (
+            <EmptyState
+              emoji="💳"
+              title="No transactions found"
+              subtitle={
+                search || filter !== 'all'
+                  ? 'Try changing your search or filter'
+                  : 'Add your first transaction'
+              }
+              actionLabel={!search && filter === 'all' ? 'Add Transaction' : undefined}
+              onAction={() => navigation.navigate('AddTransaction', { type: 'expense' })}
+            />
+          )
         }
       />
 

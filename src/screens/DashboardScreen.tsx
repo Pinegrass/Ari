@@ -21,7 +21,7 @@ import ThisMonthSummary from '../components/dashboard/ThisMonthSummary';
 import MonthSpendChart from '../components/dashboard/MonthSpendChart';
 import CategoryBreakdown from '../components/dashboard/CategoryBreakdown';
 import UpcomingBillsCard from '../components/dashboard/UpcomingBillsCard';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
+import { SkeletonList } from '../components/ui/Skeleton';
 import EmptyState from '../components/ui/EmptyState';
 import AnimatedEntry from '../components/ui/AnimatedEntry';
 import { color, font, type } from '../theme/tokens';
@@ -178,7 +178,7 @@ export default function DashboardScreen() {
           </View>
 
           {loadingData ? (
-            <LoadingSpinner />
+            <SkeletonList count={4} />
           ) : recentTxns.length === 0 ? (
             <EmptyState
               emoji="💳"
