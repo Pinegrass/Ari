@@ -153,3 +153,74 @@ export async function checkAndGenerateDue(
 
   return created;
 }
+
+// ─── Forward projection (D2 "Upcoming charges") ──────────────────────────────
+
+export interface RecurringProjection {
+  /** The recurring template's id. */
+  templateId: string;
+  name: string;
+  amount: number;
+  category: string;
+  type: Transaction['type'];
+  /** Next future occurrence as 'YYYY-MM-DD' (local). */
+  nextDueDate: string;
+  /** Whole days from today until that occurrence. 0 = today. */
+  daysUntil: number;
+}
+
+const PROJECT_GUARD = 600; // cap the walk (weekly over years) against bad data
+
+/**
+ * Project the NEXT future occurrence of each recurring template within
+ * `withinDays` days. Unlike checkAndGenerateDue this creates nothing — it's a
+ * read-only look-ahead that drives the "Upcoming charges" surfaces. The next
+ * occurrence is the first one strictly after today (past-due instances are
+ * materialised by checkAndGenerateDue, not projected here). Sorted soonest-first.
+ */
+export function projectUpcomingRecurring(
+  transactions: Transaction[],
+  now: Date,
+  withinDays = 30,
+): RecurringProjection[] {
+  const todayStr = toDateOnly(now);
+  const today = parseLocalDate(todayStr);
+  const todayMs = today.getTime();
+
+  const templates = transactions.filter(
+    (t): t is Transaction & { recurrenceRule: NonNullable<Transaction['recurrenceRule']> } =>
+      t.isRecurring === true && t.parentRecurringId == null && t.recurrenceRule != null,
+  );
+
+  const out: RecurringProjection[] = [];
+  for (const template of templates) {
+    const rule = template.recurrenceRule;
+    const templateDateStr =
+      typeof template.date === 'string'
+        ? template.date
+        : toDateOnly(template.date as unknown as Date);
+
+    // Walk forward until strictly after today. A future-dated template stays put
+    // (its start date is the first occurrence).
+    let cursor = parseLocalDate(templateDateStr);
+    let guard = 0;
+    while (cursor.getTime() <= todayMs && guard < PROJECT_GUARD) {
+      cursor = nextDueDate(cursor, rule);
+      guard++;
+    }
+
+    const daysUntil = Math.round((cursor.getTime() - todayMs) / 86_400_000);
+    if (daysUntil >= 0 && daysUntil <= withinDays) {
+      out.push({
+        templateId: template.id,
+        name: template.description || template.category,
+        amount: template.amount,
+        category: template.category,
+        type: template.type,
+        nextDueDate: toDateOnly(cursor),
+        daysUntil,
+      });
+    }
+  }
+  return out.sort((a, b) => a.daysUntil - b.daysUntil);
+}

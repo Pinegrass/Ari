@@ -18,6 +18,8 @@ import {
   type GroupDetail, type SharedExpense, type BalancesResponse,
 } from '../api/groups';
 import type { MainStackParamList } from '../navigation/navigationTypes';
+import { buildUpiUri } from '../utils/upi';
+import { track } from '../lib/analytics';
 
 type Nav = StackNavigationProp<MainStackParamList>;
 type Rt = RouteProp<MainStackParamList, 'GroupDetail'>;
@@ -130,6 +132,85 @@ export default function GroupDetailScreen() {
     }
   };
 
+  /**
+   * Per-member "Settle now": pay a creditor their whole net pair amount in one
+   * UPI intent (built client-side from their stored VPA), then record it by
+   * marking every unsettled split I owe them. Missing VPA → prompt to request.
+   */
+  const handleSettleMember = async (
+    creditor: GroupDetail['members'][number],
+    amount: number,
+  ) => {
+    if (!user) return;
+    if (!creditor.upiVpa) {
+      Alert.alert(
+        'No UPI ID yet',
+        `${creditor.name} hasn't added a UPI ID. Ask them to add one in Settings → UPI ID, then settle here — or mark it paid by cash.`,
+        [
+          { text: 'OK', style: 'cancel' },
+          { text: 'Mark cash', onPress: () => settleMemberSplits(creditor.id, 'cash') },
+        ],
+      );
+      return;
+    }
+
+    setSettling(`member:${creditor.id}`);
+    try {
+      const uri = buildUpiUri({
+        vpa: creditor.upiVpa,
+        payeeName: creditor.name,
+        amount,
+        note: `Ari · ${group?.name ?? 'group'}`,
+      });
+      const supported = await Linking.canOpenURL(uri);
+      if (!supported) {
+        Alert.alert('No UPI app installed', 'Install PhonePe / GPay / Paytm and try again.');
+        return;
+      }
+      await Linking.openURL(uri);
+      Alert.alert(
+        'Did the payment go through?',
+        `Tap "Yes" only after you confirmed the ${formatAmount(amount)} transfer in your UPI app.`,
+        [
+          { text: 'Not yet', style: 'cancel' },
+          { text: 'Yes, I paid', onPress: () => settleMemberSplits(creditor.id, 'upi') },
+        ],
+      );
+    } catch (e) {
+      Alert.alert('Could not open UPI', e instanceof Error ? e.message : 'Try again');
+    } finally {
+      setSettling(null);
+    }
+  };
+
+  /** Mark every unsettled split I owe this creditor as settled by `method`. */
+  const settleMemberSplits = async (creditorId: string, method: 'upi' | 'cash') => {
+    if (!user) return;
+    const mySplits = expenses
+      .filter((e) => e.paidBy === creditorId)
+      .flatMap((e) => e.splits.filter((s) => s.owedBy === user.id && !s.settledAt));
+    if (mySplits.length === 0) {
+      load();
+      return;
+    }
+    setSettling(`member:${creditorId}`);
+    try {
+      for (const s of mySplits) {
+        await settleSplit(params.groupId, s.id, method);
+        if (method === 'upi') await confirmUpiSettlement(params.groupId, s.id);
+      }
+      track(method === 'upi' ? 'split_settled_upi' : 'split_settled_cash', {
+        splits: mySplits.length,
+      });
+      haptics.success();
+    } catch (e) {
+      Alert.alert('Could not record settlement', e instanceof Error ? e.message : 'Try again');
+    } finally {
+      setSettling(null);
+      load();
+    }
+  };
+
   if (loading || !group) {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
@@ -171,13 +252,25 @@ export default function GroupDetailScreen() {
         {iOwe.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>You owe</Text>
-            {iOwe.map((p) => (
-              <View key={`${p.debtor.id}-${p.creditor.id}`} style={styles.pairRow}>
-                <Text style={styles.pairText}>
-                  {p.creditor.name} • {formatAmount(p.amount)}
-                </Text>
-              </View>
-            ))}
+            {iOwe.map((p) => {
+              const busy = settling === `member:${p.creditor.id}`;
+              return (
+                <View key={`${p.debtor.id}-${p.creditor.id}`} style={styles.pairRow}>
+                  <Text style={styles.pairText}>
+                    {p.creditor.name} • {formatAmount(p.amount)}
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.settleNowBtn}
+                    disabled={busy}
+                    onPress={() => handleSettleMember(p.creditor, p.amount)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Settle ${formatAmount(p.amount)} with ${p.creditor.name} via UPI`}
+                  >
+                    <Text style={styles.settleNowText}>{busy ? 'Settling…' : 'Settle now'}</Text>
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
           </View>
         )}
 
@@ -275,11 +368,17 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 8, marginTop: 8,
   },
   pairRow: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10,
     paddingVertical: 8, paddingHorizontal: 12,
     backgroundColor: color.card, borderRadius: 10,
     borderWidth: 1, borderColor: color.line, marginBottom: 6,
   },
-  pairText: { fontSize: 13, color: color.ink, fontFamily: font.bodyMed },
+  pairText: { flex: 1, fontSize: 13, color: color.ink, fontFamily: font.bodyMed },
+  settleNowBtn: {
+    paddingHorizontal: 14, minHeight: 44, justifyContent: 'center', borderRadius: 8,
+    backgroundColor: color.forest,
+  },
+  settleNowText: { fontSize: 12.5, fontFamily: font.bodySemi, color: color.cream },
   addExpenseBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
     backgroundColor: color.forest, paddingVertical: 14, borderRadius: 12,

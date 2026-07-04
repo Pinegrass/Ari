@@ -1,36 +1,25 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import type { CompositeNavigationProp } from '@react-navigation/native';
-import type { StackNavigationProp } from '@react-navigation/stack';
+import { View, Text, StyleSheet } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 
-import Icon from '../ui/Icon';
 import { color, font, type as typeScale } from '../../theme/tokens';
 import { getBills } from '../../lib/bills';
 import { selectUpcomingCharges, type UpcomingCharge } from '../../lib/upcomingCharges';
 import { useData } from '../../context/DataContext';
-import type { TabParamList, MainStackParamList } from '../../navigation/navigationTypes';
-
-type Nav = CompositeNavigationProp<
-  BottomTabNavigationProp<TabParamList, 'Dashboard'>,
-  StackNavigationProp<MainStackParamList>
->;
 
 function dueLabel(daysUntil: number): string {
-  if (daysUntil <= 0) return 'Due today';
-  if (daysUntil === 1) return 'Due tomorrow';
-  return `Due in ${daysUntil} days`;
+  if (daysUntil <= 0) return 'today';
+  if (daysUntil === 1) return 'tomorrow';
+  return `in ${daysUntil} days`;
 }
 
 /**
- * "Upcoming charges" — the next ~30 days of money going out, merging scheduled
- * bills/EMIs with projections from recurring transactions (D2). Tap a row to log
- * it via fast entry (prefilled). Renders nothing when there's nothing due soon,
- * so Home stays clean for users with neither.
+ * The full next-30-days view of upcoming charges for the Trends screen (D2) —
+ * bills + recurring projections, with a projected total. The Dashboard card
+ * shows the soonest 4; this shows everything so the user can see the month's
+ * committed outflow at a glance.
  */
-export default function UpcomingBillsCard() {
-  const navigation = useNavigation<Nav>();
+export default function UpcomingChargesSection() {
   const { transactions } = useData();
   const [charges, setCharges] = useState<UpcomingCharge[] | null>(null);
 
@@ -43,48 +32,32 @@ export default function UpcomingBillsCard() {
       return () => {
         active = false;
       };
-    }, [transactions])
+    }, [transactions]),
   );
 
   if (!charges || charges.length === 0) return null;
+
+  const total = charges.reduce((sum, c) => sum + c.amount, 0);
 
   return (
     <View style={styles.card}>
       <View style={styles.head}>
         <Text style={styles.title}>Upcoming charges</Text>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Bills')}
-          accessibilityRole="link"
-          accessibilityLabel="Manage bills"
-        >
-          <Text style={styles.manage}>Manage</Text>
-        </TouchableOpacity>
+        <Text style={styles.total}>₹{total.toLocaleString('en-IN')} · 30 days</Text>
       </View>
 
-      {charges.slice(0, 4).map((charge) => (
-        <TouchableOpacity
-          key={charge.key}
-          style={styles.row}
-          activeOpacity={0.85}
-          onPress={() =>
-            navigation.navigate('AddTransaction', {
-              type: 'expense',
-              prefill: { amount: charge.amount, description: charge.name, category: charge.category },
-            })
-          }
-          accessibilityLabel={`Log ${charge.name}`}
-        >
+      {charges.map((charge) => (
+        <View key={charge.key} style={styles.row}>
           <View style={[styles.dot, charge.daysUntil <= 1 && styles.dotSoon]} />
           <View style={{ flex: 1 }}>
             <Text style={styles.name}>{charge.name}</Text>
             <Text style={styles.meta}>
-              {dueLabel(charge.daysUntil)}
-              {charge.source === 'recurring' ? ' · recurring' : ''}
+              Due {dueLabel(charge.daysUntil)}
+              {charge.source === 'recurring' ? ' · recurring' : ' · bill'}
             </Text>
           </View>
           <Text style={styles.amount}>₹{charge.amount.toLocaleString('en-IN')}</Text>
-          <Icon name="chevron-right" size={16} color={color.inkFaint} />
-        </TouchableOpacity>
+        </View>
       ))}
     </View>
   );
@@ -97,7 +70,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: color.line,
     padding: 16,
-    marginTop: 18,
+    marginTop: 16,
   },
   head: {
     flexDirection: 'row',
@@ -106,7 +79,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   title: { fontFamily: font.displaySemi, fontSize: typeScale.sectionHead, color: color.forestDeep },
-  manage: { fontFamily: font.bodySemi, fontSize: 12.5, color: color.moss },
+  total: { fontFamily: font.bodySemi, fontSize: 12.5, color: color.moss },
   row: {
     flexDirection: 'row',
     alignItems: 'center',

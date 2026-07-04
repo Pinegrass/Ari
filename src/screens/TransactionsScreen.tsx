@@ -22,6 +22,7 @@ import AnimatedFAB from '../components/ui/AnimatedFAB';
 import AnimatedEntry from '../components/ui/AnimatedEntry';
 import Icon from '../components/ui/Icon';
 import TrendLineChart from '../components/trends/TrendLineChart';
+import UpcomingChargesSection from '../components/trends/UpcomingChargesSection';
 import CategoryComparison from '../components/trends/CategoryComparison';
 import InsightCard from '../components/trends/InsightCard';
 import { color, font, type as ftype } from '../theme/tokens';
@@ -237,6 +238,11 @@ export default function TransactionsScreen() {
             {/* Trend chart */}
             <AnimatedEntry delay={120}>
               <TrendLineChart report={pnl} loading={pnlLoading} />
+            </AnimatedEntry>
+
+            {/* Upcoming charges — bills + recurring projections, next 30 days */}
+            <AnimatedEntry delay={140}>
+              <UpcomingChargesSection />
             </AnimatedEntry>
 
             {/* Category comparison */}
