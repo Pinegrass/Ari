@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Delete your Ari account</title>
+    <meta
+      name="description"
+      content="Request deletion of your Ari account and all associated data. Required by Google Play policy."
+    />
+    <style>
+      :root {
+        --bg: #ffffff;
+        --fg: #0f172a;
+        --fg-muted: #475569;
+        --accent: #047857;
+        --accent-hover: #065f46;
+        --accent-tint: #ecfdf5;
+        --border: #e2e8f0;
+        --danger: #ef4444;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font: 16px/1.55 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+          sans-serif;
+      }
+      .wrap {
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 48px 24px;
+      }
+      header {
+        margin-bottom: 32px;
+      }
+      .badge {
+        display: inline-block;
+        background: var(--accent-tint);
+        color: var(--accent);
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+      }
+      h1 {
+        font-size: 32px;
+        line-height: 1.2;
+        margin: 0 0 8px;
+        letter-spacing: -0.5px;
+      }
+      p.lede {
+        color: var(--fg-muted);
+        margin: 0 0 32px;
+      }
+      .callout {
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 24px;
+      }
+      .callout h2 {
+        font-size: 16px;
+        margin: 0 0 8px;
+      }
+      .callout p,
+      .callout ul {
+        color: var(--fg-muted);
+        margin: 0;
+      }
+      .callout + .callout {
+        margin-top: 0;
+      }
+      ul {
+        padding-left: 20px;
+      }
+      ul li + li {
+        margin-top: 4px;
+      }
+      form {
+        margin-top: 16px;
+      }
+      label {
+        display: block;
+        font-weight: 600;
+        margin: 16px 0 6px;
+      }
+      input[type='email'],
+      textarea {
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px 14px;
+        font: inherit;
+        background: #fff;
+        color: var(--fg);
+      }
+      input[type='email']:focus,
+      textarea:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+      textarea {
+        min-height: 96px;
+        resize: vertical;
+      }
+      button {
+        margin-top: 24px;
+        width: 100%;
+        background: var(--accent);
+        color: #fff;
+        border: 0;
+        border-radius: 999px;
+        padding: 14px 16px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      button:hover {
+        background: var(--accent-hover);
+      }
+      .note {
+        margin-top: 24px;
+        font-size: 13px;
+        color: var(--fg-muted);
+      }
+      footer {
+        margin-top: 48px;
+        font-size: 13px;
+        color: var(--fg-muted);
+        border-top: 1px solid var(--border);
+        padding-top: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <header>
+        <span class="badge">Account deletion</span>
+        <h1>Delete your Ari account</h1>
+        <p class="lede">
+          You can request deletion of your Ari account and all associated data here. This page is
+          provided so you can delete your account without installing the app.
+        </p>
+      </header>
+
+      <div class="callout">
+        <h2>What gets deleted</h2>
+        <ul>
+          <li>Your profile and login</li>
+          <li>All transactions and budgets you have logged</li>
+          <li>All devices linked to your account</li>
+        </ul>
+      </div>
+
+      <div class="callout">
+        <h2>What we keep</h2>
+        <p>
+          Anonymized, aggregated records required by law (e.g. payment audit trails). Nothing that
+          can identify you. We retain these for up to 90 days before purging.
+        </p>
+      </div>
+
+      <div class="callout">
+        <h2>How long it takes</h2>
+        <p>
+          Within 30 days of your request, your data will be fully purged from our systems. You will
+          receive an email confirmation when the deletion is complete.
+        </p>
+      </div>
+
+      <form
+        method="POST"
+        action="https://web-production-7c65f.up.railway.app/api/account/deletion-request"
+      >
+        <label for="email">Email on your Ari account</label>
+        <input id="email" name="email" type="email" required autocomplete="email" />
+
+        <label for="reason">Anything we should know? (optional)</label>
+        <textarea id="reason" name="reason" placeholder="What didn't work for you?"></textarea>
+
+        <button type="submit">Request deletion</button>
+
+        <p class="note">
+          We will email you a confirmation link. Click the link to confirm — this prevents
+          accidental deletions. If you have the app installed, you can also delete your account
+          directly from <strong>Settings → Delete account</strong> without using this form.
+        </p>
+      </form>
+
+      <footer>
+        Questions? Email <a href="mailto:support@pinegrass.app">support@pinegrass.app</a>. This page
+        is provided to comply with Google Play and App Store account-deletion requirements.
+      </footer>
+    </main>
+  </body>
+</html>
