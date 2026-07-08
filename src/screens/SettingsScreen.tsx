@@ -34,6 +34,8 @@ import ExportScreen from './ExportScreen';
 import AboutScreen from './AboutScreen';
 import ManageCategoriesScreen from './ManageCategoriesScreen';
 import HelpSupportScreen from './HelpSupportScreen';
+import PrivacyPolicyScreen from './PrivacyPolicyScreen';
+import TermsScreen from './TermsScreen';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { submitFeedback } from '../api/feedback';
 import { deleteAccount } from '../api/account';
@@ -64,7 +66,7 @@ interface MenuItem {
   destructive?: boolean;
 }
 
-type SubScreen = 'main' | 'export' | 'about' | 'categories' | 'upi' | 'help';
+type SubScreen = 'main' | 'export' | 'about' | 'categories' | 'upi' | 'help' | 'privacy' | 'terms';
 
 /** "20:00" → "8:00 PM" — short, locale-friendly format for the row subtitle. */
 function formatTime12h(hour: number, minute: number): string {
@@ -154,11 +156,12 @@ export default function SettingsScreen() {
 
   const handlePrivacy = () => {
     haptics.light();
-    Alert.alert(
-      'Privacy & Security',
-      'Your data is encrypted and stored securely. We never sell your financial information to third parties.\n\nBiometric lock adds an extra layer of security when you open the app.',
-      [{ text: 'Got it' }]
-    );
+    setSubScreen('privacy');
+  };
+
+  const handleTerms = () => {
+    haptics.light();
+    setSubScreen('terms');
   };
 
   const handleHelp = () => {
@@ -283,6 +286,14 @@ export default function SettingsScreen() {
     return <HelpSupportScreen onBack={() => setSubScreen('main')} />;
   }
 
+  if (subScreen === 'privacy') {
+    return <PrivacyPolicyScreen onBack={() => setSubScreen('main')} />;
+  }
+
+  if (subScreen === 'terms') {
+    return <TermsScreen onBack={() => setSubScreen('main')} />;
+  }
+
   const tier = user?.tier ?? 'free';
   const isSubscribed = tier !== 'free';
 
@@ -310,7 +321,8 @@ export default function SettingsScreen() {
     { icon: 'list', label: 'Manage Categories', subtitle: 'Add custom expense & income types', onPress: () => { haptics.light(); setSubScreen('categories'); } },
     { icon: 'upload', label: 'Export Data', subtitle: 'Download your transactions', onPress: () => { haptics.light(); setSubScreen('export'); } },
     { icon: 'message-circle', label: 'Send Feedback', subtitle: 'Goes straight to the Ari team', onPress: handleOpenFeedback },
-    { icon: 'shield', label: 'Privacy & Security', subtitle: 'Manage your data', onPress: handlePrivacy },
+    { icon: 'shield', label: 'Privacy Policy', subtitle: 'How we protect your data', onPress: handlePrivacy },
+    { icon: 'book-open', label: 'Terms of Service', subtitle: 'Rules for using Ari', onPress: handleTerms },
     { icon: 'help-circle', label: 'Help & Support', subtitle: 'FAQs and contact us', onPress: handleHelp },
     { icon: 'star', label: 'Rate Ari', subtitle: 'Love Ari? Let us know!', onPress: handleRate },
     { icon: 'info', label: 'About', subtitle: 'Version 1.0.0', onPress: () => { haptics.light(); setSubScreen('about'); } },
