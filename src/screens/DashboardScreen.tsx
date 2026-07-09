@@ -2,12 +2,12 @@ import React, { useMemo, useCallback } from 'react';
 import {
   View,
   Text,
-  ScrollView,
   TouchableOpacity,
   RefreshControl,
   StyleSheet,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import ScreenShell, { bottomPad as shellPad } from '../components/ScreenShell';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import type { CompositeNavigationProp } from '@react-navigation/native';
@@ -99,28 +99,33 @@ export default function DashboardScreen() {
     navigation.navigate('Tabs', { screen: 'Transactions' });
   }, [navigation]);
 
-  const bottomPad = 60 + insets.bottom + 80;
+  const bottom = shellPad.tab(insets);
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
-      <ScrollView
-        contentContainerStyle={[styles.container, { paddingBottom: bottomPad }]}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
+    <ScreenShell
+      edges={['top']}
+      scrollable
+      bottomPad={bottom}
+      contentContainerStyle={styles.container}
+      backgroundColor={c.cream}
+      scrollViewProps={{
+        showsVerticalScrollIndicator: false,
+        refreshControl: (
           <RefreshControl
             refreshing={refreshing}
             onRefresh={refresh}
             tintColor={c.forest}
             colors={[c.forest]}
           />
-        }
-      >
-        <AnimatedEntry delay={0}>
-          <Text style={styles.eyebrow}>{dateLabel}</Text>
-          <Text style={styles.greet}>
-            {getGreeting()}, {user?.name?.split(' ')[0] || 'there'}
-          </Text>
-        </AnimatedEntry>
+        ),
+      }}
+    >
+      <AnimatedEntry delay={0}>
+        <Text style={styles.eyebrow}>{dateLabel}</Text>
+        <Text style={styles.greet}>
+          {getGreeting()}, {user?.name?.split(' ')[0] || 'there'}
+        </Text>
+      </AnimatedEntry>
 
         <AnimatedEntry delay={80}>
           <BalanceCard
@@ -215,13 +220,11 @@ export default function DashboardScreen() {
             ))
           )}
         </AnimatedEntry>
-      </ScrollView>
-    </SafeAreaView>
+    </ScreenShell>
   );
 }
 
 const makeStyles = (c: Palette) => StyleSheet.create({
-  safe: { flex: 1, backgroundColor: c.cream },
   container: { paddingHorizontal: 22, paddingTop: 8 },
   eyebrow: {
     fontFamily: font.bodyBold,

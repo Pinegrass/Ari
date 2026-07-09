@@ -7,7 +7,7 @@ import {
   Share,
   StyleSheet,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import ScreenShell from '../components/ScreenShell';
 import { useData } from '../context/DataContext';
 import { color, font } from '../theme/tokens';
 import { useHaptics } from '../hooks/useHaptics';
@@ -74,7 +74,7 @@ export default function ExportScreen({ onBack }: Props) {
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <ScreenShell edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} accessibilityLabel="Go back" accessibilityRole="button">
           <Text style={styles.backText}>← Back</Text>
@@ -113,12 +113,11 @@ export default function ExportScreen({ onBack }: Props) {
           </View>
         </AnimatedEntry>
       </View>
-    </SafeAreaView>
+    </ScreenShell>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: color.cream },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

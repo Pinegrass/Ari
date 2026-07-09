@@ -4,7 +4,8 @@ import {
   Modal, StyleSheet, Alert, ActivityIndicator,
   RefreshControl, KeyboardAvoidingView, Platform, Switch,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import ScreenShell, { bottomPad as shellPad } from '../components/ScreenShell';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import Icon from '../components/ui/Icon';
 import type { IconName } from '../components/ui/Icon';
@@ -226,7 +227,7 @@ export default function TodoNotesScreen() {
   // ── Render ─────────────────────────────────────────────────────────
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <ScreenShell edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
@@ -498,14 +499,13 @@ export default function TodoNotesScreen() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
-    </SafeAreaView>
+    </ScreenShell>
   );
 }
 
 // ── Styles ────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: color.cream },
   loadingWrap: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 
   header: {

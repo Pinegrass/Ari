@@ -3,7 +3,7 @@ import {
   View, Text, ScrollView, TouchableOpacity,
   StyleSheet, ActivityIndicator, Dimensions,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import ScreenShell from '../../components/ScreenShell';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import Icon from '../../components/ui/Icon';
 import AnimatedEntry from '../../components/ui/AnimatedEntry';
@@ -63,26 +63,26 @@ export default function PnlReportScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.safe} edges={['top']}>
+      <ScreenShell edges={['top']}>
         <Header onBack={() => navigation.goBack()} />
         <View style={styles.loadingWrap}>
           <ActivityIndicator size="large" color={color.forest} />
           <Text style={styles.loadingText}>Generating report...</Text>
         </View>
-      </SafeAreaView>
+      </ScreenShell>
     );
   }
 
   if (!report || report.months.length === 0) {
     return (
-      <SafeAreaView style={styles.safe} edges={['top']}>
+      <ScreenShell edges={['top']}>
         <Header onBack={() => navigation.goBack()} />
         <EmptyState
           emoji="📊"
           title="No Data Yet"
           subtitle="Add some transactions to see your P&L report"
         />
-      </SafeAreaView>
+      </ScreenShell>
     );
   }
 
@@ -97,7 +97,7 @@ export default function PnlReportScreen() {
   const totalIncAmount = incEntries.reduce((s, [, v]) => s + v, 0);
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <ScreenShell edges={['top']}>
       <Header onBack={() => navigation.goBack()} />
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -311,7 +311,7 @@ export default function PnlReportScreen() {
           </View>
         </AnimatedEntry>
       </ScrollView>
-    </SafeAreaView>
+    </ScreenShell>
   );
 }
 
@@ -370,7 +370,6 @@ function TrendBadge({
 // ── Styles ────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: color.cream },
   loadingWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
   loadingText: { fontSize: 14, color: color.inkSoft, fontFamily: font.body },
 

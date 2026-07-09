@@ -10,7 +10,7 @@ import {
   Animated,
   StyleSheet,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import ScreenShell from '../components/ScreenShell';
 import { useFocusEffect } from '@react-navigation/native';
 import { useData } from '../context/DataContext';
 import ChatBubble from '../components/ChatBubble';
@@ -112,7 +112,7 @@ export default function TomoScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <ScreenShell edges={['top']} backgroundColor={c.cream}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -195,12 +195,11 @@ export default function TomoScreen() {
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </ScreenShell>
   );
 }
 
 const makeStyles = (c: Palette) => StyleSheet.create({
-  safe: { flex: 1, backgroundColor: c.cream },
   header: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     paddingHorizontal: 20, paddingVertical: 12,

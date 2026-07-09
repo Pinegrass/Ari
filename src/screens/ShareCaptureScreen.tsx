@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
   ScrollView,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import ScreenShell from '../components/ScreenShell';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import type { RouteProp } from '@react-navigation/native';
 import { color, font } from '../theme/tokens';
@@ -88,7 +88,7 @@ export default function ShareCaptureScreen({ navigation, route }: Props) {
   };
 
   return (
-    <SafeAreaView style={styles.backdrop} edges={['top', 'bottom']}>
+    <ScreenShell edges={['top', 'bottom']} style={styles.backdrop}>
       <TouchableOpacity style={styles.dimmer} activeOpacity={1} onPress={navigation.goBack} />
       <View style={styles.sheet}>
         <View style={styles.handle} />
@@ -159,7 +159,7 @@ export default function ShareCaptureScreen({ navigation, route }: Props) {
           <Text style={styles.cancelText}>Dismiss</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </ScreenShell>
   );
 }
 

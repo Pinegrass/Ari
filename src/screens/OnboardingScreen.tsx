@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import ScreenShell from '../components/ScreenShell';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { color, font, type as typeScale } from '../theme/tokens';
 import Icon from '../components/ui/Icon';
@@ -101,7 +101,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
 
   return (
     <View style={styles.screen}>
-      <SafeAreaView style={styles.safe}>
+      <ScreenShell edges={['top', 'bottom']}>
         {/* Header: progress dots + skip */}
         <View style={styles.top}>
           <View style={styles.dots}>
@@ -207,14 +207,13 @@ export default function OnboardingScreen({ onComplete }: Props) {
             </TouchableOpacity>
           )}
         </View>
-      </SafeAreaView>
+      </ScreenShell>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: color.cream },
-  safe: { flex: 1 },
   top: {
     flexDirection: 'row',
     alignItems: 'center',

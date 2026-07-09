@@ -4,7 +4,7 @@ import {
   StyleSheet, Alert, ActivityIndicator, Switch,
   KeyboardAvoidingView, Platform,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import ScreenShell from '../../components/ScreenShell';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import Icon from '../../components/ui/Icon';
 import AnimatedEntry from '../../components/ui/AnimatedEntry';
@@ -162,12 +162,12 @@ export default function TaxEstimatorScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.safe} edges={['top']}>
+      <ScreenShell edges={['top']}>
         <View style={styles.loadingWrap}>
           <ActivityIndicator size="large" color={color.forest} />
           <Text style={styles.loadingText}>Loading tax profile...</Text>
         </View>
-      </SafeAreaView>
+      </ScreenShell>
     );
   }
 
@@ -179,7 +179,7 @@ export default function TaxEstimatorScreen() {
   const result = comparison ? comparison[regime] : null;
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <ScreenShell edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
@@ -438,7 +438,7 @@ export default function TaxEstimatorScreen() {
           </AnimatedEntry>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </ScreenShell>
   );
 }
 
@@ -492,7 +492,6 @@ function FieldInput({
 // ── Styles ────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: color.cream },
   loadingWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
   loadingText: { fontSize: 14, color: color.inkSoft, fontFamily: font.body },
 

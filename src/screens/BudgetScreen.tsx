@@ -11,7 +11,8 @@ import {
   Platform,
   StyleSheet,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import ScreenShell, { bottomPad as shellPad } from '../components/ScreenShell';
 import { useFocusEffect } from '@react-navigation/native';
 import { useData } from '../context/DataContext';
 import BudgetCard from '../components/BudgetCard';
@@ -108,7 +109,7 @@ export default function BudgetScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <ScreenShell edges={['top']} backgroundColor={c.cream}>
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
@@ -245,7 +246,7 @@ export default function BudgetScreen() {
         onCancel={() => setToDelete(null)}
         loading={deleting}
       />
-    </SafeAreaView>
+    </ScreenShell>
   );
 }
 

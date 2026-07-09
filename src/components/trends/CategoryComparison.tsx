@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { color, font, type as ftype } from '../../theme/tokens';
+import { font, type as ftype } from '../../theme/tokens';
+import { useColors } from '../../context/ThemeContext';
+import type { Palette } from '../../theme/palettes';
 import { CATEGORY_ICONS } from '../ui/Icon';
 import { usePrivacy } from '../../context/PrivacyContext';
 
@@ -10,6 +12,8 @@ interface Props {
 
 export default function CategoryComparison({ categories }: Props) {
   const { formatAmount } = usePrivacy();
+  const c = useColors();
+  const styles = useMemo(() => makeStyles(c), [c]);
 
   const entries = useMemo(() => {
     return Object.entries(categories)
@@ -34,7 +38,7 @@ export default function CategoryComparison({ categories }: Props) {
       <Text style={styles.title}>Top categories</Text>
       {entries.map(([name, amount]) => {
         const pct = total > 0 ? Math.round((amount / total) * 100) : 0;
-        const meta = CATEGORY_ICONS[name] || { color: color.inkFaint };
+        const meta = CATEGORY_ICONS[name] || { color: c.inkFaint };
         return (
           <View key={name} style={styles.row}>
             <View style={[styles.dot, { backgroundColor: meta.color }]} />
@@ -52,25 +56,25 @@ export default function CategoryComparison({ categories }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (c: Palette) => StyleSheet.create({
   card: {
-    backgroundColor: color.card,
+    backgroundColor: c.card,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: color.line,
+    borderColor: c.line,
     padding: 18,
     marginBottom: 16,
   },
   title: {
     fontFamily: font.displaySemi,
     fontSize: ftype.sectionHead,
-    color: color.forestDeep,
+    color: c.forestDeep,
     marginBottom: 14,
   },
   empty: {
     fontFamily: font.body,
     fontSize: 13,
-    color: color.inkSoft,
+    color: c.inkSoft,
   },
   row: {
     flexDirection: 'row',
@@ -87,12 +91,12 @@ const styles = StyleSheet.create({
     width: 80,
     fontFamily: font.bodyMed,
     fontSize: 12,
-    color: color.ink,
+    color: c.ink,
   },
   barWrap: {
     flex: 1,
     height: 8,
-    backgroundColor: color.line,
+    backgroundColor: c.line,
     borderRadius: 4,
     overflow: 'hidden',
   },
@@ -104,7 +108,7 @@ const styles = StyleSheet.create({
     width: 70,
     fontFamily: font.bodySemi,
     fontSize: 12,
-    color: color.ink,
+    color: c.ink,
     textAlign: 'right',
   },
 });

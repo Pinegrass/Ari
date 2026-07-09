@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, Animated, StyleSheet, Dimensions } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import ScreenShell from '../components/ScreenShell';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { AuthStackParamList } from '../navigation/navigationTypes';
 import { color, font, onForest } from '../theme/tokens';
@@ -56,7 +56,7 @@ export default function SplashScreen({ navigation }: Props) {
 
   return (
     <View style={styles.root}>
-      <SafeAreaView style={styles.safe}>
+      <ScreenShell edges={['top', 'bottom']}>
         {/* Logo */}
         <Animated.View
           style={[
@@ -118,14 +118,13 @@ export default function SplashScreen({ navigation }: Props) {
             <Text style={styles.secondaryBtnText}>I already have an account</Text>
           </TouchableOpacity>
         </Animated.View>
-      </SafeAreaView>
+      </ScreenShell>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.forest },
-  safe: { flex: 1, paddingHorizontal: 24 },
   logoSection: {
     alignItems: 'center',
     marginTop: height * 0.08,

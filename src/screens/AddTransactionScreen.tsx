@@ -12,7 +12,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import type { StackScreenProps } from '@react-navigation/stack';
@@ -60,6 +60,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
 
   const { addTransaction, updateTransaction, userCategories, fetchUserCategories } = useData();
   const haptics = useHaptics();
+  const insets = useSafeAreaInsets();
   const c = useColors();
   const styles = useMemo(() => makeStyles(c), [c]);
 
@@ -319,7 +320,12 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-      {/* Header */}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior="padding"
+        keyboardVerticalOffset={insets.top}
+      >
+        {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.close}
@@ -482,6 +488,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
       >
         <Text style={styles.saveText}>{isEdit ? 'Update entry' : 'Save entry'}</Text>
       </TouchableOpacity>
+      </KeyboardAvoidingView>
 
       {/* Toast */}
       {toast && (
@@ -495,8 +502,8 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
         <View style={styles.sheetBackdrop}>
           <KeyboardAvoidingView
             style={styles.sheetWrapper}
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+            behavior="padding"
+            keyboardVerticalOffset={insets.top}
           >
             <ScrollView
               contentContainerStyle={styles.sheetScroll}
@@ -562,8 +569,8 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
         <View style={styles.sheetBackdrop}>
           <KeyboardAvoidingView
             style={styles.sheetWrapper}
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+            behavior="padding"
+            keyboardVerticalOffset={insets.top}
           >
             <ScrollView
               contentContainerStyle={styles.sheetScroll}

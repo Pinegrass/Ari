@@ -3,7 +3,7 @@ import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, Alert,
   TextInput,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import ScreenShell from '../components/ScreenShell';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import RazorpayCheckout from 'react-native-razorpay';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -92,7 +92,7 @@ function WaitlistPlaceholder({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <ScreenShell edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={onClose} hitSlop={8}>
           <Icon name="x" size={22} color={color.ink} />
@@ -149,7 +149,7 @@ function WaitlistPlaceholder({ onClose }: { onClose: () => void }) {
           We&apos;ll only email you about Premium. No spam, unsubscribe in one tap.
         </Text>
       </ScrollView>
-    </SafeAreaView>
+    </ScreenShell>
   );
 }
 
@@ -270,7 +270,7 @@ function LivePaywallScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <ScreenShell edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={8}>
           <Icon name="x" size={22} color={color.ink} />
@@ -331,7 +331,7 @@ function LivePaywallScreen() {
           </Text>
         </ScrollView>
       )}
-    </SafeAreaView>
+    </ScreenShell>
   );
 }
 

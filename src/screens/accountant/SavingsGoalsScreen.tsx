@@ -4,7 +4,8 @@ import {
   RefreshControl, KeyboardAvoidingView, Platform, Alert, StyleSheet,
   Animated,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import ScreenShell from '../../components/ScreenShell';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import Icon from '../../components/ui/Icon';
 import type { IconName } from '../../components/ui/Icon';
@@ -197,7 +198,7 @@ export default function SavingsGoalsScreen() {
   const quickAmounts = [1000, 2000, 5000, 10000];
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <ScreenShell edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
@@ -426,7 +427,7 @@ export default function SavingsGoalsScreen() {
         onCancel={() => setDeleteTarget(null)}
         loading={deleting}
       />
-    </SafeAreaView>
+    </ScreenShell>
   );
 }
 
@@ -522,7 +523,6 @@ function GoalCard({
 // Styles
 // ---------------------------------------------------------------------------
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: color.cream },
   header: {
     flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20,
     paddingVertical: 14, gap: 12, borderBottomWidth: 1,

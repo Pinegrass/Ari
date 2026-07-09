@@ -1,7 +1,9 @@
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { LineChart } from 'react-native-gifted-charts';
-import { color, font, type as ftype } from '../../theme/tokens';
+import { font, type as ftype } from '../../theme/tokens';
+import { useColors } from '../../context/ThemeContext';
+import type { Palette } from '../../theme/palettes';
 import { Skeleton } from '../ui/Skeleton';
 import type { PnlReport } from '../../types';
 
@@ -10,6 +12,10 @@ interface Props {
   loading?: boolean;
 }
 
+const SCREEN_WIDTH = Dimensions.get('window').width;
+const CARD_PAD = 18;
+const CHART_WIDTH = SCREEN_WIDTH - 40 - CARD_PAD * 2; // 20px screen padding each side + card padding
+
 const MONTH_SHORT: Record<string, string> = {
   '01': 'Jan', '02': 'Feb', '03': 'Mar', '04': 'Apr',
   '05': 'May', '06': 'Jun', '07': 'Jul', '08': 'Aug',
@@ -17,6 +23,9 @@ const MONTH_SHORT: Record<string, string> = {
 };
 
 export default function TrendLineChart({ report, loading }: Props) {
+  const c = useColors();
+  const styles = useMemo(() => makeStyles(c), [c]);
+
   const incomeData = useMemo(() => {
     if (!report) return [];
     return report.months.map((m) => ({
@@ -56,33 +65,34 @@ export default function TrendLineChart({ report, loading }: Props) {
       <LineChart
         data={incomeData}
         data2={expenseData}
+        width={CHART_WIDTH}
         height={160}
         spacing={report.months.length > 6 ? 30 : 50}
-        color={color.forest2}
-        color2={color.clay}
+        color={c.forest2}
+        color2={c.clay}
         thickness={2}
         thickness2={2}
         hideDataPoints={false}
-        dataPointsColor={color.forest2}
-        dataPointsColor2={color.clay}
+        dataPointsColor={c.forest2}
+        dataPointsColor2={c.clay}
         hideRules
         hideYAxisText
-        xAxisColor={color.line}
+        xAxisColor={c.line}
         yAxisColor="transparent"
         yAxisThickness={0}
         xAxisThickness={1}
         xAxisLabelTextStyle={styles.labelText}
         showVerticalLines
-        verticalLinesColor={color.line}
+        verticalLinesColor={c.line}
         isAnimated
       />
       <View style={styles.legend}>
         <View style={styles.legendItem}>
-          <View style={[styles.dot, { backgroundColor: color.forest2 }]} />
+          <View style={[styles.dot, { backgroundColor: c.forest2 }]} />
           <Text style={styles.legendText}>Income</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.dot, { backgroundColor: color.clay }]} />
+          <View style={[styles.dot, { backgroundColor: c.clay }]} />
           <Text style={styles.legendText}>Expenses</Text>
         </View>
       </View>
@@ -90,35 +100,30 @@ export default function TrendLineChart({ report, loading }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (c: Palette) => StyleSheet.create({
   card: {
-    backgroundColor: color.card,
+    backgroundColor: c.card,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: color.line,
-    padding: 18,
+    borderColor: c.line,
+    padding: CARD_PAD,
     marginBottom: 16,
-  },
-  center: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 160,
   },
   title: {
     fontFamily: font.displaySemi,
     fontSize: ftype.sectionHead,
-    color: color.forestDeep,
+    color: c.forestDeep,
     marginBottom: 14,
   },
   empty: {
     fontFamily: font.body,
     fontSize: 13,
-    color: color.inkSoft,
+    color: c.inkSoft,
   },
   labelText: {
     fontFamily: font.bodyMed,
     fontSize: 9,
-    color: color.inkFaint,
+    color: c.inkFaint,
   },
   legend: {
     flexDirection: 'row',
@@ -127,7 +132,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderColor: color.line,
+    borderColor: c.line,
   },
   legendItem: {
     flexDirection: 'row',
@@ -142,6 +147,6 @@ const styles = StyleSheet.create({
   legendText: {
     fontFamily: font.bodyMed,
     fontSize: 12,
-    color: color.inkSoft,
+    color: c.inkSoft,
   },
 });

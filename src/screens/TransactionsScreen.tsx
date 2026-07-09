@@ -8,7 +8,8 @@ import {
   RefreshControl,
   StyleSheet,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import ScreenShell, { bottomPad as shellPad } from '../components/ScreenShell';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import type { CompositeNavigationProp } from '@react-navigation/native';
@@ -18,7 +19,6 @@ import TransactionItem from '../components/TransactionItem';
 import DeleteConfirmSheet from '../components/DeleteConfirmSheet';
 import EmptyState from '../components/ui/EmptyState';
 import { SkeletonList } from '../components/ui/Skeleton';
-import AnimatedFAB from '../components/ui/AnimatedFAB';
 import AnimatedEntry from '../components/ui/AnimatedEntry';
 import Icon from '../components/ui/Icon';
 import TrendLineChart from '../components/trends/TrendLineChart';
@@ -146,7 +146,7 @@ export default function TransactionsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <ScreenShell edges={['top']} backgroundColor={c.cream}>
       <SectionList
         sections={sections}
         keyExtractor={(item) => item.id}
@@ -339,14 +339,6 @@ export default function TransactionsScreen() {
         }
       />
 
-      {/* Animated FAB */}
-      <AnimatedFAB
-        onPress={() => {
-          haptics.medium();
-          navigation.navigate('AddTransaction', { type: 'expense' });
-        }}
-      />
-
       <DeleteConfirmSheet
         visible={!!toDelete}
         title="Delete Transaction?"
@@ -359,12 +351,11 @@ export default function TransactionsScreen() {
         onCancel={() => setToDelete(null)}
         loading={deleting}
       />
-    </SafeAreaView>
+    </ScreenShell>
   );
 }
 
 const makeStyles = (c: Palette) => StyleSheet.create({
-  safe: { flex: 1, backgroundColor: c.cream },
   listContent: { paddingHorizontal: 20 },
   screenTitle: {
     fontFamily: font.displayBold,

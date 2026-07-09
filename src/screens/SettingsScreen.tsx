@@ -14,7 +14,8 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import ScreenShell, { bottomPad as shellPad } from '../components/ScreenShell';
 import { useAuth } from '../context/AuthContext';
 import { color, font } from '../theme/tokens';
 import { useHaptics } from '../hooks/useHaptics';
@@ -329,7 +330,7 @@ export default function SettingsScreen() {
   ];
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: c.cream }]} edges={['top']}>
+    <ScreenShell edges={['top']} backgroundColor={c.cream}>
       <ScrollView
         contentContainerStyle={[styles.container, { paddingBottom: Math.max(insets.bottom, 20) + 20 }]}
         showsVerticalScrollIndicator={false}
@@ -746,12 +747,11 @@ export default function SettingsScreen() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
-    </SafeAreaView>
+    </ScreenShell>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: color.cream },
   container: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 40 },
   screenTitle: {
     fontFamily: font.displayBold,

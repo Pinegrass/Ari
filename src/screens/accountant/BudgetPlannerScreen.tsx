@@ -3,7 +3,8 @@ import {
   View, Text, ScrollView, TouchableOpacity, Modal, TextInput,
   RefreshControl, KeyboardAvoidingView, Platform, StyleSheet,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import ScreenShell, { bottomPad as shellPad } from '../../components/ScreenShell';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import Icon from '../../components/ui/Icon';
 import Button from '../../components/ui/Button';
@@ -144,7 +145,7 @@ export default function BudgetPlannerScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <ScreenShell edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
@@ -295,7 +296,7 @@ export default function BudgetPlannerScreen() {
         onCancel={() => setDeleteTarget(null)}
         loading={deleting}
       />
-    </SafeAreaView>
+    </ScreenShell>
   );
 }
 
@@ -366,7 +367,6 @@ function formatMonthLabel(month: string): string {
 // Styles
 // ---------------------------------------------------------------------------
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: color.cream },
   header: {
     flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20,
     paddingVertical: 14, gap: 12, borderBottomWidth: 1,

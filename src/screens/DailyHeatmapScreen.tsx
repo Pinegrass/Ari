@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import ScreenShell from '../components/ScreenShell';
 import { useNavigation } from '@react-navigation/native';
 import Icon from '../components/ui/Icon';
 import { color, font } from '../theme/tokens';
@@ -74,7 +74,7 @@ export default function DailyHeatmapScreen() {
   }, [data, sortedEntries]);
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <ScreenShell edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={8}>
           <Icon name="chevron-left" size={22} color={color.ink} />
@@ -167,7 +167,7 @@ export default function DailyHeatmapScreen() {
           <Text style={styles.error}>Couldn&apos;t load heatmap.</Text>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </ScreenShell>
   );
 }
 
@@ -181,7 +181,6 @@ function intensityColor(i: number): string {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: color.cream },
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: 20, paddingVertical: 14,
