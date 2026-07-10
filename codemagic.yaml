@@ -19,15 +19,12 @@ definitions:
       script: |
         set -eo pipefail
         if [ -f pnpm-lock.yaml ]; then
-          echo "Detected pnpm-lock.yaml — using pnpm"
           corepack enable
           corepack prepare pnpm@9 --activate
           pnpm install --frozen-lockfile
         elif [ -f package-lock.json ]; then
-          echo "Detected package-lock.json — using npm ci"
           npm ci
         else
-          echo "No lockfile found — using npm install"
           npm install
         fi
         echo "Verifying babel-preset-expo is resolvable:"
@@ -52,16 +49,12 @@ definitions:
       name: Patch fmt for Xcode 26.4 (RN#55601)
       script: |
         set -eo pipefail
-
-        # Header-level: force-disable consteval
         FMT_BASE="ios/Pods/fmt/include/fmt/base.h"
         test -f "$FMT_BASE" || { echo "ERROR: $FMT_BASE not found"; exit 1; }
         chmod u+w "$FMT_BASE"
         printf '#ifndef FMT_USE_CONSTEVAL\n#define FMT_USE_CONSTEVAL 0\n#endif\n%s' "$(cat "$FMT_BASE")" > "$FMT_BASE"
         echo "base.h head:"
         head -5 "$FMT_BASE"
-
-        # Target-level (outranks xcconfig): edit Pods.xcodeproj directly
         ruby <<'RUBY'
         require 'xcodeproj'
         project = Xcodeproj::Project.open('ios/Pods/Pods.xcodeproj')
@@ -79,8 +72,6 @@ definitions:
         abort 'ERROR: fmt target not found in Pods.xcodeproj' unless patched
         project.save
         RUBY
-
-        # PROOF: resolved settings the compiler will actually use
         echo "=== Resolved fmt build settings (Release) ==="
         xcodebuild -project ios/Pods/Pods.xcodeproj -target fmt -configuration Release -showBuildSettings 2>/dev/null | grep -E "CLANG_CXX_LANGUAGE_STANDARD|GCC_PREPROCESSOR_DEFINITIONS|OTHER_CPLUSPLUSFLAGS"
 
@@ -102,17 +93,25 @@ definitions:
         set -eo pipefail
         keychain initialize
 
+    - &fetch_signing
+      name: Fetch signing files (create if missing)
+      script: |
+        set -eo pipefail
+        app-store-connect fetch-signing-files "$BUNDLE_ID" \
+          --type IOS_APP_STORE \
+          --create
+
     - &keychain_certs
-      name: Add certificates to keychain
+      name: Set up signing certificate
       script: |
         set -eo pipefail
         keychain add-certificates
 
     - &use_profiles
-      name: Apply provisioning profiles
+      name: Set up code signing on Xcode project
       script: |
         set -eo pipefail
-        xcode-project use-profiles --warn-only
+        xcode-project use-profiles
 
     - &increment_build_number
       name: Increment build number
@@ -157,13 +156,10 @@ workflows:
       app_store_connect: "Pinegrasscm"
     environment:
       <<: *env_versions
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.pinegrass.ari
       vars:
         BUNDLE_ID: "com.pinegrass.ari"
         XCODE_SCHEME: "Ari"
-        APP_ID: 6789322260   # <-- REPLACE: Ari's numeric Apple ID from App Store Connect > App Information
+        APP_ID: 6xxxxxxxxx   # <-- REPLACE: Ari's numeric Apple ID from App Store Connect
     cache:
       <<: *cache
     scripts:
@@ -173,6 +169,7 @@ workflows:
       - *patch_fmt_xcode26
       - *resolve_workspace
       - *keychain_init
+      - *fetch_signing
       - *keychain_certs
       - *use_profiles
       - *increment_build_number
