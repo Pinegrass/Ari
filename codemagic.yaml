@@ -37,6 +37,21 @@ definitions:
         rm -rf ios
         npx expo prebuild --platform ios --clean
 
+    - &patch_podfile_modular_headers
+      name: Enable modular headers (Firebase/AppCheckCore)
+      script: |
+        set -eo pipefail
+        PODFILE="ios/Podfile"
+        test -f "$PODFILE" || { echo "ERROR: $PODFILE not found"; exit 1; }
+        if ! grep -q "use_modular_headers!" "$PODFILE"; then
+          awk '1; /^platform :ios/ && !done {print "use_modular_headers!"; done=1}' "$PODFILE" > "$PODFILE.tmp" && mv "$PODFILE.tmp" "$PODFILE"
+          echo "Inserted use_modular_headers!"
+        else
+          echo "use_modular_headers! already present"
+        fi
+        echo "=== Podfile head ==="
+        head -15 "$PODFILE"
+
     - &pod_install
       name: Install CocoaPods dependencies
       script: |
@@ -159,12 +174,13 @@ workflows:
       vars:
         BUNDLE_ID: "com.pinegrass.ari"
         XCODE_SCHEME: "Ari"
-        APP_ID: 6xxxxxxxxx   # <-- REPLACE: Ari's numeric Apple ID from App Store Connect
+        APP_ID: 6789322260   # <-- REPLACE: Ari's numeric Apple ID from App Store Connect
     cache:
       <<: *cache
     scripts:
       - *install_js_deps
       - *expo_prebuild_ios
+      - *patch_podfile_modular_headers
       - *pod_install
       - *patch_fmt_xcode26
       - *resolve_workspace
