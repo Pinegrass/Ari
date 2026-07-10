@@ -28,6 +28,37 @@ definitions:
       rm -rf ios
       npx expo prebuild --platform ios --clean
 
+  diagnose_entitlements: &diagnose_entitlements
+    name: Diagnose entitlements files and App Group config (debug)
+    script: |
+      #!/usr/bin/env bash
+      set -eo pipefail
+      mkdir -p /tmp/pinegrass_debug
+      echo "=== Searching for all .entitlements files in ios/ ==="
+      find ios -iname "*.entitlements" | tee /tmp/pinegrass_debug/entitlements_file_list.txt
+
+      echo ""
+      echo "=== Contents of each .entitlements file ==="
+      while IFS= read -r f; do
+        echo "--- $f ---"
+        cat "$f"
+        echo ""
+        cp "$f" "/tmp/pinegrass_debug/$(basename "$f")"
+      done < /tmp/pinegrass_debug/entitlements_file_list.txt
+
+      echo ""
+      echo "=== Searching app.json / app.config.js for App Group / ShareExtension / entitlements config ==="
+      for cfg in app.json app.config.js app.config.ts; do
+        if [ -f "$cfg" ]; then
+          echo "--- $cfg (grep for group/entitlement/share) ---"
+          grep -n -i "group\|entitlement\|share" "$cfg" || echo "(no matches)"
+        fi
+      done
+
+      echo ""
+      echo "=== ShareExtension target settings from project.pbxproj (CODE_SIGN / ENTITLEMENTS lines) ==="
+      find ios -iname "project.pbxproj" -exec grep -n -i "entitlement\|CODE_SIGN_ENTITLEMENTS\|PRODUCT_BUNDLE_IDENTIFIER" {} \; | tee /tmp/pinegrass_debug/pbxproj_signing_lines.txt
+
   modular_headers: &modular_headers
     name: Insert modular_headers pod flags into Podfile target block (Firebase/Stripe apps)
     script: |
@@ -253,6 +284,7 @@ workflows:
     scripts:
       - <<: *install_deps
       - <<: *prebuild_ios
+      - <<: *diagnose_entitlements
       - <<: *modular_headers   # Ari uses Firebase — keep this step
       - <<: *capture_podfile_debug
       - <<: *pod_install
