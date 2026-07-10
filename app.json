@@ -49,7 +49,7 @@
         {
           "organization": "pinegrass",
           "project": "ari",
-          "disableAutoUpload": true
+          "disableAutoUpload": false
         }
       ],
       [
@@ -89,12 +89,10 @@
     ],
     "updates": {
       "url": "https://u.expo.dev/ae18eabf-124f-4b0a-a09e-a2a40dfb473b",
-      "enabled": false,
-      "checkAutomatically": "NEVER"
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD"
     },
-    "runtimeVersion": {
-      "policy": "fingerprint"
-    },
+    "runtimeVersion": { "policy": "appVersion" },
     "extra": {
       "eas": {
         "projectId": "ae18eabf-124f-4b0a-a09e-a2a40dfb473b"

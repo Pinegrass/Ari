@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { AppState, type AppStateStatus } from 'react-native';
 import * as Linking from 'expo-linking';
 import { StatusBar } from 'expo-status-bar';
@@ -112,12 +112,6 @@ function navigateToShare(text: string) {
 // foregrounding is tracked separately via the AppState listener below.
 initSentry();
 
-// Enable certificate pinning as early as possible so the OkHttp/URLSession
-// interceptor is installed before the first Supabase/API call. Fire-and-forget:
-// initSslPinning never throws (fail-open) and the pinned hosts aren't contacted
-// until after React mounts + the user acts. See docs/ssl-pinning-runbook.md.
-initSslPinning();
-
 initAnalytics().then(() => track('app_opened', { source: 'cold' }));
 
 // Fire-and-forget OTA check on cold start. Never blocks the splash: if a newer
@@ -146,6 +140,13 @@ function App() {
     Inter_600SemiBold,
     Inter_700Bold,
   });
+
+  // SSL pinning is initialized inside a useEffect (not at module level) so the
+  // ErrorBoundary + native splash are already visible before the native module
+  // loads. We gate the subtree that makes authenticated API calls (AuthProvider
+  // calls /auth/me on mount) until pinning resolves, eliminating the race where
+  // the first API request goes out before the pinning interceptor is installed.
+  const [pinningReady, setPinningReady] = useState(false);
 
   // Tracks the wall-clock time spent in the foreground for the current
   // session. Reset on every transition into 'active'. Used to compute
@@ -212,6 +213,17 @@ function App() {
     return () => sub.remove();
   }, []);
 
+  // Certificate pinning is installed after React mounts so the ErrorBoundary +
+  // native splash are already shown before the native module initializes. If the
+  // SSL pinning module crashes iOS on first boot (rare: broken native module or
+  // New Architecture incompatibility), the user sees the splash — not a white
+  // flash. initSslPinning is fail-open on JS errors, but native SIGSEGV can't be
+  // caught by a JS try-catch, so deferring past mount is a defense-in-depth.
+  // The pinned hosts (Railway, Supabase) aren't contacted until the user logs in.
+  useEffect(() => {
+    initSslPinning().finally(() => setPinningReady(true));
+  }, []);
+
   // Apply a staged OTA update when the app goes to background, so an active
   // user is never interrupted mid-session by a reload.
   useEffect(() => registerOtaReloadHandler(), []);
@@ -263,8 +275,10 @@ function App() {
     return () => sub.remove();
   }, []);
 
-  // Native splash stays up until fonts resolve; brief null avoids a FOUT.
-  if (!fontsLoaded) return null;
+  // Native splash stays up until fonts resolve and SSL pinning interceptor is
+  // installed. Fonts gate avoids a FOUT; pinning gate prevents AuthProvider's
+  // /auth/me call from racing the interceptor install.
+  if (!fontsLoaded || !pinningReady) return null;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
