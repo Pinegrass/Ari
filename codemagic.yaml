@@ -94,6 +94,16 @@ definitions:
       cat -n ios/Podfile
       grep -n "PINEGRASS_MODULAR_HEADERS_PATCH\|modular_headers" ios/Podfile || { echo "ERROR: patch verification failed — marker not found post-insert"; exit 1; }
 
+  capture_podfile_debug: &capture_podfile_debug
+    name: Capture patched Podfile as downloadable artifact (debug)
+    script: |
+      #!/usr/bin/env bash
+      set -eo pipefail
+      mkdir -p /tmp/pinegrass_debug
+      cp ios/Podfile /tmp/pinegrass_debug/Podfile_after_modular_headers_patch.rb
+      echo "=== Copied Podfile to /tmp/pinegrass_debug for artifact upload ==="
+      cat -n /tmp/pinegrass_debug/Podfile_after_modular_headers_patch.rb
+
       echo "=== Podfile AFTER patch (last 25 lines) ==="
       tail -25 ios/Podfile
       grep -n "PINEGRASS_MODULAR_HEADERS_PATCH" ios/Podfile
@@ -284,6 +294,7 @@ workflows:
       - <<: *install_deps
       - <<: *prebuild_ios
       - <<: *modular_headers   # Ari uses Firebase — keep this step
+      - <<: *capture_podfile_debug
       - <<: *pod_install
       - <<: *fmt_diagnose
       - <<: *fmt_patch
@@ -295,5 +306,6 @@ workflows:
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
+      - /tmp/pinegrass_debug/*
     publishing:
       <<: *publish_block
