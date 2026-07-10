@@ -19,7 +19,8 @@
       "bundleIdentifier": "com.pinegrass.ari",
       "infoPlist": {
         "NSFaceIDUsageDescription": "Ari uses Face ID to secure your app access.",
-        "NSUserNotificationUsageDescription": "Ari sends you daily reminders and budget alerts."
+        "NSUserNotificationUsageDescription": "Ari sends you daily reminders and budget alerts.",
+        "NSPhotoLibraryUsageDescription": "Ari needs access to your photos so you can share receipt images into Ari to log expenses."
       }
     },
     "android": {
