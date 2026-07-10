@@ -34,23 +34,47 @@ definitions:
       #!/usr/bin/env bash
       set -eo pipefail
       test -f ios/Podfile || { echo "ERROR: ios/Podfile not found"; exit 1; }
-      echo "=== Podfile BEFORE patch (first 15 lines) ==="
-      head -15 ios/Podfile
-      if grep -qE "^\s*use_modular_headers!\s*$" ios/Podfile; then
-        echo "use_modular_headers! already present globally, skipping"
+      echo "=== Podfile BEFORE patch (last 25 lines, where post_install usually lives) ==="
+      tail -25 ios/Podfile
+
+      if grep -q "PINEGRASS_MODULAR_HEADERS_PATCH" ios/Podfile; then
+        echo "Patch marker already present, skipping insert"
+      elif grep -qE "^\s*post_install do" ios/Podfile; then
+        echo "=== WARNING: Podfile already has a post_install block (likely Expo's own autolinking hook) ==="
+        echo "Appending a second post_install block is unsafe — only inserting the pod-config lines"
+        echo "needs manual verification. Failing loudly instead of silently corrupting signing/autolinking."
+        echo "=== Existing post_install block context ==="
+        grep -n -A 15 "post_install do" ios/Podfile
+        echo "ACTION NEEDED: manually merge the DEFINES_MODULE loop into the existing post_install block above."
+        exit 1
       else
-        # Prepend globally at the very top of the file — this applies to ALL targets,
-        # regardless of Expo's exact target block syntax/whitespace, and is CocoaPods'
-        # own recommended fix for "Swift pod X cannot yet be integrated as static libraries".
-        TMP=$(mktemp)
-        echo "use_modular_headers!" > "$TMP"
-        cat ios/Podfile >> "$TMP"
-        mv "$TMP" ios/Podfile
-        echo "Prepended use_modular_headers! at top of Podfile"
+        # Scoped fix (per CocoaPods' own guidance + community consensus for this exact
+        # "Swift pod X cannot yet be integrated as static libraries" error): rather than
+        # a blunt global use_modular_headers! (which can conflict with Expo's own
+        # config-plugin Podfile injections, e.g. ExpoModulesCore autolinking), set
+        # modular headers ONLY on the specific pods named in the error via a post_install
+        # hook. This survives Expo prebuild/autolinking because it runs as part of
+        # CocoaPods' own installer lifecycle, not as static text Expo might regenerate.
+        cat >> ios/Podfile << 'RUBY_PATCH'
+
+      # PINEGRASS_MODULAR_HEADERS_PATCH — scoped fix for AppCheckCore/GoogleUtilities/RecaptchaInterop
+      # "cannot yet be integrated as static libraries" error (Firebase + Swift static-linking).
+      post_install do |installer|
+        installer.pods_project.targets.each do |target|
+          if ['GoogleUtilities', 'RecaptchaInterop', 'AppCheckCore'].include?(target.name)
+            target.build_configurations.each do |config|
+              config.build_settings['DEFINES_MODULE'] = 'YES'
+            end
+          end
+        end
+      end
+      RUBY_PATCH
+        echo "Appended scoped modular-headers post_install hook"
       fi
-      echo "=== Podfile AFTER patch (first 15 lines) ==="
-      head -15 ios/Podfile
-      grep -n "use_modular_headers!" ios/Podfile
+
+      echo "=== Podfile AFTER patch (last 25 lines) ==="
+      tail -25 ios/Podfile
+      grep -n "PINEGRASS_MODULAR_HEADERS_PATCH" ios/Podfile
 
   pod_install: &pod_install
     name: Pod install
@@ -183,7 +207,7 @@ workflows:
       vars:
         BUNDLE_ID: "com.pinegrass.gani"
         XCODE_SCHEME: "Gani"
-        APP_ID: "6789322260"
+        APP_ID: "REPLACE_WITH_GANI_NUMERIC_APPLE_ID"
       node: 20
       xcode: 26.4
       cocoapods: default
