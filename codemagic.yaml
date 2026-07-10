@@ -177,8 +177,6 @@ definitions:
         --scheme "$XCODE_SCHEME"
 
   publish_block: &publish_block
-    email:
-      recipients: []
     app_store_connect:
       auth: integration
       submit_to_testflight: true
