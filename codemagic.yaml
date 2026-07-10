@@ -1,200 +1,265 @@
 definitions:
-  instance: &instance
-    instance_type: mac_mini_m2
-    max_build_duration: 90
+  install_deps: &install_deps
+    name: Install JS dependencies (auto-detect pm)
+    script: |
+      #!/usr/bin/env bash
+      set -eo pipefail
+      if [ -f pnpm-lock.yaml ]; then
+        echo "=== Detected pnpm ==="
+        corepack enable
+        corepack prepare pnpm@latest --activate
+        test -f .npmrc && grep -q "node-linker=hoisted" .npmrc || { echo "ERROR: pnpm repo missing .npmrc with node-linker=hoisted"; exit 1; }
+        pnpm install --frozen-lockfile
+      elif [ -f package-lock.json ]; then
+        echo "=== Detected npm ==="
+        npm ci
+      else
+        echo "=== No lockfile match, falling back to npm install ==="
+        npm install
+      fi
+      echo "=== Verifying babel-preset-expo resolves ==="
+      node -e "require.resolve('babel-preset-expo')" || { echo "ERROR: babel-preset-expo not resolvable"; exit 1; }
 
-  env_versions: &env_versions
-    node: 20
-    xcode: 26.4
-    cocoapods: default
+  prebuild_ios: &prebuild_ios
+    name: Clean Expo iOS prebuild
+    script: |
+      #!/usr/bin/env bash
+      set -eo pipefail
+      rm -rf ios
+      npx expo prebuild --platform ios --clean
 
-  cache: &cache
-    cache_paths:
-      - ~/Library/Caches/CocoaPods
-      - $CM_BUILD_DIR/node_modules
+  modular_headers: &modular_headers
+    name: Insert use_modular_headers! into Podfile (Firebase apps only)
+    script: |
+      #!/usr/bin/env bash
+      set -eo pipefail
+      test -f ios/Podfile || { echo "ERROR: ios/Podfile not found"; exit 1; }
+      if grep -q "use_modular_headers!" ios/Podfile; then
+        echo "use_modular_headers! already present, skipping"
+      else
+        # Insert right after the first target block opens
+        ruby -e '
+          content = File.read("ios/Podfile")
+          content.sub!(/(target .* do\n)/) { "#{$1}  use_modular_headers!\n" }
+          File.write("ios/Podfile", content)
+        '
+        echo "Inserted use_modular_headers!"
+      fi
+      grep -n "use_modular_headers!" ios/Podfile
 
-  scripts:
-    - &install_js_deps
-      name: Install JavaScript dependencies (auto-detect package manager)
-      script: |
-        set -eo pipefail
-        if [ -f pnpm-lock.yaml ]; then
-          corepack enable
-          corepack prepare pnpm@9 --activate
-          pnpm install --frozen-lockfile
-        elif [ -f package-lock.json ]; then
-          npm ci
-        else
-          npm install
-        fi
-        echo "Verifying babel-preset-expo is resolvable:"
-        node -e "console.log(require.resolve('babel-preset-expo'))"
+  pod_install: &pod_install
+    name: Pod install
+    script: |
+      #!/usr/bin/env bash
+      set -eo pipefail
+      cd ios
+      pod install
+      cd ..
 
-    - &expo_prebuild_ios
-      name: Clean Expo iOS prebuild
-      script: |
-        set -eo pipefail
-        rm -rf ios
-        npx expo prebuild --platform ios --clean
+  fmt_diagnose: &fmt_diagnose
+    name: Diagnose fmt pod presence and path (self-detecting)
+    script: |
+      #!/usr/bin/env bash
+      set -eo pipefail
+      echo "=== Podfile.lock fmt entry ==="
+      grep -A2 -i '\- fmt' ios/Podfile.lock 2>/dev/null || echo "NO_FMT_IN_LOCKFILE"
+      echo "=== Searching for fmt header files ==="
+      FOUND_BASE=$(find ios/Pods -iname "base.h" -path "*fmt*" 2>/dev/null | head -1)
+      FOUND_CORE=$(find ios/Pods -iname "core.h" -path "*fmt*" 2>/dev/null | head -1)
+      echo "base.h candidate: ${FOUND_BASE:-none}"
+      echo "core.h candidate: ${FOUND_CORE:-none}"
+      # Persist findings for the next step via a dotfile (Codemagic script steps share the workspace)
+      echo "FMT_HEADER_PATH=${FOUND_BASE:-$FOUND_CORE}" > /tmp/fmt_env.sh
+      cat /tmp/fmt_env.sh
 
-    - &patch_podfile_modular_headers
-      name: Enable modular headers (Firebase/AppCheckCore)
-      script: |
-        set -eo pipefail
-        PODFILE="ios/Podfile"
-        test -f "$PODFILE" || { echo "ERROR: $PODFILE not found"; exit 1; }
-        if ! grep -q "use_modular_headers!" "$PODFILE"; then
-          awk '1; /^platform :ios/ && !done {print "use_modular_headers!"; done=1}' "$PODFILE" > "$PODFILE.tmp" && mv "$PODFILE.tmp" "$PODFILE"
-          echo "Inserted use_modular_headers!"
-        else
-          echo "use_modular_headers! already present"
-        fi
-        echo "=== Podfile head ==="
-        head -15 "$PODFILE"
+  fmt_patch: &fmt_patch
+    name: Patch fmt for Xcode 26.4 (RN#55601) — conditional
+    script: |
+      #!/usr/bin/env bash
+      set -eo pipefail
+      source /tmp/fmt_env.sh 2>/dev/null || true
+      if [ -z "$FMT_HEADER_PATH" ] || [ ! -f "$FMT_HEADER_PATH" ]; then
+        echo "=== No fmt header found — this app does not vendor fmt directly, or Podfile.lock has no fmt entry. Skipping patch. ==="
+        exit 0
+      fi
+      echo "=== Patching $FMT_HEADER_PATH ==="
+      chmod u+w "$FMT_HEADER_PATH"
+      printf '#ifndef FMT_USE_CONSTEVAL\n#define FMT_USE_CONSTEVAL 0\n#endif\n%s' "$(cat "$FMT_HEADER_PATH")" > "$FMT_HEADER_PATH"
+      echo "Patched header head:"
+      head -5 "$FMT_HEADER_PATH"
 
-    - &pod_install
-      name: Install CocoaPods dependencies
-      script: |
-        set -eo pipefail
-        cd ios
-        pod install 2>&1 | tee /tmp/pod_install.log
-        cd ..
-
-    - &patch_fmt_xcode26
-      name: Patch fmt for Xcode 26.4 (RN#55601)
-      script: |
-        set -eo pipefail
-        FMT_BASE="ios/Pods/fmt/include/fmt/base.h"
-        test -f "$FMT_BASE" || { echo "ERROR: $FMT_BASE not found"; exit 1; }
-        chmod u+w "$FMT_BASE"
-        printf '#ifndef FMT_USE_CONSTEVAL\n#define FMT_USE_CONSTEVAL 0\n#endif\n%s' "$(cat "$FMT_BASE")" > "$FMT_BASE"
-        echo "base.h head:"
-        head -5 "$FMT_BASE"
-        ruby <<'RUBY'
-        require 'xcodeproj'
-        project = Xcodeproj::Project.open('ios/Pods/Pods.xcodeproj')
-        patched = false
-        project.targets.each do |t|
-          next unless t.name == 'fmt'
-          t.build_configurations.each do |c|
-            c.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
-            c.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = ['$(inherited)', 'FMT_USE_CONSTEVAL=0']
-            c.build_settings['OTHER_CPLUSPLUSFLAGS'] = ['$(inherited)', '-Wno-invalid-constexpr']
-            puts "Patched fmt target config: #{c.name}"
-            patched = true
-          end
+      ruby <<'RUBY'
+      require 'xcodeproj'
+      project = Xcodeproj::Project.open('ios/Pods/Pods.xcodeproj')
+      patched = false
+      project.targets.each do |t|
+        next unless t.name == 'fmt'
+        t.build_configurations.each do |c|
+          c.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
+          existing_defs = c.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] || ['$(inherited)']
+          existing_defs = [existing_defs] if existing_defs.is_a?(String)
+          c.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = (existing_defs + ['FMT_USE_CONSTEVAL=0']).uniq
+          existing_flags = c.build_settings['OTHER_CPLUSPLUSFLAGS'] || ['$(inherited)']
+          existing_flags = [existing_flags] if existing_flags.is_a?(String)
+          c.build_settings['OTHER_CPLUSPLUSFLAGS'] = (existing_flags + ['-Wno-invalid-constexpr']).uniq
+          puts "Patched fmt target config: #{c.name}"
+          patched = true
         end
-        abort 'ERROR: fmt target not found in Pods.xcodeproj' unless patched
+      end
+      if patched
         project.save
-        RUBY
-        echo "=== Resolved fmt build settings (Release) ==="
-        xcodebuild -project ios/Pods/Pods.xcodeproj -target fmt -configuration Release -showBuildSettings 2>/dev/null | grep -E "CLANG_CXX_LANGUAGE_STANDARD|GCC_PREPROCESSOR_DEFINITIONS|OTHER_CPLUSPLUSFLAGS"
+      else
+        puts "WARNING: fmt header existed but no 'fmt' target found in Pods.xcodeproj — header-only patch applied, target-level settings skipped"
+      end
+      RUBY
 
-    - &resolve_workspace
-      name: Resolve Xcode workspace
-      script: |
-        set -eo pipefail
-        ls -la ios
-        test -f ios/Podfile.lock || { echo "ERROR: Podfile.lock missing — pod install failed"; exit 1; }
-        test -f ios/Pods/Manifest.lock || { echo "ERROR: Manifest.lock missing — pod install failed"; exit 1; }
-        WORKSPACE_PATH=$(find ios -maxdepth 1 -name "*.xcworkspace" | head -n 1)
-        test -n "$WORKSPACE_PATH" || { echo "ERROR: No .xcworkspace found"; exit 1; }
-        echo "Resolved workspace: $WORKSPACE_PATH"
-        echo "XCODE_WORKSPACE=$WORKSPACE_PATH" >> $CM_ENV
+      echo "=== Resolved fmt build settings (Release), if target exists ==="
+      xcodebuild -project ios/Pods/Pods.xcodeproj -target fmt -configuration Release -showBuildSettings 2>/dev/null \
+        | grep -E "CLANG_CXX_LANGUAGE_STANDARD|GCC_PREPROCESSOR_DEFINITIONS|OTHER_CPLUSPLUSFLAGS" \
+        || echo "No 'fmt' target in Pods.xcodeproj (header-only patch still applied above)"
 
-    - &keychain_init
-      name: Set up keychain
-      script: |
-        set -eo pipefail
-        keychain initialize
+  resolve_workspace: &resolve_workspace
+    name: Resolve workspace and fail-fast checks
+    script: |
+      #!/usr/bin/env bash
+      set -eo pipefail
+      WORKSPACE=$(find ios -maxdepth 1 -iname "*.xcworkspace" | head -1)
+      test -n "$WORKSPACE" || { echo "ERROR: no .xcworkspace found in ios/"; exit 1; }
+      echo "Using workspace: $WORKSPACE"
+      test -f ios/Podfile.lock || { echo "ERROR: Podfile.lock missing — pod install did not run"; exit 1; }
 
-    - &fetch_signing
-      name: Fetch signing files (create if missing)
-      script: |
-        set -eo pipefail
-        app-store-connect fetch-signing-files "$BUNDLE_ID" \
-          --type IOS_APP_STORE \
-          --create
+  keychain_init: &keychain_init
+    name: Initialize keychain
+    script: keychain initialize
 
-    - &keychain_certs
-      name: Set up signing certificate
-      script: |
-        set -eo pipefail
-        keychain add-certificates
+  fetch_signing: &fetch_signing
+    name: Fetch signing files (create if missing)
+    script: |
+      #!/usr/bin/env bash
+      set -eo pipefail
+      app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
 
-    - &use_profiles
-      name: Set up code signing on Xcode project
-      script: |
-        set -eo pipefail
-        xcode-project use-profiles
+  add_certs: &add_certs
+    name: Add certificates to keychain
+    script: keychain add-certificates
 
-    - &increment_build_number
-      name: Increment build number
-      script: |
-        set -eo pipefail
-        cd $CM_BUILD_DIR/ios
-        LATEST_BUILD_NUMBER=$(app-store-connect get-latest-testflight-build-number "$APP_ID" || echo "0")
-        echo "Latest TestFlight build number: $LATEST_BUILD_NUMBER"
-        agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
+  use_profiles: &use_profiles
+    name: Use profiles in Xcode project
+    script: xcode-project use-profiles --warn-only
 
-    - &list_schemes
-      name: Show available Xcode schemes
-      script: |
-        set -eo pipefail
-        xcodebuild -list -workspace "$XCODE_WORKSPACE"
+  increment_build: &increment_build
+    name: Increment build number
+    script: |
+      #!/usr/bin/env bash
+      set -eo pipefail
+      LATEST=$(app-store-connect get-latest-testflight-build-number "$APP_ID" || echo "0")
+      NEXT=$((LATEST + 1))
+      echo "Latest TestFlight build: $LATEST -> setting: $NEXT"
+      cd ios
+      agvtool new-version -all "$NEXT"
+      cd ..
 
-    - &build_ipa
-      name: Build iOS IPA
-      script: |
-        set -eo pipefail
-        xcode-project build-ipa \
-          --workspace "$XCODE_WORKSPACE" \
-          --scheme "$XCODE_SCHEME"
+  list_schemes: &list_schemes
+    name: List schemes (diagnostic)
+    script: |
+      #!/usr/bin/env bash
+      set -eo pipefail
+      WORKSPACE=$(find ios -maxdepth 1 -iname "*.xcworkspace" | head -1)
+      xcodebuild -workspace "$WORKSPACE" -list
 
-  artifacts:
-    - &ipa build/ios/ipa/*.ipa
-    - &xcode_logs /tmp/xcodebuild_logs/*.log
-    - &pod_log /tmp/pod_install.log
-    - &dsym $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
+  build_ipa: &build_ipa
+    name: Build ipa for distribution
+    script: |
+      #!/usr/bin/env bash
+      set -eo pipefail
+      xcode-project build-ipa \
+        --workspace "ios/$(find ios -maxdepth 1 -iname '*.xcworkspace' -exec basename {} \;)" \
+        --scheme "$XCODE_SCHEME"
 
-  testflight_publish: &testflight_publish
+  publish_block: &publish_block
+    email:
+      recipients: []
     app_store_connect:
       auth: integration
       submit_to_testflight: true
-      submit_to_app_store: false
 
 workflows:
-  ios-testflight:
-    name: iOS TestFlight Build (Ari)
-    <<: *instance
+  gani-ios-workflow:
+    name: Gani Calculator - iOS TestFlight
+    max_build_duration: 90
     integrations:
-      app_store_connect: "Pinegrasscm"
+      app_store_connect: Pinegrasscm
     environment:
-      <<: *env_versions
+      groups:
+        - gani_ios
+      vars:
+        BUNDLE_ID: "com.pinegrass.gani"
+        XCODE_SCHEME: "Gani"
+        APP_ID: "6789322260"
+      node: 20
+      xcode: 26.4
+      cocoapods: default
+    cache:
+      cache_paths:
+        - $CM_BUILD_DIR/node_modules
+        - $HOME/Library/Caches/CocoaPods
+    scripts:
+      - <<: *install_deps
+      - <<: *prebuild_ios
+      # Gani: no Firebase modular headers step needed (confirm before removing if this changes)
+      - <<: *pod_install
+      - <<: *fmt_diagnose
+      - <<: *fmt_patch
+      - <<: *resolve_workspace
+      - <<: *keychain_init
+      - <<: *fetch_signing
+      - <<: *add_certs
+      - <<: *use_profiles
+      - <<: *increment_build
+      - <<: *list_schemes
+      - <<: *build_ipa
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      <<: *publish_block
+
+  ari-ios-workflow:
+    name: Ari - iOS TestFlight
+    max_build_duration: 90
+    integrations:
+      app_store_connect: Pinegrasscm
+    environment:
+      groups:
+        - ari_ios
       vars:
         BUNDLE_ID: "com.pinegrass.ari"
         XCODE_SCHEME: "Ari"
-        APP_ID: 6789322260   # <-- REPLACE: Ari's numeric Apple ID from App Store Connect
+        APP_ID: "6789322260"
+      node: 20
+      xcode: 26.4
+      cocoapods: default
     cache:
-      <<: *cache
+      cache_paths:
+        - $CM_BUILD_DIR/node_modules
+        - $HOME/Library/Caches/CocoaPods
     scripts:
-      - *install_js_deps
-      - *expo_prebuild_ios
-      - *patch_podfile_modular_headers
-      - *pod_install
-      - *patch_fmt_xcode26
-      - *resolve_workspace
-      - *keychain_init
-      - *fetch_signing
-      - *keychain_certs
-      - *use_profiles
-      - *increment_build_number
-      - *list_schemes
-      - *build_ipa
+      - <<: *install_deps
+      - <<: *prebuild_ios
+      - <<: *modular_headers   # Ari uses Firebase — keep this step
+      - <<: *pod_install
+      - <<: *fmt_diagnose
+      - <<: *fmt_patch
+      - <<: *resolve_workspace
+      - <<: *keychain_init
+      - <<: *fetch_signing
+      - <<: *add_certs
+      - <<: *use_profiles
+      - <<: *increment_build
+      - <<: *list_schemes
+      - <<: *build_ipa
     artifacts:
-      - *ipa
-      - *xcode_logs
-      - *pod_log
-      - *dsym
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
     publishing:
-      <<: *testflight_publish
+      <<: *publish_block
