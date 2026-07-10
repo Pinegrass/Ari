@@ -34,17 +34,22 @@ definitions:
       #!/usr/bin/env bash
       set -eo pipefail
       test -f ios/Podfile || { echo "ERROR: ios/Podfile not found"; exit 1; }
-      if grep -q "use_modular_headers!" ios/Podfile; then
-        echo "use_modular_headers! already present, skipping"
+      echo "=== Podfile BEFORE patch (first 15 lines) ==="
+      head -15 ios/Podfile
+      if grep -qE "^\s*use_modular_headers!\s*$" ios/Podfile; then
+        echo "use_modular_headers! already present globally, skipping"
       else
-        # Insert right after the first target block opens
-        ruby -e '
-          content = File.read("ios/Podfile")
-          content.sub!(/(target .* do\n)/) { "#{$1}  use_modular_headers!\n" }
-          File.write("ios/Podfile", content)
-        '
-        echo "Inserted use_modular_headers!"
+        # Prepend globally at the very top of the file — this applies to ALL targets,
+        # regardless of Expo's exact target block syntax/whitespace, and is CocoaPods'
+        # own recommended fix for "Swift pod X cannot yet be integrated as static libraries".
+        TMP=$(mktemp)
+        echo "use_modular_headers!" > "$TMP"
+        cat ios/Podfile >> "$TMP"
+        mv "$TMP" ios/Podfile
+        echo "Prepended use_modular_headers! at top of Podfile"
       fi
+      echo "=== Podfile AFTER patch (first 15 lines) ==="
+      head -15 ios/Podfile
       grep -n "use_modular_headers!" ios/Podfile
 
   pod_install: &pod_install
@@ -128,21 +133,6 @@ definitions:
       echo "Using workspace: $WORKSPACE"
       test -f ios/Podfile.lock || { echo "ERROR: Podfile.lock missing — pod install did not run"; exit 1; }
 
-  keychain_init: &keychain_init
-    name: Initialize keychain
-    script: keychain initialize
-
-  fetch_signing: &fetch_signing
-    name: Fetch signing files (create if missing)
-    script: |
-      #!/usr/bin/env bash
-      set -eo pipefail
-      app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
-
-  add_certs: &add_certs
-    name: Add certificates to keychain
-    script: keychain add-certificates
-
   use_profiles: &use_profiles
     name: Use profiles in Xcode project
     script: xcode-project use-profiles --warn-only
@@ -197,6 +187,9 @@ workflows:
       node: 20
       xcode: 26.4
       cocoapods: default
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: "com.pinegrass.gani"
     cache:
       cache_paths:
         - $CM_BUILD_DIR/node_modules
@@ -209,9 +202,6 @@ workflows:
       - <<: *fmt_diagnose
       - <<: *fmt_patch
       - <<: *resolve_workspace
-      - <<: *keychain_init
-      - <<: *fetch_signing
-      - <<: *add_certs
       - <<: *use_profiles
       - <<: *increment_build
       - <<: *list_schemes
@@ -237,6 +227,9 @@ workflows:
       node: 20
       xcode: 26.4
       cocoapods: default
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: "com.pinegrass.ari"
     cache:
       cache_paths:
         - $CM_BUILD_DIR/node_modules
@@ -249,9 +242,6 @@ workflows:
       - <<: *fmt_diagnose
       - <<: *fmt_patch
       - <<: *resolve_workspace
-      - <<: *keychain_init
-      - <<: *fetch_signing
-      - <<: *add_certs
       - <<: *use_profiles
       - <<: *increment_build
       - <<: *list_schemes
