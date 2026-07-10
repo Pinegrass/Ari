@@ -4,9 +4,9 @@ import {
   RefreshControl, KeyboardAvoidingView, Platform, StyleSheet,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import ScreenShell, { bottomPad as shellPad } from '../../components/ScreenShell';
+import ScreenShell from '../../components/ScreenShell';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import Icon from '../../components/ui/Icon';
+import Icon, { CATEGORY_ICONS } from '../../components/ui/Icon';
 import Button from '../../components/ui/Button';
 import EmptyState from '../../components/ui/EmptyState';
 import ErrorBanner from '../../components/ui/ErrorBanner';
@@ -14,14 +14,12 @@ import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import CategoryPicker from '../../components/CategoryPicker';
 import DeleteConfirmSheet from '../../components/DeleteConfirmSheet';
 import AnimatedEntry from '../../components/ui/AnimatedEntry';
-import ProgressBar from '../../components/ui/ProgressBar';
 import { color, font } from '../../theme/tokens';
 import { usePrivacy } from '../../context/PrivacyContext';
 import { useHaptics } from '../../hooks/useHaptics';
 import { useData } from '../../context/DataContext';
 import * as budgetApi from '../../api/budgets';
 import type { Budget } from '../../types';
-import { CATEGORY_ICONS } from '../../components/ui/Icon';
 
 export default function BudgetPlannerScreen() {
   const navigation = useNavigation();

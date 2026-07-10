@@ -35,7 +35,6 @@ const STANDARD_DEDUCTION_NEW = 75000; // New regime FY 2025-26
 const STANDARD_DEDUCTION_OLD = 50000; // Old regime
 const MAX_80C = 150000;
 const MAX_80D_SELF = 25000;
-const MAX_80D_SENIOR = 50000;
 const MAX_HOME_LOAN_OLD = 200000;
 const REBATE_LIMIT_NEW = 1200000; // Section 87A — New regime
 const REBATE_LIMIT_OLD = 500000; // Section 87A — Old regime

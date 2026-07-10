@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet,
-  KeyboardAvoidingView, Platform, ActivityIndicator, Alert,
+  KeyboardAvoidingView, Platform, ActivityIndicator,
 } from 'react-native';
 import ScreenShell from '../components/ScreenShell';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -29,7 +29,9 @@ export default function AddSharedExpenseScreen() {
   const [group, setGroup] = useState<GroupDetail | null>(null);
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
-  const [splitType, setSplitType] = useState<'equal' | 'me_only'>('equal');
+  // Feature-flag gated; both vars intentionally unused until group splitting ships.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_splitType, _setSplitType] = useState<'equal' | 'me_only'>('equal');
   // selected = members included in the equal split
   const [included, setIncluded] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);

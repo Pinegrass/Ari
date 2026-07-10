@@ -2,7 +2,6 @@ import React, { useState, useCallback } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, Modal, TextInput,
   RefreshControl, KeyboardAvoidingView, Platform, Alert, StyleSheet,
-  Animated,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ScreenShell from '../../components/ScreenShell';
@@ -41,7 +40,8 @@ export default function SavingsGoalsScreen() {
   const [goals, setGoals] = useState<SavingsGoal[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState('');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_error, setError] = useState('');
 
   // Add/Edit modal
   const [showAddModal, setShowAddModal] = useState(false);

@@ -11,7 +11,6 @@ import {
   StyleSheet,
 } from 'react-native';
 import ScreenShell from '../components/ScreenShell';
-import { useFocusEffect } from '@react-navigation/native';
 import { useData } from '../context/DataContext';
 import ChatBubble from '../components/ChatBubble';
 import Icon from '../components/ui/Icon';

@@ -6,6 +6,17 @@
  */
 
 // In-memory AsyncStorage (jest.mock factory vars must be `mock`-prefixed).
+import {
+  getBills,
+  saveBill,
+  deleteBill,
+  selectUpcomingBills,
+  scheduleBillReminders,
+  reconcileBillReminders,
+  ensureNotificationPermission,
+  type Bill,
+} from '../bills';
+
 const mockStore = new Map<string, string>();
 jest.mock('@react-native-async-storage/async-storage', () => ({
   __esModule: true,
@@ -42,17 +53,6 @@ jest.mock('expo-notifications', () => ({
 }));
 
 jest.mock('expo-device', () => ({ isDevice: true }));
-
-import {
-  getBills,
-  saveBill,
-  deleteBill,
-  selectUpcomingBills,
-  scheduleBillReminders,
-  reconcileBillReminders,
-  ensureNotificationPermission,
-  type Bill,
-} from '../bills';
 
 const NOW = new Date('2026-07-10T06:00:00Z'); // 11:30 IST, 10 Jul 2026
 

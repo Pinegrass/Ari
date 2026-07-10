@@ -14,7 +14,7 @@ import {
   Platform,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import ScreenShell, { bottomPad as shellPad } from '../components/ScreenShell';
+import ScreenShell from '../components/ScreenShell';
 import { color, font } from '../theme/tokens';
 import { useHaptics } from '../hooks/useHaptics';
 import AnimatedEntry from '../components/ui/AnimatedEntry';

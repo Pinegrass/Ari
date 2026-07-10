@@ -9,7 +9,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import ScreenShell, { bottomPad as shellPad } from '../components/ScreenShell';
+import ScreenShell from '../components/ScreenShell';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import type { CompositeNavigationProp } from '@react-navigation/native';

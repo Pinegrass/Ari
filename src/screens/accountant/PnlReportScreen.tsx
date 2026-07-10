@@ -5,15 +5,14 @@ import {
 } from 'react-native';
 import ScreenShell from '../../components/ScreenShell';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import Icon from '../../components/ui/Icon';
+import Icon, { CATEGORY_ICONS } from '../../components/ui/Icon';
 import AnimatedEntry from '../../components/ui/AnimatedEntry';
 import EmptyState from '../../components/ui/EmptyState';
 import { color, font } from '../../theme/tokens';
 import { usePrivacy } from '../../context/PrivacyContext';
 import { useHaptics } from '../../hooks/useHaptics';
 import * as reportsApi from '../../api/reports';
-import type { PnlReport, PnlMonth } from '../../types';
-import { CATEGORY_ICONS } from '../../components/ui/Icon';
+import type { PnlReport } from '../../types';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const CHART_PADDING = 40;

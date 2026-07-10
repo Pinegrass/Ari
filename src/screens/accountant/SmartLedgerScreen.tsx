@@ -5,14 +5,13 @@ import {
 } from 'react-native';
 import ScreenShell from '../../components/ScreenShell';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import Icon from '../../components/ui/Icon';
+import Icon, { CATEGORY_ICONS } from '../../components/ui/Icon';
 import type { IconName } from '../../components/ui/Icon';
 import AnimatedEntry from '../../components/ui/AnimatedEntry';
 import EmptyState from '../../components/ui/EmptyState';
 import { color, font } from '../../theme/tokens';
 import { usePrivacy } from '../../context/PrivacyContext';
 import { useHaptics } from '../../hooks/useHaptics';
-import { CATEGORY_ICONS } from '../../components/ui/Icon';
 import * as txnApi from '../../api/transactions';
 import type { Transaction } from '../../types';
 

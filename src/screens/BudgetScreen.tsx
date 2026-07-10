@@ -12,7 +12,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import ScreenShell, { bottomPad as shellPad } from '../components/ScreenShell';
+import ScreenShell from '../components/ScreenShell';
 import { useFocusEffect } from '@react-navigation/native';
 import { useData } from '../context/DataContext';
 import BudgetCard from '../components/BudgetCard';

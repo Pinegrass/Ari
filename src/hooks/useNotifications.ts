@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Platform, Alert } from 'react-native';
+import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';

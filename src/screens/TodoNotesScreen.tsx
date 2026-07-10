@@ -5,10 +5,9 @@ import {
   RefreshControl, KeyboardAvoidingView, Platform, Switch,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import ScreenShell, { bottomPad as shellPad } from '../components/ScreenShell';
+import ScreenShell from '../components/ScreenShell';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import Icon from '../components/ui/Icon';
-import type { IconName } from '../components/ui/Icon';
 import AnimatedEntry from '../components/ui/AnimatedEntry';
 import EmptyState from '../components/ui/EmptyState';
 import { color, font } from '../theme/tokens';
