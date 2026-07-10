@@ -29,48 +29,70 @@ definitions:
       npx expo prebuild --platform ios --clean
 
   modular_headers: &modular_headers
-    name: Insert use_modular_headers! into Podfile (Firebase apps only)
+    name: Insert modular_headers pod flags into Podfile target block (Firebase/Stripe apps)
     script: |
       #!/usr/bin/env bash
       set -eo pipefail
       test -f ios/Podfile || { echo "ERROR: ios/Podfile not found"; exit 1; }
-      echo "=== Podfile BEFORE patch (last 25 lines, where post_install usually lives) ==="
-      tail -25 ios/Podfile
+      echo "=== Podfile BEFORE patch ==="
+      cat -n ios/Podfile
 
       if grep -q "PINEGRASS_MODULAR_HEADERS_PATCH" ios/Podfile; then
         echo "Patch marker already present, skipping insert"
-      elif grep -qE "^\s*post_install do" ios/Podfile; then
-        echo "=== WARNING: Podfile already has a post_install block (likely Expo's own autolinking hook) ==="
-        echo "Appending a second post_install block is unsafe — only inserting the pod-config lines"
-        echo "needs manual verification. Failing loudly instead of silently corrupting signing/autolinking."
-        echo "=== Existing post_install block context ==="
-        grep -n -A 15 "post_install do" ios/Podfile
-        echo "ACTION NEEDED: manually merge the DEFINES_MODULE loop into the existing post_install block above."
-        exit 1
       else
-        # Scoped fix (per CocoaPods' own guidance + community consensus for this exact
-        # "Swift pod X cannot yet be integrated as static libraries" error): rather than
-        # a blunt global use_modular_headers! (which can conflict with Expo's own
-        # config-plugin Podfile injections, e.g. ExpoModulesCore autolinking), set
-        # modular headers ONLY on the specific pods named in the error via a post_install
-        # hook. This survives Expo prebuild/autolinking because it runs as part of
-        # CocoaPods' own installer lifecycle, not as static text Expo might regenerate.
-        cat >> ios/Podfile << 'RUBY_PATCH'
+        # CORRECT MECHANISM (confirmed against multiple real-world fixes for this exact
+        # "cannot yet be integrated as static libraries: AppCheckCore depends upon
+        # GoogleUtilities and RecaptchaInterop" error — seen identically in Expo+Stripe
+        # monorepo setups): the fix must be `pod 'X', :modular_headers => true` declared
+        # INSIDE the target block at Podfile-parse time. A post_install hook runs too
+        # late — CocoaPods already fails the static-library check during dependency
+        # resolution, before post_install ever executes. A global use_modular_headers!
+        # can also conflict with Expo's own config-plugin Podfile injections.
+        #
+        # We anchor on `use_expo_modules!` or `use_native_modules!`, both of which are
+        # reliably present near the top of every Expo-generated target block, and insert
+        # the pod declarations immediately after via Ruby (robust to whitespace/quoting,
+        # unlike a bash regex).
+        ruby -e '
+          content = File.read("ios/Podfile")
+          marker = "  # PINEGRASS_MODULAR_HEADERS_PATCH\n" \
+                   "  pod %(GoogleUtilities), :modular_headers => true\n" \
+                   "  pod %(RecaptchaInterop), :modular_headers => true\n" \
+                   "  pod %(AppCheckCore), :modular_headers => true\n"
 
-      # PINEGRASS_MODULAR_HEADERS_PATCH — scoped fix for AppCheckCore/GoogleUtilities/RecaptchaInterop
-      # "cannot yet be integrated as static libraries" error (Firebase + Swift static-linking).
-      post_install do |installer|
-        installer.pods_project.targets.each do |target|
-          if ['GoogleUtilities', 'RecaptchaInterop', 'AppCheckCore'].include?(target.name)
-            target.build_configurations.each do |config|
-              config.build_settings['DEFINES_MODULE'] = 'YES'
+          anchor_patterns = [
+            /^\s*use_expo_modules!\s*$/,
+            /^\s*config\s*=\s*use_native_modules!.*$/,
+            /^\s*use_native_modules!.*$/
+          ]
+
+          inserted = false
+          anchor_patterns.each do |pattern|
+            if content =~ pattern
+              content = content.sub(pattern) { |match| "#{match}\n#{marker}" }
+              inserted = true
+              break
             end
           end
-        end
-      end
-      RUBY_PATCH
-        echo "Appended scoped modular-headers post_install hook"
+
+          unless inserted
+            # Fallback: insert right after the first "target Y do" line
+            if content =~ /^(target .* do\s*)$/
+              content = content.sub(/^(target .* do\s*)$/) { "#{$1}\n#{marker}" }
+              inserted = true
+            end
+          end
+
+          abort("ERROR: could not find a safe anchor point (use_expo_modules!/use_native_modules!/target block) in Podfile") unless inserted
+
+          File.write("ios/Podfile", content)
+          puts "Inserted modular_headers pod declarations"
+        '
       fi
+
+      echo "=== Podfile AFTER patch ==="
+      cat -n ios/Podfile
+      grep -n "PINEGRASS_MODULAR_HEADERS_PATCH\|modular_headers" ios/Podfile || { echo "ERROR: patch verification failed — marker not found post-insert"; exit 1; }
 
       echo "=== Podfile AFTER patch (last 25 lines) ==="
       tail -25 ios/Podfile
