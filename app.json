@@ -48,7 +48,8 @@
         "@sentry/react-native",
         {
           "organization": "pinegrass",
-          "project": "ari"
+          "project": "ari",
+          "disableAutoUpload": true
         }
       ],
       [
