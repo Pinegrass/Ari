@@ -20,7 +20,8 @@
       "infoPlist": {
         "NSFaceIDUsageDescription": "Ari uses Face ID to secure your app access.",
         "NSUserNotificationUsageDescription": "Ari sends you daily reminders and budget alerts.",
-        "NSPhotoLibraryUsageDescription": "Ari needs access to your photos so you can share receipt images into Ari to log expenses."
+        "NSPhotoLibraryUsageDescription": "Ari needs access to your photos so you can share receipt images into Ari to log expenses.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -86,7 +87,9 @@
       ]
     ],
     "updates": {
-      "url": "https://u.expo.dev/ae18eabf-124f-4b0a-a09e-a2a40dfb473b"
+      "url": "https://u.expo.dev/ae18eabf-124f-4b0a-a09e-a2a40dfb473b",
+      "enabled": false,
+      "checkAutomatically": "NEVER"
     },
     "runtimeVersion": {
       "policy": "fingerprint"
