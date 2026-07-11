@@ -271,7 +271,7 @@ workflows:
         BUNDLE_ID: "com.pinegrass.ari"
         XCODE_SCHEME: "Ari"
         APP_ID: "6789322260"
-        SENTRY_DISABLE_AUTO_UPLOAD: "false"
+        SENTRY_DISABLE_AUTO_UPLOAD: "true"
       node: 20
       xcode: 26.4
       cocoapods: default
