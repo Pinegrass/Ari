@@ -271,7 +271,12 @@ workflows:
         BUNDLE_ID: "com.pinegrass.ari"
         XCODE_SCHEME: "Ari"
         APP_ID: "6789322260"
-        SENTRY_DISABLE_AUTO_UPLOAD: "true"
+        # Upload source maps/dSYMs so iOS crashes symbolicate in Sentry, but
+        # never fail the build over it: with ALLOW_FAILURE a missing or invalid
+        # SENTRY_AUTH_TOKEN (expected in the ari_ios env group) logs a warning
+        # instead of breaking TestFlight delivery.
+        SENTRY_DISABLE_AUTO_UPLOAD: "false"
+        SENTRY_ALLOW_FAILURE: "true"
       node: 20
       xcode: 26.4
       cocoapods: default

@@ -9,6 +9,8 @@ import {
 } from 'react-native';
 import ScreenShell from '../components/ScreenShell';
 import { useData } from '../context/DataContext';
+import { getPnlReport } from '../api/reports';
+import { buildPnlCsv, buildTransactionsCsv, saveOrShareCsv } from '../utils/exportCsv';
 import { color, font } from '../theme/tokens';
 import { useHaptics } from '../hooks/useHaptics';
 import Button from '../components/ui/Button';
@@ -19,57 +21,66 @@ interface Props {
   onBack: () => void;
 }
 
+const PNL_MONTHS = 12;
+
 export default function ExportScreen({ onBack }: Props) {
   const { transactions } = useData();
   const haptics = useHaptics();
-  const [exporting, setExporting] = useState(false);
+  const [exporting, setExporting] = useState<'transactions' | 'pnl' | null>(null);
 
-  const generateCSV = (): string => {
-    const header = 'Date,Type,Category,Description,Amount,Note';
-    const rows = transactions.map((t) =>
-      [
-        t.date,
-        t.type,
-        t.category,
-        `"${(t.description || '').replace(/"/g, '""')}"`,
-        t.type === 'income' ? t.amount : -t.amount,
-        `"${(t.note || '').replace(/"/g, '""')}"`,
-      ].join(',')
-    );
-    return [header, ...rows].join('\n');
+  const today = () => new Date().toISOString().slice(0, 10);
+
+  const deliverCsv = async (filename: string, csv: string, fallbackTitle: string) => {
+    try {
+      const outcome = await saveOrShareCsv(filename, csv);
+      if (outcome === 'saved') {
+        Alert.alert('Export Complete', `${filename} saved. Open it in Excel or Sheets.`);
+      }
+      if (outcome !== 'cancelled') haptics.success();
+    } catch {
+      // File delivery unavailable (rare) — fall back to sharing the raw CSV text.
+      await Share.share({ message: csv, title: fallbackTitle });
+      haptics.success();
+    }
   };
 
-  const handleExport = async () => {
+  const handleExportTransactions = async () => {
     if (transactions.length === 0) {
       Alert.alert('No Data', 'Add some transactions first to export.');
       return;
     }
 
-    setExporting(true);
+    setExporting('transactions');
     haptics.light();
-
     try {
-      const csv = generateCSV();
-      const totalIncome = transactions
-        .filter((t) => t.type === 'income')
-        .reduce((s, t) => s + t.amount, 0);
-      const totalExpenses = transactions
-        .filter((t) => t.type === 'expense')
-        .reduce((s, t) => s + t.amount, 0);
-
-      const summary = `Ari - Transaction Export\n${transactions.length} transactions\nIncome: Rs.${totalIncome}\nExpenses: Rs.${totalExpenses}\nBalance: Rs.${totalIncome - totalExpenses}`;
-
-      await Share.share({
-        message: `${summary}\n\n--- CSV Data ---\n\n${csv}`,
-        title: 'Ari Transactions Export',
-      });
-
-      haptics.success();
+      await deliverCsv(
+        `ari-transactions-${today()}.csv`,
+        buildTransactionsCsv(transactions),
+        'Ari Transactions Export'
+      );
     } catch {
       Alert.alert('Export Failed', 'Could not export your data. Please try again.');
       haptics.error();
     } finally {
-      setExporting(false);
+      setExporting(null);
+    }
+  };
+
+  const handleExportPnl = async () => {
+    setExporting('pnl');
+    haptics.light();
+    try {
+      const report = await getPnlReport(PNL_MONTHS);
+      if (!report.months.length) {
+        Alert.alert('No Data', 'Add some transactions first to build a P&L report.');
+        return;
+      }
+      await deliverCsv(`ari-pnl-${today()}.csv`, buildPnlCsv(report), 'Ari P&L Export');
+    } catch {
+      Alert.alert('Export Failed', 'Could not build your P&L report. Check your connection and try again.');
+      haptics.error();
+    } finally {
+      setExporting(null);
     }
   };
 
@@ -89,8 +100,8 @@ export default function ExportScreen({ onBack }: Props) {
             <Icon name="pie-chart" size={48} color={color.forest} />
             <Text style={styles.cardTitle}>Export as CSV</Text>
             <Text style={styles.cardDesc}>
-              Share your transaction data via text, email, or save it. Perfect for
-              spreadsheets or backup.
+              Save a spreadsheet-ready file of your transactions, or a P&L
+              statement for the last {PNL_MONTHS} months — handy at tax time.
             </Text>
             <Text style={styles.txnCount}>
               {transactions.length} transaction{transactions.length !== 1 ? 's' : ''} available
@@ -99,12 +110,33 @@ export default function ExportScreen({ onBack }: Props) {
         </AnimatedEntry>
 
         <AnimatedEntry delay={250}>
-          <Button onPress={handleExport} loading={exporting} fullWidth accessibilityLabel="Export and share data" accessibilityRole="button">
-            Export & Share
+          <Button
+            onPress={handleExportTransactions}
+            loading={exporting === 'transactions'}
+            disabled={exporting !== null}
+            fullWidth
+            accessibilityLabel="Export transactions as CSV"
+            accessibilityRole="button"
+          >
+            Export Transactions (CSV)
           </Button>
         </AnimatedEntry>
 
-        <AnimatedEntry delay={400}>
+        <AnimatedEntry delay={350}>
+          <Button
+            onPress={handleExportPnl}
+            loading={exporting === 'pnl'}
+            disabled={exporting !== null}
+            variant="secondary"
+            fullWidth
+            accessibilityLabel="Export profit and loss report as CSV"
+            accessibilityRole="button"
+          >
+            Export P&L Report (CSV)
+          </Button>
+        </AnimatedEntry>
+
+        <AnimatedEntry delay={450}>
           <View style={styles.infoBox}>
             <Text style={styles.infoText}>
               Your data stays on your device. We never sell or share your
