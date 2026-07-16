@@ -111,6 +111,7 @@ is done. P2 is stretch.
 | T3.5 | Ari CSV export (transactions + P&L) — smallest sprint-5 moat item, high retention value for tax season | Ari | P1 | 1d | Export opens correctly in Excel/Sheets with en-IN formatting |
 | T3.6 | Proactive Tomo: weekly brief push on existing `/coaching` infra + one anomaly nudge ("food spend 2× this week") | Ari | P2 | 2d | First proactive brief delivered to a real device |
 | T3.7 | Aritomo web polish: error/empty/loading states on the dashboard actions shipped last week | Web | P2 | 1d | No silent failures on transaction/budget writes |
+| T3.8 | Activate the shipped Razorpay billing stack in **test mode**: create plans, set Railway env vars, register webhook; verify subscribe → webhook → tier upgrade → cancel end-to-end (see §6; in-app paywall stays OFF pending F7) | Backend | P1 | 1d | `/api/billing/status` returns `configured:true`; test-mode subscription lifecycle green |
 
 ### Track 4 — Quality gates (make regressions impossible)
 
@@ -129,6 +130,7 @@ is done. P2 is stretch.
 |---|----------|--------|-----|
 | F1 | Grant org access / push rights to migrate the backend into `pinegrass/ari-backend`, and repoint Railway | T2.1 (P0) | 30 min this week |
 | F2 | RevenueCat account + Play Console billing setup for Gani Plus; confirm ₹ price points | T3.1 (P0) | 1 hour |
+| F7 | Pick Ari's billing path per §6 (web-first Razorpay vs. Play Billing vs. User Choice Billing) — paywall stays OFF until decided | Ari monetization | 30 min discussion |
 | F3 | "Go" on the v1.1.0 Play submission after the device checklist (note: EAS was at 91% of monthly build credits on 2026-07-05 — check before the AAB build, or route through Codemagic) | T1.2 | Same day as T1.1 |
 | F4 | Dark palette sign-off (preview artifact from sprint 4) | T1.6 | 15 min |
 | F5 | Staging infra click-through (Railway service + Supabase project) | T2.3 | 10 min |
@@ -145,7 +147,48 @@ is done. P2 is stretch.
 5. Backend CORS locked; tutor quota abuse-resistant; staging environment exists.
 6. Re-grade both products against the excellence-plan scorecard with CI-verified numbers.
 
-## 6. Explicitly out of scope this sprint
+## 6. Payments update (2026-07-16) — Razorpay & Cashfree approved
+
+Both payment-aggregator registrations are approved. What that does and does not unblock:
+
+### What it unblocks now
+
+- **Ari backend billing activation (test → live):** the full Razorpay subscription
+  stack is already shipped and dormant (`/api/billing/*`: plan catalog, subscription
+  create, HMAC-verified webhook, `subscription_events` audit — see
+  `RAZORPAY_INTEGRATION.md`). Setup is: create the 3 plans (₹99/₹129/₹249), set the
+  6 Railway env vars, register the webhook. `/api/billing/status` flips
+  `configured:true`. **New sprint task T3.8 (P1):** do this in Razorpay test mode and
+  verify the webhook → tier-upgrade → cancel flow end-to-end.
+- **Web checkout on aritomo.in:** subscriptions sold on the web carry **no Google
+  service fee** and no Play-policy constraints. This is the fastest legitimate
+  revenue path for Ari and a natural next step for the web dashboard.
+
+### What it does NOT unblock
+
+- **In-app digital subscriptions in the Play builds.** Google Play's payments policy
+  requires Google Play Billing for digital goods consumed in-app. Shipping the
+  existing `react-native-razorpay` checkout inside the Play build as-is is an
+  app-removal risk. In India, Google's **User Choice Billing** program permits an
+  alternative billing system (Razorpay qualifies) — but only *alongside* Play
+  Billing, with enrollment, and the service fee is only reduced by ~4%, not removed.
+- **Gani Plus (T3.1) is unchanged:** it needs Google Play Billing, which is exactly
+  what RevenueCat wraps. F2 (RevenueCat + Play Console merchant setup) remains the
+  blocking ask.
+
+### Recommended path (decision F7)
+
+1. **Gani Plus:** RevenueCat + Play Billing. Simple, compliant, already 80% wired.
+2. **Ari:** web-first — activate Razorpay checkout on aritomo.in (0% Google fee, reuses
+   the shipped backend), keep the in-app paywall flag OFF, let the app consume the
+   entitlement via the existing `/me` tier field. Evaluate User Choice Billing
+   enrollment only if web conversion proves the price points.
+3. **Cashfree:** park it as the backup gateway. Do not dual-integrate now — a second
+   gateway doubles the webhook/audit/reconciliation surface for zero user value at
+   this stage. Its future role: failover, and payouts if group settle-up ever moves
+   beyond UPI intents.
+
+## 7. Explicitly out of scope this sprint
 
 Account Aggregator go-live (needs compliance budget + pen test first), SMS autocapture
 phase 2, Ari paywall/Razorpay activation, Gani workbench features (Canvas/Sheet/
