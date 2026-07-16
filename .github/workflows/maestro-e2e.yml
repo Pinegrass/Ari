@@ -1,15 +1,24 @@
 name: E2E Tests (Maestro)
 
 on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
   workflow_dispatch:
   schedule:
     # Run E2E nightly at 2 AM UTC
     - cron: '0 2 * * *'
 
+concurrency:
+  group: maestro-e2e-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   e2e:
     name: Maestro E2E Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
@@ -31,23 +40,54 @@ jobs:
           curl -Ls "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> $GITHUB_PATH
 
-      - name: Setup Android Emulator
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 34
-          arch: x86_64
-          profile: pixel_6
-          script: |
-            # Build the dev APK
-            eas build --platform android --profile development --local --output ./app.apk
+      # The org Actions policy blocks third-party actions such as
+      # reactivecircus/android-emulator-runner, so the emulator is brought
+      # up manually in plain shell steps (ubuntu-latest ships the Android
+      # SDK via $ANDROID_HOME and supports KVM).
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          ls -l /dev/kvm
 
-            # Install on emulator
-            adb install ./app.apk
+      # Build before booting the emulator so build failures fail fast.
+      - name: Build dev APK (EAS local)
+        timeout-minutes: 45
+        run: eas build --platform android --profile development --local --output ./app.apk
 
-            # Run Maestro flows
-            maestro test .maestro/login_flow.yaml
-            maestro test .maestro/navigation_flow.yaml
-            maestro test .maestro/export_flow.yaml
+      - name: Create AVD (api 34, x86_64, pixel_6)
+        run: |
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager --install "system-images;android-34;google_apis;x86_64"
+          echo no | avdmanager create avd --force -n maestro -k "system-images;android-34;google_apis;x86_64" --device "pixel_6"
+
+      - name: Boot emulator and wait for boot
+        run: |
+          emulator -avd maestro -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect > emulator.log 2>&1 &
+          adb wait-for-device
+          boot_completed=""
+          elapsed=0
+          while [ "$boot_completed" != "1" ]; do
+            if [ "$elapsed" -ge 300 ]; then
+              echo "Emulator failed to boot within 300s"
+              exit 1
+            fi
+            sleep 5
+            elapsed=$((elapsed + 5))
+            boot_completed=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r') || true
+          done
+          echo "Emulator booted after ${elapsed}s"
+
+      - name: Install APK and run Maestro flows
+        env:
+          MAESTRO_DRIVER_STARTUP_TIMEOUT: 120000
+        run: |
+          adb shell input keyevent 82
+          adb install -r ./app.apk
+          maestro test .maestro/login_flow.yaml
+          maestro test .maestro/navigation_flow.yaml
+          maestro test .maestro/export_flow.yaml
 
       - name: Upload E2E results
         if: always()

@@ -53,5 +53,8 @@ Per the never-ran-green rule, these were **not** written blind:
 - **Offline add → airplane-mode → sync verify** — needs device airplane-mode
   toggling; this is the highest-value flow to add once the harness is green.
 
-CI wiring is intentionally deferred (don't burn days on emulator-in-CI) — a
-documented local `npm run e2e` is the bar for now.
+CI runs the login, navigation, and export flows on PRs and pushes to `master`
+(plus a nightly schedule) via `.github/workflows/maestro-e2e.yml`, which boots
+an Android emulator in plain shell steps — the org Actions policy blocks
+third-party emulator actions. The flows are still **not verified green**; the
+workflow reports real pass/fail until they are.
