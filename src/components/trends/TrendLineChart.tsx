@@ -48,12 +48,6 @@ export default function TrendLineChart({ report, loading }: Props) {
     return Math.max(maxIncome, maxExpense, 1);
   }, [incomeData, expenseData]);
 
-  const hasData = useMemo(() => {
-    const totalIncome = incomeData.reduce((s, d) => s + (d.value ?? 0), 0);
-    const totalExpense = expenseData.reduce((s, d) => s + (d.value ?? 0), 0);
-    return totalIncome > 0 || totalExpense > 0;
-  }, [incomeData, expenseData]);
-
   if (loading) {
     return (
       <View style={styles.card}>
@@ -99,6 +93,9 @@ export default function TrendLineChart({ report, loading }: Props) {
         startIndex1={0}
         startIndex2={0}
       />
+      <Text style={styles.debug}>
+        I: {incomeData.map(d => d.value).join(',')} | E: {expenseData.map(d => d.value).join(',')}
+      </Text>
       <View style={styles.legend}>
         <View style={styles.legendItem}>
           <View style={[styles.dot, { backgroundColor: c.forest2 }]} />
@@ -138,12 +135,19 @@ const makeStyles = (c: Palette) => StyleSheet.create({
     fontSize: 9,
     color: c.inkFaint,
   },
+  debug: {
+    fontFamily: font.body,
+    fontSize: 9,
+    color: c.inkFaint,
+    marginTop: 4,
+    marginBottom: 2,
+  },
   legend: {
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 20,
-    marginTop: 12,
-    paddingTop: 12,
+    marginTop: 8,
+    paddingTop: 8,
     borderTopWidth: 1,
     borderColor: c.line,
   },
