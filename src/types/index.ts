@@ -88,7 +88,7 @@ export interface User {
   mainGoal: string;
   role: string;
   currency?: string;
-  // Sprint 3 — Razorpay subscription tier
+  // RevenueCat entitlement-derived subscription tier
   tier?: 'free' | 'pilot' | 'pro' | 'family';
   subscriptionStatus?: string;
   tierValidUntil?: string | null;
