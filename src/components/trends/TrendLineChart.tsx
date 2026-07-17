@@ -63,7 +63,7 @@ export default function TrendLineChart({ report, loading }: Props) {
     );
   }
 
-  if (!report || report.months.length === 0 || !hasData) {
+  if (!report || report.months.length === 0) {
     return (
       <View style={styles.card}>
         <Text style={styles.title}>Income vs Expenses</Text>
