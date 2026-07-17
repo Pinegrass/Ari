@@ -14,7 +14,7 @@ interface Props {
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const CARD_PAD = 18;
-const CHART_WIDTH = SCREEN_WIDTH - 40 - CARD_PAD * 2; // 20px screen padding each side + card padding
+const CHART_WIDTH = SCREEN_WIDTH - 40 - CARD_PAD * 2;
 
 const MONTH_SHORT: Record<string, string> = {
   '01': 'Jan', '02': 'Feb', '03': 'Mar', '04': 'Apr',
@@ -41,8 +41,6 @@ export default function TrendLineChart({ report, loading }: Props) {
     }));
   }, [report]);
 
-  // Ensure chart has at least 1 unit of height even when all values are 0,
-  // otherwise react-native-gifted-charts collapses the chart to zero height.
   const maxValue = useMemo(() => {
     const maxIncome = incomeData.length > 0 ? Math.max(...incomeData.map(d => d.value)) : 0;
     const maxExpense = expenseData.length > 0 ? Math.max(...expenseData.map(d => d.value)) : 0;
@@ -76,14 +74,12 @@ export default function TrendLineChart({ report, loading }: Props) {
         width={CHART_WIDTH}
         height={160}
         maxValue={maxValue}
+        noOfSections={4}
         spacing={report.months.length > 6 ? 30 : 50}
         color={c.forest2}
         color2={c.clay}
         thickness={2}
-        thickness2={2}
-        hideDataPoints={false}
-        dataPointsColor={c.forest2}
-        dataPointsColor2={c.clay}
+        hideDataPoints
         hideRules
         hideYAxisText
         xAxisColor={c.line}
@@ -91,9 +87,6 @@ export default function TrendLineChart({ report, loading }: Props) {
         yAxisThickness={0}
         xAxisThickness={1}
         xAxisLabelTextStyle={styles.labelText}
-        showVerticalLines
-        verticalLinesColor={c.line}
-        isAnimated
       />
       <View style={styles.legend}>
         <View style={styles.legendItem}>
