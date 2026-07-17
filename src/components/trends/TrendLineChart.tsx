@@ -14,6 +14,7 @@ interface Props {
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const CARD_PAD = 18;
 const CHART_WIDTH = SCREEN_WIDTH - 40 - CARD_PAD * 2;
+const CHART_HEIGHT = 140;
 
 const MONTH_SHORT: Record<string, string> = {
   '01': 'Jan', '02': 'Feb', '03': 'Mar', '04': 'Apr',
@@ -47,11 +48,13 @@ export default function TrendLineChart({ report, loading }: Props) {
     return Math.max(maxIncome, maxExpense, 1);
   }, [incomeData, expenseData]);
 
+  const barH = (v: number) => Math.max(0, (v / maxValue) * CHART_HEIGHT);
+
   if (loading) {
     return (
       <View style={styles.card}>
         <Text style={styles.title}>Income vs Expenses</Text>
-        <Skeleton width="100%" height={160} radius={12} style={{ marginTop: 12 }} />
+        <Skeleton width="100%" height={CHART_HEIGHT} radius={12} style={{ marginTop: 12 }} />
       </View>
     );
   }
@@ -65,34 +68,29 @@ export default function TrendLineChart({ report, loading }: Props) {
     );
   }
 
-  const barCount = incomeData.length;
-  const gap = 4;
-  const barW = Math.max(4, (CHART_WIDTH - gap * (barCount - 1)) / barCount / 2 - 2);
-  const h = (v: number) => Math.max(0, (v / maxValue) * 140);
-
   return (
     <View style={styles.card}>
       <Text style={styles.title}>Income vs Expenses</Text>
 
-      {/* Chart area */}
       <View style={styles.chartArea}>
-        {/* Y-axis guide lines */}
-        <View style={[styles.guide, { bottom: 0 }]} />
-        <View style={[styles.guide, { bottom: 35 }]} />
-        <View style={[styles.guide, { bottom: 70 }]} />
-        <View style={[styles.guide, { bottom: 105 }]} />
+        {/* Guide lines */}
+        <View style={[styles.guide, { bottom: CHART_HEIGHT * 0.75 }]} />
+        <View style={[styles.guide, { bottom: CHART_HEIGHT * 0.5 }]} />
+        <View style={[styles.guide, { bottom: CHART_HEIGHT * 0.25 }]} />
+        <View style={[styles.guide, { bottom: 0, backgroundColor: c.lineStrong }]} />
 
         {/* Bars */}
         <View style={styles.barsRow}>
           {incomeData.map((d, i) => {
             const ev = expenseData[i]?.value ?? 0;
+            const ih = barH(d.value ?? 0);
+            const eh = barH(ev);
             return (
               <View key={d.label ?? i} style={styles.barCol}>
-                {/* Income bar (green) */}
-                <View style={[styles.bar, { height: h(d.value ?? 0), backgroundColor: c.forest2, width: barW }]} />
-                {/* Expense bar (clay) */}
-                <View style={[styles.bar, { height: h(ev), backgroundColor: c.clay, width: barW, marginLeft: 2 }]} />
-                {/* Label */}
+                <View style={styles.barPair}>
+                  <View style={[styles.barIncome, { height: ih }]} />
+                  <View style={[styles.barExpense, { height: eh }]} />
+                </View>
                 <Text style={styles.barLabel} numberOfLines={1}>{d.label}</Text>
               </View>
             );
@@ -100,14 +98,13 @@ export default function TrendLineChart({ report, loading }: Props) {
         </View>
       </View>
 
-      {/* Legend */}
       <View style={styles.legend}>
         <View style={styles.legendItem}>
-          <View style={[styles.dot, { backgroundColor: c.forest2 }]} />
+          <View style={[styles.legendDot, { backgroundColor: c.forest2 }]} />
           <Text style={styles.legendText}>Income</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.dot, { backgroundColor: c.clay }]} />
+          <View style={[styles.legendDot, { backgroundColor: c.clay }]} />
           <Text style={styles.legendText}>Expenses</Text>
         </View>
       </View>
@@ -136,7 +133,7 @@ const makeStyles = (c: Palette) => StyleSheet.create({
     color: c.inkSoft,
   },
   chartArea: {
-    height: 140,
+    height: CHART_HEIGHT,
     width: CHART_WIDTH,
     justifyContent: 'flex-end',
   },
@@ -144,35 +141,49 @@ const makeStyles = (c: Palette) => StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    height: 1,
+    height: StyleSheet.hairlineWidth,
     backgroundColor: c.line,
   },
   barsRow: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    justifyContent: 'space-between',
     flex: 1,
   },
   barCol: {
-    alignItems: 'center',
     flex: 1,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
   },
-  bar: {
-    borderTopLeftRadius: 2,
-    borderTopRightRadius: 2,
-    minHeight: 1,
+  barPair: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 3,
+  },
+  barIncome: {
+    width: 8,
+    backgroundColor: c.forest2,
+    borderTopLeftRadius: 3,
+    borderTopRightRadius: 3,
+    minHeight: 2,
+  },
+  barExpense: {
+    width: 8,
+    backgroundColor: c.clay,
+    borderTopLeftRadius: 3,
+    borderTopRightRadius: 3,
+    minHeight: 2,
   },
   barLabel: {
     fontFamily: font.bodyMed,
-    fontSize: 8,
+    fontSize: 9,
     color: c.inkFaint,
-    marginTop: 4,
+    marginTop: 6,
   },
   legend: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 20,
-    marginTop: 12,
+    gap: 24,
+    marginTop: 14,
     paddingTop: 12,
     borderTopWidth: 1,
     borderColor: c.line,
@@ -182,14 +193,14 @@ const makeStyles = (c: Palette) => StyleSheet.create({
     alignItems: 'center',
     gap: 6,
   },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+  legendDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 3,
   },
   legendText: {
     fontFamily: font.bodyMed,
-    fontSize: 12,
+    fontSize: 13,
     color: c.inkSoft,
   },
 });
