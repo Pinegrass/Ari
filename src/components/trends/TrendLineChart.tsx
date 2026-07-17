@@ -76,17 +76,21 @@ export default function TrendLineChart({ report, loading }: Props) {
         maxValue={maxValue}
         noOfSections={4}
         spacing={report.months.length > 6 ? 30 : 50}
-        color={c.forest2}
+        color1={c.forest2}
         color2={c.clay}
-        thickness={2}
-        hideDataPoints
+        thickness1={2.5}
+        thickness2={2.5}
+        hideDataPoints1
+        hideDataPoints2
         hideRules
         hideYAxisText
         xAxisColor={c.line}
         yAxisColor="transparent"
         yAxisThickness={0}
-        xAxisThickness={1}
+        xAxisThickness={1.5}
         xAxisLabelTextStyle={styles.labelText}
+        startIndex1={0}
+        startIndex2={0}
       />
       <View style={styles.legend}>
         <View style={styles.legendItem}>
