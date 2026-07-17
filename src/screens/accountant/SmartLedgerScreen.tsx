@@ -12,6 +12,7 @@ import EmptyState from '../../components/ui/EmptyState';
 import { color, font } from '../../theme/tokens';
 import { usePrivacy } from '../../context/PrivacyContext';
 import { useHaptics } from '../../hooks/useHaptics';
+import { useLocale } from '../../hooks/useLocale';
 import * as txnApi from '../../api/transactions';
 import type { Transaction } from '../../types';
 
@@ -39,10 +40,10 @@ function formatMonth(m: string): string {
   return `${MONTH_NAMES[mo] || mo} ${y}`;
 }
 
-function formatDate(d: string): string {
+function fmtTxnDate(d: string, localeTag: string): string {
   try {
     const dt = new Date(d);
-    return dt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+    return dt.toLocaleDateString(localeTag, { day: 'numeric', month: 'short' });
   } catch {
     return d;
   }
@@ -54,6 +55,7 @@ type FilterType = 'all' | 'income' | 'expense';
 type SortBy = 'date' | 'amount';
 
 export default function SmartLedgerScreen() {
+  const { locale, formatDate } = useLocale();
   const navigation = useNavigation();
   const haptics = useHaptics();
   const { formatAmount } = usePrivacy();
@@ -267,7 +269,7 @@ export default function SmartLedgerScreen() {
               onPress={() => { haptics.light(); setSortBy(sortBy === 'date' ? 'amount' : 'date'); }}
             >
               <Text style={[styles.chipText, sortBy === 'amount' && styles.chipTextActive]}>
-                {sortBy === 'amount' ? '₹ Amount' : '📅 Date'}
+                {sortBy === 'amount' ? `${locale.symbol} Amount` : '📅 Date'}
               </Text>
             </TouchableOpacity>
           </ScrollView>
@@ -367,7 +369,7 @@ export default function SmartLedgerScreen() {
                         {txn.category.charAt(0).toUpperCase() + txn.category.slice(1)}
                       </Text>
                       <Text style={styles.txnDot}>·</Text>
-                      <Text style={styles.txnDate}>{formatDate(txn.date)}</Text>
+                      <Text style={styles.txnDate}>{fmtTxnDate(txn.date, locale.localeTag)}</Text>
                       {txn.incomeSource && (
                         <>
                           <Text style={styles.txnDot}>·</Text>

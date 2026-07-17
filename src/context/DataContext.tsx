@@ -117,7 +117,7 @@ const DataContext = createContext<DataContextValue | null>(null);
 const INITIAL_TOMO_MESSAGE: ChatMessage = {
   role: 'assistant',
   content:
-    "Namaste! 🙏 I'm Tomo, your personal finance coach. How can I help you build better money habits today?",
+    "Hey! 👋 I'm Tomo, your personal finance coach. How can I help you build better money habits today?",
 };
 
 export function DataProvider({ children }: { children: React.ReactNode }) {

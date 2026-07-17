@@ -198,8 +198,8 @@ export function track(event: AnalyticsEvent, props: Record<string, unknown> = {}
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /**
- * Bucket an INR amount into a coarse band. Buckets are calibrated to Indian
- * personal-finance context so the histogram across users is balanced and
+ * Bucket an amount into a coarse band. Buckets are calibrated to cover
+ * typical personal-finance ranges so the histogram across users is balanced and
  * actionable — most expenses fall in 100–2k, salaries land in 50k+.
  *
  * Reasons we bucket instead of sending raw amounts:

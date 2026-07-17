@@ -19,6 +19,9 @@ import Button from '../components/ui/Button';
 import ErrorBanner from '../components/ui/ErrorBanner';
 import { color, font } from '../theme/tokens';
 import Icon from '../components/ui/Icon';
+import CountryPicker from '../components/CountryPicker';
+import { getLocale } from '../utils/locale';
+import { getDefaultCountry } from '../utils/detectCountry';
 
 type Props = StackScreenProps<AuthStackParamList, 'Register'>;
 
@@ -27,14 +30,6 @@ const AGE_OPTIONS = [
   { value: 'young', label: '18–35', icon: 'briefcase' as const },
   { value: 'adult', label: '36–50', icon: 'home' as const },
   { value: 'senior', label: '50+', icon: 'sun' as const },
-];
-
-const INCOME_OPTIONS = [
-  { value: 'under-15k', label: 'Under ₹15K' },
-  { value: '15k-30k', label: '₹15K – ₹30K' },
-  { value: '30k-60k', label: '₹30K – ₹60K' },
-  { value: '60k-1L', label: '₹60K – ₹1L' },
-  { value: '1L+', label: '₹1L+' },
 ];
 
 const GOAL_OPTIONS = [
@@ -53,6 +48,7 @@ interface FormData {
   ageGroup: string;
   incomeBracket: string;
   mainGoal: string;
+  country: string;
 }
 
 export default function RegisterScreen({ navigation }: Props) {
@@ -65,6 +61,7 @@ export default function RegisterScreen({ navigation }: Props) {
     ageGroup: '25-35',
     incomeBracket: '15k-30k',
     mainGoal: 'save_more',
+    country: getDefaultCountry(),
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -73,6 +70,9 @@ export default function RegisterScreen({ navigation }: Props) {
   const setField = (key: keyof FormData, value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
+
+  // Derive locale-aware income options from selected country
+  const incomeOptions = getLocale(form.country).incomeBrackets;
 
   const animateProgress = (targetPct: number) => {
     Animated.spring(progressAnim, {
@@ -189,12 +189,21 @@ export default function RegisterScreen({ navigation }: Props) {
             </View>
           )}
 
-          {/* Step 2: Age & Income */}
+          {/* Step 2: Country, Age & Income */}
           {step === 2 && (
             <View>
               <Text style={styles.stepLabel}>Step 2 of 3</Text>
               <Text style={styles.title}>Tell us about yourself</Text>
               <Text style={styles.subtitle}>So Tomo can give you relevant advice</Text>
+
+              <CountryPicker
+                value={form.country}
+                onChange={(c) => {
+                  setField('country', c);
+                  // Reset income bracket when country changes
+                  setField('incomeBracket', getLocale(c).incomeBrackets[1]?.value ?? '');
+                }}
+              />
 
               <Text style={styles.sectionLabel}>Age Group</Text>
               <View style={styles.grid2}>
@@ -225,7 +234,7 @@ export default function RegisterScreen({ navigation }: Props) {
 
               <Text style={styles.sectionLabel}>Monthly Income</Text>
               <View style={styles.incomeList}>
-                {INCOME_OPTIONS.map((opt) => (
+                {incomeOptions.map((opt) => (
                   <TouchableOpacity
                     key={opt.value}
                     onPress={() => setField('incomeBracket', opt.value)}

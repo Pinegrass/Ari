@@ -12,6 +12,8 @@ import Icon from '../components/ui/Icon';
 import type { IconName } from '../components/ui/Icon';
 import { track } from '../lib/analytics';
 import { useHaptics } from '../hooks/useHaptics';
+import { getLocale } from '../utils/locale';
+import { getDefaultCountry } from '../utils/detectCountry';
 
 /**
  * Onboarding — Sprint 3 (D4). Value-first, ≤3 skippable steps, ending in a live
@@ -37,13 +39,14 @@ interface Props {
 const FEATURES: { icon: IconName; title: string; desc: string }[] = [
   { icon: 'bell', title: 'Bill reminders', desc: 'Rent, EMI & bills — nudged the day before' },
   { icon: 'bot', title: 'Tomo, your AI coach', desc: 'Ask anything about your money' },
-  { icon: 'briefcase', title: 'Tax, sorted', desc: 'Old vs new regime, 80C, HRA & GST' },
+  { icon: 'briefcase', title: 'Know your money', desc: 'Budgets, goals & smart insights' },
 ];
 
 const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'del'];
 
 export default function OnboardingScreen({ onComplete }: Props) {
   const haptics = useHaptics();
+  const loc = getLocale(getDefaultCountry());
   const [step, setStep] = useState(0);
   const [amount, setAmount] = useState('');
   const [logged, setLogged] = useState(false);
@@ -128,7 +131,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
               {/* Demo dashboard glimpse — show, don't ask */}
               <View style={styles.glimpse}>
                 <Text style={styles.glimpseLabel}>Spent today</Text>
-                <Text style={styles.glimpseAmount}>₹0</Text>
+                <Text style={styles.glimpseAmount}>{loc.symbol}0</Text>
                 <Text style={styles.glimpseHint}>{"Let's change that in a moment →"}</Text>
               </View>
             </View>
@@ -158,7 +161,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
               <Text style={styles.h1}>Try it — log a spend</Text>
               <Text style={styles.sub}>This is the whole flow. Punch in an amount.</Text>
 
-              <Text style={styles.amount}>₹{amount ? Number(amount).toLocaleString('en-IN') : '0'}</Text>
+              <Text style={styles.amount}>{loc.symbol}{amount ? Number(amount).toLocaleString(loc.localeTag) : '0'}</Text>
 
               {logged ? (
                 <View style={styles.doneRow}>

@@ -10,6 +10,7 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import Icon from '../components/ui/Icon';
 import { color, font } from '../theme/tokens';
 import { useHaptics } from '../hooks/useHaptics';
+import { useLocale } from '../hooks/useLocale';
 import { usePrivacy } from '../context/PrivacyContext';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -30,6 +31,7 @@ export default function GroupDetailScreen() {
   const haptics = useHaptics();
   const { formatAmount } = usePrivacy();
   const { user } = useAuth();
+  const { formatDate } = useLocale();
 
   const [group, setGroup] = useState<GroupDetail | null>(null);
   const [expenses, setExpenses] = useState<SharedExpense[]>([]);
@@ -312,7 +314,7 @@ export default function GroupDetailScreen() {
                   <View style={{ flex: 1 }}>
                     <Text style={styles.expenseDesc}>{e.description || 'Shared expense'}</Text>
                     <Text style={styles.expenseSub}>
-                      {payerName} paid • {new Date(e.date + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                      {payerName} paid • {formatDate(new Date(e.date + 'T00:00:00'), { day: 'numeric', month: 'short' })}
                     </Text>
                   </View>
                   <Text style={styles.expenseAmount}>{formatAmount(e.amount)}</Text>

@@ -28,11 +28,13 @@ import type { Palette } from '../theme/palettes';
 import { usePrivacy } from '../context/PrivacyContext';
 import { getCurrentMonth } from '../utils/dateHelpers';
 import { useHaptics } from '../hooks/useHaptics';
+import { useLocale } from '../hooks/useLocale';
 import type { Budget } from '../types';
 
 export default function BudgetScreen() {
   const { budgets, loadingData, refreshing, fetchBudgets, saveBudget, deleteBudget, refresh, userCategories, fetchUserCategories } =
     useData();
+  const { locale } = useLocale();
   const haptics = useHaptics();
   const c = useColors();
   const styles = useMemo(() => makeStyles(c), [c]);
@@ -215,9 +217,9 @@ export default function BudgetScreen() {
               customCategories={userCategories}
             />
 
-            <Text style={[styles.sectionLabel, { marginTop: 20 }]}>Monthly Limit (₹)</Text>
+            <Text style={[styles.sectionLabel, { marginTop: 20 }]}>Monthly Limit ({locale.symbol})</Text>
             <View style={styles.limitRow}>
-              <Text style={styles.rupee}>₹</Text>
+              <Text style={styles.rupee}>{locale.symbol}</Text>
               <TextInput
                 style={styles.limitInput}
                 value={limit}

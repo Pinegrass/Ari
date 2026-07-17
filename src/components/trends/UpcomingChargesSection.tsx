@@ -6,6 +6,7 @@ import { color, font, type as typeScale } from '../../theme/tokens';
 import { getBills } from '../../lib/bills';
 import { selectUpcomingCharges, type UpcomingCharge } from '../../lib/upcomingCharges';
 import { useData } from '../../context/DataContext';
+import { useLocale } from '../../hooks/useLocale';
 
 function dueLabel(daysUntil: number): string {
   if (daysUntil <= 0) return 'today';
@@ -20,6 +21,7 @@ function dueLabel(daysUntil: number): string {
  * committed outflow at a glance.
  */
 export default function UpcomingChargesSection() {
+  const { formatCurrency } = useLocale();
   const { transactions } = useData();
   const [charges, setCharges] = useState<UpcomingCharge[] | null>(null);
 
@@ -43,7 +45,7 @@ export default function UpcomingChargesSection() {
     <View style={styles.card}>
       <View style={styles.head}>
         <Text style={styles.title}>Upcoming charges</Text>
-        <Text style={styles.total}>₹{total.toLocaleString('en-IN')} · 30 days</Text>
+        <Text style={styles.total}>{formatCurrency(total)} · 30 days</Text>
       </View>
 
       {charges.map((charge) => (
@@ -56,7 +58,7 @@ export default function UpcomingChargesSection() {
               {charge.source === 'recurring' ? ' · recurring' : ' · bill'}
             </Text>
           </View>
-          <Text style={styles.amount}>₹{charge.amount.toLocaleString('en-IN')}</Text>
+          <Text style={styles.amount}>{formatCurrency(charge.amount)}</Text>
         </View>
       ))}
     </View>

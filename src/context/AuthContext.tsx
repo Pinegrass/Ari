@@ -40,6 +40,7 @@ export interface RegisterFormData {
   incomeBracket?: string;
   primary_goal?: string;
   mainGoal?: string;
+  country?: string;
 }
 
 const AGE_GROUP_TO_API: Record<string, string> = {
@@ -79,6 +80,7 @@ function buildRegisterPayload(data: RegisterFormData): RegisterPayload {
       data.mainGoal ||
       MAIN_GOAL_TO_API[data.primary_goal ?? ''] ||
       'save_more',
+    country: data.country || 'IN',
   };
 }
 

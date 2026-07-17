@@ -13,6 +13,7 @@ import ErrorBanner from '../components/ui/ErrorBanner';
 import { color, font } from '../theme/tokens';
 import { useHaptics } from '../hooks/useHaptics';
 import { useAuth } from '../context/AuthContext';
+import { useLocale } from '../hooks/useLocale';
 import { getGroupDetail, logSharedExpense, type GroupDetail } from '../api/groups';
 import { todayISO } from '../utils/dateHelpers';
 import type { MainStackParamList } from '../navigation/navigationTypes';
@@ -25,6 +26,7 @@ export default function AddSharedExpenseScreen() {
   const { params } = useRoute<Rt>();
   const haptics = useHaptics();
   const { user } = useAuth();
+  const { locale, formatCurrency } = useLocale();
 
   const [group, setGroup] = useState<GroupDetail | null>(null);
   const [amount, setAmount] = useState('');
@@ -126,7 +128,7 @@ export default function AddSharedExpenseScreen() {
           <ErrorBanner message={error} />
 
           <View style={styles.amountRow}>
-            <Text style={styles.rupee}>₹</Text>
+            <Text style={styles.rupee}>{locale.symbol}</Text>
             <TextInput
               style={styles.amount}
               value={amount}
@@ -166,7 +168,7 @@ export default function AddSharedExpenseScreen() {
                 </Text>
                 {checked && amount && parseFloat(amount) > 0 && (
                   <Text style={styles.share}>
-                    ₹{(parseFloat(amount) / included.size).toFixed(2)}
+                    {locale.symbol}{(parseFloat(amount) / included.size).toFixed(2)}
                   </Text>
                 )}
               </TouchableOpacity>

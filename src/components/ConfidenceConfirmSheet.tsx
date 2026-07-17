@@ -9,6 +9,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { color, font } from '../theme/tokens';
 import Icon from './ui/Icon';
+import { useLocale } from '../hooks/useLocale';
 import Button from './ui/Button';
 import type { Category, TransactionType } from '../types';
 
@@ -40,6 +41,7 @@ export default function ConfidenceConfirmSheet({
   onCancel,
 }: Props) {
   const insets = useSafeAreaInsets();
+  const { formatCurrency } = useLocale();
   const pct = Math.round(confidence * 100);
 
   return (
@@ -63,7 +65,7 @@ export default function ConfidenceConfirmSheet({
             Our AI is {pct}% confident this is a{' '}
             <Text style={styles.bold}>{category}</Text> {type}
             {merchant ? ` at ${merchant}` : ''}
-            {amount > 0 ? ` for ₹${amount.toLocaleString('en-IN')}` : ''}.
+            {amount > 0 ? ` for ${formatCurrency(amount)}` : ''}.
           </Text>
           <View style={styles.buttons}>
             <Button

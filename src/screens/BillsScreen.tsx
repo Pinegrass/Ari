@@ -24,6 +24,7 @@ import AnimatedEntry from '../components/ui/AnimatedEntry';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import DeleteConfirmSheet from '../components/DeleteConfirmSheet';
 import { useHaptics } from '../hooks/useHaptics';
+import { useLocale } from '../hooks/useLocale';
 import { color, font, type as typeScale } from '../theme/tokens';
 import { track } from '../lib/analytics';
 import {
@@ -52,7 +53,7 @@ function genId(): string {
 }
 
 /** Next due date label for a bill (independent of the 7-day window). */
-function nextDueLabel(bill: Bill): string {
+function nextDueLabel(bill: Bill, localeTag: string): string {
   let iso: string;
   if (bill.repeatMonthly) {
     iso = toISODate(nextMonthlyOccurrence(bill.dueDay, new Date()));
@@ -62,10 +63,11 @@ function nextDueLabel(bill: Bill): string {
   if (!iso) return 'No upcoming date';
   const [y, m, d] = iso.split('-').map(Number);
   const dt = new Date(y, m - 1, d);
-  return dt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+  return dt.toLocaleDateString(localeTag, { day: 'numeric', month: 'short' });
 }
 
 export default function BillsScreen() {
+  const { locale, formatCurrency, formatDate } = useLocale();
   const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
   const haptics = useHaptics();
   const insets = useSafeAreaInsets();
@@ -226,7 +228,7 @@ export default function BillsScreen() {
                 <View style={{ flex: 1 }}>
                   <Text style={styles.cardName}>{bill.name}</Text>
                   <Text style={styles.cardMeta}>
-                    ₹{bill.amount.toLocaleString('en-IN')} · due {nextDueLabel(bill)}
+                    {formatCurrency(bill.amount)} · due {nextDueLabel(bill, locale.localeTag)}
                     {bill.repeatMonthly ? ' · monthly' : ''}
                   </Text>
                 </View>
@@ -259,7 +261,7 @@ export default function BillsScreen() {
 
             <Input label="Name" placeholder="Rent, Credit card, Netflix…" value={name} onChangeText={setName} />
             <Input
-              label="Amount (₹)"
+              label={`Amount (${locale.symbol})`}
               placeholder="0"
               value={amount}
               onChangeText={(t) => setAmount(t.replace(/[^0-9]/g, ''))}

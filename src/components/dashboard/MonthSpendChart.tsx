@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { BarChart } from 'react-native-gifted-charts';
 import { color, font, type as ftype } from '../../theme/tokens';
 import { Skeleton } from '../ui/Skeleton';
+import { useLocale } from '../../hooks/useLocale';
 import type { DailyAnalytics } from '../../api/reports';
 
 interface Props {
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export default function MonthSpendChart({ data, loading }: Props) {
+  const { formatCurrency } = useLocale();
   const chartData = useMemo(() => {
     if (!data) return [];
     return Object.entries(data.days)
@@ -68,7 +70,7 @@ export default function MonthSpendChart({ data, loading }: Props) {
       />
       <View style={styles.footer}>
         <Text style={styles.footerText}>
-          Total <Text style={styles.footerBold}>₹{data.total.toLocaleString('en-IN')}</Text>
+          Total <Text style={styles.footerBold}>{formatCurrency(data.total)}</Text>
         </Text>
       </View>
     </View>

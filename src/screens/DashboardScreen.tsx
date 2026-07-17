@@ -29,6 +29,7 @@ import { useColors } from '../context/ThemeContext';
 import type { Palette } from '../theme/palettes';
 import { todayISO } from '../utils/dateHelpers';
 import { useHaptics } from '../hooks/useHaptics';
+import { useLocale } from '../hooks/useLocale';
 import type { TabParamList, MainStackParamList } from '../navigation/navigationTypes';
 
 type Nav = CompositeNavigationProp<
@@ -53,6 +54,7 @@ function getGreeting(): string {
 export default function DashboardScreen() {
   const navigation = useNavigation<Nav>();
   const { user } = useAuth();
+  const { formatDate } = useLocale();
   const insets = useSafeAreaInsets();
   const { transactions, summary, dailyData, loadingData, refreshing, fetchAll, refresh } = useData();
   const haptics = useHaptics();
@@ -82,7 +84,7 @@ export default function DashboardScreen() {
 
   const dateLabel = useMemo(
     () =>
-      new Date().toLocaleDateString('en-IN', {
+      formatDate(new Date(), {
         weekday: 'long',
         day: 'numeric',
         month: 'long',

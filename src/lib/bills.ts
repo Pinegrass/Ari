@@ -22,6 +22,7 @@ import {
   istToday,
   type BillReminder,
 } from './billSchedule';
+import { formatCurrency } from '../utils/formatCurrency';
 
 const BILLS_KEY = 'ari_bills';
 const ID_PREFIX = 'bill:';
@@ -184,7 +185,7 @@ export async function scheduleBillReminders(bill: Bill, now: Date = new Date()):
         identifier: `${ID_PREFIX}${bill.id}:${r.occurrenceDate}:${r.kind}`,
         content: {
           title: reminderTitle(bill, r),
-          body: `₹${bill.amount.toLocaleString('en-IN')} — tap to log it`,
+          body: `${formatCurrency(bill.amount)} — tap to log it`,
           data: data as unknown as Record<string, unknown>,
           sound: 'default',
         },

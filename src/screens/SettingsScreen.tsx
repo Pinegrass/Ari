@@ -42,16 +42,24 @@ import { submitFeedback } from '../api/feedback';
 import { deleteAccount } from '../api/account';
 import { track } from '../lib/analytics';
 
+import CountryPicker from '../components/CountryPicker';
+import { getLocale } from '../utils/locale';
+
 const AGE_LABELS: Record<string, string> = {
   'under-18': 'Under 18', '18-24': '18–24', '25-35': '25–35',
   '36-50': '36–50', '50+': '50+',
   teen: 'Under 18', young: '18–35', adult: '36–50', senior: '50+',
 };
 
-const INCOME_LABELS: Record<string, string> = {
-  'under-15k': 'Under ₹15K', '15k-30k': '₹15K–30K',
-  '30k-60k': '₹30K–60K', '60k-1L': '₹60K–1L', '1L+': '₹1L+',
-};
+/** Derive income bracket labels from the user's country, not hardcoded ₹. */
+function getIncomeLabels(country: string | undefined): Record<string, string> {
+  const brackets = getLocale(country).incomeBrackets;
+  const labels: Record<string, string> = {};
+  for (const b of brackets) {
+    labels[b.value] = b.label;
+  }
+  return labels;
+}
 
 const GOAL_LABELS: Record<string, string> = {
   save_more: '🏦 Save More', pay_debt: '💳 Pay Off Debt',
@@ -356,7 +364,7 @@ export default function SettingsScreen() {
           <View style={styles.detailsCard}>
             {[
               { label: 'Age Group', value: AGE_LABELS[user?.ageGroup ?? ''] ?? user?.ageGroup, emoji: '📅' },
-              { label: 'Monthly Income', value: INCOME_LABELS[user?.incomeBracket ?? ''] ?? user?.incomeBracket, emoji: '💰' },
+              { label: 'Monthly Income', value: getIncomeLabels(user?.country)[user?.incomeBracket ?? ''] ?? user?.incomeBracket, emoji: '💰' },
               { label: 'Main Goal', value: GOAL_LABELS[user?.mainGoal ?? ''] ?? user?.mainGoal, emoji: '🎯' },
             ].map((item, i, arr) => (
               <View key={item.label}>

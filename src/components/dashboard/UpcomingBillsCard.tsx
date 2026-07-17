@@ -6,6 +6,7 @@ import type { CompositeNavigationProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 
 import Icon from '../ui/Icon';
+import { useLocale } from '../../hooks/useLocale';
 import { color, font, type as typeScale } from '../../theme/tokens';
 import { getBills } from '../../lib/bills';
 import { selectUpcomingCharges, type UpcomingCharge } from '../../lib/upcomingCharges';
@@ -30,6 +31,7 @@ function dueLabel(daysUntil: number): string {
  * so Home stays clean for users with neither.
  */
 export default function UpcomingBillsCard() {
+  const { formatCurrency } = useLocale();
   const navigation = useNavigation<Nav>();
   const { transactions } = useData();
   const [charges, setCharges] = useState<UpcomingCharge[] | null>(null);
@@ -82,7 +84,7 @@ export default function UpcomingBillsCard() {
               {charge.source === 'recurring' ? ' · recurring' : ''}
             </Text>
           </View>
-          <Text style={styles.amount}>₹{charge.amount.toLocaleString('en-IN')}</Text>
+          <Text style={styles.amount}>{formatCurrency(charge.amount)}</Text>
           <Icon name="chevron-right" size={16} color={color.inkFaint} />
         </TouchableOpacity>
       ))}

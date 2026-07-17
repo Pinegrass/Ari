@@ -10,7 +10,7 @@ module.exports = {
   // Agent worktrees carry a full copy of the repo; without this Jest runs every suite twice.
   // Anchored to <rootDir> so Jest still works when run from inside a worktree
   // (whose own absolute path contains /.claude/).
-  testPathIgnorePatterns: ['/node_modules/', '<rootDir>/.claude/'],
+  testPathIgnorePatterns: ['/node_modules/', '<rootDir>/.claude/', '<rootDir>/aritomo-web/'],
   // Coverage gate is scoped to the logic layers the unit suite targets;
   // screens/components/navigation are covered by Maestro e2e instead.
   collectCoverageFrom: [

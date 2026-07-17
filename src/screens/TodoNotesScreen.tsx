@@ -12,6 +12,7 @@ import AnimatedEntry from '../components/ui/AnimatedEntry';
 import EmptyState from '../components/ui/EmptyState';
 import { color, font } from '../theme/tokens';
 import { useHaptics } from '../hooks/useHaptics';
+import { useLocale } from '../hooks/useLocale';
 import * as todosApi from '../api/todos';
 import type { TodoNote } from '../api/todos';
 
@@ -33,6 +34,7 @@ type Filter = 'all' | 'active' | 'done' | 'pinned';
 export default function TodoNotesScreen() {
   const navigation = useNavigation();
   const haptics = useHaptics();
+  const { locale } = useLocale();
   const insets = useSafeAreaInsets();
 
   const [todos, setTodos] = useState<TodoNote[]>([]);
@@ -206,7 +208,7 @@ export default function TodoNotesScreen() {
     if (!date) return null;
     try {
       const d = new Date(date + 'T00:00:00');
-      const label = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+      const label = d.toLocaleDateString(locale.localeTag, { day: 'numeric', month: 'short' });
       return time ? `${label} at ${time}` : label;
     } catch {
       return date;

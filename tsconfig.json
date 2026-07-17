@@ -9,5 +9,5 @@
     "jsx": "react-jsx",
     "types": ["react-native", "jest"]
   },
-  "exclude": ["node_modules", "coverage"]
+  "exclude": ["node_modules", "coverage", "aritomo-web"]
 }

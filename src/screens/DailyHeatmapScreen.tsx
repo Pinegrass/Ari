@@ -7,6 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import Icon from '../components/ui/Icon';
 import { color, font } from '../theme/tokens';
 import { usePrivacy } from '../context/PrivacyContext';
+import { useLocale } from '../hooks/useLocale';
 import { getDailyHeatmap, type DailyHeatmap } from '../api/analytics';
 
 /**
@@ -24,9 +25,9 @@ function offsetMonth(m: string, delta: number): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 }
 
-function monthLabel(m: string): string {
+function monthLabel(m: string, localeTag: string): string {
   const [y, mo] = m.split('-').map(Number);
-  return new Date(y, mo - 1, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+  return new Date(y, mo - 1, 1).toLocaleDateString(localeTag, { month: 'long', year: 'numeric' });
 }
 
 function todayIso(): string {
@@ -37,6 +38,7 @@ function todayIso(): string {
 export default function DailyHeatmapScreen() {
   const navigation = useNavigation();
   const { formatAmount } = usePrivacy();
+  const { locale } = useLocale();
 
   const [month, setMonth] = useState(() => todayIso().slice(0, 7));
   const [loading, setLoading] = useState(true);
@@ -87,7 +89,7 @@ export default function DailyHeatmapScreen() {
         <TouchableOpacity onPress={() => setMonth(offsetMonth(month, -1))} hitSlop={8}>
           <Icon name="chevron-left" size={18} color={color.inkSoft} />
         </TouchableOpacity>
-        <Text style={styles.monthLabel}>{monthLabel(month)}</Text>
+        <Text style={styles.monthLabel}>{monthLabel(month, locale.localeTag)}</Text>
         <TouchableOpacity
           onPress={() => setMonth(offsetMonth(month, 1))}
           hitSlop={8}
@@ -118,7 +120,7 @@ export default function DailyHeatmapScreen() {
                 </Text>
                 {heaviest && (
                   <Text style={styles.summarySub}>
-                    {new Date(heaviest[0] + 'T00:00:00').toLocaleDateString('en-IN', {
+                    {new Date(heaviest[0] + 'T00:00:00').toLocaleDateString(locale.localeTag, {
                       day: 'numeric', month: 'short',
                     })}
                   </Text>

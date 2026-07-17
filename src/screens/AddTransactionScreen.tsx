@@ -31,12 +31,13 @@ import { parseExpenseAI, type AiParseResult } from '../api/parse';
 import ConfidenceConfirmSheet from '../components/ConfidenceConfirmSheet';
 import { todayISO, toLocalISODate, formatSectionDate } from '../utils/dateHelpers';
 import { useHaptics } from '../hooks/useHaptics';
+import { useLocale } from '../hooks/useLocale';
 import { useVoiceInput } from '../hooks/useVoiceInput';
 import type { Category, Transaction, TransactionType } from '../types';
 
 type Props = StackScreenProps<MainStackParamList, 'AddTransaction'>;
 
-const MAX_AMOUNT = 10_000_000; // ₹1 crore (D5)
+const MAX_AMOUNT = 10_000_000; // 1 crore in smallest currency unit (D5)
 const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'del'] as const;
 
 /**
@@ -59,6 +60,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
   const initialType: TransactionType = editTxn?.type ?? (params as { type?: 'expense' | 'income' } | undefined)?.type ?? 'expense';
 
   const { addTransaction, updateTransaction, userCategories, fetchUserCategories } = useData();
+  const { locale, formatCurrency } = useLocale();
   const haptics = useHaptics();
   const insets = useSafeAreaInsets();
   const c = useColors();
@@ -315,7 +317,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
   // Chip display uses the built-in defs; a custom category falls back to a
   // generic emoji + its capitalized name, which reads fine on the chip.
   const cat = getCategoryDef(category);
-  const displayAmount = numericAmount.toLocaleString('en-IN');
+  const displayAmount = numericAmount.toLocaleString(locale.localeTag);
   const dateLabel = date === todayISO() ? 'Today' : formatSectionDate(date);
 
   return (
@@ -364,7 +366,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
         </Text>
         <View style={styles.amountRow}>
           <Text style={[styles.amountValue, type === 'income' && { color: c.forest2 }]}>
-            <Text style={styles.rupee}>₹</Text>
+            <Text style={styles.rupee}>{locale.symbol}</Text>
             {displayAmount}
           </Text>
           <Animated.View style={[styles.caret, { opacity: caretOpacity }]} />

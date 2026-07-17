@@ -17,6 +17,7 @@ import AnimatedEntry from '../../components/ui/AnimatedEntry';
 import { color, font } from '../../theme/tokens';
 import { usePrivacy } from '../../context/PrivacyContext';
 import { useHaptics } from '../../hooks/useHaptics';
+import { useLocale } from '../../hooks/useLocale';
 import { useData } from '../../context/DataContext';
 import * as budgetApi from '../../api/budgets';
 import type { Budget } from '../../types';
@@ -26,6 +27,7 @@ export default function BudgetPlannerScreen() {
   const haptics = useHaptics();
   const insets = useSafeAreaInsets();
   const { saveBudget, deleteBudget } = useData();
+  const { locale } = useLocale();
   const { formatAmount } = usePrivacy();
 
   const [month, setMonth] = useState(getCurrentMonth());
@@ -265,7 +267,7 @@ export default function BudgetPlannerScreen() {
 
             <Text style={[styles.fieldLabel, { marginTop: 20 }]}>Monthly Limit</Text>
             <View style={styles.amountRow}>
-              <Text style={styles.rupee}>₹</Text>
+              <Text style={styles.rupee}>{locale.symbol}</Text>
               <TextInput
                 style={styles.amountInput}
                 value={limit}

@@ -3,6 +3,7 @@ import {
   ExpoSpeechRecognitionModule,
   useSpeechRecognitionEvent,
 } from 'expo-speech-recognition';
+import { useLocale } from './useLocale';
 
 /**
  * Voice input for expense logging (spec §1 core differentiator, §2 Voice
@@ -31,6 +32,7 @@ export interface VoiceInputState {
 }
 
 export function useVoiceInput(): VoiceInputState {
+  const { locale } = useLocale();
   const [isAvailable, setIsAvailable] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
@@ -94,7 +96,7 @@ export function useVoiceInput(): VoiceInputState {
         return;
       }
       ExpoSpeechRecognitionModule.start({
-        lang: 'en-IN',
+        lang: locale.localeTag,
         interimResults: true,
         // en-IN + noun biasing for Indian merchants could go here later.
       });

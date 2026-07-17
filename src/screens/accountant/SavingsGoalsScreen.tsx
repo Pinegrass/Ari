@@ -17,6 +17,7 @@ import AnimatedEntry from '../../components/ui/AnimatedEntry';
 import { color, font } from '../../theme/tokens';
 import { usePrivacy } from '../../context/PrivacyContext';
 import { useHaptics } from '../../hooks/useHaptics';
+import { useLocale } from '../../hooks/useLocale';
 import * as goalsApi from '../../api/savingsGoals';
 import type { SavingsGoal } from '../../types';
 
@@ -36,6 +37,7 @@ export default function SavingsGoalsScreen() {
   const haptics = useHaptics();
   const insets = useSafeAreaInsets();
   const { formatAmount } = usePrivacy();
+  const { locale } = useLocale();
 
   const [goals, setGoals] = useState<SavingsGoal[]>([]);
   const [loading, setLoading] = useState(true);
@@ -325,7 +327,7 @@ export default function SavingsGoalsScreen() {
 
               <Text style={styles.fieldLabel}>Target Amount</Text>
               <View style={styles.amountRow}>
-                <Text style={styles.rupee}>₹</Text>
+                <Text style={styles.rupee}>{locale.symbol}</Text>
                 <TextInput
                   style={styles.amountInput}
                   value={targetAmount}
@@ -383,7 +385,7 @@ export default function SavingsGoalsScreen() {
             )}
 
             <View style={[styles.amountRow, { marginTop: 16 }]}>
-              <Text style={styles.rupee}>₹</Text>
+              <Text style={styles.rupee}>{locale.symbol}</Text>
               <TextInput
                 style={styles.amountInput}
                 value={contributeAmount}

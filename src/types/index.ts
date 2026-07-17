@@ -88,6 +88,7 @@ export interface User {
   mainGoal: string;
   role: string;
   currency?: string;
+  country?: string;  // ISO 3166-1 alpha-2, e.g. "IN", "US"
   // RevenueCat entitlement-derived subscription tier
   tier?: 'free' | 'pilot' | 'pro' | 'family';
   subscriptionStatus?: string;
@@ -113,6 +114,7 @@ export interface RegisterPayload {
   incomeBracket: string;
   mainGoal: string;
   role?: string;
+  country?: string;  // ISO 3166-1 alpha-2
 }
 
 // ---------------------------------------------------------------------------
