@@ -38,6 +38,7 @@ export default function TrendLineChart({ report, loading }: Props) {
     if (!report) return [];
     return report.months.map((m) => ({
       value: m.expenses,
+      label: MONTH_SHORT[m.month.split('-')[1]] ?? m.month,
     }));
   }, [report]);
 
@@ -45,6 +46,12 @@ export default function TrendLineChart({ report, loading }: Props) {
     const maxIncome = incomeData.length > 0 ? Math.max(...incomeData.map(d => d.value)) : 0;
     const maxExpense = expenseData.length > 0 ? Math.max(...expenseData.map(d => d.value)) : 0;
     return Math.max(maxIncome, maxExpense, 1);
+  }, [incomeData, expenseData]);
+
+  const hasData = useMemo(() => {
+    const totalIncome = incomeData.reduce((s, d) => s + (d.value ?? 0), 0);
+    const totalExpense = expenseData.reduce((s, d) => s + (d.value ?? 0), 0);
+    return totalIncome > 0 || totalExpense > 0;
   }, [incomeData, expenseData]);
 
   if (loading) {
@@ -56,7 +63,7 @@ export default function TrendLineChart({ report, loading }: Props) {
     );
   }
 
-  if (!report || report.months.length === 0) {
+  if (!report || report.months.length === 0 || !hasData) {
     return (
       <View style={styles.card}>
         <Text style={styles.title}>Income vs Expenses</Text>
