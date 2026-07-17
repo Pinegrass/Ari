@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
-import { LineChart } from 'react-native-gifted-charts';
 import { font, type as ftype } from '../../theme/tokens';
 import { useColors } from '../../context/ThemeContext';
 import type { Palette } from '../../theme/palettes';
@@ -66,36 +65,42 @@ export default function TrendLineChart({ report, loading }: Props) {
     );
   }
 
+  const barCount = incomeData.length;
+  const gap = 4;
+  const barW = Math.max(4, (CHART_WIDTH - gap * (barCount - 1)) / barCount / 2 - 2);
+  const h = (v: number) => Math.max(0, (v / maxValue) * 140);
+
   return (
     <View style={styles.card}>
       <Text style={styles.title}>Income vs Expenses</Text>
-      <LineChart
-        data={incomeData}
-        data2={expenseData}
-        width={CHART_WIDTH}
-        height={160}
-        maxValue={maxValue}
-        noOfSections={4}
-        spacing={report.months.length > 6 ? 30 : 50}
-        color1={c.forest2}
-        color2={c.clay}
-        thickness1={2.5}
-        thickness2={2.5}
-        hideDataPoints1
-        hideDataPoints2
-        hideRules
-        hideYAxisText
-        xAxisColor={c.line}
-        yAxisColor="transparent"
-        yAxisThickness={0}
-        xAxisThickness={1.5}
-        xAxisLabelTextStyle={styles.labelText}
-        startIndex1={0}
-        startIndex2={0}
-      />
-      <Text style={styles.debug}>
-        I: {incomeData.map(d => d.value).join(',')} | E: {expenseData.map(d => d.value).join(',')}
-      </Text>
+
+      {/* Chart area */}
+      <View style={styles.chartArea}>
+        {/* Y-axis guide lines */}
+        <View style={[styles.guide, { bottom: 0 }]} />
+        <View style={[styles.guide, { bottom: 35 }]} />
+        <View style={[styles.guide, { bottom: 70 }]} />
+        <View style={[styles.guide, { bottom: 105 }]} />
+
+        {/* Bars */}
+        <View style={styles.barsRow}>
+          {incomeData.map((d, i) => {
+            const ev = expenseData[i]?.value ?? 0;
+            return (
+              <View key={d.label ?? i} style={styles.barCol}>
+                {/* Income bar (green) */}
+                <View style={[styles.bar, { height: h(d.value ?? 0), backgroundColor: c.forest2, width: barW }]} />
+                {/* Expense bar (clay) */}
+                <View style={[styles.bar, { height: h(ev), backgroundColor: c.clay, width: barW, marginLeft: 2 }]} />
+                {/* Label */}
+                <Text style={styles.barLabel} numberOfLines={1}>{d.label}</Text>
+              </View>
+            );
+          })}
+        </View>
+      </View>
+
+      {/* Legend */}
       <View style={styles.legend}>
         <View style={styles.legendItem}>
           <View style={[styles.dot, { backgroundColor: c.forest2 }]} />
@@ -130,24 +135,45 @@ const makeStyles = (c: Palette) => StyleSheet.create({
     fontSize: 13,
     color: c.inkSoft,
   },
-  labelText: {
-    fontFamily: font.bodyMed,
-    fontSize: 9,
-    color: c.inkFaint,
+  chartArea: {
+    height: 140,
+    width: CHART_WIDTH,
+    justifyContent: 'flex-end',
   },
-  debug: {
-    fontFamily: font.body,
-    fontSize: 9,
+  guide: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    height: 1,
+    backgroundColor: c.line,
+  },
+  barsRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    flex: 1,
+  },
+  barCol: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  bar: {
+    borderTopLeftRadius: 2,
+    borderTopRightRadius: 2,
+    minHeight: 1,
+  },
+  barLabel: {
+    fontFamily: font.bodyMed,
+    fontSize: 8,
     color: c.inkFaint,
     marginTop: 4,
-    marginBottom: 2,
   },
   legend: {
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 20,
-    marginTop: 8,
-    paddingTop: 8,
+    marginTop: 12,
+    paddingTop: 12,
     borderTopWidth: 1,
     borderColor: c.line,
   },
