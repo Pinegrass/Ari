@@ -41,6 +41,14 @@ export default function TrendLineChart({ report, loading }: Props) {
     }));
   }, [report]);
 
+  // Ensure chart has at least 1 unit of height even when all values are 0,
+  // otherwise react-native-gifted-charts collapses the chart to zero height.
+  const maxValue = useMemo(() => {
+    const maxIncome = incomeData.length > 0 ? Math.max(...incomeData.map(d => d.value)) : 0;
+    const maxExpense = expenseData.length > 0 ? Math.max(...expenseData.map(d => d.value)) : 0;
+    return Math.max(maxIncome, maxExpense, 1);
+  }, [incomeData, expenseData]);
+
   if (loading) {
     return (
       <View style={styles.card}>
@@ -67,6 +75,7 @@ export default function TrendLineChart({ report, loading }: Props) {
         data2={expenseData}
         width={CHART_WIDTH}
         height={160}
+        maxValue={maxValue}
         spacing={report.months.length > 6 ? 30 : 50}
         color={c.forest2}
         color2={c.clay}
