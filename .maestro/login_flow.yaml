@@ -38,4 +38,7 @@ name: Login Flow
 - assertVisible: "Home"
 - assertVisible: "Trends"
 - assertVisible: "Tomo"
-- assertVisible: "Add an entry"
+# Dashboard sections fade in via AnimatedEntry — wait explicitly.
+- extendedWaitUntil:
+    visible: "Add an entry"
+    timeout: 15000
