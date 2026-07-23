@@ -13,7 +13,8 @@ tags:
 - tapOn: "5"
 - tapOn: "0"
 - tapOn: "0"
-- assertVisible: "500"
+# Maestro matches element text exactly — the display node is "₹500".
+- assertVisible: "₹500"
 
 # Save
 - tapOn: "Save entry"
@@ -22,7 +23,7 @@ tags:
 - assertVisible: "Home"
 
 # Edit: long-press the transaction to open the edit sheet, bump the amount
-- longPressOn: "500"
+- longPressOn: "₹500"
 - assertVisible: "Update entry"
 - tapOn: "0"          # 500 -> 5000
 - tapOn: "Update entry"
