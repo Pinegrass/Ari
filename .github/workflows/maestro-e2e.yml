@@ -67,6 +67,14 @@ jobs:
           GRADLE_OPTS: "-Xmx4g -XX:MaxMetaspaceSize=1g -XX:+HeapDumpOnOutOfMemoryError"
         run: eas build --platform android --profile e2e --local --output ./app.apk --non-interactive
 
+      - name: Add Android SDK tools to PATH
+        # ubuntu-latest sets $ANDROID_HOME but only platform-tools is on
+        # PATH; sdkmanager/avdmanager/emulator need explicit entries.
+        run: |
+          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$ANDROID_HOME/emulator" >> $GITHUB_PATH
+          echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
+
       - name: Create AVD (api 34, x86_64, pixel_6)
         run: |
           yes | sdkmanager --licenses > /dev/null || true
