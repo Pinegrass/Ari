@@ -73,14 +73,23 @@ jobs:
           echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
 
       - name: Create AVD (api 34, x86_64, pixel_6)
+        env:
+          # Pin the AVD location so avdmanager and the emulator binary
+          # agree on it regardless of runner env quirks.
+          ANDROID_AVD_HOME: /home/runner/.android/avd
         run: |
           yes | sdkmanager --licenses > /dev/null || true
-          sdkmanager --install "system-images;android-34;google_apis;x86_64"
+          sdkmanager --install "system-images;android-34;google_apis;x86_64" "emulator" "platform-tools"
           echo no | avdmanager create avd --force -n maestro -k "system-images;android-34;google_apis;x86_64" --device "pixel_6"
+          avdmanager list avd
+          ls -la "$ANDROID_AVD_HOME"
 
       - name: Boot emulator and wait for boot
         timeout-minutes: 12
+        env:
+          ANDROID_AVD_HOME: /home/runner/.android/avd
         run: |
+          emulator -list-avds
           emulator -avd maestro -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot > emulator.log 2>&1 &
           EMU_PID=$!
           # adb wait-for-device blocks forever if the emulator never
