@@ -15,8 +15,10 @@ tags:
 - tapOn: "Export Data"
 - assertVisible: "Export Data"
 
-# Back to the More menu
-- tapOn: "More"
+# Back to the More menu — the Export sub-screen is in-place state with
+# its own Back button; tapping the More tab while already on it is a
+# no-op and leaves the sub-screen open.
+- tapOn: "Back"
 - scrollUntilVisible:
     element:
       text: "Sign Out"
