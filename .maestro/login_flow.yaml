@@ -27,6 +27,8 @@ name: Login Flow
 - assertVisible: "Welcome back!"
 - tapOn: "you@example.com"
 - inputText: "demo@ari.app"
+# Keyboard covers the password field after email input — dismiss before tapping.
+- hideKeyboard
 - tapOn: "Your password"
 - inputText: "demo123"
 - hideKeyboard
