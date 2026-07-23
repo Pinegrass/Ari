@@ -48,7 +48,7 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci --legacy-peer-deps
-      - run: npx expo lint 2>/dev/null || echo "Lint check complete"
+      - run: npx expo lint
 
   security-audit:
     name: Dependency Audit

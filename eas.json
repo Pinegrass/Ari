@@ -23,6 +23,13 @@
         "APP_VARIANT": "preview"
       }
     },
+    "e2e": {
+      "extends": "preview",
+      "android": {
+        "buildType": "apk",
+        "autoIncrement": false
+      }
+    },
     "production": {
       "channel": "production",
       "android": {

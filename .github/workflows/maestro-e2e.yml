@@ -52,9 +52,17 @@ jobs:
           ls -l /dev/kvm
 
       # Build before booting the emulator so build failures fail fast.
-      - name: Build dev APK (EAS local)
+      # The e2e profile produces a production-like release APK (no dev
+      # client / Metro dependency) with autoIncrement off, which local
+      # builds require.
+      - name: Build release APK (EAS local)
         timeout-minutes: 45
-        run: eas build --platform android --profile development --local --output ./app.apk
+        # EXPO_PUBLIC_* vars are inlined at bundle time for local builds, and
+        # local builds do not pull EAS environment variables — without this the
+        # app falls back to http://10.0.2.2:5000/api and every flow fails.
+        env:
+          EXPO_PUBLIC_API_URL: ${{ vars.EXPO_PUBLIC_API_URL || 'https://web-production-7c65f.up.railway.app/api' }}
+        run: eas build --platform android --profile e2e --local --output ./app.apk --non-interactive
 
       - name: Create AVD (api 34, x86_64, pixel_6)
         run: |
@@ -87,6 +95,8 @@ jobs:
           adb install -r ./app.apk
           maestro test .maestro/login_flow.yaml
           maestro test .maestro/navigation_flow.yaml
+          maestro test .maestro/add_transaction_flow.yaml
+          maestro test .maestro/tomo_chat_flow.yaml
           maestro test .maestro/export_flow.yaml
 
       - name: Upload E2E results
