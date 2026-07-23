@@ -1,11 +1,12 @@
 /**
  * palettes — theme groundwork (Sprint 3, C4). The app shipped a single
- * teal-on-cream (light) palette in `tokens.ts`; this file re-exposes it as the
+ * paper-based (light) palette in `tokens.ts`; this file re-exposes it as the
  * `light` Palette and adds a *draft* `dark` palette so a future dark mode has a
  * concrete target.
  *
- * Sprint 8: forest→teal shift (Kleriq owns forest #1F3D2B in the Pinegrass
- * system; Ari's anchor is deep teal #0F2B2A, matching aritomo-web).
+ * Sprint 8: forest→teal VALUE shift (Kleriq owns forest #1F3D2B in the
+ * Pinegrass system; Ari's anchor is deep teal #0F2B2A, matching aritomo-web).
+ * Key names unchanged — no screen code breaks.
  *
  * IMPORTANT: the dark palette is unreviewed scaffolding. Dark mode is gated OFF
  * (see ThemeContext `DARK_ENABLED`) until (a) every screen sources colours from
@@ -26,9 +27,9 @@ export const lightPalette: Palette = { ...color };
  * Values are a reasonable first pass, not a finished design.
  */
 export const darkPalette: Palette = {
-  teal: '#2E6B66', // primary action — brightened for contrast on charcoal
-  teal2: '#3D7A74',
-  tealDeep: '#EAF3F1', // headings become light on dark
+  forest: '#2E6B66', // primary action — brightened teal for contrast on charcoal
+  forest2: '#3D7A74',
+  forestDeep: '#EAF3F1', // headings become light on dark
   moss: '#8AA8A3',
   cream: '#0E1514', // app background — near-black charcoal
   cream2: '#16201E', // sunk panels
