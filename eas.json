@@ -29,6 +29,10 @@
         "buildType": "apk",
         "autoIncrement": false,
         "gradleCommand": ":app:assembleRelease -x :app:lintVitalRelease -x lintVitalAnalyzeRelease"
+      },
+      "env": {
+        "APP_VARIANT": "preview",
+        "EXPO_PUBLIC_API_URL": "https://web-production-7c65f.up.railway.app/api"
       }
     },
     "production": {

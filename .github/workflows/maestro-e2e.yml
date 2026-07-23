@@ -51,21 +51,18 @@ jobs:
           sudo udevadm trigger --name-match=kvm
           ls -l /dev/kvm
 
-      # Build before booting the emulator so build failures fail fast.
-      # The e2e profile produces a production-like release APK (no dev
-      # client / Metro dependency) with autoIncrement off, which local
-      # builds require.
-      - name: Build release APK (EAS local)
-        timeout-minutes: 45
-        # EXPO_PUBLIC_* vars are inlined at bundle time for local builds, and
-        # local builds do not pull EAS environment variables — without this the
-        # app falls back to http://10.0.2.2:5000/api and every flow fails.
-        env:
-          EXPO_PUBLIC_API_URL: ${{ vars.EXPO_PUBLIC_API_URL || 'https://web-production-7c65f.up.railway.app/api' }}
-          # lintVitalAnalyzeRelease (react-native-android-widget) OOMs on
-          # Metaspace with default JVM args on CI runners.
-          GRADLE_OPTS: "-Xmx4g -XX:MaxMetaspaceSize=1g -XX:+HeapDumpOnOutOfMemoryError"
-        run: eas build --platform android --profile e2e --local --output ./app.apk --non-interactive
+      # Local Gradle builds on the free runner proved flaky at ~25 min
+      # (Metaspace OOM in lint workers, then packageRelease failing under
+      # resource pressure — different failure each run). The EAS cloud
+      # build is proven green; download the APK artifact and spend the
+      # job budget on the emulator and flows instead.
+      - name: Build release APK (EAS cloud) and download
+        timeout-minutes: 40
+        run: |
+          eas build --platform android --profile e2e --non-interactive --json > build.json
+          URL=$(node -e "const b=require('./build.json');const a=Array.isArray(b)?b[0]:b;const u=a.artifacts&&(a.artifacts.buildUrl||a.artifacts.applicationArchiveUrl);if(!u){console.error('No artifact URL in build.json');process.exit(1)}console.log(u)")
+          curl -fL "$URL" -o app.apk
+          ls -lh app.apk
 
       - name: Add Android SDK tools to PATH
         # ubuntu-latest sets $ANDROID_HOME but only platform-tools is on
