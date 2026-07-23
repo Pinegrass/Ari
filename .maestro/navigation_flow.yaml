@@ -17,15 +17,17 @@ tags:
 
 # Tomo
 - tapOn: "Tomo"
-- assertVisible:
-    text: "Ask Tomo.*"
-    regex: true
+# Placeholder is "Ask Tomo anything..." — substring match, no regex
+# (current Maestro rejects the `regex` selector property).
+- assertVisible: "Ask Tomo"
 
 # More (was "Settings")
 - tapOn: "More"
 - assertVisible: "Export"
 - assertVisible: "Sign Out"
 
-# Back to Home
+# Back to Home — dashboard sections fade in via AnimatedEntry; wait.
 - tapOn: "Home"
-- assertVisible: "Add an entry"
+- extendedWaitUntil:
+    visible: "Add an entry"
+    timeout: 15000
