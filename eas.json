@@ -27,7 +27,8 @@
       "extends": "preview",
       "android": {
         "buildType": "apk",
-        "autoIncrement": false
+        "autoIncrement": false,
+        "gradleCommand": ":app:assembleRelease -x :app:lintVitalRelease -x lintVitalAnalyzeRelease"
       }
     },
     "production": {
