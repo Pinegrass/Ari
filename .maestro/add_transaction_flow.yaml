@@ -22,8 +22,15 @@ tags:
 # Back on Home — the entry is reflected in the ledger / recent list
 - assertVisible: "Home"
 
-# Edit: long-press the transaction to open the edit sheet, bump the amount
-- longPressOn: "₹500"
+# Edit: the Recent list is below the fold; scroll to it, then long-press
+# the entry row (its visible text is the category "Food"; '₹500' also
+# appears in the hero/month cards, so it can't target the row).
+# TransactionItem.onLongPress opens the edit sheet.
+- scrollUntilVisible:
+    element:
+      text: "Recent"
+    direction: DOWN
+- longPressOn: "Food"
 - assertVisible: "Update entry"
 - tapOn: "0"          # 500 -> 5000
 - tapOn: "Update entry"
