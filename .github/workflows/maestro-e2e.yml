@@ -91,6 +91,7 @@ jobs:
           avd.ini.encoding=UTF-8
           AvdId=maestro
           abi.type=x86_64
+          hw.cpu.arch=x86_64
           avd.ini.displayname=maestro
           disk.dataPartition.size=6442450944
           hw.device.name=pixel_6
