@@ -16,9 +16,10 @@ tags:
 - assertVisible: "Export Data"
 
 # Back to the More menu — the Export sub-screen is in-place state with
-# its own Back button; tapping the More tab while already on it is a
-# no-op and leaves the sub-screen open.
-- tapOn: "Back"
+# its own back button (accessibilityLabel "Go back"; its visible text is
+# "← Back", which exact-match can't hit without the arrow glyph).
+# Tapping the More tab while already on it is a no-op.
+- tapOn: "Go back"
 - scrollUntilVisible:
     element:
       text: "Sign Out"
