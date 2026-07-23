@@ -13,8 +13,10 @@ tags:
 # The user's message echoes into the transcript
 - assertVisible: "How much did I spend this month?"
 
-# Wait for Tomo's reply to render
+# The quick-prompt section ("Try asking:") disappears once the chat has
+# messages — confirms the send path rendered. (The input placeholder is
+# a TextInput hint, invisible to Maestro; and reply text is dynamic, so
+# asserting on it would be flaky against the live AI backend.)
 - extendedWaitUntil:
-    visible:
-      text: "Ask Tomo anything..."
+    notVisible: "Try asking:"
     timeout: 20000

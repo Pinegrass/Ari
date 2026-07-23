@@ -17,9 +17,10 @@ tags:
 
 # Tomo
 - tapOn: "Tomo"
-# Placeholder is "Ask Tomo anything..." — substring match, no regex
-# (current Maestro rejects the `regex` selector property).
-- assertVisible: "Ask Tomo"
+# The input placeholder is a TextInput hint, which RN does not expose to
+# the accessibility hierarchy Maestro reads — assert the rendered header
+# subtitle instead.
+- assertVisible: "Your AI Finance Coach"
 
 # More (was "Settings")
 - tapOn: "More"
