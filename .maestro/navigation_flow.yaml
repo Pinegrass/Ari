@@ -22,9 +22,14 @@ tags:
 # subtitle instead.
 - assertVisible: "Your AI Finance Coach"
 
-# More (was "Settings")
+# More (was "Settings") — the Export/Sign Out rows live below the fold
+# in the current design, so scroll them into view first.
 - tapOn: "More"
-- assertVisible: "Export"
+- scrollUntilVisible:
+    element:
+      text: "Sign Out"
+    direction: DOWN
+- assertVisible: "Export Data"
 - assertVisible: "Sign Out"
 
 # Back to Home — dashboard sections fade in via AnimatedEntry; wait.

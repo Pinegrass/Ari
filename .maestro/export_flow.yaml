@@ -7,9 +7,18 @@ tags:
 ---
 - tapOn: "More"
 
+# Export Data sits below the fold in the current Settings design.
+- scrollUntilVisible:
+    element:
+      text: "Export Data"
+    direction: DOWN
 - tapOn: "Export Data"
 - assertVisible: "Export Data"
 
 # Back to the More menu
 - tapOn: "More"
+- scrollUntilVisible:
+    element:
+      text: "Sign Out"
+    direction: DOWN
 - assertVisible: "Sign Out"
