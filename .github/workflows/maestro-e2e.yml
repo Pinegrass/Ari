@@ -62,6 +62,9 @@ jobs:
         # app falls back to http://10.0.2.2:5000/api and every flow fails.
         env:
           EXPO_PUBLIC_API_URL: ${{ vars.EXPO_PUBLIC_API_URL || 'https://web-production-7c65f.up.railway.app/api' }}
+          # lintVitalAnalyzeRelease (react-native-android-widget) OOMs on
+          # Metaspace with default JVM args on CI runners.
+          GRADLE_OPTS: "-Xmx4g -XX:MaxMetaspaceSize=1g -XX:+HeapDumpOnOutOfMemoryError"
         run: eas build --platform android --profile e2e --local --output ./app.apk --non-interactive
 
       - name: Create AVD (api 34, x86_64, pixel_6)
