@@ -5,12 +5,22 @@ name: Login Flow
 ---
 - launchApp:
     clearState: true
+# First launch (clearState) shows OnboardingScreen — RootNavigator shows it
+# when no onboarding flag is stored. Skip it to reach the Auth stack.
+- tapOn:
+    text: "Skip"
+    optional: true
+# "Pixel Launcher isn't responding" ANR dialogs pop up on software-rendered
+# emulators; tap Wait if one is up so it doesn't block the app.
+- tapOn:
+    text: "Wait"
+    optional: true
 # Splash / value screen — the logo + tagline fade in over ~500ms
 # (opacity-animated), so an immediate assertVisible races the animation
 # on software-rendered emulators. Wait explicitly.
 - extendedWaitUntil:
     visible: "Your Money, Your Future"
-    timeout: 10000
+    timeout: 15000
 - tapOn: "I already have an account"
 
 # Login screen — fields matched by their placeholder text

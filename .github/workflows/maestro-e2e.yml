@@ -138,6 +138,13 @@ jobs:
           MAESTRO_DRIVER_STARTUP_TIMEOUT: 120000
         run: |
           adb shell input keyevent 82
+          # Let the freshly booted system settle (the Pixel Launcher ANR'd
+          # under first-boot load in a previous run) and strip system
+          # animation jank for more deterministic taps.
+          adb shell settings put global window_animation_scale 0
+          adb shell settings put global transition_animation_scale 0
+          adb shell settings put global animator_duration_scale 0
+          sleep 15
           adb install -r ./app.apk
           maestro test .maestro/login_flow.yaml
           maestro test .maestro/navigation_flow.yaml
