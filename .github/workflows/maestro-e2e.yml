@@ -1,10 +1,9 @@
 name: E2E Tests (Maestro)
 
 on:
-  push:
-    branches: [master]
-  pull_request:
-    branches: [master]
+  # push/PR triggers are temporarily disabled while the suite is being
+  # stabilized (each red run spams failure emails to the pusher).
+  # Re-enable once the 5 flows pass end-to-end on manual dispatch.
   workflow_dispatch:
   schedule:
     # Run E2E nightly at 2 AM UTC
