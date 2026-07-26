@@ -31,7 +31,11 @@ tags:
     element:
       text: "−₹500"
     direction: DOWN
-- longPressOn: "−₹500"
+# Tap the row itself (testID txn-row-0 = most recent) to open edit.
+# Using tapOn instead of longPressOn because the long-press gesture
+# is unreliable on non-clickable child Text elements under Fabric.
+- tapOn:
+    id: "txn-row-0"
 - assertVisible: "Update entry"
 - tapOn: "0"          # 500 -> 5000
 - tapOn: "Update entry"

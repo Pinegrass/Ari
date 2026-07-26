@@ -36,8 +36,12 @@ jobs:
       - run: npm ci --legacy-peer-deps
 
       - name: Install Maestro
+        env:
+          MAESTRO_VERSION: "2.7.0"
         run: |
-          curl -Ls "https://get.maestro.mobile.dev" | bash
+          curl -fsSL "https://github.com/mobile-dev-inc/maestro/releases/download/cli-${MAESTRO_VERSION}/maestro.zip" -o maestro.zip
+          unzip -q maestro.zip -d "$HOME/.maestro"
+          rm maestro.zip
           echo "$HOME/.maestro/bin" >> $GITHUB_PATH
 
       # The org Actions policy blocks third-party actions such as

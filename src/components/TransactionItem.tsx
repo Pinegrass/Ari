@@ -12,6 +12,7 @@ interface Props {
   onDelete?: (id: string) => void;
   onEdit?: (transaction: Transaction) => void;
   showDelete?: boolean;
+  testID?: string;
 }
 
 /**
@@ -19,12 +20,16 @@ interface Props {
  * (not a card), warm emoji tile, Fraunces signed amount. Mirrors `.row` in
  * docs/ari-v2-forest.html. Subline uses inkSoft, not inkFaint, for legibility.
  */
-export default function TransactionItem({ transaction, onDelete, onEdit, showDelete }: Props) {
+export default function TransactionItem({ transaction, onDelete, onEdit, showDelete, testID }: Props) {
   const cat = getCategoryDef(transaction.category);
   const isExpense = transaction.type === 'expense';
   const { formatAmount } = usePrivacy();
   const sync = transaction.syncStatus;
   const showSyncTag = sync === 'pending' || sync === 'failed';
+
+  const handlePress = () => {
+    if (onEdit) onEdit(transaction);
+  };
 
   const handleLongPress = () => {
     if (onEdit) onEdit(transaction);
@@ -36,12 +41,14 @@ export default function TransactionItem({ transaction, onDelete, onEdit, showDel
   return (
     <TouchableOpacity
       style={styles.row}
+      onPress={handlePress}
       onLongPress={handleLongPress}
       delayLongPress={400}
       activeOpacity={onEdit ? 0.7 : 1}
       accessibilityRole={onEdit ? 'button' : 'text'}
       accessibilityLabel={a11yLabel}
-      accessibilityHint={onEdit ? 'Double tap and hold to edit' : undefined}
+      accessibilityHint={onEdit ? 'Tap to edit' : undefined}
+      testID={testID}
     >
       <View style={styles.iconBox}>
         <Text style={styles.icon}>{cat.emoji}</Text>

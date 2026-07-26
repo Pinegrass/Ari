@@ -204,6 +204,7 @@ export default function DashboardScreen() {
                 <TransactionItem
                   transaction={txn}
                   showDelete={false}
+                  testID={`txn-row-${i}`}
                   onEdit={(t) =>
                     navigation.navigate('AddTransaction', {
                       editTransaction: {
