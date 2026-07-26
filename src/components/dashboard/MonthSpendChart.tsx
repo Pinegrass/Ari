@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { BarChart } from 'react-native-gifted-charts';
+import { LineChart } from 'react-native-gifted-charts';
 import { color, font, type as ftype } from '../../theme/tokens';
 import { Skeleton } from '../ui/Skeleton';
 import { useLocale } from '../../hooks/useLocale';
@@ -22,7 +22,7 @@ export default function MonthSpendChart({ data, loading }: Props) {
         return {
           value: amount,
           label: day % 5 === 0 || day === 1 ? String(day) : '',
-          frontColor: amount > 0 ? color.clay : color.line,
+          hideDataPoint: amount === 0,
         };
       });
   }, [data]);
@@ -50,23 +50,30 @@ export default function MonthSpendChart({ data, loading }: Props) {
   return (
     <View style={styles.card}>
       <Text style={styles.title}>Daily spending</Text>
-      <BarChart
+      <LineChart
         data={chartData}
         height={140}
         maxValue={maxValue}
         noOfSections={4}
-        barWidth={6}
-        spacing={4}
-        barBorderRadius={3}
+        spacing={8}
         hideRules
         hideYAxisText
+        hideAxesAndRules
         xAxisColor={color.line}
-        yAxisColor="transparent"
-        yAxisThickness={0}
         xAxisThickness={1}
         xAxisLabelTextStyle={styles.labelText}
-        showLine={false}
+        color={color.clay}
+        thickness={2}
+        startFillColor={color.clay}
+        endFillColor={color.card}
+        startOpacity={0.2}
+        endOpacity={0.0}
+        curved
         isAnimated
+        initialSpacing={8}
+        endSpacing={8}
+        dataPointsColor={color.clay}
+        dataPointsRadius={3}
       />
       <View style={styles.footer}>
         <Text style={styles.footerText}>
