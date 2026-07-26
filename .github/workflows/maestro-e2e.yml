@@ -42,7 +42,7 @@ jobs:
           curl -fsSL "https://github.com/mobile-dev-inc/maestro/releases/download/cli-${MAESTRO_VERSION}/maestro.zip" -o maestro.zip
           unzip -q maestro.zip -d "$HOME/.maestro"
           rm maestro.zip
-          echo "$HOME/.maestro/bin" >> $GITHUB_PATH
+          echo "$HOME/.maestro/maestro/bin" >> $GITHUB_PATH
 
       # The org Actions policy blocks third-party actions such as
       # reactivecircus/android-emulator-runner, so the emulator is brought
