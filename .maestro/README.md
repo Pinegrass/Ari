@@ -8,7 +8,7 @@ npm run e2e                       # runs every flow in .maestro/
 maestro test .maestro/login_flow.yaml   # a single flow
 ```
 
-## ✅ Status: verified green in CI (2026-07-23, run 30043818806)
+## ✅ Status: verified green in CI (2026-07-26, run 30209575108)
 
 All 5 flows pass end-to-end on the CI harness. The suite runs on pushes/PRs to
 `master` and nightly via `.github/workflows/maestro-e2e.yml`: an EAS **cloud**
