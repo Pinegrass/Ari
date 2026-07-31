@@ -18,6 +18,11 @@ import { font } from '../theme/tokens';
 import { useColors } from '../context/ThemeContext';
 import type { Palette } from '../theme/palettes';
 import { useHaptics } from '../hooks/useHaptics';
+import { useNavigation } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
+import type { MainStackParamList } from '../navigation/navigationTypes';
+import { isAriPro } from '../lib/revenuecat';
+import { track } from '../lib/analytics';
 
 const QUICK_PROMPTS = [
   'How much did I spend this month?',
@@ -91,6 +96,12 @@ export default function TomoScreen() {
   const styles = useMemo(() => makeStyles(c), [c]);
   const listRef = useRef<FlatList>(null);
   const [input, setInput] = useState('');
+  const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
+  const [proStatus, setProStatus] = useState<'unknown' | 'pro' | 'free'>('unknown');
+
+  useEffect(() => {
+    void isAriPro().then((pro) => setProStatus(pro ? 'pro' : 'free'));
+  }, []);
 
   const showQuickPrompts = chatHistory.length <= 1;
 
@@ -104,7 +115,12 @@ export default function TomoScreen() {
 
   const handleSend = async (msg?: string) => {
     const text = (msg ?? input).trim();
-    if (!text || tomoLoading) return;
+    if (!text || tomoLoading || proStatus === 'unknown') return;
+    if (proStatus === 'free') {
+      track('paywall_viewed', { source_screen: 'tomo_limit' });
+      navigation.navigate('Paywall', { source: 'tomo_limit' });
+      return;
+    }
     setInput('');
     haptics.light();
     await askTomo(text);
@@ -184,8 +200,8 @@ export default function TomoScreen() {
           />
           <TouchableOpacity
             onPress={() => handleSend()}
-            disabled={!input.trim() || tomoLoading}
-            style={[styles.sendBtn, (!input.trim() || tomoLoading) && styles.sendBtnDisabled]}
+            disabled={!input.trim() || tomoLoading || proStatus === 'unknown'}
+            style={[styles.sendBtn, (!input.trim() || tomoLoading || proStatus === 'unknown') && styles.sendBtnDisabled]}
             activeOpacity={0.75}
             accessibilityRole="button"
             accessibilityLabel="Send message"

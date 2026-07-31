@@ -41,7 +41,7 @@ This policy describes how we collect, use, and protect personal information when
 - We do not read your SMS messages.
 - We do not access your location continuously.
 - We do not record audio or video.
-- We do not collect payment information (Ari does not process payments).
+- We do not collect payment card information. Subscription billing is handled by the Apple App Store / Google Play Store; RevenueCat helps us verify and manage subscription status.
 
 ## 4. How we use your information
 
@@ -63,6 +63,7 @@ We share information only with the service providers required to operate Ari:
 |---|---|---|
 | **Google** | Authenticates your sign-in | Your email, name, profile picture (per OAuth scopes you approve) |
 | **Sentry** | Crash and error reporting | Device info, stack traces, breadcrumbs (with auth tokens scrubbed) |
+| **RevenueCat** | Subscription management and in-app purchase validation | Purchase history, subscription status, anonymous app-user ID |
 | **Railway** | Hosts our backend servers | Your account data and transactions (this is where they live) |
 
 Each of these providers has its own privacy policy. They are contractually required to process data only on our behalf.

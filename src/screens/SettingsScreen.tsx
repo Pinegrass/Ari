@@ -311,7 +311,7 @@ export default function SettingsScreen() {
       label: isSubscribed ? `Ari ${tier[0].toUpperCase() + tier.slice(1)}` : 'Upgrade to Ari Pro',
       subtitle: isSubscribed
         ? 'Manage your subscription'
-        : 'Unlock the weekly brief, AA sync, and more',
+        : '14-day free trial, then ₹99/month — cancel anytime',
       onPress: () => { haptics.light(); navigation.navigate('Paywall', { source: 'settings' }); },
     },
     {

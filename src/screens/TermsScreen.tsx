@@ -52,7 +52,7 @@ export default function TermsScreen({ onBack }: Props) {
 
           <Text style={styles.sectionTitle}>5. Subscriptions and Payments</Text>
           <Text style={styles.body}>
-            Ari offers both free and paid subscription tiers ("Ari Pro"). Paid subscriptions are processed through the Google Play Store or Apple App Store billing systems. Subscription terms, pricing, and cancellation policies are disclosed at the point of purchase. You may manage or cancel your subscription through your device's app store settings.
+            Ari offers both free and paid subscription tiers ("Ari Pro"). Paid subscriptions are processed through the Google Play Store or Apple App Store billing systems. Ari Pro starts with a 14-day free trial; after the trial, the subscription continues at the price shown at the point of purchase unless you cancel. You may manage or cancel your subscription through your device's app store settings at any time.
           </Text>
 
           <Text style={styles.sectionTitle}>6. Acceptable Use</Text>

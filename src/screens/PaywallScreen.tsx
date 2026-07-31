@@ -1,28 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import RevenueCatUI from 'react-native-purchases-ui';
-import Purchases, { LOG_LEVEL } from 'react-native-purchases';
 import ScreenShell from '../components/ScreenShell';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
 import { color, font } from '../theme/tokens';
 import { track } from '../lib/analytics';
+import { ARI_PRO_ENTITLEMENT, syncRevenueCatUser } from '../lib/revenuecat';
 
-const ENTITLEMENT = 'pro';
-const API_KEY = process.env.EXPO_PUBLIC_REVENUECAT_API_KEY ?? '';
-let configuredFor: string | null = null;
-
-async function configureRevenueCat(userId: string) {
-  if (!API_KEY) throw new Error('Subscriptions are not configured in this build.');
-  if (configuredFor === null) {
-    Purchases.setLogLevel(__DEV__ ? LOG_LEVEL.DEBUG : LOG_LEVEL.ERROR);
-    Purchases.configure({ apiKey: API_KEY, appUserID: userId });
-    configuredFor = userId;
-  } else if (configuredFor !== userId) {
-    await Purchases.logIn(userId);
-    configuredFor = userId;
-  }
-}
 
 export default function PaywallScreen() {
   const navigation = useNavigation();
@@ -40,8 +25,8 @@ export default function PaywallScreen() {
       setError('Sign in before upgrading so your purchase can be restored on every device.');
       return;
     }
-    configureRevenueCat(String(user.id))
-      .then(() => setReady(true))
+    syncRevenueCatUser(String(user.id))
+      .then((available) => available ? setReady(true) : setError('Subscriptions are not configured in this build.'))
       .catch((cause: unknown) => setError(cause instanceof Error ? cause.message : 'Could not load plans.'));
   }, [route.params?.source, user]);
 
@@ -67,7 +52,7 @@ export default function PaywallScreen() {
     <RevenueCatUI.Paywall
       options={{ displayCloseButton: true }}
       onPurchaseCompleted={({ customerInfo, storeTransaction }) => {
-        const active = customerInfo.entitlements.active[ENTITLEMENT] !== undefined;
+        const active = customerInfo.entitlements.active[ARI_PRO_ENTITLEMENT] !== undefined;
         track('pro_purchase_completed', { active, product_id: storeTransaction.productIdentifier });
         if (active) navigation.goBack();
       }}
@@ -76,7 +61,7 @@ export default function PaywallScreen() {
         track('pro_purchase_failed', { code: purchaseError.code, message: purchaseError.message })
       }
       onRestoreCompleted={({ customerInfo }) => {
-        const active = customerInfo.entitlements.active[ENTITLEMENT] !== undefined;
+        const active = customerInfo.entitlements.active[ARI_PRO_ENTITLEMENT] !== undefined;
         track('pro_purchase_completed', { active, source_screen: 'restore' });
         if (active) navigation.goBack();
       }}

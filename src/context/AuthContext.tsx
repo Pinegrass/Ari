@@ -17,6 +17,7 @@ import { localStore } from '../lib/localStore';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { addBreadcrumb, captureError, setUserContext, clearUserContext } from '../config/sentry';
 import type { User, RegisterPayload } from '../types';
+import { syncRevenueCatUser } from '../lib/revenuecat';
 
 interface AuthContextValue {
   user: User | null;
@@ -135,6 +136,12 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    void syncRevenueCatUser(user ? String(user.id) : null).catch((error) => {
+      if (__DEV__) console.warn('[RevenueCat] identity sync failed', error);
+    });
+  }, [user?.id]);
 
   // Wrap the React setter so anywhere we update `user`, the AsyncStorage
   // cache stays in lockstep. Avoids subtle drift between cache + state.
