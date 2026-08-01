@@ -65,12 +65,12 @@ describe('hasAriPro', () => {
     const info = {
       entitlements: { active: { [ARI_PRO_ENTITLEMENT]: {} as never } },
     };
-    expect(hasAriPro(info as Parameters<typeof hasAriPro>[0])).toBe(true);
+    expect(hasAriPro(info as never)).toBe(true);
   });
 
   it('returns false when the entitlement is missing', () => {
     const info = { entitlements: { active: {} } };
-    expect(hasAriPro(info as Parameters<typeof hasAriPro>[0])).toBe(false);
+    expect(hasAriPro(info as never)).toBe(false);
   });
 });
 
