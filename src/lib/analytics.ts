@@ -175,6 +175,7 @@ export type AnalyticsEvent =
   | 'brief_opened'
   | 'brief_dismissed'
   | 'private_mode_toggled'
+  | 'country_changed'
   | 'aa_consent_started'
   | 'aa_consent_completed'
   | 'ota_check_started'

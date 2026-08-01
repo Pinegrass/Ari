@@ -25,6 +25,9 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<void>;
   register: (payload: RegisterFormData) => Promise<void>;
   logout: () => Promise<void>;
+  /** PATCH profile fields (name, country, monthlyIncome, upiVpa) and keep
+   * context + cache in sync with the server-returned user. */
+  updateProfile: (patch: authApi.PatchMePayload) => Promise<void>;
   /** Hydrate the context from an already-persisted session (e.g. after
    * Google OAuth or phone-OTP stash the access_token themselves). */
   refreshFromSession: (user: User) => Promise<void>;
@@ -313,8 +316,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     attemptPushRegister();
   }, [setUserAndCache]);
 
+  const updateProfile = useCallback(async (patch: authApi.PatchMePayload) => {
+    const updated = await authApi.patchMe(patch);
+    setUserAndCache(updated);
+  }, [setUserAndCache]);
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, refreshFromSession }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, refreshFromSession, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );

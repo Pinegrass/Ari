@@ -85,7 +85,7 @@ function formatTime12h(hour: number, minute: number): string {
 }
 
 export default function SettingsScreen() {
-  const { user, logout } = useAuth();
+  const { user, logout, updateProfile } = useAuth();
   const haptics = useHaptics();
   const insets = useSafeAreaInsets();
   const { isAvailable: biometricAvailable, isEnabled: biometricEnabled, toggleBiometric } = useBiometric();
@@ -121,6 +121,21 @@ export default function SettingsScreen() {
   const [deletePassword, setDeletePassword] = useState('');
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDeletePassword, setShowDeletePassword] = useState(false);
+
+  const handleCountryChange = async (country: string) => {
+    if (country === user?.country) return;
+    haptics.light();
+    try {
+      // Backend also syncs currency to the new locale; the returned user
+      // lands in context, so every useLocale() consumer re-renders.
+      await updateProfile({ country });
+      track('country_changed', { country });
+      haptics.success();
+    } catch {
+      haptics.error();
+      Alert.alert('Could not update country', 'Check your connection and try again.');
+    }
+  };
 
   const handleLogout = () => {
     Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
@@ -378,6 +393,20 @@ export default function SettingsScreen() {
                 {i < arr.length - 1 && <View style={styles.separator} />}
               </View>
             ))}
+          </View>
+        </AnimatedEntry>
+
+        {/* Country / Locale — drives currency, number format, and which
+            country-specific toolkits (e.g. Indian Tax Estimator) appear */}
+        <AnimatedEntry delay={110}>
+          <View style={styles.menuCard}>
+            <CountryPicker
+              value={user?.country ?? 'IN'}
+              onChange={handleCountryChange}
+            />
+            <Text style={styles.countryHint}>
+              Sets your currency, number format, and locale-specific tools.
+            </Text>
           </View>
         </AnimatedEntry>
 
@@ -804,6 +833,10 @@ const styles = StyleSheet.create({
   menuLabel: { fontFamily: font.bodyMed, fontSize: 15, color: color.ink },
   menuSubtitle: { fontFamily: font.body, fontSize: 12, color: color.inkSoft, marginTop: 2 },
   separator: { height: 1, backgroundColor: color.line, marginLeft: 42 },
+  countryHint: {
+    fontFamily: font.body, fontSize: 12, color: color.inkFaint,
+    paddingBottom: 14, marginTop: 2,
+  },
   segment: {
     flexDirection: 'row',
     gap: 6,

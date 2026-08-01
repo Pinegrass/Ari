@@ -44,6 +44,8 @@ export interface PatchMePayload {
   name?: string;
   upiVpa?: string | null;
   monthlyIncome?: number | null;
+  /** ISO 3166-1 alpha-2. Backend also syncs `currency` to the new locale. */
+  country?: string;
 }
 
 /** PATCH /api/auth/me — update a small subset of profile fields. */
