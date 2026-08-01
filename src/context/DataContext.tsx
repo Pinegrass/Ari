@@ -679,6 +679,18 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           { role: 'assistant', content: response },
         ]);
       } catch (err) {
+        // Free-tier quota exhausted — let the screen route to the paywall
+        // instead of showing a generic connectivity error.
+        if (
+          err instanceof ApiError &&
+          err.status === 403 &&
+          (err.body as { code?: string } | undefined)?.code === 'tomo_free_limit_reached'
+        ) {
+          // Drop the user message we optimistically appended — it never
+          // reached Tomo, and leaving it implies a reply is coming.
+          setChatHistory(chatHistory);
+          throw err;
+        }
         track('tomo_response_received', {
           latency_ms: Date.now() - startedAt,
           response_length: 0,

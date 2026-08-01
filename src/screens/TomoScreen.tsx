@@ -21,7 +21,7 @@ import { useHaptics } from '../hooks/useHaptics';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import type { MainStackParamList } from '../navigation/navigationTypes';
-import { isAriPro } from '../lib/revenuecat';
+import { ApiError } from '../api/client';
 import { track } from '../lib/analytics';
 
 const QUICK_PROMPTS = [
@@ -97,11 +97,6 @@ export default function TomoScreen() {
   const listRef = useRef<FlatList>(null);
   const [input, setInput] = useState('');
   const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
-  const [proStatus, setProStatus] = useState<'unknown' | 'pro' | 'free'>('unknown');
-
-  useEffect(() => {
-    void isAriPro().then((pro) => setProStatus(pro ? 'pro' : 'free'));
-  }, []);
 
   const showQuickPrompts = chatHistory.length <= 1;
 
@@ -115,15 +110,23 @@ export default function TomoScreen() {
 
   const handleSend = async (msg?: string) => {
     const text = (msg ?? input).trim();
-    if (!text || tomoLoading || proStatus === 'unknown') return;
-    if (proStatus === 'free') {
-      track('paywall_viewed', { source_screen: 'tomo_limit' });
-      navigation.navigate('Paywall', { source: 'tomo_limit' });
-      return;
-    }
+    if (!text || tomoLoading) return;
     setInput('');
     haptics.light();
-    await askTomo(text);
+    try {
+      // Free users get a small daily quota, enforced server-side. The paywall
+      // shows only when the server says today's free messages are used up.
+      await askTomo(text);
+    } catch (err) {
+      if (
+        err instanceof ApiError &&
+        (err.body as { code?: string } | undefined)?.code === 'tomo_free_limit_reached'
+      ) {
+        haptics.warning();
+        track('paywall_viewed', { source_screen: 'tomo_limit' });
+        navigation.navigate('Paywall', { source: 'tomo_limit' });
+      }
+    }
   };
 
   return (
@@ -200,8 +203,8 @@ export default function TomoScreen() {
           />
           <TouchableOpacity
             onPress={() => handleSend()}
-            disabled={!input.trim() || tomoLoading || proStatus === 'unknown'}
-            style={[styles.sendBtn, (!input.trim() || tomoLoading || proStatus === 'unknown') && styles.sendBtnDisabled]}
+            disabled={!input.trim() || tomoLoading}
+            style={[styles.sendBtn, (!input.trim() || tomoLoading) && styles.sendBtnDisabled]}
             activeOpacity={0.75}
             accessibilityRole="button"
             accessibilityLabel="Send message"

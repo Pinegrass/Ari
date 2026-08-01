@@ -17,7 +17,7 @@ import { localStore } from '../lib/localStore';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { addBreadcrumb, captureError, setUserContext, clearUserContext } from '../config/sentry';
 import type { User, RegisterPayload } from '../types';
-import { syncRevenueCatUser } from '../lib/revenuecat';
+import { refreshEntitlements, syncRevenueCatUser } from '../lib/revenuecat';
 
 interface AuthContextValue {
   user: User | null;
@@ -138,9 +138,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    void syncRevenueCatUser(user ? String(user.id) : null).catch((error) => {
-      if (__DEV__) console.warn('[RevenueCat] identity sync failed', error);
-    });
+    if (!user) {
+      void syncRevenueCatUser(null).catch((error) => {
+        if (__DEV__) console.warn('[RevenueCat] identity sync failed', error);
+      });
+      return;
+    }
+    // Login-time entitlement refresh: SDK-side Pro + server-side free means a
+    // webhook was missed — the backend verifies with RevenueCat and repairs.
+    void refreshEntitlements(String(user.id), user.tier)
+      .then((pro) => {
+        if (pro && user.tier !== 'pro') {
+          setUserAndCache({ ...user, tier: 'pro' });
+        }
+      })
+      .catch((error) => {
+        if (__DEV__) console.warn('[RevenueCat] entitlement refresh failed', error);
+      });
   }, [user?.id]);
 
   // Wrap the React setter so anywhere we update `user`, the AsyncStorage
