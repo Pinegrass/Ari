@@ -29,8 +29,9 @@ third-party emulator actions), then all 5 flows.
 
 - **Paywall-gated features are Pro in E2E** — The `e2e` build sets
   `EXPO_PUBLIC_MAESTRO_E2E=1`; `src/lib/revenuecat.ts` treats this as an Ari Pro
-  entitlement so Tomo chat and other gated flows can run without a real store
-  purchase. Do not set this in production builds.
+  entitlement and skips RevenueCat SDK initialization so the release APK is not
+  blocked by the "Wrong API Key" test-key dialog. Do not set this in production
+  builds.
 - **AVD is hand-written** (`maestro.ini` + `config.ini`) — `avdmanager create`
   silently no-ops on the current runner cmdline-tools. `hw.cpu.arch=x86_64` is
   mandatory (emulator defaults the AVD to arm and dies), as are real

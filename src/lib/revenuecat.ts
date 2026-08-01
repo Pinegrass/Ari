@@ -20,6 +20,7 @@ export function isRevenueCatAvailable(): boolean {
 }
 
 export async function syncRevenueCatUser(userId?: string | null): Promise<boolean> {
+  if (isMaestroE2E()) return false;
   if (!isRevenueCatAvailable()) return false;
 
   if (!configured) {

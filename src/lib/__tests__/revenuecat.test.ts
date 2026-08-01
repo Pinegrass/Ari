@@ -120,7 +120,15 @@ describe('syncRevenueCatUser', () => {
   beforeEach(() => {
     mockPlatformOS = 'ios';
     delete process.env.EXPO_PUBLIC_REVENUECAT_API_KEY;
+    delete process.env.EXPO_PUBLIC_MAESTRO_E2E;
     jest.clearAllMocks();
+  });
+
+  it('returns false in Maestro E2E builds without touching the SDK', async () => {
+    process.env.EXPO_PUBLIC_MAESTRO_E2E = '1';
+    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY = 'key';
+    await expect(syncRevenueCatUser('user-1')).resolves.toBe(false);
+    expect(mockedPurchases.configure).not.toHaveBeenCalled();
   });
 
   it('returns false when RevenueCat is not configured', async () => {
