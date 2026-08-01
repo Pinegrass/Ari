@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   Alert,
   Share,
+  ScrollView,
   StyleSheet,
 } from 'react-native';
 import ScreenShell from '../components/ScreenShell';
@@ -107,7 +108,10 @@ export default function ExportScreen({ onBack }: Props) {
         <View style={{ width: 60 }} />
       </View>
 
-      <View style={styles.content}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
         <AnimatedEntry delay={100}>
           <View style={styles.card}>
             <Icon name="pie-chart" size={48} color={color.forest} />
@@ -154,7 +158,7 @@ export default function ExportScreen({ onBack }: Props) {
             </Text>
           </View>
         </AnimatedEntry>
-      </View>
+      </ScrollView>
     </ScreenShell>
   );
 }
@@ -171,7 +175,7 @@ const styles = StyleSheet.create({
   },
   backText: { fontSize: 16, color: color.inkSoft, fontFamily: font.body },
   title: { fontSize: 17, fontFamily: font.bodyBold, color: color.ink },
-  content: { flex: 1, paddingHorizontal: 20, paddingTop: 24, gap: 20 },
+  content: { paddingHorizontal: 20, paddingTop: 24, paddingBottom: 48, gap: 20 },
   card: {
     backgroundColor: color.card,
     borderRadius: 16,

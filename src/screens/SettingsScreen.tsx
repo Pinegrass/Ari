@@ -15,6 +15,7 @@ import {
   KeyboardAvoidingView,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Constants from 'expo-constants';
 import ScreenShell from '../components/ScreenShell';
 import { useAuth } from '../context/AuthContext';
 import { color, font } from '../theme/tokens';
@@ -322,6 +323,12 @@ export default function SettingsScreen() {
 
   const menuItems: MenuItem[] = [
     {
+      icon: 'briefcase',
+      label: 'Ari Accountant',
+      subtitle: 'Budgets, bills, goals, tax, reports & notes',
+      onPress: () => { haptics.light(); navigation.navigate('Accountant'); },
+    },
+    {
       icon: 'sparkles',
       label: isSubscribed ? `Ari ${tier[0].toUpperCase() + tier.slice(1)}` : 'Upgrade to Ari Pro',
       subtitle: isSubscribed
@@ -348,7 +355,7 @@ export default function SettingsScreen() {
     { icon: 'book-open', label: 'Terms of Service', subtitle: 'Rules for using Ari', onPress: handleTerms },
     { icon: 'help-circle', label: 'Help & Support', subtitle: 'FAQs and contact us', onPress: handleHelp },
     { icon: 'star', label: 'Rate Ari', subtitle: 'Love Ari? Let us know!', onPress: handleRate },
-    { icon: 'info', label: 'About', subtitle: 'Version 1.0.0', onPress: () => { haptics.light(); setSubScreen('about'); } },
+    { icon: 'info', label: 'About', subtitle: `Version ${Constants.expoConfig?.version ?? '1.2.0'}`, onPress: () => { haptics.light(); setSubScreen('about'); } },
   ];
 
   return (

@@ -88,6 +88,13 @@ const MODULES: ModuleItem[] = [
     title: 'Shared Expenses',
     subtitle: 'Split with friends, settle via UPI',
   },
+  {
+    key: 'TodoNotes',
+    icon: 'edit',
+    iconColor: color.moss,
+    title: 'To-do Notes',
+    subtitle: 'Track financial tasks and due dates',
+  },
 ];
 
 /** Modules visible for a user's country (defaults to IN, the origin market). */

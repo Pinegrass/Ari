@@ -338,6 +338,11 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
         behavior="padding"
         keyboardVerticalOffset={insets.top}
       >
+      <ScrollView
+        contentContainerStyle={styles.formContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
         {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -501,6 +506,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
       >
         <Text style={styles.saveText}>{isEdit ? 'Update entry' : 'Save entry'}</Text>
       </TouchableOpacity>
+      </ScrollView>
       </KeyboardAvoidingView>
 
       {/* Toast */}
@@ -639,6 +645,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
 
 const makeStyles = (c: Palette) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: c.cream, paddingHorizontal: 22 },
+  formContent: { flexGrow: 1, paddingBottom: 12 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

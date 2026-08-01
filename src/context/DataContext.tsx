@@ -276,6 +276,15 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     }
   }, [handleError, fetchWithCache]);
 
+  const refreshDerivedFinancialData = useCallback(async () => {
+    await Promise.all([
+      fetchSummary(),
+      fetchDailyData(),
+      fetchNudge(),
+      fetchInsights(),
+    ]);
+  }, [fetchSummary, fetchDailyData, fetchNudge, fetchInsights]);
+
   const fetchUserCategories = useCallback(async () => {
     try {
       const data = await fetchWithCache('user_categories', () =>
@@ -405,7 +414,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           userId: server.userId,
         });
         setTransactions(await localStore.getAll());
-        await fetchSummary();
+        await refreshDerivedFinancialData();
         return { ok: true, queued: false };
       } catch (err) {
         handleError(err);
@@ -449,7 +458,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         return { ok: true, queued: true };
       }
     },
-    [fetchSummary, handleError]
+    [refreshDerivedFinancialData, handleError]
   );
 
   const deleteTransaction = useCallback(
@@ -466,12 +475,12 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       try {
         await txnApi.deleteTransaction(id);
         await localStore.removeRow(id);
-        await fetchSummary();
+        await refreshDerivedFinancialData();
       } catch (err) {
         handleError(err);
       }
     },
-    [fetchSummary, handleError]
+    [refreshDerivedFinancialData, handleError]
   );
 
   const updateTransaction = useCallback(
@@ -521,7 +530,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           userId: server.userId,
         });
         setTransactions(await localStore.getAll());
-        await fetchSummary();
+        await refreshDerivedFinancialData();
         return { ok: true, queued: false };
       } catch (err) {
         handleError(err);
@@ -571,7 +580,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         return { ok: true, queued: true };
       }
     },
-    [fetchSummary, handleError, transactions]
+    [refreshDerivedFinancialData, handleError, transactions]
   );
 
   const saveBudget = useCallback(
