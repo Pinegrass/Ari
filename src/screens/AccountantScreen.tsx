@@ -13,6 +13,7 @@ import Icon from '../components/ui/Icon';
 import type { IconName } from '../components/ui/Icon';
 import { color, font } from '../theme/tokens';
 import { useHaptics } from '../hooks/useHaptics';
+import { useAuth } from '../context/AuthContext';
 import type { MainStackParamList } from '../navigation/navigationTypes';
 
 type Nav = StackNavigationProp<MainStackParamList>;
@@ -23,6 +24,8 @@ interface ModuleItem {
   iconColor: string;
   title: string;
   subtitle: string;
+  /** ISO country codes this module applies to. Omit for universal modules. */
+  countries?: string[];
 }
 
 const MODULES: ModuleItem[] = [
@@ -60,6 +63,9 @@ const MODULES: ModuleItem[] = [
     iconColor: color.moss,
     title: 'Tax Estimator',
     subtitle: 'Old vs New regime, 80C/80D, HRA, GST',
+    // Indian tax law (FY slabs, 80C/80D, HRA, GST) — meaningless elsewhere.
+    // Other markets get their own estimator when tax rules are modelled.
+    countries: ['IN'],
   },
   {
     key: 'PnlReport',
@@ -84,9 +90,18 @@ const MODULES: ModuleItem[] = [
   },
 ];
 
+/** Modules visible for a user's country (defaults to IN, the origin market). */
+export function visibleModules(country: string | null | undefined): ModuleItem[] {
+  const c = country ?? 'IN';
+  return MODULES.filter((m) => !m.countries || m.countries.includes(c));
+}
+
 export default function AccountantScreen() {
   const navigation = useNavigation<Nav>();
   const haptics = useHaptics();
+  const { user } = useAuth();
+  const country = user?.country ?? 'IN';
+  const modules = visibleModules(country);
 
   return (
     <ScreenShell edges={['top']}>
@@ -110,7 +125,7 @@ export default function AccountantScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {MODULES.map((mod) => (
+        {modules.map((mod) => (
           <TouchableOpacity
             key={mod.key}
             style={styles.moduleCard}
@@ -127,7 +142,11 @@ export default function AccountantScreen() {
             </View>
             <View style={styles.moduleText}>
               <Text style={styles.moduleTitle}>{mod.title}</Text>
-              <Text style={styles.moduleSub}>{mod.subtitle}</Text>
+              <Text style={styles.moduleSub}>
+                {mod.key === 'Groups' && country !== 'IN'
+                  ? 'Split expenses with friends'
+                  : mod.subtitle}
+              </Text>
             </View>
             <Icon name="chevron-right" size={18} color={color.inkFaint} />
           </TouchableOpacity>
