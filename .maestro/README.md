@@ -8,16 +8,29 @@ npm run e2e                       # runs every flow in .maestro/
 maestro test .maestro/login_flow.yaml   # a single flow
 ```
 
-## ✅ Status: verified green in CI (2026-07-26, run 30209575108)
+## ⚠️ Status: fix in progress
 
-All 5 flows pass end-to-end on the CI harness. The suite runs on pushes/PRs to
-`master` and nightly via `.github/workflows/maestro-e2e.yml`: an EAS **cloud**
-build of the `e2e` profile (release APK), then a manually brought-up emulator
-(plain `sdkmanager`/`emulator`/`adb` shell steps — the org Actions policy blocks
+The suite was last green on 2026-07-26 (run 30209575108). Two subsequent changes
+broke it:
+
+1. **RevenueCat paywall gating** — Tomo chat is now Pro-only, so the E2E build
+   is treated as Pro via `EXPO_PUBLIC_MAESTRO_E2E=1` (see below).
+2. **Dashboard line chart** — `MonthSpendChart` uses `LineChart`; `isAnimated`
+   was removed and the chart is wrapped in an `ErrorBoundary` to avoid release
+   crashes under Fabric.
+
+The suite runs on pushes/PRs to `master` and nightly via
+`.github/workflows/maestro-e2e.yml`: an EAS **cloud** build of the `e2e` profile
+(release APK), then a manually brought-up emulator (plain
+`sdkmanager`/`emulator`/`adb` shell steps — the org Actions policy blocks
 third-party emulator actions), then all 5 flows.
 
 ## Harness gotchas (hard-won, don't rediscover)
 
+- **Paywall-gated features are Pro in E2E** — The `e2e` build sets
+  `EXPO_PUBLIC_MAESTRO_E2E=1`; `src/lib/revenuecat.ts` treats this as an Ari Pro
+  entitlement so Tomo chat and other gated flows can run without a real store
+  purchase. Do not set this in production builds.
 - **AVD is hand-written** (`maestro.ini` + `config.ini`) — `avdmanager create`
   silently no-ops on the current runner cmdline-tools. `hw.cpu.arch=x86_64` is
   mandatory (emulator defaults the AVD to arm and dies), as are real

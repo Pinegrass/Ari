@@ -42,8 +42,15 @@ export function hasAriPro(info: CustomerInfo): boolean {
   return Boolean(info.entitlements.active[ARI_PRO_ENTITLEMENT]);
 }
 
-/** Check the current RevenueCat entitlement status. Returns false if the SDK is not configured. */
+function isMaestroE2E(): boolean {
+  return process.env.EXPO_PUBLIC_MAESTRO_E2E === '1';
+}
+
+/** Check the current RevenueCat entitlement status. Returns false if the SDK is not configured.
+ *  The Maestro E2E build is treated as Pro so paywall-gated flows can be exercised without a
+ *  real store purchase. */
 export async function isAriPro(): Promise<boolean> {
+  if (isMaestroE2E()) return true;
   if (!isRevenueCatAvailable()) return false;
   try {
     return hasAriPro(await Purchases.getCustomerInfo());

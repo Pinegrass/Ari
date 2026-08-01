@@ -4,6 +4,7 @@ import { LineChart } from 'react-native-gifted-charts';
 import { color, font, type as ftype } from '../../theme/tokens';
 import { Skeleton } from '../ui/Skeleton';
 import { useLocale } from '../../hooks/useLocale';
+import ErrorBoundary from '../ErrorBoundary';
 import type { DailyAnalytics } from '../../api/reports';
 
 interface Props {
@@ -50,31 +51,32 @@ export default function MonthSpendChart({ data, loading }: Props) {
   return (
     <View style={styles.card}>
       <Text style={styles.title}>Daily spending</Text>
-      <LineChart
-        data={chartData}
-        height={140}
-        maxValue={maxValue}
-        noOfSections={4}
-        spacing={8}
-        hideRules
-        hideYAxisText
-        hideAxesAndRules
-        xAxisColor={color.line}
-        xAxisThickness={1}
-        xAxisLabelTextStyle={styles.labelText}
-        color={color.clay}
-        thickness={2}
-        startFillColor={color.clay}
-        endFillColor={color.card}
-        startOpacity={0.2}
-        endOpacity={0.0}
-        curved
-        isAnimated
-        initialSpacing={8}
-        endSpacing={8}
-        dataPointsColor={color.clay}
-        dataPointsRadius={3}
-      />
+      <ErrorBoundary>
+        <LineChart
+          data={chartData}
+          height={140}
+          maxValue={maxValue}
+          noOfSections={4}
+          spacing={8}
+          hideRules
+          hideYAxisText
+          hideAxesAndRules
+          xAxisColor={color.line}
+          xAxisThickness={1}
+          xAxisLabelTextStyle={styles.labelText}
+          color={color.clay}
+          thickness={2}
+          startFillColor={color.clay}
+          endFillColor={color.card}
+          startOpacity={0.2}
+          endOpacity={0.0}
+          curved
+          initialSpacing={8}
+          endSpacing={8}
+          dataPointsColor={color.clay}
+          dataPointsRadius={3}
+        />
+      </ErrorBoundary>
       <View style={styles.footer}>
         <Text style={styles.footerText}>
           Total <Text style={styles.footerBold}>{formatCurrency(data.total)}</Text>

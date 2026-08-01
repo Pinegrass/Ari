@@ -32,7 +32,8 @@
       },
       "env": {
         "APP_VARIANT": "preview",
-        "EXPO_PUBLIC_API_URL": "https://web-production-7c65f.up.railway.app/api"
+        "EXPO_PUBLIC_API_URL": "https://web-production-7c65f.up.railway.app/api",
+        "EXPO_PUBLIC_MAESTRO_E2E": "1"
       }
     },
     "production": {
