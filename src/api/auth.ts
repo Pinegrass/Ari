@@ -25,6 +25,21 @@ export const register = (payload: RegisterPayload) =>
 
 export const getMe = () => apiRequest<User>('/auth/me');
 
+/** Full account data dump (DPDP §11 / GDPR Art. 15+20) as JSON. */
+export interface DataExport {
+  exported_at: string;
+  profile: User;
+  transactions: unknown[];
+  budgets: unknown[];
+  savings_goals: unknown[];
+  tax_profile: unknown | null;
+  categories: unknown[];
+  todo_notes: unknown[];
+  feedback: unknown[];
+}
+
+export const exportMyData = () => apiRequest<DataExport>('/auth/export');
+
 export interface PatchMePayload {
   name?: string;
   upiVpa?: string | null;
