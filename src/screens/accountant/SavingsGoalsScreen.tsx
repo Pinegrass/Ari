@@ -18,6 +18,7 @@ import { color, font } from '../../theme/tokens';
 import { usePrivacy } from '../../context/PrivacyContext';
 import { useHaptics } from '../../hooks/useHaptics';
 import { useLocale } from '../../hooks/useLocale';
+import { parseAmountInput } from '../../utils/locale';
 import * as goalsApi from '../../api/savingsGoals';
 import type { SavingsGoal } from '../../types';
 
@@ -119,8 +120,8 @@ export default function SavingsGoalsScreen() {
   const handleSaveGoal = async () => {
     setFormError('');
     if (!goalName.trim()) { setFormError('Give your goal a name'); return; }
-    const amt = parseInt(targetAmount, 10);
-    if (!targetAmount || isNaN(amt) || amt <= 0) { setFormError('Enter a valid target amount'); return; }
+    const amt = parseAmountInput(targetAmount, locale);
+    if (amt === null) { setFormError('Enter a valid target amount'); return; }
 
     // Validate date format if provided
     if (targetDate && !/^\d{4}-\d{2}-\d{2}$/.test(targetDate)) {
@@ -162,8 +163,8 @@ export default function SavingsGoalsScreen() {
 
   const handleContribute = async () => {
     if (!contributeGoal) return;
-    const amt = parseInt(contributeAmount, 10);
-    if (!contributeAmount || isNaN(amt) || amt <= 0) return;
+    const amt = parseAmountInput(contributeAmount, locale);
+    if (amt === null) return;
 
     setContributing(true);
     try {
@@ -334,7 +335,7 @@ export default function SavingsGoalsScreen() {
                   onChangeText={setTargetAmount}
                   placeholder="5,00,000"
                   placeholderTextColor={color.inkFaint}
-                  keyboardType="numeric"
+                  keyboardType={locale.usesDecimalAmounts ? 'decimal-pad' : 'numeric'}
                   selectionColor={color.forest}
                 />
               </View>
@@ -392,7 +393,7 @@ export default function SavingsGoalsScreen() {
                 onChangeText={setContributeAmount}
                 placeholder="1,000"
                 placeholderTextColor={color.inkFaint}
-                keyboardType="numeric"
+                keyboardType={locale.usesDecimalAmounts ? 'decimal-pad' : 'numeric'}
                 selectionColor={color.forest}
                 autoFocus
               />

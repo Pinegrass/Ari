@@ -37,13 +37,16 @@ import type { Category, Transaction, TransactionType } from '../types';
 
 type Props = StackScreenProps<MainStackParamList, 'AddTransaction'>;
 
-const MAX_AMOUNT = 10_000_000; // 1 crore in smallest currency unit (D5)
+const MAX_AMOUNT = 10_000_000; // 1 crore / $10M in major currency units (D5)
 const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'del'] as const;
+// Cents-based locales (USD/GBP/AUD) swap the dead key for a decimal point.
+const KEYS_DECIMAL = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', 'del'] as const;
 
 /**
  * Fast Entry (Sprint 2, Commit 3). Keypad-first, amount-and-direction-only
  * happy path: a Spent/Received toggle, a big Fraunces amount with a blinking
- * caret, an in-app numeric keypad (no decimal — whole rupees, D5), and Save.
+ * caret, an in-app numeric keypad (decimal point only for cents-based
+ * locales — INR stays whole-rupee, D5), and Save.
  * Everything else is an optional chip. The voice + MerchantDB + Gemini parse
  * pipeline is preserved (D1) behind the note chip: typing/speaking a
  * description auto-fills the category. Writes go through DataContext, which is
@@ -238,11 +241,19 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
       return;
     }
     if (k === '') return;
+    if (k === '.') {
+      // Decimal point: cents locales only, one per amount, never leading.
+      if (!locale.usesDecimalAmounts) return;
+      setAmount((a) => (a === '' || a.includes('.')) ? a : a + '.');
+      return;
+    }
     setAmount((a) => {
       if (a === '' && k === '0') return a; // no leading zero
+      const dot = a.indexOf('.');
+      if (dot >= 0 && a.length - dot > 2) return a; // max 2 decimal places
       const next = a + k;
       if (Number(next) > MAX_AMOUNT) return a;
-      if (next.length > 8) return a;
+      if (next.length > 8 + (dot >= 0 ? 3 : 0)) return a;
       return next;
     });
   };
@@ -464,7 +475,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
 
       {/* Keypad */}
       <View style={styles.keypad}>
-        {KEYS.map((k, i) => (
+        {(locale.usesDecimalAmounts ? KEYS_DECIMAL : KEYS).map((k, i) => (
           <TouchableOpacity
             key={i}
             style={[styles.key, k === '' && styles.keyEmpty]}

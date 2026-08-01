@@ -15,6 +15,8 @@ export interface LocaleInfo {
   symbol: string;         // e.g. "₹", "$", "£"
   localeTag: string;      // BCP-47 locale, e.g. "en-IN"
   numberingSystem: 'indian' | 'western';
+  /** False for whole-unit currencies (INR: no paise); true where cents/pence are first-class. Mirrors backend locale_config.py. */
+  usesDecimalAmounts: boolean;
   incomeBrackets: IncomeBracket[];
 }
 
@@ -34,6 +36,7 @@ const LOCALE_DATA: Record<string, Omit<LocaleInfo, 'code' | 'incomeBrackets'> & 
     symbol: '₹',
     localeTag: 'en-IN',
     numberingSystem: 'indian',
+    usesDecimalAmounts: false,
     incomeBrackets: [
       { label: 'Under ₹15K', min: 0, max: 14999 },
       { label: '₹15K – ₹30K', min: 15000, max: 30000 },
@@ -48,6 +51,7 @@ const LOCALE_DATA: Record<string, Omit<LocaleInfo, 'code' | 'incomeBrackets'> & 
     symbol: '$',
     localeTag: 'en-US',
     numberingSystem: 'western',
+    usesDecimalAmounts: true,
     incomeBrackets: [
       { label: 'Under $2K', min: 0, max: 1999 },
       { label: '$2K – $5K', min: 2000, max: 5000 },
@@ -62,6 +66,7 @@ const LOCALE_DATA: Record<string, Omit<LocaleInfo, 'code' | 'incomeBrackets'> & 
     symbol: '£',
     localeTag: 'en-GB',
     numberingSystem: 'western',
+    usesDecimalAmounts: true,
     incomeBrackets: [
       { label: 'Under £1.5K', min: 0, max: 1499 },
       { label: '£1.5K – £3K', min: 1500, max: 3000 },
@@ -76,6 +81,7 @@ const LOCALE_DATA: Record<string, Omit<LocaleInfo, 'code' | 'incomeBrackets'> & 
     symbol: '$',
     localeTag: 'en-AU',
     numberingSystem: 'western',
+    usesDecimalAmounts: true,
     incomeBrackets: [
       { label: 'Under $2K', min: 0, max: 1999 },
       { label: '$2K – $5K', min: 2000, max: 5000 },
@@ -93,6 +99,7 @@ const GLOBAL_LOCALE: Omit<LocaleInfo, 'code' | 'incomeBrackets'> & { incomeBrack
   symbol: '$',
   localeTag: 'en-US',
   numberingSystem: 'western',
+  usesDecimalAmounts: true,
   incomeBrackets: [
     { label: 'Under $1K', min: 0, max: 999 },
     { label: '$1K – $3K', min: 1000, max: 3000 },
@@ -129,19 +136,33 @@ export function formatCurrency(amount: number, locale?: LocaleInfo | string | nu
     : locale;
 
   const a = Math.abs(amount);  // formatCurrency always shows absolute value
+  return loc.symbol + formatMagnitude(a, loc);
+}
 
-  if (loc.numberingSystem === 'indian' && a >= 100000) {
-    return loc.symbol + formatIndian(a);
-  }
+/** Split into whole units + cents, carrying 4.999 → 5 across the boundary. */
+function splitCents(a: number): { whole: number; cents: number } {
+  let whole = Math.floor(a);
+  let cents = Math.round((a - whole) * 100);
+  if (cents === 100) { whole += 1; cents = 0; }
+  return { whole, cents };
+}
 
-  return loc.symbol + formatWestern(a);
+function formatMagnitude(a: number, loc: LocaleInfo): string {
+  const { whole, cents } = splitCents(a);
+  const grouped = loc.numberingSystem === 'indian' && whole >= 100000
+    ? formatIndian(whole)
+    : formatWestern(whole);
+  const frac = cents > 0 && loc.usesDecimalAmounts
+    ? '.' + String(cents).padStart(2, '0')
+    : '';
+  return grouped + frac;
 }
 
 /**
  * Standard Western numbering: 1,250,000
  */
-function formatWestern(amount: number): string {
-  return amount.toLocaleString('en-US', {
+function formatWestern(whole: number): string {
+  return whole.toLocaleString('en-US', {
     maximumFractionDigits: 0,
     minimumFractionDigits: 0,
   });
@@ -152,8 +173,8 @@ function formatWestern(amount: number): string {
  * 125000 → "1,25,000"
  * 1500000 → "15,00,000"
  */
-function formatIndian(amount: number): string {
-  const s = String(amount);
+function formatIndian(whole: number): string {
+  const s = String(whole);
   if (s.length <= 3) return s;
 
   const last3 = s.slice(-3);
@@ -177,13 +198,27 @@ export function formatCurrencyFull(amount: number, locale?: LocaleInfo | string 
     : locale;
 
   const sign = amount < 0 ? '-' : '';
-  const a = Math.abs(amount);
+  return sign + loc.symbol + formatMagnitude(Math.abs(amount), loc);
+}
 
-  if (loc.numberingSystem === 'indian' && a >= 100000) {
-    return sign + loc.symbol + formatIndian(a);
-  }
+/**
+ * Validate a raw amount-input string for the locale.
+ * Whole-unit locales (INR) reject a decimal point; cents-based locales allow
+ * up to 2 decimal places. Returns the numeric amount, or null when invalid.
+ */
+export function parseAmountInput(text: string, locale?: LocaleInfo | string | null): number | null {
+  const loc = typeof locale === 'string' || !locale
+    ? getLocale(typeof locale === 'string' ? locale : null)
+    : locale;
 
-  return sign + loc.symbol + formatWestern(a);
+  const t = text.trim();
+  if (t === '' || t === '.') return null;
+  if (!/^\d*\.?\d*$/.test(t)) return null;
+  if (!loc.usesDecimalAmounts && t.includes('.')) return null;
+  const frac = t.split('.')[1];
+  if (frac && frac.length > 2) return null;
+  const n = Number(t);
+  return Number.isFinite(n) && n > 0 ? n : null;
 }
 
 /**

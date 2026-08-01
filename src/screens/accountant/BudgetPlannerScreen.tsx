@@ -18,6 +18,7 @@ import { color, font } from '../../theme/tokens';
 import { usePrivacy } from '../../context/PrivacyContext';
 import { useHaptics } from '../../hooks/useHaptics';
 import { useLocale } from '../../hooks/useLocale';
+import { parseAmountInput } from '../../utils/locale';
 import { useData } from '../../context/DataContext';
 import * as budgetApi from '../../api/budgets';
 import type { Budget } from '../../types';
@@ -111,8 +112,8 @@ export default function BudgetPlannerScreen() {
 
   const handleSave = async () => {
     setFormError('');
-    const lmt = parseInt(limit, 10);
-    if (!limit || isNaN(lmt) || lmt <= 0) {
+    const lmt = parseAmountInput(limit, locale);
+    if (lmt === null) {
       setFormError('Enter a valid budget amount');
       return;
     }
@@ -274,7 +275,7 @@ export default function BudgetPlannerScreen() {
                 onChangeText={setLimit}
                 placeholder="5000"
                 placeholderTextColor={color.inkFaint}
-                keyboardType="numeric"
+                keyboardType={locale.usesDecimalAmounts ? 'decimal-pad' : 'numeric'}
                 selectionColor={color.forest}
                 returnKeyType="done"
                 onSubmitEditing={handleSave}

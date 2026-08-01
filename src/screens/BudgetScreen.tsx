@@ -29,6 +29,7 @@ import { usePrivacy } from '../context/PrivacyContext';
 import { getCurrentMonth } from '../utils/dateHelpers';
 import { useHaptics } from '../hooks/useHaptics';
 import { useLocale } from '../hooks/useLocale';
+import { parseAmountInput } from '../utils/locale';
 import type { Budget } from '../types';
 
 export default function BudgetScreen() {
@@ -79,8 +80,8 @@ export default function BudgetScreen() {
 
   const handleSave = async () => {
     setError('');
-    const lmt = parseFloat(limit);
-    if (!limit || isNaN(lmt) || lmt <= 0) {
+    const lmt = parseAmountInput(limit, locale);
+    if (lmt === null) {
       setError('Enter a valid budget amount');
       return;
     }
@@ -226,7 +227,7 @@ export default function BudgetScreen() {
                 onChangeText={setLimit}
                 placeholder="5000"
                 placeholderTextColor={c.inkFaint}
-                keyboardType="numeric"
+                keyboardType={locale.usesDecimalAmounts ? 'decimal-pad' : 'numeric'}
                 returnKeyType="done"
                 selectionColor={c.forest}
                 onSubmitEditing={handleSave}
