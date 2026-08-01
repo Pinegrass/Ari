@@ -126,8 +126,9 @@ Teal:          #4ECDC4
 - Labels: fontSize 10-12, textTransform uppercase
 
 ### Currency
-- Indian Rupee (₹) with en-IN locale formatting
-- Integer amounts only (no decimal paise)
+- Locale-driven via the locale engine (`src/utils/locale.ts` frontend, `backend/locale_config.py` backend): INR (en-IN, lakhs/crores grouping), USD, GBP, AUD, GLOBAL fallback
+- INR is whole-unit (no paise); USD/GBP/AUD accept and render 2-decimal cents
+- Use `useLocale()` / `formatCurrency()` for display and `parseAmountInput()` for amount inputs
 
 ### UI Patterns
 - Bottom sheet modals with borderTopRadius: 24, safe area bottom padding
@@ -177,6 +178,7 @@ RootNavigator (Stack)
 | POST | /auth/register | Register new user |
 | POST | /auth/login | Login, returns JWT |
 | GET | /auth/me | Get current user |
+| GET | /auth/export | Full data export — JSON dump (DPDP §11 / GDPR Art. 15+20), 5/hour |
 | DELETE | /auth/account | Delete account (requires password) |
 
 ### Transactions
@@ -234,9 +236,15 @@ RootNavigator (Stack)
 ### Tomo AI
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | /tomo/chat | Send message to Tomo |
+| POST | /tomo/chat | Send message to Tomo (free tier: `TOMO_FREE_DAILY_MESSAGES`/day, then 403 `tomo_free_limit_reached`) |
 | GET | /tomo/nudge | Get financial nudge |
 | GET | /insights | Get monthly insights |
+
+### Billing
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | /billing/revenuecat-webhook | RevenueCat server events → tier sync (idempotent, billing-issue grace window) |
+| POST | /billing/reconcile | Client-driven entitlement repair (verifies with RevenueCat server API, upgrade-only) |
 
 ### Other
 | Method | Endpoint | Description |
@@ -453,8 +461,12 @@ EXPO_PUBLIC_SENTRY_DSN=<sentry-dsn>
 ```
 SECRET_KEY=<jwt-secret>
 DATABASE_URL=postgresql://...  (or sqlite:///ari_dev.db for local)
-GEMINI_API_KEY=<google-gemini-key>
+GEMINI_API_KEY=<google-gemini-key>        # AI fallback
+DEEPSEEK_API_KEY=<deepseek-key>           # AI primary
 CORS_ORIGIN=*
+REVENUECAT_WEBHOOK_SECRET=<webhook-secret>
+REVENUECAT_SECRET_API_KEY=<secret-api-key>  # enables /billing/reconcile
+TOMO_FREE_DAILY_MESSAGES=5                  # free-tier Tomo quota
 ```
 
 ### EAS Environment (preview)
@@ -537,7 +549,7 @@ npm run typecheck        # TypeScript validation
 2. **Auth Flow**: JWT stored in expo-secure-store under key `ari_token` (Keychain on iOS, KeyStore + EncryptedSharedPreferences on Android). Access via `secureStorage` adapter in `src/lib/secureStorage.ts`. AuthContext checks on mount; the adapter transparently migrates legacy AsyncStorage values on first read.
 3. **Data Flow**: DataContext provides all data + methods. Components use `useData()` hook.
 4. **Month Format**: `YYYY-MM` string used consistently for month-based queries.
-5. **Currency**: Always integer amounts in INR. Formatted with `formatCurrency()`.
+5. **Currency**: Locale-aware amounts — whole units for INR, 2-decimal cents for USD/GBP/AUD. Formatted with `formatCurrency()` / the locale engine on both ends.
 6. **Safe Area**: All modal bottom sheets use `useSafeAreaInsets()` for bottom padding.
 7. **Haptics**: useHaptics() hook — light (tap), medium (FAB), success, warning, error.
 8. **Icons**: Custom Icon component with 60+ Lucide-style SVG paths. Use `IconName` type.
