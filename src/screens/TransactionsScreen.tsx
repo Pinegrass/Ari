@@ -225,7 +225,7 @@ export default function TransactionsScreen() {
                   <Text style={[styles.summaryAmount, styles.expenseText]}>{formatAmount(expenses)}</Text>
                 </View>
                 <View style={styles.summaryCard}>
-                  <Text style={styles.summaryLabel}>Saved</Text>
+                  <Text style={styles.summaryLabel}>{savings >= 0 ? 'Saved' : 'Deficit'}</Text>
                   <Text style={[styles.summaryAmount, savings >= 0 ? styles.incomeText : styles.expenseText]}>
                     {formatAmount(Math.abs(savings))}
                   </Text>

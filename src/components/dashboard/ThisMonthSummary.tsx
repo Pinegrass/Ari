@@ -28,7 +28,7 @@ export default function ThisMonthSummary({ income, expenses }: Props) {
         </View>
         <View style={styles.divider} />
         <View style={styles.cell}>
-          <Text style={styles.label}>Saved</Text>
+          <Text style={styles.label}>{savings >= 0 ? 'Saved' : 'Deficit'}</Text>
           <Text style={[styles.amount, savings >= 0 ? styles.saved : styles.expense]}>
             {formatAmount(Math.abs(savings))}
           </Text>

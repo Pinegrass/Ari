@@ -44,6 +44,20 @@ export function hasAriPro(info: CustomerInfo): boolean {
   return Boolean(info.entitlements.active[ARI_PRO_ENTITLEMENT]);
 }
 
+/** Confirm that the store backing this build has at least one purchasable
+ * package. RevenueCat can be configured with an API key while the current
+ * offering contains only Test Store products; presenting the native paywall
+ * in that state produces an opaque "Error 23" dialog. */
+export async function hasCurrentStoreOffering(): Promise<boolean> {
+  if (!isRevenueCatAvailable()) return false;
+  try {
+    const offering = (await Purchases.getOfferings()).current;
+    return Boolean(offering && offering.availablePackages.length > 0);
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Login-time entitlement refresh. Webhooks keep the server-side tier in sync,
  * but an event can be missed or a purchase restored on a new device before

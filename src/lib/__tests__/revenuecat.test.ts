@@ -2,6 +2,7 @@ import Purchases from 'react-native-purchases';
 import {
   ARI_PRO_ENTITLEMENT,
   hasAriPro,
+  hasCurrentStoreOffering,
   isAriPro,
   isRevenueCatAvailable,
   refreshEntitlements,
@@ -29,6 +30,7 @@ jest.mock('react-native-purchases', () => ({
     logIn: jest.fn().mockResolvedValue(undefined),
     logOut: jest.fn().mockResolvedValue(undefined),
     getCustomerInfo: jest.fn(),
+    getOfferings: jest.fn(),
   },
   LOG_LEVEL: { DEBUG: 'DEBUG', ERROR: 'ERROR' },
 }));
@@ -79,6 +81,33 @@ describe('hasAriPro', () => {
   it('returns false when the entitlement is missing', () => {
     const info = { entitlements: { active: {} } };
     expect(hasAriPro(info as never)).toBe(false);
+  });
+});
+
+describe('hasCurrentStoreOffering', () => {
+  beforeEach(() => {
+    mockPlatformOS = 'android';
+    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY = 'key';
+    jest.clearAllMocks();
+  });
+
+  it('returns true when the current offering has a store package', async () => {
+    mockedPurchases.getOfferings.mockResolvedValueOnce({
+      current: { availablePackages: [{}] },
+    } as never);
+    await expect(hasCurrentStoreOffering()).resolves.toBe(true);
+  });
+
+  it('returns false when only non-current or empty offerings exist', async () => {
+    mockedPurchases.getOfferings.mockResolvedValueOnce({
+      current: { availablePackages: [] },
+    } as never);
+    await expect(hasCurrentStoreOffering()).resolves.toBe(false);
+  });
+
+  it('returns false when the store lookup fails', async () => {
+    mockedPurchases.getOfferings.mockRejectedValueOnce(new Error('store unavailable'));
+    await expect(hasCurrentStoreOffering()).resolves.toBe(false);
   });
 });
 
