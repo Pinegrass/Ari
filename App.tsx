@@ -26,6 +26,8 @@ import * as Notifications from 'expo-notifications';
 import { initAnalytics, track } from './src/lib/analytics';
 import { checkAndApplyUpdate, registerOtaReloadHandler } from './src/lib/otaUpdates';
 import { reconcileBillReminders, type BillNotificationData } from './src/lib/bills';
+import { routeForNotificationData, notificationTypeOf } from './src/lib/notificationRouting';
+import { rotateDailyReminderMessage } from './src/hooks/useNotifications';
 import ErrorBoundary from './src/components/ErrorBoundary';
 import UpdateToast from './src/components/UpdateToast';
 import { AuthProvider } from './src/context/AuthContext';
@@ -69,6 +71,37 @@ function billDataFromResponse(response: Notifications.NotificationResponse | nul
   const data = response?.notification?.request?.content?.data as { type?: string } | undefined;
   if (data && data.type === 'bill_reminder') return data as unknown as BillNotificationData;
   return null;
+}
+
+// Pending push tap buffered before the navigator is ready (cold start).
+let _pendingPushPayload: unknown = null;
+
+/**
+ * Non-bill push taps (budget_alert, weekly_brief, monthly_review,
+ * subscription_leak) route through the pure mapper in
+ * src/lib/notificationRouting.ts. Buffered until the navigator is ready,
+ * drained in onReady like the bill prefill above.
+ */
+function navigateForPushPayload(data: unknown) {
+  const target = routeForNotificationData(data);
+  if (!target) return;
+  if (!navigationRef.isReady()) {
+    _pendingPushPayload = data;
+    return;
+  }
+  try {
+    if (target.kind === 'tab') {
+      (navigationRef as any).navigate('Main', {
+        screen: 'Tabs',
+        params: { screen: target.tab },
+      });
+    } else {
+      (navigationRef as any).navigate('Main', { screen: target.screen });
+    }
+    track('push_opened', { type: notificationTypeOf(data) ?? 'unknown' });
+  } catch {
+    // Navigator on Auth (logged out) — drop silently.
+  }
 }
 
 /** Widget tap (ari://add) — open fast entry. Buffered until the nav is ready. */
@@ -124,6 +157,11 @@ checkAndApplyUpdate();
 // notifications don't survive a reinstall or an OS purge, so reconciling here
 // (idempotent: cancel-then-reschedule) is what makes reminders durable.
 reconcileBillReminders();
+
+// Rotate the daily reminder copy on cold start — a DAILY trigger repeats the
+// same title/body forever, so each foreground reschedules with the next
+// message. No-op when reminders are off.
+rotateDailyReminderMessage();
 
 function App() {
   // Forest-on-cream design system uses Fraunces (display) + Inter (body).
@@ -194,6 +232,8 @@ function App() {
         // occurrence just fired gets its next month scheduled without waiting
         // for a cold start.
         reconcileBillReminders();
+        // Same resume pass rotates the daily reminder to its next message.
+        rotateDailyReminderMessage();
       }
 
       // active → background : measure session length. iOS fires 'inactive'
@@ -228,18 +268,22 @@ function App() {
   // user is never interrupted mid-session by a reload.
   useEffect(() => registerOtaReloadHandler(), []);
 
-  // Bill reminders: when the user taps a reminder, open fast entry prefilled.
-  // Cold-start taps (app launched by the notification) are read once; warm taps
-  // come through the response listener.
+  // Push taps: bill reminders open fast entry prefilled; all other typed
+  // payloads (budget_alert, weekly_brief, monthly_review, subscription_leak)
+  // route via navigateForPushPayload. Cold-start taps (app launched by the
+  // notification) are read once; warm taps come through the response listener.
   useEffect(() => {
-    Notifications.getLastNotificationResponseAsync().then((response) => {
-      const data = billDataFromResponse(response);
-      if (data) navigateToBillEntry(data);
-    });
-    const sub = Notifications.addNotificationResponseReceivedListener((response) => {
-      const data = billDataFromResponse(response);
-      if (data) navigateToBillEntry(data);
-    });
+    const handleResponse = (response: Notifications.NotificationResponse | null) => {
+      if (!response) return;
+      const bill = billDataFromResponse(response);
+      if (bill) {
+        navigateToBillEntry(bill);
+        return;
+      }
+      navigateForPushPayload(response.notification.request.content.data);
+    };
+    Notifications.getLastNotificationResponseAsync().then(handleResponse);
+    const sub = Notifications.addNotificationResponseReceivedListener(handleResponse);
     return () => sub.remove();
   }, []);
 
@@ -294,6 +338,10 @@ function App() {
               if (_pendingBillPrefill) {
                 navigateToBillEntry(_pendingBillPrefill);
                 _pendingBillPrefill = null;
+              }
+              if (_pendingPushPayload) {
+                navigateForPushPayload(_pendingPushPayload);
+                _pendingPushPayload = null;
               }
               if (_pendingOpenAdd) {
                 navigateToAdd();

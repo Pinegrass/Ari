@@ -154,6 +154,7 @@ export type AnalyticsEvent =
   | 'bill_updated'
   | 'bill_deleted'
   | 'bill_reminder_opened'
+  | 'push_opened'
   | 'onboarding_started'
   | 'onboarding_step_completed'
   | 'onboarding_step_skipped'

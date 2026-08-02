@@ -55,7 +55,7 @@ const KEYS_DECIMAL = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', 'de
 export default function AddTransactionScreen({ navigation, route }: Props) {
   const params = route.params as
     | { type?: 'expense' | 'income'; prefill?: { amount?: number; description?: string; category?: string } }
-    | { editTransaction: { id: string; type: 'expense' | 'income'; amount: number; category: string; description: string; note: string; date: string } }
+    | { editTransaction: { id: string; type: 'expense' | 'income'; amount: number; category: string; description: string; note: string; date: string; isRecurring?: boolean; recurrenceRule?: Transaction['recurrenceRule'] } }
     | undefined;
   const editTxn = params && 'editTransaction' in params ? params.editTransaction : null;
   const prefill = params && !('editTransaction' in params) ? (params as { prefill?: { amount?: number; description?: string; category?: string } }).prefill : undefined;
@@ -83,9 +83,14 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
     editTxn?.category ?? prefill?.category ?? (initialType === 'expense' ? 'food' : 'salary')
   );
   const [date, setDate] = useState(editTxn?.date ?? todayISO());
-  // Recurring — only applies to new entries, not edits.
+  // Recurring — applies to new entries; in edit mode only recurring TEMPLATES
+  // (opened from Recurring Payments) expose their schedule, as rule pills
+  // without the toggle (stopping a series happens on that screen instead).
+  const editingTemplate = !!editTxn?.isRecurring;
   const [isRecurring, setIsRecurring] = React.useState(false);
-  const [recurrenceRule, setRecurrenceRule] = React.useState<Transaction['recurrenceRule']>('monthly');
+  const [recurrenceRule, setRecurrenceRule] = React.useState<Transaction['recurrenceRule']>(
+    editTxn?.recurrenceRule ?? 'monthly'
+  );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
@@ -281,6 +286,8 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
           description: description.trim(),
           note: note.trim(),
           date,
+          // Template edits may also change the schedule (rule pills shown).
+          ...(editingTemplate && recurrenceRule && { recurrenceRule }),
         });
         if (!outcome.ok) {
           haptics.error();
@@ -432,20 +439,25 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
         </TouchableOpacity>
       </View>
 
-      {/* Recurring toggle — new entries only */}
-      {!isEdit && (
+      {/* Recurring toggle — new entries; schedule pills — template edits */}
+      {(!isEdit || editingTemplate) && (
         <View>
-          <View style={styles.recurringRow}>
-            <Text style={styles.recurringLabel}>Repeat</Text>
-            <Switch
-              value={isRecurring}
-              onValueChange={(v) => { haptics.light(); setIsRecurring(v); }}
-              trackColor={{ false: c.line, true: c.forest2 }}
-              thumbColor={c.cream}
-              accessibilityLabel="Repeat this transaction"
-            />
-          </View>
-          {isRecurring && (
+          {!isEdit && (
+            <View style={styles.recurringRow}>
+              <Text style={styles.recurringLabel}>Repeat</Text>
+              <Switch
+                value={isRecurring}
+                onValueChange={(v) => { haptics.light(); setIsRecurring(v); }}
+                trackColor={{ false: c.line, true: c.forest2 }}
+                thumbColor={c.cream}
+                accessibilityLabel="Repeat this transaction"
+              />
+            </View>
+          )}
+          {editingTemplate && (
+            <Text style={styles.recurringLabelRow}>Repeats</Text>
+          )}
+          {((!isEdit && isRecurring) || editingTemplate) && (
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -811,6 +823,14 @@ const makeStyles = (c: Palette) => StyleSheet.create({
     marginBottom: 6,
   },
   recurringLabel: { fontFamily: font.bodyMed, fontSize: 14, color: c.ink },
+  recurringLabelRow: {
+    fontFamily: font.bodyBold,
+    fontSize: ftype.eyebrow,
+    letterSpacing: 1.6,
+    textTransform: 'uppercase',
+    color: c.inkFaint,
+    marginBottom: 8,
+  },
   rulePills: { paddingHorizontal: 2, gap: 8, paddingBottom: 6 },
   rulePill: {
     borderWidth: 1,

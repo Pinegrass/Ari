@@ -15,6 +15,8 @@ interface Props {
   visible: boolean;
   title?: string;
   message?: string;
+  /** Confirm button label — e.g. "Stop series" for recurring templates. */
+  confirmLabel?: string;
   onConfirm: () => void;
   onCancel: () => void;
   loading?: boolean;
@@ -24,6 +26,7 @@ export default function DeleteConfirmSheet({
   visible,
   title = 'Delete?',
   message = 'This action cannot be undone.',
+  confirmLabel = 'Delete',
   onConfirm,
   onCancel,
   loading,
@@ -64,7 +67,7 @@ export default function DeleteConfirmSheet({
               loading={loading}
               accessibilityLabel="Confirm deletion"
             >
-              Delete
+              {confirmLabel}
             </Button>
           </View>
         </View>

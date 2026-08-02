@@ -100,30 +100,35 @@ cd backend && git push origin master
 
 ## Design System
 
-### Colors (Dark Theme)
+### Colors (Teal-on-Cream — `src/theme/tokens.ts` is the single source of truth)
+The app ships a light "paper" theme; the old dark palette below was replaced in
+Sprint 2 and the values shifted forest→deep teal in Sprint 8 (key names kept).
 ```
-Primary:       #00C896 (teal green)
-PrimaryDark:   #00A07A
-PrimaryLight:  #4ECDC4
-Background:    #0A0A0A (near black)
-Card:          #1A1A2E (dark navy)
-Card2:         #1E2040
-Input:         #252545
-Border:        #2A2A4A
-TextPrimary:   #E8E8F0
-TextSecondary: #8A8AB0
-TextMuted:     #5A5A80
-Accent:        #FFD93D (gold)
-Danger:        #FF4757 (red)
-Orange:        #FF6B35
-Purple:        #7C5CBF
-Teal:          #4ECDC4
+forest:      #0F2B2A (brand ink, primary actions, hero — deep teal)
+forest2:     #1A3D3B (lighter teal — "received", secondary action)
+forestDeep:  #081817 (headings, toast bg)
+moss:        #5C7370 (muted secondary text / links)
+cream:       #F4EFE3 (app background — warm paper, never pure white)
+cream2:      #EDE7D7 (sunk panels, pressed states)
+card:        #FBF8F0 (raised cards, keypad keys)
+line:        #E0D8C4 (hairline borders — no drop shadows, no gradients)
+lineStrong:  #CFC5AC (stronger borders)
+ink:         #23291F (primary text on cream)
+inkSoft:     #6E6B5C (secondary text)
+inkFaint:    #9A9683 (tertiary/decoration only — low contrast)
+clay:        #B4612F (spending accent + Add FAB)
+clayTint:    #F0E2D2
+gold:        #A8862C (sparing accent — never a fill)
 ```
+Text on the dark hero surface uses the `onForest` tokens (textBright #FBF8F0,
+text #EFEAD9, muted #A9C6BD, label #8FB0A8, clay #E8A06B). A DRAFT dark
+palette exists in `src/theme/palettes.ts` but dark mode is gated OFF
+(`DARK_ENABLED` in ThemeContext); `useColors()` always returns light today.
 
 ### Typography
-- Headers: fontWeight '700'-'800', fontSize 16-22
-- Body: fontSize 13-14
-- Labels: fontSize 10-12, textTransform uppercase
+- Display (Fraunces): `font.display/displaySemi/displayBold` — hero amounts, screen titles
+- Body (Inter): `font.body/bodyMed/bodySemi/bodyBold` — `type` scale: heroAmount 54, sectionHead 17, body 13.5, caption 12, eyebrow 11
+- Labels/eyebrows: uppercase with letterSpacing 1.4-1.6
 
 ### Currency
 - Locale-driven via the locale engine (`src/utils/locale.ts` frontend, `backend/locale_config.py` backend): INR (en-IN, lakhs/crores grouping), USD, GBP, AUD, GLOBAL fallback
@@ -161,7 +166,13 @@ RootNavigator (Stack)
     ├── SavingsGoals
     ├── TaxEstimator
     ├── PnlReport
-    └── TodoNotes
+    ├── TodoNotes
+    ├── Bills
+    ├── RecurringPayments
+    ├── DailyHeatmap
+    ├── Paywall (modal)
+    ├── Groups
+    └── GroupDetail
 ```
 
 ---
@@ -192,9 +203,11 @@ RootNavigator (Stack)
 ### Budgets
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | /budgets?month=YYYY-MM | List budgets |
+| GET | /budgets?month=YYYY-MM | List budgets (includes `rollover` + `available` = limit + carry; lazily materializes budget_rollovers rows) |
 | POST | /budgets | Create/update budget |
 | DELETE | /budgets/:id | Delete budget |
+| GET | /budgets/overall?month=YYYY-MM | Overall (category-agnostic) monthly budget; `limit: null` when unset |
+| PUT | /budgets/overall | Set overall budget (`{month, limit}`); `limit: null` clears it |
 
 ### Categories
 | Method | Endpoint | Description |
@@ -224,6 +237,7 @@ RootNavigator (Stack)
 |--------|----------|-------------|
 | GET | /reports/pnl?months=N | P&L report |
 | GET | /reports/category-trends?category=X&months=N | Category trend |
+| GET | /analytics/streak-days | All logged days (expense+income) with counts, ascending — streak engine |
 
 ### To-Do Notes
 | Method | Endpoint | Description |
@@ -239,6 +253,15 @@ RootNavigator (Stack)
 | POST | /tomo/chat | Send message to Tomo (free tier: `TOMO_FREE_DAILY_MESSAGES`/day, then 403 `tomo_free_limit_reached`) |
 | GET | /tomo/nudge | Get financial nudge |
 | GET | /insights | Get monthly insights |
+
+### Coaching
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /coaching/latest | Latest cached brief — free users CAN read (Pro teaser); no 403 |
+| GET | /coaching/subscription-leaks | List detected recurring-charge leaks |
+| POST | /coaching/weekly-brief/run | Internal; `X-Internal-Token: SCHEDULER_TOKEN` |
+| POST | /coaching/monthly-review/run | Internal; `X-Internal-Token: SCHEDULER_TOKEN` |
+| POST | /coaching/subscription-leaks/run | Internal; `X-Internal-Token: SCHEDULER_TOKEN` |
 
 ### Billing
 | Method | Endpoint | Description |
@@ -260,10 +283,16 @@ RootNavigator (Stack)
 id, name, email, password_hash, phone, age_group, income_bracket, main_goal, role, currency, created_at
 
 ### Transaction
-id, user_id, amount, type (expense/income), category, description, note, date, month, is_recurring, recurrence_rule, tags, income_source, parent_recurring_id, created_at
+id, user_id, amount, type (expense/income), category, description, note, date, month, is_recurring, recurrence_rule, is_paused (paused recurring template — no new instances), tags, income_source, parent_recurring_id, created_at
 
 ### Budget
 id, user_id, category, limit_amount, month, icon, color, created_at (unique: user_id+category+month)
+
+### BudgetRollover
+id, user_id, category, from_month, to_month, rollover_amount, created_at (unique: user_id+category+from_month) — materialized lazily on GET /budgets; stored once, never recomputed
+
+### MonthlyBudget
+id, user_id, month, total_limit, created_at, updated_at (unique: user_id+month) — overall monthly spending cap
 
 ### SavingsGoal
 id, user_id, name, target_amount, current_amount, target_date, icon, color, is_completed, created_at, updated_at
@@ -467,6 +496,7 @@ CORS_ORIGIN=*
 REVENUECAT_WEBHOOK_SECRET=<webhook-secret>
 REVENUECAT_SECRET_API_KEY=<secret-api-key>  # enables /billing/reconcile
 TOMO_FREE_DAILY_MESSAGES=5                  # free-tier Tomo quota
+SCHEDULER_TOKEN=<32-byte-random>            # bearer for /api/coaching/*/run (scheduled jobs)
 ```
 
 ### EAS Environment (preview)
@@ -485,6 +515,16 @@ APP_VARIANT=preview
 - **Auto-deploy**: Enabled (master branch connected to production)
 - **Region**: asia-southeast1 (Singapore)
 - **Database**: Railway PostgreSQL add-on
+- **Scheduled jobs**: `backend/.github/workflows/scheduled-jobs.yml` triggers the
+  coaching jobs (weekly brief Sun 20:00 IST, monthly review 1st 09:00 IST,
+  subscription leaks every other day 10:00 IST) via
+  `backend/scripts/run_scheduled_jobs.py`, which POSTs the internal
+  `/api/coaching/*/run` endpoints with `X-Internal-Token: SCHEDULER_TOKEN`.
+  Requires a `SCHEDULER_TOKEN` GitHub secret matching the Railway env var
+  (optional `API_BASE_URL` GitHub variable to override the prod URL). Railway
+  cron is NOT configured in `railway.json` — Railway cron is a per-service
+  Settings → Cron Schedule entry for a service that exits when done; an
+  equivalent alternative is a tiny second service running the same script.
 
 ### Frontend (EAS Build)
 - **EAS Project**: pinegrass-tech/ari

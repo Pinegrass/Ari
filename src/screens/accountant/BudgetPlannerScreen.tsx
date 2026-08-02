@@ -21,6 +21,7 @@ import { useLocale } from '../../hooks/useLocale';
 import { parseAmountInput } from '../../utils/locale';
 import { useData } from '../../context/DataContext';
 import * as budgetApi from '../../api/budgets';
+import { effectiveProgress, hasRollover } from '../../utils/budgetRollover';
 import type { Budget } from '../../types';
 
 export default function BudgetPlannerScreen() {
@@ -86,12 +87,16 @@ export default function BudgetPlannerScreen() {
   const monthLabel = formatMonthLabel(month);
   const isCurrentMonth = month === getCurrentMonth();
 
-  // Summary
+  // Summary — progress is measured against the rollover-adjusted available
+  // amounts (available = limit + carry from last month).
   const totalBudget = budgets.reduce((s, b) => s + b.limit, 0);
   const totalSpent = budgets.reduce((s, b) => s + b.spent, 0);
-  const totalRemaining = totalBudget - totalSpent;
-  const overBudgetCount = budgets.filter(b => b.percentage > 100).length;
-  const overallPct = totalBudget > 0 ? Math.round((totalSpent / totalBudget) * 100) : 0;
+  const totalAvailable = budgets.reduce((s, b) => s + (b.available ?? b.limit), 0);
+  const totalRemaining = totalAvailable - totalSpent;
+  const overBudgetCount = budgets.filter(
+    b => effectiveProgress(b.spent, b.available ?? b.limit).isOver
+  ).length;
+  const overallPct = totalAvailable > 0 ? Math.round((totalSpent / totalAvailable) * 100) : 0;
 
   // Add/Edit handlers
   const openAdd = () => {
@@ -192,12 +197,12 @@ export default function BudgetPlannerScreen() {
                   <View style={styles.summaryRow}>
                     <View style={styles.summaryItem}>
                       <Text style={styles.summaryLabel}>Budgeted</Text>
-                      <Text style={styles.summaryValue}>{formatAmount(totalBudget)}</Text>
+                      <Text style={styles.summaryValue}>{formatAmount(totalAvailable)}</Text>
                     </View>
                     <View style={styles.summaryDivider} />
                     <View style={styles.summaryItem}>
                       <Text style={styles.summaryLabel}>Spent</Text>
-                      <Text style={[styles.summaryValue, totalSpent > totalBudget && { color: color.clay }]}>
+                      <Text style={[styles.summaryValue, totalSpent > totalAvailable && { color: color.clay }]}>
                         {formatAmount(totalSpent)}
                       </Text>
                     </View>
@@ -209,6 +214,13 @@ export default function BudgetPlannerScreen() {
                       </Text>
                     </View>
                   </View>
+
+                  {totalAvailable !== totalBudget && (
+                    <Text style={styles.carriedHint}>
+                      Includes {formatAmount(Math.abs(totalAvailable - totalBudget))}{' '}
+                      {totalAvailable > totalBudget ? 'carried from last month' : 'overspend carried from last month'}
+                    </Text>
+                  )}
 
                   {/* Overall progress */}
                   <View style={styles.overallBarBg}>
@@ -307,9 +319,12 @@ export default function BudgetPlannerScreen() {
 function BudgetCard({ budget, onEdit, onDelete }: { budget: Budget; onEdit: () => void; onDelete: () => void }) {
   const { formatAmount } = usePrivacy();
   const catInfo = CATEGORY_ICONS[budget.category] || { icon: 'package' as const, color: color.inkFaint };
-  const isOver = budget.percentage > 100;
-  const isWarning = budget.percentage > 80 && budget.percentage <= 100;
+  const available = budget.available ?? budget.limit;
+  const progress = effectiveProgress(budget.spent, available);
+  const isOver = progress.isOver;
+  const isWarning = progress.percentage > 80 && progress.percentage <= 100;
   const barColor = isOver ? color.clay : isWarning ? color.gold : color.forest;
+  const carried = hasRollover(budget.rollover);
 
   return (
     <View style={styles.budgetCard}>
@@ -320,6 +335,13 @@ function BudgetCard({ budget, onEdit, onDelete }: { budget: Budget; onEdit: () =
         <View style={{ flex: 1 }}>
           <Text style={styles.catName}>{budget.category.charAt(0).toUpperCase() + budget.category.slice(1)}</Text>
           <Text style={styles.budgetLimit}>Limit: {formatAmount(budget.limit)}</Text>
+          {carried && (
+            <Text style={[styles.carried, { color: budget.rollover > 0 ? color.forest : color.clay }]}>
+              {budget.rollover > 0
+                ? `+${formatAmount(budget.rollover)} carried`
+                : `−${formatAmount(Math.abs(budget.rollover))} over carried`}
+            </Text>
+          )}
         </View>
         <View style={styles.budgetActions}>
           <TouchableOpacity onPress={onEdit} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
@@ -331,20 +353,20 @@ function BudgetCard({ budget, onEdit, onDelete }: { budget: Budget; onEdit: () =
         </View>
       </View>
 
-      {/* Spending progress */}
+      {/* Spending progress (against rollover-adjusted available) */}
       <View style={styles.budgetProgressRow}>
         <Text style={styles.budgetSpent}>{formatAmount(budget.spent)} spent</Text>
-        <Text style={[styles.budgetPct, { color: barColor }]}>{budget.percentage}%</Text>
+        <Text style={[styles.budgetPct, { color: barColor }]}>{progress.percentage}%</Text>
       </View>
 
       <View style={styles.progressBg}>
-        <View style={[styles.progressFill, { width: `${Math.min(budget.percentage, 100)}%`, backgroundColor: barColor }]} />
+        <View style={[styles.progressFill, { width: `${Math.min(progress.percentage, 100)}%`, backgroundColor: barColor }]} />
       </View>
 
       <Text style={[styles.budgetRemaining, isOver && { color: color.clay }]}>
         {isOver
-          ? `Over by ${formatAmount(Math.abs(budget.remaining))}`
-          : `${formatAmount(budget.remaining)} remaining`}
+          ? `Over by ${formatAmount(Math.abs(progress.remaining))}`
+          : `${formatAmount(progress.remaining)} remaining`}
       </Text>
     </View>
   );
@@ -412,6 +434,10 @@ const styles = StyleSheet.create({
     padding: 8, borderWidth: 1, borderColor: color.clay,
   },
   overWarningText: { fontSize: 12, color: color.clay, textAlign: 'center', fontFamily: font.bodySemi },
+  carriedHint: {
+    fontSize: 11, color: color.inkSoft, textAlign: 'center',
+    marginTop: 10, fontFamily: font.body,
+  },
 
   // Budget Card
   budgetCard: {
@@ -424,6 +450,7 @@ const styles = StyleSheet.create({
   },
   catName: { fontSize: 15, fontFamily: font.bodyBold, color: color.ink },
   budgetLimit: { fontSize: 12, color: color.inkSoft, marginTop: 2, fontFamily: font.body },
+  carried: { fontSize: 11, marginTop: 2, fontFamily: font.bodySemi },
   budgetActions: { flexDirection: 'row', gap: 14 },
   budgetProgressRow: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 14,

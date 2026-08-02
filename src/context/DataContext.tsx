@@ -26,6 +26,7 @@ import type {
   Transaction,
   Summary,
   Budget,
+  OverallBudget,
   Nudge,
   Insight,
   ChatMessage,
@@ -36,6 +37,7 @@ interface DataContextValue {
   transactions: Transaction[];
   summary: Summary | null;
   budgets: Budget[];
+  overallBudget: OverallBudget | null;
   nudge: Nudge | null;
   insights: Insight[];
   chatHistory: ChatMessage[];
@@ -79,10 +81,13 @@ interface DataContextValue {
       description?: string;
       note?: string;
       date?: string;
+      recurrenceRule?: Transaction['recurrenceRule'];
+      isPaused?: boolean;
     }
   ) => Promise<SaveOutcome>;
   saveBudget: (data: { category: string; limit: number; month: string }) => Promise<void>;
   deleteBudget: (id: string) => Promise<void>;
+  saveOverallBudget: (data: { month: string; limit: number | null }) => Promise<void>;
   createSavingsGoal: (data: {
     name: string;
     targetAmount: number;
@@ -126,6 +131,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [budgets, setBudgets] = useState<Budget[]>([]);
+  const [overallBudget, setOverallBudget] = useState<OverallBudget | null>(null);
   const [nudge, setNudge] = useState<Nudge | null>(null);
   const [insights, setInsights] = useState<Insight[]>([]);
   const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>([]);
@@ -253,6 +259,10 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         budgetApi.getBudgets(month)
       );
       setBudgets(data);
+      const overall = await fetchWithCache(`budgets_overall_${month}`, () =>
+        budgetApi.getOverallBudget(month)
+      );
+      setOverallBudget(overall);
     } catch (err) {
       handleError(err);
     }
@@ -493,6 +503,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         description?: string;
         note?: string;
         date?: string;
+        recurrenceRule?: Transaction['recurrenceRule'];
+        isPaused?: boolean;
       }
     ): Promise<SaveOutcome> => {
       // Read the current updatedAt BEFORE patching — it's the LWW baseline we
@@ -508,6 +520,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         description: patch.description,
         note: patch.note,
         date: patch.date,
+        recurrenceRule: patch.recurrenceRule,
+        isPaused: patch.isPaused,
       });
       // Row disappeared (e.g. deleted concurrently) — nothing to edit. Not a
       // failure the user needs to see; the screen just returns.
@@ -603,6 +617,14 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     await budgetApi.deleteBudget(id);
     setBudgets((prev) => prev.filter((b) => b.id !== id));
   }, []);
+
+  const saveOverallBudget = useCallback(
+    async (data: { month: string; limit: number | null }) => {
+      const overall = await budgetApi.saveOverallBudget(data);
+      setOverallBudget(overall);
+    },
+    []
+  );
 
   // ── Savings Goals ────────────────────────────────────────────────────
 
@@ -732,6 +754,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         transactions,
         summary,
         budgets,
+        overallBudget,
         nudge,
         insights,
         chatHistory,
@@ -755,6 +778,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         updateTransaction,
         saveBudget,
         deleteBudget,
+        saveOverallBudget,
         createSavingsGoal,
         updateSavingsGoal,
         contributeToGoal,

@@ -329,6 +329,12 @@ export default function SettingsScreen() {
       onPress: () => { haptics.light(); navigation.navigate('Accountant'); },
     },
     {
+      icon: 'refresh-cw',
+      label: 'Recurring Payments',
+      subtitle: 'Pause, edit or stop repeating entries',
+      onPress: () => { haptics.light(); navigation.navigate('RecurringPayments'); },
+    },
+    {
       icon: 'sparkles',
       label: isSubscribed ? `Ari ${tier[0].toUpperCase() + tier.slice(1)}` : 'Upgrade to Ari Pro',
       subtitle: isSubscribed

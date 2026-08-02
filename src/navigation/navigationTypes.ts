@@ -27,6 +27,10 @@ export type MainStackParamList = {
           description: string;
           note: string;
           date: string;
+          // Set when editing a recurring TEMPLATE (from Recurring Payments) —
+          // unlocks the recurrence-rule pills in edit mode.
+          isRecurring?: boolean;
+          recurrenceRule?: 'monthly' | 'weekly' | 'biweekly' | 'quarterly' | 'yearly';
         };
       }
     | undefined;
@@ -40,6 +44,7 @@ export type MainStackParamList = {
   PnlReport: undefined;
   TodoNotes: undefined;
   Bills: undefined;
+  RecurringPayments: undefined;
   DailyHeatmap: undefined;
   // `source` is the upstream surface that triggered the paywall — drives
   // funnel attribution in PostHog (paywall_viewed, pro_purchase_*).

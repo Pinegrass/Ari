@@ -64,6 +64,8 @@ export async function flushPending(): Promise<{ changed: boolean }> {
               description: r.description,
               note: r.note,
               date: r.date,
+              ...(r.recurrenceRule !== undefined && { recurrenceRule: r.recurrenceRule }),
+              ...(r.isPaused !== undefined && { isPaused: r.isPaused }),
               updatedAt: r.updatedAt,
             });
             await localStore.markSynced(r.id, {
@@ -112,6 +114,11 @@ export async function flushPending(): Promise<{ changed: boolean }> {
             merchant: r.merchant,
             rawInput: r.rawInput ?? undefined,
             entryType: r.entryType,
+            // Recurring template fields — without these an offline-created
+            // template lands on the server as a plain transaction.
+            ...(r.isRecurring !== undefined && { isRecurring: r.isRecurring }),
+            ...(r.recurrenceRule !== undefined && { recurrenceRule: r.recurrenceRule }),
+            ...(r.isPaused !== undefined && { isPaused: r.isPaused }),
             suppressAlerts: true, // backlog — don't fire stale budget pushes (G7)
           });
           await localStore.markSynced(r.id, {

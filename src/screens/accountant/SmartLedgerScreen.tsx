@@ -263,6 +263,18 @@ export default function SmartLedgerScreen() {
               <Icon name="refresh-cw" size={12} color={showRecurringOnly ? color.cream : color.inkFaint} />
               <Text style={[styles.chipText, showRecurringOnly && styles.chipTextActive]}>Recurring</Text>
             </TouchableOpacity>
+            {/* Manage recurring templates (pause/edit/stop) */}
+            <TouchableOpacity
+              style={styles.chip}
+              onPress={() => {
+                haptics.light();
+                (navigation as { navigate: (screen: string) => void }).navigate('RecurringPayments');
+              }}
+              accessibilityRole="button"
+              accessibilityLabel="Manage recurring payments"
+            >
+              <Text style={styles.chipText}>Manage →</Text>
+            </TouchableOpacity>
             <View style={styles.chipDivider} />
             <TouchableOpacity
               style={[styles.chip, sortBy === 'amount' && styles.chipActive]}

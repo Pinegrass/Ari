@@ -8,7 +8,8 @@ import Icon from '../components/ui/Icon';
 import { color, font } from '../theme/tokens';
 import { usePrivacy } from '../context/PrivacyContext';
 import { useLocale } from '../hooks/useLocale';
-import { getDailyHeatmap, type DailyHeatmap } from '../api/analytics';
+import { getDailyHeatmap, getStreakDays, type DailyHeatmap } from '../api/analytics';
+import { computeStreaks, writeStreakCache, type StreakInfo } from '../lib/streaks';
 
 /**
  * Daily spending heatmap — spec §6 "/api/analytics/daily ... daily spend
@@ -43,6 +44,7 @@ export default function DailyHeatmapScreen() {
   const [month, setMonth] = useState(() => todayIso().slice(0, 7));
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DailyHeatmap | null>(null);
+  const [streak, setStreak] = useState<StreakInfo | null>(null);
 
   const load = useCallback(async (m: string) => {
     setLoading(true);
@@ -56,6 +58,25 @@ export default function DailyHeatmapScreen() {
   }, []);
 
   useEffect(() => { load(month); }, [month, load]);
+
+  // Streak history is month-independent — fetch once. Also snapshot it to
+  // `ari_streak_cache` so the daily reminder can use streak-save copy.
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const history = await getStreakDays();
+        const info = computeStreaks(history.days, todayIso());
+        await writeStreakCache(info);
+        if (active) setStreak(info);
+      } catch {
+        // offline — header just stays hidden
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const sortedEntries = useMemo(() => {
     if (!data) return [] as [string, number][];
@@ -104,6 +125,34 @@ export default function DailyHeatmapScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll}>
+        {streak && (
+          <View style={styles.streakCard}>
+            <View style={styles.streakRow}>
+              <View style={styles.streakCell}>
+                <View style={styles.streakValueRow}>
+                  <Icon
+                    name="zap"
+                    size={17}
+                    color={streak.current > 0 ? color.clay : color.inkFaint}
+                  />
+                  <Text style={styles.streakValue}>{streak.current}</Text>
+                </View>
+                <Text style={styles.summaryLabel}>Current streak</Text>
+              </View>
+              <View style={styles.streakCell}>
+                <Text style={styles.streakValue}>{streak.longest}</Text>
+                <Text style={styles.summaryLabel}>Longest streak</Text>
+              </View>
+            </View>
+            {!streak.loggedToday && (
+              <Text style={styles.streakHint}>
+                {streak.current > 0
+                  ? `Log something today to keep your ${streak.current}-day streak alive.`
+                  : 'Log something today to start a streak.'}
+              </Text>
+            )}
+          </View>
+        )}
         {loading ? (
           <ActivityIndicator color={color.forest} style={{ marginTop: 40 }} />
         ) : data ? (
@@ -198,6 +247,15 @@ const styles = StyleSheet.create({
   summary: {
     flexDirection: 'row', gap: 12, marginBottom: 20,
   },
+  streakCard: {
+    padding: 14, borderRadius: 12, marginBottom: 20,
+    backgroundColor: color.card, borderWidth: 1, borderColor: color.line,
+  },
+  streakRow: { flexDirection: 'row', gap: 12 },
+  streakCell: { flex: 1 },
+  streakValueRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  streakValue: { fontSize: 22, fontFamily: font.displayBold, color: color.ink },
+  streakHint: { fontSize: 12, color: color.clay, marginTop: 10 },
   summaryCell: {
     flex: 1, padding: 14, borderRadius: 12,
     backgroundColor: color.card, borderWidth: 1, borderColor: color.line,

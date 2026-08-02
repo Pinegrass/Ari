@@ -54,13 +54,22 @@ export default function UpcomingBillsCard() {
     <View style={styles.card}>
       <View style={styles.head}>
         <Text style={styles.title}>Upcoming charges</Text>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Bills')}
-          accessibilityRole="link"
-          accessibilityLabel="Manage bills"
-        >
-          <Text style={styles.manage}>Manage</Text>
-        </TouchableOpacity>
+        <View style={styles.headLinks}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('RecurringPayments')}
+            accessibilityRole="link"
+            accessibilityLabel="Manage recurring payments"
+          >
+            <Text style={styles.manage}>Recurring</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Bills')}
+            accessibilityRole="link"
+            accessibilityLabel="Manage bills"
+          >
+            <Text style={styles.manage}>Manage</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {charges.slice(0, 4).map((charge) => (
@@ -108,6 +117,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   title: { fontFamily: font.displaySemi, fontSize: typeScale.sectionHead, color: color.forestDeep },
+  headLinks: { flexDirection: 'row', gap: 16 },
   manage: { fontFamily: font.bodySemi, fontSize: 12.5, color: color.moss },
   row: {
     flexDirection: 'row',

@@ -53,6 +53,7 @@ export interface LocalTxn {
   isRecurring?: boolean;
   recurrenceRule?: 'monthly' | 'weekly' | 'biweekly' | 'quarterly' | 'yearly';
   parentRecurringId?: string;
+  isPaused?: boolean;
 }
 
 export interface CreateInput {
@@ -79,6 +80,8 @@ export interface UpdateInput {
   description?: string;
   note?: string;
   date?: string;
+  recurrenceRule?: 'monthly' | 'weekly' | 'biweekly' | 'quarterly' | 'yearly';
+  isPaused?: boolean;
 }
 
 // In-memory cache of the full row set. Loaded once, kept in sync with every
@@ -136,6 +139,7 @@ function toTxn(r: LocalTxn): Transaction {
     ...(r.isRecurring !== undefined && { isRecurring: r.isRecurring }),
     ...(r.recurrenceRule !== undefined && { recurrenceRule: r.recurrenceRule }),
     ...(r.parentRecurringId !== undefined && { parentRecurringId: r.parentRecurringId }),
+    ...(r.isPaused !== undefined && { isPaused: r.isPaused }),
   };
 }
 
@@ -173,6 +177,7 @@ function fromServer(t: Transaction): LocalTxn {
     ...(t.isRecurring !== undefined && { isRecurring: t.isRecurring }),
     ...(t.recurrenceRule !== undefined && { recurrenceRule: t.recurrenceRule }),
     ...(t.parentRecurringId !== undefined && { parentRecurringId: t.parentRecurringId }),
+    ...(t.isPaused !== undefined && { isPaused: t.isPaused }),
   };
 }
 
@@ -275,6 +280,8 @@ export const localStore = {
       if (patch.description !== undefined) r.description = patch.description;
       if (patch.note !== undefined) r.note = patch.note;
       if (patch.date !== undefined) r.date = patch.date;
+      if (patch.recurrenceRule !== undefined) r.recurrenceRule = patch.recurrenceRule;
+      if (patch.isPaused !== undefined) r.isPaused = patch.isPaused;
       r.updatedAt = nowISO();
       // A never-synced create just gets re-queued as the same create op with
       // the new fields — the server will see the final state on first flush.

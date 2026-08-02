@@ -9,7 +9,7 @@
  *
  * localStore.create is mocked so no AsyncStorage plumbing is required.
  */
-import { checkAndGenerateDue } from '../recurringEngine';
+import { checkAndGenerateDue, projectUpcomingRecurring, nextDueForTemplate } from '../recurringEngine';
 import { localStore } from '../localStore';
 import type { Transaction } from '../../types';
 
@@ -282,5 +282,66 @@ describe('checkAndGenerateDue', () => {
 
     expect(mockCreate).not.toHaveBeenCalled();
     expect(result).toHaveLength(0);
+  });
+
+  // ── Paused templates (Phase 1 recurring management) ──────────────────────
+
+  it('skips a paused template that would otherwise be due', async () => {
+    const template = makeTemplate({ date: daysAgo(35), isPaused: true });
+
+    const result = await checkAndGenerateDue([template]);
+
+    expect(mockCreate).not.toHaveBeenCalled();
+    expect(result).toHaveLength(0);
+  });
+
+  it('still generates for active templates alongside paused ones', async () => {
+    const templateDate = daysAgo(35);
+    const instanceDate = addMonthsToStr(templateDate, 1);
+    queueCreateResult(instanceDate);
+
+    const paused = makeTemplate({ id: 'paused-1', date: templateDate, isPaused: true });
+    const active = makeTemplate({ date: templateDate });
+
+    const result = await checkAndGenerateDue([paused, active]);
+
+    expect(mockCreate).toHaveBeenCalledTimes(1);
+    expect(result).toHaveLength(1);
+    expect(result[0].parentRecurringId).toBe('template-1');
+  });
+});
+
+describe('projectUpcomingRecurring — pause handling', () => {
+  it('excludes paused templates from the projection', () => {
+    const now = new Date();
+    const active = makeTemplate({ date: daysAgo(3) });
+    const paused = makeTemplate({ id: 'paused-1', date: daysAgo(3), isPaused: true });
+
+    const out = projectUpcomingRecurring([active, paused], now, 30);
+
+    expect(out.map((p) => p.templateId)).toEqual(['template-1']);
+  });
+});
+
+describe('nextDueForTemplate', () => {
+  it('returns the first occurrence strictly after now', () => {
+    const now = new Date();
+    const template = makeTemplate({ date: daysAgo(35) });
+
+    const proj = nextDueForTemplate(template as Transaction & { recurrenceRule: 'monthly' }, now);
+
+    expect(proj.templateId).toBe('template-1');
+    expect(proj.daysUntil).toBeGreaterThan(0);
+    // A monthly template's next occurrence is always within 31 days.
+    expect(proj.daysUntil).toBeLessThanOrEqual(31);
+  });
+
+  it('keeps a future-dated template at its start date', () => {
+    const now = new Date('2026-08-02T12:00:00');
+    const template = makeTemplate({ date: '2026-12-25' });
+
+    const proj = nextDueForTemplate(template as Transaction & { recurrenceRule: 'monthly' }, now);
+
+    expect(proj.nextDueDate).toBe('2026-12-25');
   });
 });

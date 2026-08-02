@@ -16,11 +16,13 @@ import { useAuth } from '../context/AuthContext';
 import { useData } from '../context/DataContext';
 import BalanceCard from '../components/BalanceCard';
 import CoachingBriefCard from '../components/CoachingBriefCard';
+import NudgeCard from '../components/NudgeCard';
 import TransactionItem from '../components/TransactionItem';
 import ThisMonthSummary from '../components/dashboard/ThisMonthSummary';
 import MonthSpendChart from '../components/dashboard/MonthSpendChart';
 import CategoryBreakdown from '../components/dashboard/CategoryBreakdown';
 import UpcomingBillsCard from '../components/dashboard/UpcomingBillsCard';
+import StreakChip from '../components/StreakChip';
 import { SkeletonList } from '../components/ui/Skeleton';
 import EmptyState from '../components/ui/EmptyState';
 import AnimatedEntry from '../components/ui/AnimatedEntry';
@@ -47,16 +49,26 @@ function getGreeting(): string {
 /**
  * Home — forest-on-cream, stripped to the prototype (docs/ari-v2-forest.html):
  * date eyebrow, greeting, "Spent today" hero, one Add-entry CTA, Tomo brief,
- * Recent list. Quick Actions grid, banners, group balance, nudge and insights
- * were removed from Home this sprint; they remain reachable via the existing
- * bottom tabs until the nav/FAB restructure (Commit 6).
+ * Tomo nudge, Recent list. Quick Actions grid, banners, group balance and
+ * insights were removed from Home this sprint; they remain reachable via the
+ * existing bottom tabs until the nav/FAB restructure (Commit 6).
  */
 export default function DashboardScreen() {
   const navigation = useNavigation<Nav>();
   const { user } = useAuth();
   const { formatDate } = useLocale();
   const insets = useSafeAreaInsets();
-  const { transactions, summary, dailyData, loadingData, refreshing, fetchAll, refresh } = useData();
+  const {
+    transactions,
+    summary,
+    dailyData,
+    nudge,
+    loadingData,
+    refreshing,
+    fetchAll,
+    fetchNudge,
+    refresh,
+  } = useData();
   const haptics = useHaptics();
   const c = useColors();
   const styles = useMemo(() => makeStyles(c), [c]);
@@ -64,7 +76,10 @@ export default function DashboardScreen() {
   useFocusEffect(
     useCallback(() => {
       fetchAll();
-    }, [fetchAll])
+      // Nudge has its own 30-min cache TTL inside fetchWithCache, so asking
+      // on every focus is cheap and keeps the card fresh after new entries.
+      fetchNudge();
+    }, [fetchAll, fetchNudge])
   );
 
   const today = todayISO();
@@ -101,6 +116,11 @@ export default function DashboardScreen() {
     navigation.navigate('Tabs', { screen: 'Transactions' });
   }, [navigation]);
 
+  const handleNudgePress = useCallback(() => {
+    haptics.light();
+    navigation.navigate('Tabs', { screen: 'Tomo' });
+  }, [haptics, navigation]);
+
   const bottom = shellPad.tab(insets);
 
   return (
@@ -127,6 +147,7 @@ export default function DashboardScreen() {
         <Text style={styles.greet}>
           {getGreeting()}, {user?.name?.split(' ')[0] || 'there'}
         </Text>
+        <StreakChip />
       </AnimatedEntry>
 
         <AnimatedEntry delay={80}>
@@ -156,6 +177,12 @@ export default function DashboardScreen() {
         <AnimatedEntry delay={200}>
           <CoachingBriefCard />
         </AnimatedEntry>
+
+        {nudge && (
+          <AnimatedEntry delay={230}>
+            <NudgeCard nudge={nudge} onPress={handleNudgePress} />
+          </AnimatedEntry>
+        )}
 
         <AnimatedEntry delay={260}>
           <ThisMonthSummary
