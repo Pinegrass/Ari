@@ -107,7 +107,14 @@ export default function RecurringPaymentsScreen() {
   const handleTogglePause = async (t: Template) => {
     setActionFor(null);
     const pausing = t.isPaused !== true;
-    const outcome = await updateTransaction(t.id, { isPaused: pausing });
+    // Skip-on-resume: stamp today so occurrences that fell inside the pause
+    // window are never backfilled — generation resumes at the next due date.
+    const now = new Date();
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const outcome = await updateTransaction(t.id, {
+      isPaused: pausing,
+      ...(pausing ? {} : { resumeFrom: today }),
+    });
     if (outcome.ok) {
       haptics.success();
     } else {

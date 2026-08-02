@@ -66,6 +66,7 @@ export async function flushPending(): Promise<{ changed: boolean }> {
               date: r.date,
               ...(r.recurrenceRule !== undefined && { recurrenceRule: r.recurrenceRule }),
               ...(r.isPaused !== undefined && { isPaused: r.isPaused }),
+              ...(r.resumeFrom !== undefined && { resumeFrom: r.resumeFrom }),
               updatedAt: r.updatedAt,
             });
             await localStore.markSynced(r.id, {
@@ -119,6 +120,7 @@ export async function flushPending(): Promise<{ changed: boolean }> {
             ...(r.isRecurring !== undefined && { isRecurring: r.isRecurring }),
             ...(r.recurrenceRule !== undefined && { recurrenceRule: r.recurrenceRule }),
             ...(r.isPaused !== undefined && { isPaused: r.isPaused }),
+            ...(r.resumeFrom !== undefined && { resumeFrom: r.resumeFrom }),
             suppressAlerts: true, // backlog — don't fire stale budget pushes (G7)
           });
           await localStore.markSynced(r.id, {

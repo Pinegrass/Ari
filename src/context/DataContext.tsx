@@ -505,6 +505,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         date?: string;
         recurrenceRule?: Transaction['recurrenceRule'];
         isPaused?: boolean;
+        resumeFrom?: string | null;
       }
     ): Promise<SaveOutcome> => {
       // Read the current updatedAt BEFORE patching — it's the LWW baseline we
@@ -522,6 +523,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         date: patch.date,
         recurrenceRule: patch.recurrenceRule,
         isPaused: patch.isPaused,
+        resumeFrom: patch.resumeFrom,
       });
       // Row disappeared (e.g. deleted concurrently) — nothing to edit. Not a
       // failure the user needs to see; the screen just returns.

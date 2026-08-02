@@ -283,7 +283,7 @@ RootNavigator (Stack)
 id, name, email, password_hash, phone, age_group, income_bracket, main_goal, role, currency, created_at
 
 ### Transaction
-id, user_id, amount, type (expense/income), category, description, note, date, month, is_recurring, recurrence_rule, is_paused (paused recurring template — no new instances), tags, income_source, parent_recurring_id, created_at
+id, user_id, amount, type (expense/income), category, description, note, date, month, is_recurring, recurrence_rule, is_paused (paused recurring template — no new instances), resume_from (skip-on-resume — due dates before this day are never generated), tags, income_source, parent_recurring_id, created_at
 
 ### Budget
 id, user_id, category, limit_amount, month, icon, color, created_at (unique: user_id+category+month)

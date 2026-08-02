@@ -37,6 +37,9 @@ export interface Transaction {
   recurrenceRule?: 'monthly' | 'weekly' | 'biweekly' | 'quarterly' | 'yearly';
   // Paused recurring template: excluded from generation and projections.
   isPaused?: boolean;
+  // Stamped when a paused template resumes: due dates before this day are
+  // skipped, so the pause window is never backfilled. 'YYYY-MM-DD'.
+  resumeFrom?: string | null;
   tags?: string[];
   incomeSource?: string;
   parentRecurringId?: string;
