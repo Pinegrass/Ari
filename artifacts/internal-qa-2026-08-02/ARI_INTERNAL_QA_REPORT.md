@@ -27,6 +27,8 @@ Ari is stable enough for continued internal rollout, but the next Play update mu
 | Backend pytest | **184/184 passed** |
 | Live backend health | **200**, `{"status":"healthy"}` |
 | Anonymous billing reconcile | **401**, authentication boundary enforced |
+| Railway RevenueCat secret | **HOLD** — `REVENUECAT_SECRET_API_KEY` is absent |
+| Railway Redis | **ADVISORY** — `REDIS_URL` is absent; fallback works but multi-worker quotas are loose |
 
 ## Android / store compliance
 
@@ -35,7 +37,7 @@ Ari is stable enough for continued internal rollout, but the next Play update mu
 | Target SDK | Installed QA artifact reports `targetSdk=36` | **PASS** |
 | Google Play Billing | RevenueCat Android 10.13.0 resolves Billing Library **8.3.0** | **PASS** |
 | 16 KB pages | `zipalign -c -P 16 -v 4` on installed APK: `Verification successful` | **PASS** |
-| OTA | EAS project URL configured, updates enabled on load, runtime `1.2.0`, preview channel | **PASS** |
+| OTA | Preview update downloaded on the connected device, displayed the apply-on-reopen notice, and loaded after a cold restart | **PASS** |
 | Versioning | Internal APK build version **47**, app/runtime **1.2.0** | **PASS** |
 
 ## Connected-device verification
@@ -52,8 +54,10 @@ Device: Samsung Android handset `R9ZY6046FML`.
 | Delete and resync | **PASS** — QA expense deleted and all totals returned to ₹0 |
 | Tomo AI | **PASS** — live budgeting prompt returned coherent 50/30/20 arithmetic, used only supplied figures, no account-data fabrication |
 | Reminders | **PASS** — enabled at 8:00 PM; Android alarm registered for `com.pinegrass.ari` and notification channel is active |
-| RevenueCat paywall failure handling | **FIXED** — empty Play offering now fails closed with a user-readable message |
-| Profile edit | **PASS** in internal APK/preview OTA validation |
+| RevenueCat paywall failure handling | **FIXED / DEVICE PASS** — empty Play offering now renders `Ari Pro is not available from Google Play yet` instead of raw `Error 23` |
+| Profile edit | **PASS** — changed `Ejaj Hassan` to `Ejaj Hassan QA` through the authenticated server flow, verified it in Settings, then restored the original name and verified it after a fresh launch |
+
+Preview OTA group `719c2f6d-2f3b-4bb4-8dff-c4e180cb4b05` was published for Android and iOS from commit `8786ce7`; production was not modified. Internal preview APK build `26205a37-d468-426b-94fd-9f10fe44d0f5` (version code 47) installed successfully over the existing app while preserving the signed-in session. The first restoration request during the reversible profile test hit a transient connection error; the retry succeeded, and the original name was confirmed after force-stop and relaunch.
 
 Screenshots and raw device captures are in `artifacts/internal-qa-2026-08-02/screenshots/`.
 
@@ -70,7 +74,8 @@ Required promotion gate after approval to build:
 1. Upload the reviewed AAB to Play internal testing.
 2. Create/import the intended Ari subscription SKU and base plan in Play Console.
 3. Import it into RevenueCat, attach it to the `Ari Finance Pro` entitlement and the `default` package.
-4. Install Ari from the Play internal-test link and pass purchase, cancel, restore and backend reconcile tests.
+4. Add the RevenueCat secret API key to Railway as `REVENUECAT_SECRET_API_KEY`.
+5. Install Ari from the Play internal-test link and pass purchase, cancel, restore and backend reconcile tests.
 
 ## Final classification
 
