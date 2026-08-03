@@ -6,6 +6,13 @@ jest.mock('@react-navigation/native', () => ({ useNavigation: jest.fn() }));
 jest.mock('../../context/AuthContext', () => ({ useAuth: jest.fn() }));
 
 describe('visibleModules', () => {
+  it('keeps Trends reachable from the Accountant tab', () => {
+    expect(visibleModules('IN')[0]).toMatchObject({
+      key: 'Transactions',
+      title: 'Trends & Insights',
+    });
+  });
+
   it('shows the Indian Tax Estimator to Indian users', () => {
     expect(visibleModules('IN').some((m) => m.key === 'TaxEstimator')).toBe(true);
   });

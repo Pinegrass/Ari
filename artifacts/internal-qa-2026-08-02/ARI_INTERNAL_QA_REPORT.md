@@ -1,4 +1,4 @@
-# Ari internal rollout QA — 2 August 2026
+# Ari internal rollout QA — 3 August 2026
 
 ## Decision
 
@@ -14,17 +14,21 @@ Ari is stable enough for continued internal rollout, but the next Play update mu
 - Corrected negative monthly cash flow from the misleading label `Saved` to `Deficit` on Home and Trends.
 - Added a RevenueCat offering preflight so an empty Google Play offering shows a clear in-app explanation instead of RevenueCat's opaque `Error 23` dialog.
 - Enabled `EXPO_PUBLIC_PAYWALL_ENABLED=true` in the EAS production environment.
+- Exposed the existing overall monthly budget API in the live Budget Planner route; the prior UI was unreachable.
+- Added one safe retry for transient mobile-network failures on idempotent `GET`, `PUT`, `PATCH`, and `DELETE` requests; `POST` is deliberately never retried.
+- Tightened Tomo's production prompt to answer first, stay under 80 words by default, follow requested formats, and remove praise/filler; retained enough Gemini output headroom to prevent truncated answers.
+- Promoted Ari Accountant to the primary five-slot bottom navigation and moved Trends & Insights into the top of that toolkit; removed the duplicate Settings entry.
 
 ## Automated verification
 
 | Gate | Result |
 |---|---|
-| Frontend Jest | **458/458 passed** (30 suites) |
+| Frontend Jest | **464/464 passed** (30 suites) |
 | TypeScript | **PASS** |
 | ESLint | **PASS — 0 errors** (17 pre-existing warnings) |
 | Expo Doctor | **18/18 passed** |
 | npm audit | **0 vulnerabilities** |
-| Backend pytest | **184/184 passed** |
+| Backend pytest | **185/185 passed** |
 | Live backend health | **200**, `{"status":"healthy"}` |
 | Anonymous billing reconcile | **401**, authentication boundary enforced |
 | Railway RevenueCat secret | **HOLD** — `REVENUECAT_SECRET_API_KEY` is absent |
@@ -47,17 +51,30 @@ Device: Samsung Android handset `R9ZY6046FML`.
 | Flow | Result |
 |---|---|
 | Existing authenticated session and cold launch | **PASS** — account loaded as Ejaj Hassan |
+| Primary navigation | **FIXED / PASS** — Home · Accountant · Add · Tomo · More rendered on-device; Accountant opened directly without a back arrow and its Trends & Insights module opened the existing Trends screen |
 | Home dashboard | **PASS** — daily/monthly totals and charts refreshed |
 | Expense create | **PASS** — created labeled QA expense for ₹123 |
 | Category and note | **PASS** — Food / `QA Internal Rollout Lunch` persisted |
 | Trends | **PASS** — totals, chart, category insight and recent row reflected ₹123 |
 | Delete and resync | **PASS** — QA expense deleted and all totals returned to ₹0 |
-| Tomo AI | **PASS** — live budgeting prompt returned coherent 50/30/20 arithmetic, used only supplied figures, no account-data fabrication |
+| Recurring transaction lifecycle | **PASS** — created a ₹321 monthly Food item, paused, resumed with next date advanced to 3 September, stopped the series, and verified ₹0 cleanup |
+| Overall monthly budget | **FIXED / PASS** — set ₹10,000, rendered `₹10,000 left`, cleared it, and verified the empty CTA and clean account state |
+| Tomo AI | **FIXED / PASS** — production reply completed in **6.3 s**, used the supplied ₹60,000/₹30,000 figures, and returned exactly three actions in **66 words** |
 | Reminders | **PASS** — enabled at 8:00 PM; Android alarm registered for `com.pinegrass.ari` and notification channel is active |
 | RevenueCat paywall failure handling | **FIXED / DEVICE PASS** — empty Play offering now renders `Ari Pro is not available from Google Play yet` instead of raw `Error 23` |
 | Profile edit | **PASS** — changed `Ejaj Hassan` to `Ejaj Hassan QA` through the authenticated server flow, verified it in Settings, then restored the original name and verified it after a fresh launch |
 
-Preview OTA group `719c2f6d-2f3b-4bb4-8dff-c4e180cb4b05` was published for Android and iOS from commit `8786ce7`; production was not modified. Internal preview APK build `26205a37-d468-426b-94fd-9f10fe44d0f5` (version code 47) installed successfully over the existing app while preserving the signed-in session. The first restoration request during the reversible profile test hit a transient connection error; the retry succeeded, and the original name was confirmed after force-stop and relaunch.
+Final preview OTA group `f10a97c1-17bd-4cdd-87e2-65eeec0da2c3` (Android update `019fc793-f0d7-792a-bb6b-17f4005d34bf`, iOS update `019fc793-f0d7-7460-834c-c34cea069651`) was published and applied on the connected device; production was not modified. Internal preview APK build `26205a37-d468-426b-94fd-9f10fe44d0f5` (version code 47) remained the native shell and preserved the signed-in session. A profile `PATCH` succeeded server-side while its response was lost during a radio transition; the new idempotent retry policy covers that case. The final restoration to `Ejaj Hassan` passed and was verified in Settings.
+
+## Device performance
+
+| Metric | Result |
+|---|---|
+| Cold launch samples | **1,368 ms**, then **1,057 ms** |
+| Frames / modern jank | **1,331 / 23 (1.73%)** |
+| Frame latency | p50 **11 ms**, p90 **17 ms**, p95 **21 ms**, p99 **53 ms** |
+| Memory | **210,248 KB PSS**, **307,149 KB RSS** |
+| Crash / ANR scan | **0** Ari crashes or ANRs |
 
 Screenshots and raw device captures are in `artifacts/internal-qa-2026-08-02/screenshots/`.
 

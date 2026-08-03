@@ -19,7 +19,7 @@ import type { MainStackParamList } from '../navigation/navigationTypes';
 type Nav = StackNavigationProp<MainStackParamList>;
 
 interface ModuleItem {
-  key: keyof MainStackParamList;
+  key: keyof MainStackParamList | 'Transactions';
   icon: IconName;
   iconColor: string;
   title: string;
@@ -29,6 +29,13 @@ interface ModuleItem {
 }
 
 const MODULES: ModuleItem[] = [
+  {
+    key: 'Transactions',
+    icon: 'trending-up',
+    iconColor: color.forest,
+    title: 'Trends & Insights',
+    subtitle: 'Spending patterns, categories and recent activity',
+  },
   {
     key: 'SmartLedger',
     icon: 'list',
@@ -103,7 +110,11 @@ export function visibleModules(country: string | null | undefined): ModuleItem[]
   return MODULES.filter((m) => !m.countries || m.countries.includes(c));
 }
 
-export default function AccountantScreen() {
+interface AccountantScreenProps {
+  embedded?: boolean;
+}
+
+export default function AccountantScreen({ embedded = false }: AccountantScreenProps) {
   const navigation = useNavigation<Nav>();
   const haptics = useHaptics();
   const { user } = useAuth();
@@ -114,14 +125,16 @@ export default function AccountantScreen() {
     <ScreenShell edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backBtn}
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
-        >
-          <Icon name="arrow-left" size={22} color={color.ink} />
-        </TouchableOpacity>
+        {!embedded && (
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backBtn}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+          >
+            <Icon name="arrow-left" size={22} color={color.ink} />
+          </TouchableOpacity>
+        )}
         <View>
           <Text style={styles.headerTitle}>Ari Accountant</Text>
           <Text style={styles.headerSub}>Your personal finance toolkit</Text>
@@ -141,7 +154,11 @@ export default function AccountantScreen() {
             accessibilityLabel={mod.title}
             onPress={() => {
               haptics.light();
-              navigation.navigate(mod.key as any);
+              if (mod.key === 'Transactions') {
+                navigation.navigate('Tabs', { screen: 'Transactions' });
+              } else {
+                navigation.navigate(mod.key as any);
+              }
             }}
           >
             <View style={[styles.iconBox, { backgroundColor: mod.iconColor + '20' }]}>

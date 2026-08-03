@@ -22,7 +22,7 @@ import { parseAmountInput } from '../../utils/locale';
 import { useData } from '../../context/DataContext';
 import * as budgetApi from '../../api/budgets';
 import { effectiveProgress, hasRollover } from '../../utils/budgetRollover';
-import type { Budget } from '../../types';
+import type { Budget, OverallBudget } from '../../types';
 
 export default function BudgetPlannerScreen() {
   const navigation = useNavigation();
@@ -34,6 +34,7 @@ export default function BudgetPlannerScreen() {
 
   const [month, setMonth] = useState(getCurrentMonth());
   const [budgets, setBudgets] = useState<Budget[]>([]);
+  const [overallBudget, setOverallBudget] = useState<OverallBudget | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -45,14 +46,24 @@ export default function BudgetPlannerScreen() {
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState('');
 
+  // Overall monthly budget modal
+  const [showOverallModal, setShowOverallModal] = useState(false);
+  const [overallLimit, setOverallLimit] = useState('');
+  const [savingOverall, setSavingOverall] = useState(false);
+  const [overallError, setOverallError] = useState('');
+
   // Delete
   const [deleteTarget, setDeleteTarget] = useState<Budget | null>(null);
   const [deleting, setDeleting] = useState(false);
 
   const fetchBudgets = useCallback(async () => {
     try {
-      const data = await budgetApi.getBudgets(month);
+      const [data, overall] = await Promise.all([
+        budgetApi.getBudgets(month),
+        budgetApi.getOverallBudget(month),
+      ]);
       setBudgets(data);
+      setOverallBudget(overall);
     } catch {
       // silently fail
     } finally {
@@ -97,6 +108,51 @@ export default function BudgetPlannerScreen() {
     b => effectiveProgress(b.spent, b.available ?? b.limit).isOver
   ).length;
   const overallPct = totalAvailable > 0 ? Math.round((totalSpent / totalAvailable) * 100) : 0;
+  const overallSet = overallBudget?.limit != null && overallBudget.limit > 0;
+  const overallProgress = overallSet
+    ? effectiveProgress(overallBudget!.spent, overallBudget!.limit!)
+    : null;
+
+  const openOverallEdit = () => {
+    setOverallLimit(overallBudget?.limit != null ? String(overallBudget.limit) : '');
+    setOverallError('');
+    setShowOverallModal(true);
+  };
+
+  const handleSaveOverall = async () => {
+    setOverallError('');
+    const amount = parseAmountInput(overallLimit, locale);
+    if (amount === null) {
+      setOverallError('Enter a valid overall budget amount');
+      return;
+    }
+    setSavingOverall(true);
+    try {
+      const saved = await budgetApi.saveOverallBudget({ month, limit: amount });
+      setOverallBudget(saved);
+      haptics.medium();
+      setShowOverallModal(false);
+    } catch {
+      setOverallError('Failed to save overall budget');
+    } finally {
+      setSavingOverall(false);
+    }
+  };
+
+  const handleClearOverall = async () => {
+    setOverallError('');
+    setSavingOverall(true);
+    try {
+      const cleared = await budgetApi.saveOverallBudget({ month, limit: null });
+      setOverallBudget(cleared);
+      haptics.medium();
+      setShowOverallModal(false);
+    } catch {
+      setOverallError('Failed to clear overall budget');
+    } finally {
+      setSavingOverall(false);
+    }
+  };
 
   // Add/Edit handlers
   const openAdd = () => {
@@ -190,6 +246,55 @@ export default function BudgetPlannerScreen() {
       >
         {loading ? <LoadingSpinner /> : (
           <>
+            {/* Overall monthly limit — intentionally lives in this navigable
+                planner instead of the retired, unreachable BudgetScreen. */}
+            {overallSet && overallProgress ? (
+              <TouchableOpacity
+                style={styles.overallBudgetCard}
+                onPress={openOverallEdit}
+                activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel="Edit overall monthly budget"
+              >
+                <View style={styles.overallBudgetHeader}>
+                  <View>
+                    <Text style={styles.overallBudgetTitle}>Overall monthly budget</Text>
+                    <Text style={styles.overallBudgetMeta}>
+                      {formatAmount(overallBudget!.spent)} of {formatAmount(overallBudget!.limit!)}
+                    </Text>
+                  </View>
+                  <Icon name="edit" size={16} color={color.inkSoft} />
+                </View>
+                <View style={styles.overallBarBg}>
+                  <View style={[
+                    styles.overallBarFill,
+                    { width: `${Math.min(overallProgress.percentage, 100)}%` },
+                    overallProgress.isOver && { backgroundColor: color.clay },
+                  ]} />
+                </View>
+                <Text style={[
+                  styles.overallBudgetRemaining,
+                  overallProgress.isOver && { color: color.clay },
+                ]}>
+                  {overallProgress.isOver
+                    ? `${formatAmount(Math.abs(overallProgress.remaining))} over`
+                    : `${formatAmount(overallProgress.remaining)} left`}
+                </Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={styles.overallBudgetSetCard}
+                onPress={openOverallEdit}
+                activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel="Set an overall monthly budget"
+              >
+                <Icon name="target" size={18} color={color.forest} />
+                <Text style={styles.overallBudgetSetText}>Set an overall monthly budget</Text>
+                <Icon name="chevron-right" size={16} color={color.inkFaint} />
+              </TouchableOpacity>
+            )}
+
             {/* Summary Card */}
             {budgets.length > 0 && (
               <AnimatedEntry delay={0}>
@@ -297,6 +402,49 @@ export default function BudgetPlannerScreen() {
             <Button onPress={handleSave} loading={saving} fullWidth style={{ marginTop: 24 }}>
               {editBudget ? 'Update Budget' : 'Set Budget'}
             </Button>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
+
+      {/* Overall Budget Modal */}
+      <Modal visible={showOverallModal} transparent animationType="slide" onRequestClose={() => setShowOverallModal(false)}>
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+          <TouchableOpacity style={styles.modalOverlay} onPress={() => setShowOverallModal(false)} activeOpacity={1} />
+          <View style={[styles.modalSheet, { paddingBottom: Math.max(insets.bottom, 24) + 16 }]}>
+            <View style={styles.modalHandle} />
+            <Text style={styles.modalTitle}>Overall Monthly Budget</Text>
+            <ErrorBanner message={overallError} />
+
+            <Text style={styles.fieldLabel}>Total spending limit</Text>
+            <View style={styles.amountRow}>
+              <Text style={styles.rupee}>{locale.symbol}</Text>
+              <TextInput
+                style={styles.amountInput}
+                value={overallLimit}
+                onChangeText={setOverallLimit}
+                placeholder="30000"
+                placeholderTextColor={color.inkFaint}
+                keyboardType={locale.usesDecimalAmounts ? 'decimal-pad' : 'numeric'}
+                selectionColor={color.forest}
+                returnKeyType="done"
+                onSubmitEditing={handleSaveOverall}
+                accessibilityLabel="Overall monthly budget amount"
+              />
+            </View>
+
+            <Button onPress={handleSaveOverall} loading={savingOverall} fullWidth style={{ marginTop: 24 }}>
+              {overallSet ? 'Update Overall Budget' : 'Set Overall Budget'}
+            </Button>
+            {overallSet && (
+              <TouchableOpacity
+                onPress={handleClearOverall}
+                style={styles.clearOverallBtn}
+                disabled={savingOverall}
+                accessibilityRole="button"
+              >
+                <Text style={styles.clearOverallText}>Clear overall budget</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </KeyboardAvoidingView>
       </Modal>
@@ -420,6 +568,22 @@ const styles = StyleSheet.create({
     backgroundColor: color.card, borderRadius: 16, borderWidth: 1,
     borderColor: color.line, padding: 16, marginBottom: 20,
   },
+  overallBudgetCard: {
+    backgroundColor: color.card, borderRadius: 16, borderWidth: 1,
+    borderColor: color.line, padding: 16, marginBottom: 14,
+  },
+  overallBudgetHeader: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+  },
+  overallBudgetTitle: { fontSize: 14, fontFamily: font.bodySemi, color: color.ink },
+  overallBudgetMeta: { fontSize: 12, fontFamily: font.body, color: color.inkSoft, marginTop: 4 },
+  overallBudgetRemaining: { fontSize: 12, fontFamily: font.body, color: color.inkSoft, marginTop: 8 },
+  overallBudgetSetCard: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    backgroundColor: color.card, borderRadius: 16, borderWidth: 1,
+    borderColor: color.line, padding: 16, marginBottom: 14,
+  },
+  overallBudgetSetText: { flex: 1, fontSize: 14, fontFamily: font.bodySemi, color: color.ink },
   summaryRow: { flexDirection: 'row', alignItems: 'center' },
   summaryItem: { flex: 1, alignItems: 'center' },
   summaryDivider: { width: 1, height: 36, backgroundColor: color.line },
@@ -464,6 +628,8 @@ const styles = StyleSheet.create({
   budgetRemaining: {
     fontSize: 12, color: color.inkSoft, marginTop: 8, fontFamily: font.body,
   },
+  clearOverallBtn: { alignItems: 'center', paddingVertical: 14, marginTop: 4 },
+  clearOverallText: { color: color.clay, fontFamily: font.bodySemi, fontSize: 13 },
 
   // Modals
   modalOverlay: { flex: 1, backgroundColor: 'rgba(35,41,31,0.55)' },

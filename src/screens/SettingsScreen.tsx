@@ -354,12 +354,6 @@ export default function SettingsScreen() {
 
   const menuItems: MenuItem[] = [
     {
-      icon: 'briefcase',
-      label: 'Ari Accountant',
-      subtitle: 'Budgets, bills, goals, tax, reports & notes',
-      onPress: () => { haptics.light(); navigation.navigate('Accountant'); },
-    },
-    {
       icon: 'refresh-cw',
       label: 'Recurring Payments',
       subtitle: 'Pause, edit or stop repeating entries',
