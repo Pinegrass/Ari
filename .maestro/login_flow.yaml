@@ -34,9 +34,9 @@ name: Login Flow
 - hideKeyboard
 - tapOn: "Sign In"
 
-# Lands on the Home tab (bottom tabs: Home / Trends / Tomo / More)
+# Lands on the Home tab (bottom tabs: Home / Accountant / Tomo / More)
 - assertVisible: "Home"
-- assertVisible: "Trends"
+- assertVisible: "Accountant"
 - assertVisible: "Tomo"
 # Dashboard sections fade in via AnimatedEntry — wait explicitly.
 - extendedWaitUntil:
