@@ -7,12 +7,14 @@ tags:
 ---
 # Bottom tabs present
 - assertVisible: "Home"
-- assertVisible: "Trends"
+- assertVisible: "Accountant"
 - assertVisible: "Tomo"
 - assertVisible: "More"
 
-# Trends (was "Expenses")
-- tapOn: "Trends"
+# Accountant hub and its Trends module
+- tapOn: "Accountant"
+- assertVisible: "Ari Accountant"
+- tapOn: "Trends & Insights"
 - assertVisible: "Trends"
 
 # Tomo

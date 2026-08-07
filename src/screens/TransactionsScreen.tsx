@@ -225,7 +225,7 @@ export default function TransactionsScreen() {
                   <Text style={[styles.summaryAmount, styles.expenseText]}>{formatAmount(expenses)}</Text>
                 </View>
                 <View style={styles.summaryCard}>
-                  <Text style={styles.summaryLabel}>Saved</Text>
+                  <Text style={styles.summaryLabel}>{savings >= 0 ? 'Saved' : 'Deficit'}</Text>
                   <Text style={[styles.summaryAmount, savings >= 0 ? styles.incomeText : styles.expenseText]}>
                     {formatAmount(Math.abs(savings))}
                   </Text>
@@ -341,11 +341,20 @@ export default function TransactionsScreen() {
 
       <DeleteConfirmSheet
         visible={!!toDelete}
-        title="Delete Transaction?"
+        title={
+          toDelete?.isRecurring && !toDelete?.parentRecurringId
+            ? 'Stop this recurring payment?'
+            : 'Delete Transaction?'
+        }
         message={
           toDelete
-            ? `Delete "${toDelete.description || toDelete.category}" of ${formatAmount(toDelete.amount)}?`
+            ? toDelete.isRecurring && !toDelete.parentRecurringId
+              ? 'This is a recurring payment. Deleting it stops all future repeats; past entries are kept.'
+              : `Delete "${toDelete.description || toDelete.category}" of ${formatAmount(toDelete.amount)}?`
             : ''
+        }
+        confirmLabel={
+          toDelete?.isRecurring && !toDelete?.parentRecurringId ? 'Stop series' : 'Delete'
         }
         onConfirm={handleDeleteConfirm}
         onCancel={() => setToDelete(null)}

@@ -12,6 +12,7 @@
     "test:coverage": "jest --coverage",
     "typecheck": "tsc --noEmit --skipLibCheck",
     "lint": "npx expo lint",
+    "eas-build-pre-install": "node scripts/verify-release-env.mjs",
     "e2e": "maestro test .maestro"
   },
   "dependencies": {
@@ -26,7 +27,7 @@
     "@react-navigation/stack": "^6.4.1",
     "@sentry/react-native": "~7.2.0",
     "@supabase/supabase-js": "^2.103.3",
-    "expo": "~54.0.35",
+    "expo": "~54.0.36",
     "expo-auth-session": "~7.0.11",
     "expo-constants": "~18.0.13",
     "expo-crypto": "~15.0.9",
@@ -42,7 +43,7 @@
     "expo-speech-recognition": "^3.1.2",
     "expo-splash-screen": "~31.0.13",
     "expo-status-bar": "~3.0.9",
-    "expo-updates": "~29.0.18",
+    "expo-updates": "~29.0.19",
     "expo-web-browser": "~15.0.11",
     "posthog-react-native": "^4.43.0",
     "react": "19.1.0",
@@ -76,6 +77,22 @@
     "jest-expo": "~54.0.17",
     "react-test-renderer": "^19.1.0",
     "typescript": "~5.9.2"
+  },
+  "overrides": {
+    "brace-expansion@<=1.1.17": "1.1.18",
+    "brace-expansion@>=2.0.0 <2.1.4": "2.1.4",
+    "brace-expansion@>=4.0.0 <5.0.9": "5.0.9",
+    "fast-uri": "3.1.5",
+    "js-yaml": "4.3.1",
+    "minimatch@3.1.5": {
+      "brace-expansion": "1.1.18"
+    },
+    "minimatch@9.0.9": {
+      "brace-expansion": "2.1.4"
+    },
+    "postcss": "8.5.23",
+    "tar": "7.5.21",
+    "uuid": "11.1.1"
   },
   "private": true
 }

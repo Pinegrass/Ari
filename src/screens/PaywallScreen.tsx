@@ -6,7 +6,11 @@ import { useNavigation, useRoute, type RouteProp } from '@react-navigation/nativ
 import { useAuth } from '../context/AuthContext';
 import { color, font } from '../theme/tokens';
 import { track } from '../lib/analytics';
-import { ARI_PRO_ENTITLEMENT, syncRevenueCatUser } from '../lib/revenuecat';
+import {
+  ARI_PRO_ENTITLEMENT,
+  hasCurrentStoreOffering,
+  syncRevenueCatUser,
+} from '../lib/revenuecat';
 
 
 export default function PaywallScreen() {
@@ -26,7 +30,17 @@ export default function PaywallScreen() {
       return;
     }
     syncRevenueCatUser(String(user.id))
-      .then((available) => available ? setReady(true) : setError('Subscriptions are not configured in this build.'))
+      .then(async (available) => {
+        if (!available) {
+          setError('Subscriptions are not configured in this build.');
+          return;
+        }
+        if (!(await hasCurrentStoreOffering())) {
+          setError('Ari Pro is not available from Google Play yet. Please try again after the internal Play release is installed.');
+          return;
+        }
+        setReady(true);
+      })
       .catch((cause: unknown) => setError(cause instanceof Error ? cause.message : 'Could not load plans.'));
   }, [route.params?.source, user]);
 

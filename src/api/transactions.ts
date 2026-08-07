@@ -28,6 +28,12 @@ export const addTransaction = (data: {
   merchant?: string | null;
   rawInput?: string;
   entryType?: 'manual' | 'voice' | 'aa_sync';
+  // Recurring template fields — must ride along on backlog creates too, or an
+  // offline-created template syncs as a plain transaction (recurrence lost).
+  isRecurring?: boolean;
+  recurrenceRule?: 'monthly' | 'weekly' | 'biweekly' | 'quarterly' | 'yearly';
+  isPaused?: boolean;
+  resumeFrom?: string | null;
   // Sync engine sets this when flushing a backlog so old offline writes don't
   // fire stale budget pushes (G7).
   suppressAlerts?: boolean;
@@ -51,6 +57,12 @@ export const updateTransaction = (
     description?: string;
     note?: string;
     date?: string;
+    // Edit a recurring template's schedule (Phase 1 recurring management).
+    recurrenceRule?: 'monthly' | 'weekly' | 'biweekly' | 'quarterly' | 'yearly';
+    // Pause/resume a recurring template (Phase 1 recurring management).
+    isPaused?: boolean;
+    // Skip-on-resume: due dates before this day are never generated.
+    resumeFrom?: string | null;
     // Last-write-wins baseline: the updatedAt the client edited from. If the
     // server has moved past it, the PUT returns 409 (ApiError 409) and the
     // sync engine reconciles by taking the server's version.

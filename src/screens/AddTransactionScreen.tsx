@@ -37,13 +37,16 @@ import type { Category, Transaction, TransactionType } from '../types';
 
 type Props = StackScreenProps<MainStackParamList, 'AddTransaction'>;
 
-const MAX_AMOUNT = 10_000_000; // 1 crore in smallest currency unit (D5)
+const MAX_AMOUNT = 10_000_000; // 1 crore / $10M in major currency units (D5)
 const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'del'] as const;
+// Cents-based locales (USD/GBP/AUD) swap the dead key for a decimal point.
+const KEYS_DECIMAL = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', 'del'] as const;
 
 /**
  * Fast Entry (Sprint 2, Commit 3). Keypad-first, amount-and-direction-only
  * happy path: a Spent/Received toggle, a big Fraunces amount with a blinking
- * caret, an in-app numeric keypad (no decimal — whole rupees, D5), and Save.
+ * caret, an in-app numeric keypad (decimal point only for cents-based
+ * locales — INR stays whole-rupee, D5), and Save.
  * Everything else is an optional chip. The voice + MerchantDB + Gemini parse
  * pipeline is preserved (D1) behind the note chip: typing/speaking a
  * description auto-fills the category. Writes go through DataContext, which is
@@ -52,7 +55,7 @@ const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'del'] as co
 export default function AddTransactionScreen({ navigation, route }: Props) {
   const params = route.params as
     | { type?: 'expense' | 'income'; prefill?: { amount?: number; description?: string; category?: string } }
-    | { editTransaction: { id: string; type: 'expense' | 'income'; amount: number; category: string; description: string; note: string; date: string } }
+    | { editTransaction: { id: string; type: 'expense' | 'income'; amount: number; category: string; description: string; note: string; date: string; isRecurring?: boolean; recurrenceRule?: Transaction['recurrenceRule'] } }
     | undefined;
   const editTxn = params && 'editTransaction' in params ? params.editTransaction : null;
   const prefill = params && !('editTransaction' in params) ? (params as { prefill?: { amount?: number; description?: string; category?: string } }).prefill : undefined;
@@ -80,9 +83,14 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
     editTxn?.category ?? prefill?.category ?? (initialType === 'expense' ? 'food' : 'salary')
   );
   const [date, setDate] = useState(editTxn?.date ?? todayISO());
-  // Recurring — only applies to new entries, not edits.
+  // Recurring — applies to new entries; in edit mode only recurring TEMPLATES
+  // (opened from Recurring Payments) expose their schedule, as rule pills
+  // without the toggle (stopping a series happens on that screen instead).
+  const editingTemplate = !!editTxn?.isRecurring;
   const [isRecurring, setIsRecurring] = React.useState(false);
-  const [recurrenceRule, setRecurrenceRule] = React.useState<Transaction['recurrenceRule']>('monthly');
+  const [recurrenceRule, setRecurrenceRule] = React.useState<Transaction['recurrenceRule']>(
+    editTxn?.recurrenceRule ?? 'monthly'
+  );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
@@ -238,11 +246,19 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
       return;
     }
     if (k === '') return;
+    if (k === '.') {
+      // Decimal point: cents locales only, one per amount, never leading.
+      if (!locale.usesDecimalAmounts) return;
+      setAmount((a) => (a === '' || a.includes('.')) ? a : a + '.');
+      return;
+    }
     setAmount((a) => {
       if (a === '' && k === '0') return a; // no leading zero
+      const dot = a.indexOf('.');
+      if (dot >= 0 && a.length - dot > 2) return a; // max 2 decimal places
       const next = a + k;
       if (Number(next) > MAX_AMOUNT) return a;
-      if (next.length > 8) return a;
+      if (next.length > 8 + (dot >= 0 ? 3 : 0)) return a;
       return next;
     });
   };
@@ -270,6 +286,8 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
           description: description.trim(),
           note: note.trim(),
           date,
+          // Template edits may also change the schedule (rule pills shown).
+          ...(editingTemplate && recurrenceRule && { recurrenceRule }),
         });
         if (!outcome.ok) {
           haptics.error();
@@ -326,6 +344,11 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
         style={{ flex: 1 }}
         behavior="padding"
         keyboardVerticalOffset={insets.top}
+      >
+      <ScrollView
+        contentContainerStyle={styles.formContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
         {/* Header */}
       <View style={styles.header}>
@@ -416,20 +439,25 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
         </TouchableOpacity>
       </View>
 
-      {/* Recurring toggle — new entries only */}
-      {!isEdit && (
+      {/* Recurring toggle — new entries; schedule pills — template edits */}
+      {(!isEdit || editingTemplate) && (
         <View>
-          <View style={styles.recurringRow}>
-            <Text style={styles.recurringLabel}>Repeat</Text>
-            <Switch
-              value={isRecurring}
-              onValueChange={(v) => { haptics.light(); setIsRecurring(v); }}
-              trackColor={{ false: c.line, true: c.forest2 }}
-              thumbColor={c.cream}
-              accessibilityLabel="Repeat this transaction"
-            />
-          </View>
-          {isRecurring && (
+          {!isEdit && (
+            <View style={styles.recurringRow}>
+              <Text style={styles.recurringLabel}>Repeat</Text>
+              <Switch
+                value={isRecurring}
+                onValueChange={(v) => { haptics.light(); setIsRecurring(v); }}
+                trackColor={{ false: c.line, true: c.forest2 }}
+                thumbColor={c.cream}
+                accessibilityLabel="Repeat this transaction"
+              />
+            </View>
+          )}
+          {editingTemplate && (
+            <Text style={styles.recurringLabelRow}>Repeats</Text>
+          )}
+          {((!isEdit && isRecurring) || editingTemplate) && (
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -464,7 +492,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
 
       {/* Keypad */}
       <View style={styles.keypad}>
-        {KEYS.map((k, i) => (
+        {(locale.usesDecimalAmounts ? KEYS_DECIMAL : KEYS).map((k, i) => (
           <TouchableOpacity
             key={i}
             style={[styles.key, k === '' && styles.keyEmpty]}
@@ -490,6 +518,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
       >
         <Text style={styles.saveText}>{isEdit ? 'Update entry' : 'Save entry'}</Text>
       </TouchableOpacity>
+      </ScrollView>
       </KeyboardAvoidingView>
 
       {/* Toast */}
@@ -628,6 +657,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
 
 const makeStyles = (c: Palette) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: c.cream, paddingHorizontal: 22 },
+  formContent: { flexGrow: 1, paddingBottom: 12 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -793,6 +823,14 @@ const makeStyles = (c: Palette) => StyleSheet.create({
     marginBottom: 6,
   },
   recurringLabel: { fontFamily: font.bodyMed, fontSize: 14, color: c.ink },
+  recurringLabelRow: {
+    fontFamily: font.bodyBold,
+    fontSize: ftype.eyebrow,
+    letterSpacing: 1.6,
+    textTransform: 'uppercase',
+    color: c.inkFaint,
+    marginBottom: 8,
+  },
   rulePills: { paddingHorizontal: 2, gap: 8, paddingBottom: 6 },
   rulePill: {
     borderWidth: 1,

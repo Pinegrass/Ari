@@ -22,6 +22,8 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';
 import EmptyState from '../components/ui/EmptyState';
 import ErrorBanner from '../components/ui/ErrorBanner';
 import Button from '../components/ui/Button';
+import Icon from '../components/ui/Icon';
+import ProgressBar from '../components/ui/ProgressBar';
 import { font } from '../theme/tokens';
 import { useColors } from '../context/ThemeContext';
 import type { Palette } from '../theme/palettes';
@@ -29,10 +31,12 @@ import { usePrivacy } from '../context/PrivacyContext';
 import { getCurrentMonth } from '../utils/dateHelpers';
 import { useHaptics } from '../hooks/useHaptics';
 import { useLocale } from '../hooks/useLocale';
+import { parseAmountInput } from '../utils/locale';
+import { effectiveProgress } from '../utils/budgetRollover';
 import type { Budget } from '../types';
 
 export default function BudgetScreen() {
-  const { budgets, loadingData, refreshing, fetchBudgets, saveBudget, deleteBudget, refresh, userCategories, fetchUserCategories } =
+  const { budgets, overallBudget, loadingData, refreshing, fetchBudgets, saveBudget, deleteBudget, saveOverallBudget, refresh, userCategories, fetchUserCategories } =
     useData();
   const { locale } = useLocale();
   const haptics = useHaptics();
@@ -50,6 +54,12 @@ export default function BudgetScreen() {
   const [toDelete, setToDelete] = useState<Budget | null>(null);
   const [deleting, setDeleting] = useState(false);
 
+  // Overall monthly budget
+  const [showOverallModal, setShowOverallModal] = useState(false);
+  const [overallLimit, setOverallLimit] = useState('');
+  const [savingOverall, setSavingOverall] = useState(false);
+  const [overallError, setOverallError] = useState('');
+
   useFocusEffect(
     useCallback(() => {
       fetchBudgets();
@@ -59,7 +69,14 @@ export default function BudgetScreen() {
 
   const totalBudget = budgets.reduce((s, b) => s + b.limit, 0);
   const totalSpent = budgets.reduce((s, b) => s + b.spent, 0);
-  const overBudgetCount = budgets.filter((b) => b.percentage > 100).length;
+  const overBudgetCount = budgets.filter(
+    (b) => effectiveProgress(b.spent, b.available ?? b.limit).isOver
+  ).length;
+
+  const overallSet = overallBudget?.limit != null && overallBudget.limit > 0;
+  const overallProg = overallSet
+    ? effectiveProgress(overallBudget!.spent, overallBudget!.limit!)
+    : null;
 
   const openAdd = () => {
     setEditBudget(null);
@@ -79,8 +96,8 @@ export default function BudgetScreen() {
 
   const handleSave = async () => {
     setError('');
-    const lmt = parseFloat(limit);
-    if (!limit || isNaN(lmt) || lmt <= 0) {
+    const lmt = parseAmountInput(limit, locale);
+    if (lmt === null) {
       setError('Enter a valid budget amount');
       return;
     }
@@ -110,6 +127,46 @@ export default function BudgetScreen() {
     }
   };
 
+  // Overall monthly budget handlers
+  const openOverallEdit = () => {
+    setOverallLimit(overallBudget?.limit != null ? String(overallBudget.limit) : '');
+    setOverallError('');
+    setShowOverallModal(true);
+  };
+
+  const handleSaveOverall = async () => {
+    setOverallError('');
+    const lmt = parseAmountInput(overallLimit, locale);
+    if (lmt === null) {
+      setOverallError('Enter a valid budget amount');
+      return;
+    }
+    setSavingOverall(true);
+    try {
+      await saveOverallBudget({ month: getCurrentMonth(), limit: lmt });
+      haptics.medium();
+      setShowOverallModal(false);
+    } catch {
+      setOverallError('Failed to save overall budget');
+    } finally {
+      setSavingOverall(false);
+    }
+  };
+
+  const handleClearOverall = async () => {
+    setOverallError('');
+    setSavingOverall(true);
+    try {
+      await saveOverallBudget({ month: getCurrentMonth(), limit: null });
+      haptics.medium();
+      setShowOverallModal(false);
+    } catch {
+      setOverallError('Failed to clear overall budget');
+    } finally {
+      setSavingOverall(false);
+    }
+  };
+
   return (
     <ScreenShell edges={['top']} backgroundColor={c.cream}>
       <ScrollView
@@ -131,6 +188,47 @@ export default function BudgetScreen() {
             <Text style={styles.addBtnText}>+ Add</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Overall monthly budget */}
+        {overallSet && overallProg ? (
+          <View style={styles.overallCard}>
+            <View style={styles.overallHeader}>
+              <Text style={styles.overallTitle}>Overall Monthly Budget</Text>
+              <TouchableOpacity
+                onPress={openOverallEdit}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                accessibilityLabel="Edit overall budget"
+                accessibilityRole="button"
+              >
+                <Icon name="edit" size={16} color={c.inkSoft} />
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.overallMeta}>
+              {formatAmount(overallBudget!.spent)} of {formatAmount(overallBudget!.limit!)}
+            </Text>
+            <ProgressBar
+              percentage={overallProg.percentage}
+              color={overallProg.isOver ? c.clay : c.forest}
+            />
+            <Text style={[styles.overallRemaining, overallProg.isOver ? styles.danger : null]}>
+              {overallProg.isOver
+                ? `${formatAmount(Math.abs(overallProg.remaining))} over`
+                : `${formatAmount(overallProg.remaining)} left`}
+            </Text>
+          </View>
+        ) : (
+          <TouchableOpacity
+            style={styles.overallSetCard}
+            onPress={openOverallEdit}
+            activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel="Set an overall monthly budget"
+          >
+            <Icon name="target" size={18} color={c.forest} />
+            <Text style={styles.overallSetText}>Set an overall monthly budget</Text>
+            <Icon name="chevron-right" size={16} color={c.inkFaint} />
+          </TouchableOpacity>
+        )}
 
         {/* Summary */}
         {budgets.length > 0 && (
@@ -226,7 +324,7 @@ export default function BudgetScreen() {
                 onChangeText={setLimit}
                 placeholder="5000"
                 placeholderTextColor={c.inkFaint}
-                keyboardType="numeric"
+                keyboardType={locale.usesDecimalAmounts ? 'decimal-pad' : 'numeric'}
                 returnKeyType="done"
                 selectionColor={c.forest}
                 onSubmitEditing={handleSave}
@@ -236,6 +334,56 @@ export default function BudgetScreen() {
             <Button onPress={handleSave} loading={saving} fullWidth style={{ marginTop: 24 }}>
               {editBudget ? 'Update Budget' : 'Set Budget'}
             </Button>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
+
+      {/* Overall Budget Modal */}
+      <Modal visible={showOverallModal} transparent animationType="slide" onRequestClose={() => setShowOverallModal(false)}>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+          <TouchableOpacity
+            style={styles.modalOverlay}
+            onPress={() => setShowOverallModal(false)}
+            activeOpacity={1}
+          />
+          <View style={[styles.modalSheet, { paddingBottom: Math.max(insets.bottom, 24) + 16 }]}>
+            <View style={styles.modalHandle} />
+            <Text style={styles.modalTitle}>Overall Monthly Budget</Text>
+
+            <ErrorBanner message={overallError} />
+
+            <Text style={styles.sectionLabel}>Total spending limit ({locale.symbol})</Text>
+            <View style={styles.limitRow}>
+              <Text style={styles.rupee}>{locale.symbol}</Text>
+              <TextInput
+                style={styles.limitInput}
+                value={overallLimit}
+                onChangeText={setOverallLimit}
+                placeholder="30000"
+                placeholderTextColor={c.inkFaint}
+                keyboardType={locale.usesDecimalAmounts ? 'decimal-pad' : 'numeric'}
+                returnKeyType="done"
+                selectionColor={c.forest}
+                onSubmitEditing={handleSaveOverall}
+              />
+            </View>
+
+            <Button onPress={handleSaveOverall} loading={savingOverall} fullWidth style={{ marginTop: 24 }}>
+              {overallSet ? 'Update Overall Budget' : 'Set Overall Budget'}
+            </Button>
+            {overallSet && (
+              <TouchableOpacity
+                onPress={handleClearOverall}
+                style={styles.clearBtn}
+                disabled={savingOverall}
+                accessibilityRole="button"
+              >
+                <Text style={styles.clearBtnText}>Clear overall budget</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </KeyboardAvoidingView>
       </Modal>
@@ -276,6 +424,27 @@ const makeStyles = (c: Palette) => StyleSheet.create({
   summaryLabel: { fontFamily: font.body, fontSize: 12, color: c.inkSoft, marginBottom: 4 },
   summaryValue: { fontFamily: font.displaySemi, fontSize: 20, color: c.ink },
   danger: { color: c.clay },
+  overallCard: {
+    backgroundColor: c.card, borderRadius: 16,
+    borderWidth: 1, borderColor: c.line,
+    padding: 16, marginBottom: 20,
+  },
+  overallHeader: {
+    flexDirection: 'row', justifyContent: 'space-between',
+    alignItems: 'center', marginBottom: 6,
+  },
+  overallTitle: { fontFamily: font.bodySemi, fontSize: 14, color: c.ink },
+  overallMeta: { fontFamily: font.body, fontSize: 12, color: c.inkSoft, marginBottom: 10 },
+  overallRemaining: { fontFamily: font.body, fontSize: 12, color: c.inkSoft, marginTop: 8 },
+  overallSetCard: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    backgroundColor: c.card, borderRadius: 16,
+    borderWidth: 1, borderColor: c.line, borderStyle: 'dashed',
+    padding: 16, marginBottom: 20,
+  },
+  overallSetText: { flex: 1, fontFamily: font.bodySemi, fontSize: 14, color: c.ink },
+  clearBtn: { marginTop: 16, alignItems: 'center', paddingVertical: 8 },
+  clearBtnText: { fontFamily: font.bodySemi, fontSize: 14, color: c.clay },
   overWarning: {
     marginTop: 12, backgroundColor: c.clayTint,
     borderRadius: 8, padding: 10, borderWidth: 1, borderColor: c.line,

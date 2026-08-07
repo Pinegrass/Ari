@@ -91,6 +91,25 @@ describe('apiRequest', () => {
     expect(result).toEqual(expected);
   });
 
+  it.each(['GET', 'PUT', 'PATCH', 'DELETE'])('retries one transient network failure for idempotent %s', async (method) => {
+    mockFetch
+      .mockRejectedValueOnce(new Error('radio transition'))
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({ recovered: true }),
+      });
+
+    await expect(apiRequest('/safe-mutation', { method })).resolves.toEqual({ recovered: true });
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not retry POST after a network failure', async () => {
+    mockFetch.mockRejectedValueOnce(new Error('radio transition'));
+
+    await expect(apiRequest('/transactions', { method: 'POST' })).rejects.toMatchObject({ status: 0 });
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+  });
+
   it('propagates 401 with correct status', async () => {
     mockFetch.mockResolvedValue({
       ok: false,

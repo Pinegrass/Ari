@@ -11,6 +11,10 @@
  * Catch-up: if a template was created months ago, every missed instance up to
  * and including today is generated. Capped at MAX_INSTANCES per call to
  * prevent runaway on very old data.
+ *
+ * Skip-on-resume: a template resumed after a pause carries `resumeFrom`
+ * (stamped at resume time). Due dates before it belong to the pause window
+ * and are never generated — they also don't consume the MAX_INSTANCES cap.
  */
 import { localStore } from './localStore';
 import type { Transaction } from '../types';
@@ -80,11 +84,13 @@ export async function checkAndGenerateDue(
   }
 
   // Templates: isRecurring=true, no parentRecurringId, must have a recurrenceRule.
+  // Paused templates generate nothing until resumed.
   const templates = transactions.filter(
     (t): t is Transaction & { recurrenceRule: NonNullable<Transaction['recurrenceRule']> } =>
       t.isRecurring === true &&
       t.parentRecurringId == null &&
-      t.recurrenceRule != null
+      t.recurrenceRule != null &&
+      t.isPaused !== true
   );
 
   const created: Transaction[] = [];
@@ -98,6 +104,8 @@ export async function checkAndGenerateDue(
 
     let cursor = parseLocalDate(templateDateStr);
     let count = 0;
+    // Skip-on-resume: due dates before resumeFrom are in the pause window.
+    const resumeFrom = template.resumeFrom ? parseLocalDate(template.resumeFrom) : null;
 
     // Walk forward from the template date, generating every missed due date up
     // to and including today.
@@ -106,6 +114,11 @@ export async function checkAndGenerateDue(
       const nextDateStr = toDateOnly(nextDate);
 
       if (nextDate > todayDate) break; // not due yet — stop
+
+      if (resumeFrom && nextDate < resumeFrom) {
+        cursor = nextDate; // pause window — skip without consuming the cap
+        continue;
+      }
 
       const key = `${template.id}:${nextDateStr}`;
       if (!existingKeys.has(key)) {
@@ -172,6 +185,43 @@ export interface RecurringProjection {
 const PROJECT_GUARD = 600; // cap the walk (weekly over years) against bad data
 
 /**
+ * Walk a template forward to its first occurrence strictly after `now` (a
+ * future-dated template stays put — its start date is the first occurrence).
+ * No window cap, unlike projectUpcomingRecurring — used by the Recurring
+ * Payments screen to show a next-due date for every active template.
+ */
+export function nextDueForTemplate(
+  template: Transaction & { recurrenceRule: NonNullable<Transaction['recurrenceRule']> },
+  now: Date,
+): RecurringProjection {
+  const todayStr = toDateOnly(now);
+  const today = parseLocalDate(todayStr);
+  const todayMs = today.getTime();
+
+  const templateDateStr =
+    typeof template.date === 'string'
+      ? template.date
+      : toDateOnly(template.date as unknown as Date);
+
+  let cursor = parseLocalDate(templateDateStr);
+  let guard = 0;
+  while (cursor.getTime() <= todayMs && guard < PROJECT_GUARD) {
+    cursor = nextDueDate(cursor, template.recurrenceRule);
+    guard++;
+  }
+
+  return {
+    templateId: template.id,
+    name: template.description || template.category,
+    amount: template.amount,
+    category: template.category,
+    type: template.type,
+    nextDueDate: toDateOnly(cursor),
+    daysUntil: Math.round((cursor.getTime() - todayMs) / 86_400_000),
+  };
+}
+
+/**
  * Project the NEXT future occurrence of each recurring template within
  * `withinDays` days. Unlike checkAndGenerateDue this creates nothing — it's a
  * read-only look-ahead that drives the "Upcoming charges" surfaces. The next
@@ -189,7 +239,10 @@ export function projectUpcomingRecurring(
 
   const templates = transactions.filter(
     (t): t is Transaction & { recurrenceRule: NonNullable<Transaction['recurrenceRule']> } =>
-      t.isRecurring === true && t.parentRecurringId == null && t.recurrenceRule != null,
+      t.isRecurring === true &&
+      t.parentRecurringId == null &&
+      t.recurrenceRule != null &&
+      t.isPaused !== true,
   );
 
   const out: RecurringProjection[] = [];

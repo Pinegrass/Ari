@@ -13,19 +13,29 @@ import Icon from '../components/ui/Icon';
 import type { IconName } from '../components/ui/Icon';
 import { color, font } from '../theme/tokens';
 import { useHaptics } from '../hooks/useHaptics';
+import { useAuth } from '../context/AuthContext';
 import type { MainStackParamList } from '../navigation/navigationTypes';
 
 type Nav = StackNavigationProp<MainStackParamList>;
 
 interface ModuleItem {
-  key: keyof MainStackParamList;
+  key: keyof MainStackParamList | 'Transactions';
   icon: IconName;
   iconColor: string;
   title: string;
   subtitle: string;
+  /** ISO country codes this module applies to. Omit for universal modules. */
+  countries?: string[];
 }
 
 const MODULES: ModuleItem[] = [
+  {
+    key: 'Transactions',
+    icon: 'trending-up',
+    iconColor: color.forest,
+    title: 'Trends & Insights',
+    subtitle: 'Spending patterns, categories and recent activity',
+  },
   {
     key: 'SmartLedger',
     icon: 'list',
@@ -60,6 +70,9 @@ const MODULES: ModuleItem[] = [
     iconColor: color.moss,
     title: 'Tax Estimator',
     subtitle: 'Old vs New regime, 80C/80D, HRA, GST',
+    // Indian tax law (FY slabs, 80C/80D, HRA, GST) — meaningless elsewhere.
+    // Other markets get their own estimator when tax rules are modelled.
+    countries: ['IN'],
   },
   {
     key: 'PnlReport',
@@ -82,24 +95,46 @@ const MODULES: ModuleItem[] = [
     title: 'Shared Expenses',
     subtitle: 'Split with friends, settle via UPI',
   },
+  {
+    key: 'TodoNotes',
+    icon: 'edit',
+    iconColor: color.moss,
+    title: 'To-do Notes',
+    subtitle: 'Track financial tasks and due dates',
+  },
 ];
 
-export default function AccountantScreen() {
+/** Modules visible for a user's country (defaults to IN, the origin market). */
+export function visibleModules(country: string | null | undefined): ModuleItem[] {
+  const c = country ?? 'IN';
+  return MODULES.filter((m) => !m.countries || m.countries.includes(c));
+}
+
+interface AccountantScreenProps {
+  embedded?: boolean;
+}
+
+export default function AccountantScreen({ embedded = false }: AccountantScreenProps) {
   const navigation = useNavigation<Nav>();
   const haptics = useHaptics();
+  const { user } = useAuth();
+  const country = user?.country ?? 'IN';
+  const modules = visibleModules(country);
 
   return (
     <ScreenShell edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backBtn}
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
-        >
-          <Icon name="arrow-left" size={22} color={color.ink} />
-        </TouchableOpacity>
+        {!embedded && (
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backBtn}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+          >
+            <Icon name="arrow-left" size={22} color={color.ink} />
+          </TouchableOpacity>
+        )}
         <View>
           <Text style={styles.headerTitle}>Ari Accountant</Text>
           <Text style={styles.headerSub}>Your personal finance toolkit</Text>
@@ -110,7 +145,7 @@ export default function AccountantScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {MODULES.map((mod) => (
+        {modules.map((mod) => (
           <TouchableOpacity
             key={mod.key}
             style={styles.moduleCard}
@@ -119,7 +154,11 @@ export default function AccountantScreen() {
             accessibilityLabel={mod.title}
             onPress={() => {
               haptics.light();
-              navigation.navigate(mod.key as any);
+              if (mod.key === 'Transactions') {
+                navigation.navigate('Tabs', { screen: 'Transactions' });
+              } else {
+                navigation.navigate(mod.key as any);
+              }
             }}
           >
             <View style={[styles.iconBox, { backgroundColor: mod.iconColor + '20' }]}>
@@ -127,7 +166,11 @@ export default function AccountantScreen() {
             </View>
             <View style={styles.moduleText}>
               <Text style={styles.moduleTitle}>{mod.title}</Text>
-              <Text style={styles.moduleSub}>{mod.subtitle}</Text>
+              <Text style={styles.moduleSub}>
+                {mod.key === 'Groups' && country !== 'IN'
+                  ? 'Split expenses with friends'
+                  : mod.subtitle}
+              </Text>
             </View>
             <Icon name="chevron-right" size={18} color={color.inkFaint} />
           </TouchableOpacity>

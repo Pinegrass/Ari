@@ -104,8 +104,17 @@ export async function apiRequest<T>(
   path: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const first = await _doRequest<T>(path, options);
+  let first = await _doRequest<T>(path, options);
   if (first.ok) return first.data;
+
+  // A brief radio/DNS transition should not make safe reads or idempotent
+  // mutations fail. Retry exactly once for methods the server can repeat
+  // without duplicating financial records. POST is deliberately excluded.
+  const method = (options.method ?? 'GET').toUpperCase();
+  if (first.status === 0 && ['GET', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+    first = await _doRequest<T>(path, options);
+    if (first.ok) return first.data;
+  }
 
   // On 401, try once to refresh the session and retry. Anything else
   // (network, 4xx that isn't 401, 5xx) propagates without retry. We

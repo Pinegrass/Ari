@@ -9,7 +9,7 @@
  *
  * localStore.create is mocked so no AsyncStorage plumbing is required.
  */
-import { checkAndGenerateDue } from '../recurringEngine';
+import { checkAndGenerateDue, projectUpcomingRecurring, nextDueForTemplate } from '../recurringEngine';
 import { localStore } from '../localStore';
 import type { Transaction } from '../../types';
 
@@ -282,5 +282,159 @@ describe('checkAndGenerateDue', () => {
 
     expect(mockCreate).not.toHaveBeenCalled();
     expect(result).toHaveLength(0);
+  });
+
+  // ── Paused templates (Phase 1 recurring management) ──────────────────────
+
+  it('skips a paused template that would otherwise be due', async () => {
+    const template = makeTemplate({ date: daysAgo(35), isPaused: true });
+
+    const result = await checkAndGenerateDue([template]);
+
+    expect(mockCreate).not.toHaveBeenCalled();
+    expect(result).toHaveLength(0);
+  });
+
+  it('still generates for active templates alongside paused ones', async () => {
+    const templateDate = daysAgo(35);
+    const instanceDate = addMonthsToStr(templateDate, 1);
+    queueCreateResult(instanceDate);
+
+    const paused = makeTemplate({ id: 'paused-1', date: templateDate, isPaused: true });
+    const active = makeTemplate({ date: templateDate });
+
+    const result = await checkAndGenerateDue([paused, active]);
+
+    expect(mockCreate).toHaveBeenCalledTimes(1);
+    expect(result).toHaveLength(1);
+    expect(result[0].parentRecurringId).toBe('template-1');
+  });
+
+  // ── Skip-on-resume (resumeFrom) ───────────────────────────────────────────
+
+  it('skips due dates before resumeFrom and generates only later ones', async () => {
+    // Monthly template ~90 days old, resumed 10 days ago → the two older
+    // monthly dues are in the pause window; only the latest due survives.
+    const templateDate = addMonthsToStr(daysAgo(0), -3);
+    const resumeFrom = daysAgo(10);
+
+    // Walk like the engine to find the expected due dates >= resumeFrom.
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const resumeDate = new Date(resumeFrom + 'T00:00:00');
+    let cursor = new Date(templateDate + 'T00:00:00');
+    const expected: string[] = [];
+    while (expected.length < 24) {
+      const targetDay = cursor.getDate();
+      const next = new Date(cursor);
+      next.setMonth(next.getMonth() + 1);
+      if (next.getDate() !== targetDay) next.setDate(0);
+      if (next > today) break;
+      if (next >= resumeDate) {
+        expected.push(
+          [next.getFullYear(), String(next.getMonth() + 1).padStart(2, '0'), String(next.getDate()).padStart(2, '0')].join('-')
+        );
+      }
+      cursor = next;
+    }
+    expect(expected.length).toBeGreaterThanOrEqual(1);
+    expect(expected.length).toBeLessThanOrEqual(2);
+
+    expected.forEach((d, i) => queueCreateResult(d, String(i + 1)));
+
+    const template = makeTemplate({ date: templateDate, resumeFrom });
+    const result = await checkAndGenerateDue([template]);
+
+    expect(mockCreate).toHaveBeenCalledTimes(expected.length);
+    expect(result).toHaveLength(expected.length);
+    mockCreate.mock.calls.forEach((call) => {
+      expect(call[0].date >= resumeFrom).toBe(true);
+    });
+  });
+
+  it('generates a due that lands exactly on the resumeFrom day', async () => {
+    // Template exactly one month old → next due is today. resumeFrom = today
+    // means "skip strictly-before", so today's charge IS generated.
+    const templateDate = addMonthsToStr(daysAgo(0), -1);
+    const resumeFrom = daysAgo(0);
+
+    queueCreateResult(resumeFrom);
+
+    const template = makeTemplate({ date: templateDate, resumeFrom });
+    const result = await checkAndGenerateDue([template]);
+
+    expect(mockCreate).toHaveBeenCalledTimes(1);
+    expect(result).toHaveLength(1);
+    expect(mockCreate.mock.calls[0][0].date).toBe(resumeFrom);
+  });
+
+  it('skipped pause-window dues do not consume the catch-up cap', async () => {
+    // Weekly template ~30 weeks old: 29 dues are in the pause window. If skips
+    // counted against MAX_INSTANCES (24) the walk would stop before reaching
+    // the resume window and generate nothing.
+    const templateDate = daysAgo(210);
+    const resumeFrom = daysAgo(18);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const resumeDate = new Date(resumeFrom + 'T00:00:00');
+    const expected: string[] = [];
+    let cursor = new Date(templateDate + 'T00:00:00');
+    for (let guard = 0; guard < 600; guard++) {
+      const next = new Date(cursor.getTime() + 7 * 24 * 60 * 60 * 1000);
+      if (next > today) break;
+      if (next >= resumeDate) {
+        expected.push(
+          [next.getFullYear(), String(next.getMonth() + 1).padStart(2, '0'), String(next.getDate()).padStart(2, '0')].join('-')
+        );
+      }
+      cursor = next;
+    }
+    // ~18 days of weekly dues → 2 or 3 instances.
+    expect(expected.length).toBeGreaterThanOrEqual(2);
+    expect(expected.length).toBeLessThanOrEqual(3);
+
+    expected.forEach((d, i) => queueCreateResult(d, String(i + 1)));
+
+    const template = makeTemplate({ date: templateDate, recurrenceRule: 'weekly', resumeFrom });
+    const result = await checkAndGenerateDue([template]);
+
+    expect(mockCreate).toHaveBeenCalledTimes(expected.length);
+    expect(result).toHaveLength(expected.length);
+  });
+});
+
+describe('projectUpcomingRecurring — pause handling', () => {
+  it('excludes paused templates from the projection', () => {
+    const now = new Date();
+    const active = makeTemplate({ date: daysAgo(3) });
+    const paused = makeTemplate({ id: 'paused-1', date: daysAgo(3), isPaused: true });
+
+    const out = projectUpcomingRecurring([active, paused], now, 30);
+
+    expect(out.map((p) => p.templateId)).toEqual(['template-1']);
+  });
+});
+
+describe('nextDueForTemplate', () => {
+  it('returns the first occurrence strictly after now', () => {
+    const now = new Date();
+    const template = makeTemplate({ date: daysAgo(35) });
+
+    const proj = nextDueForTemplate(template as Transaction & { recurrenceRule: 'monthly' }, now);
+
+    expect(proj.templateId).toBe('template-1');
+    expect(proj.daysUntil).toBeGreaterThan(0);
+    // A monthly template's next occurrence is always within 31 days.
+    expect(proj.daysUntil).toBeLessThanOrEqual(31);
+  });
+
+  it('keeps a future-dated template at its start date', () => {
+    const now = new Date('2026-08-02T12:00:00');
+    const template = makeTemplate({ date: '2026-12-25' });
+
+    const proj = nextDueForTemplate(template as Transaction & { recurrenceRule: 'monthly' }, now);
+
+    expect(proj.nextDueDate).toBe('2026-12-25');
   });
 });

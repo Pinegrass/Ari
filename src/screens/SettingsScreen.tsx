@@ -15,6 +15,7 @@ import {
   KeyboardAvoidingView,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Constants from 'expo-constants';
 import ScreenShell from '../components/ScreenShell';
 import { useAuth } from '../context/AuthContext';
 import { color, font } from '../theme/tokens';
@@ -85,7 +86,7 @@ function formatTime12h(hour: number, minute: number): string {
 }
 
 export default function SettingsScreen() {
-  const { user, logout } = useAuth();
+  const { user, logout, updateProfile } = useAuth();
   const haptics = useHaptics();
   const insets = useSafeAreaInsets();
   const { isAvailable: biometricAvailable, isEnabled: biometricEnabled, toggleBiometric } = useBiometric();
@@ -106,6 +107,12 @@ export default function SettingsScreen() {
   const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
   const [subScreen, setSubScreen] = useState<SubScreen>('main');
 
+  // Profile editor — the backend already supports PATCH /auth/me; expose it
+  // here so every account can correct its display name without re-registering.
+  const [profileVisible, setProfileVisible] = useState(false);
+  const [profileName, setProfileName] = useState(user?.name ?? '');
+  const [profileLoading, setProfileLoading] = useState(false);
+
   // Feedback state
   const [feedbackVisible, setFeedbackVisible] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState('');
@@ -121,6 +128,46 @@ export default function SettingsScreen() {
   const [deletePassword, setDeletePassword] = useState('');
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDeletePassword, setShowDeletePassword] = useState(false);
+
+  const handleCountryChange = async (country: string) => {
+    if (country === user?.country) return;
+    haptics.light();
+    try {
+      // Backend also syncs currency to the new locale; the returned user
+      // lands in context, so every useLocale() consumer re-renders.
+      await updateProfile({ country });
+      track('country_changed', { country });
+      haptics.success();
+    } catch {
+      haptics.error();
+      Alert.alert('Could not update country', 'Check your connection and try again.');
+    }
+  };
+
+  const handleOpenProfile = () => {
+    haptics.light();
+    setProfileName(user?.name ?? '');
+    setProfileVisible(true);
+  };
+
+  const handleSaveProfile = async () => {
+    const name = profileName.trim();
+    if (!name) {
+      Alert.alert('Name required', 'Enter the name you want Ari to use.');
+      return;
+    }
+    setProfileLoading(true);
+    try {
+      await updateProfile({ name });
+      haptics.success();
+      setProfileVisible(false);
+    } catch {
+      haptics.error();
+      Alert.alert('Could not update profile', 'Check your connection and try again.');
+    } finally {
+      setProfileLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
@@ -307,6 +354,12 @@ export default function SettingsScreen() {
 
   const menuItems: MenuItem[] = [
     {
+      icon: 'refresh-cw',
+      label: 'Recurring Payments',
+      subtitle: 'Pause, edit or stop repeating entries',
+      onPress: () => { haptics.light(); navigation.navigate('RecurringPayments'); },
+    },
+    {
       icon: 'sparkles',
       label: isSubscribed ? `Ari ${tier[0].toUpperCase() + tier.slice(1)}` : 'Upgrade to Ari Pro',
       subtitle: isSubscribed
@@ -333,7 +386,7 @@ export default function SettingsScreen() {
     { icon: 'book-open', label: 'Terms of Service', subtitle: 'Rules for using Ari', onPress: handleTerms },
     { icon: 'help-circle', label: 'Help & Support', subtitle: 'FAQs and contact us', onPress: handleHelp },
     { icon: 'star', label: 'Rate Ari', subtitle: 'Love Ari? Let us know!', onPress: handleRate },
-    { icon: 'info', label: 'About', subtitle: 'Version 1.0.0', onPress: () => { haptics.light(); setSubScreen('about'); } },
+    { icon: 'info', label: 'About', subtitle: `Version ${Constants.expoConfig?.version ?? '1.2.0'}`, onPress: () => { haptics.light(); setSubScreen('about'); } },
   ];
 
   return (
@@ -346,7 +399,13 @@ export default function SettingsScreen() {
 
         {/* Profile Card */}
         <AnimatedEntry delay={0}>
-          <View style={styles.profileCard}>
+          <TouchableOpacity
+            style={styles.profileCard}
+            onPress={handleOpenProfile}
+            activeOpacity={0.78}
+            accessibilityRole="button"
+            accessibilityLabel={`Edit profile name. Current name ${user?.name ?? 'User'}`}
+          >
             <View style={styles.avatarLarge}>
               <Text style={styles.avatarInitial}>
                 {(user?.name ?? 'U')[0].toUpperCase()}
@@ -356,7 +415,11 @@ export default function SettingsScreen() {
               <Text style={styles.profileName}>{user?.name ?? 'User'}</Text>
               <Text style={styles.profileEmail}>{user?.email}</Text>
             </View>
-          </View>
+            <View style={styles.profileEdit}>
+              <Icon name="edit" size={18} color={color.forest} />
+              <Text style={styles.profileEditText}>Edit</Text>
+            </View>
+          </TouchableOpacity>
         </AnimatedEntry>
 
         {/* Profile Details */}
@@ -378,6 +441,20 @@ export default function SettingsScreen() {
                 {i < arr.length - 1 && <View style={styles.separator} />}
               </View>
             ))}
+          </View>
+        </AnimatedEntry>
+
+        {/* Country / Locale — drives currency, number format, and which
+            country-specific toolkits (e.g. Indian Tax Estimator) appear */}
+        <AnimatedEntry delay={110}>
+          <View style={styles.menuCard}>
+            <CountryPicker
+              value={user?.country ?? 'IN'}
+              onChange={handleCountryChange}
+            />
+            <Text style={styles.countryHint}>
+              Sets your currency, number format, and locale-specific tools.
+            </Text>
           </View>
         </AnimatedEntry>
 
@@ -632,6 +709,53 @@ export default function SettingsScreen() {
         />
       )}
 
+      {/* ── Profile Modal ──────────────────────────────────────────── */}
+      <Modal visible={profileVisible} transparent animationType="slide" onRequestClose={() => setProfileVisible(false)}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalOverlay}
+        >
+          <View style={[styles.modalContent, { paddingBottom: Math.max(insets.bottom, 24) }]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Edit profile</Text>
+              <TouchableOpacity
+                onPress={() => setProfileVisible(false)}
+                accessibilityRole="button"
+                accessibilityLabel="Close profile editor"
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <Icon name="x" size={22} color={color.inkSoft} />
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.modalSubtitle}>This is the name Ari and Tomo use across the app.</Text>
+            <Text style={styles.fieldLabel}>Display name</Text>
+            <TextInput
+              style={styles.profileInput}
+              value={profileName}
+              onChangeText={setProfileName}
+              placeholder="Your name"
+              placeholderTextColor={color.inkFaint}
+              autoCapitalize="words"
+              autoCorrect={false}
+              maxLength={80}
+              returnKeyType="done"
+              onSubmitEditing={() => { void handleSaveProfile(); }}
+              accessibilityLabel="Profile display name"
+              testID="profile-name-input"
+            />
+            <TouchableOpacity
+              style={[styles.submitBtn, (!profileName.trim() || profileLoading) && styles.submitBtnDisabled]}
+              onPress={() => { void handleSaveProfile(); }}
+              disabled={!profileName.trim() || profileLoading}
+              accessibilityRole="button"
+              accessibilityLabel="Save profile"
+            >
+              {profileLoading ? <ActivityIndicator color={color.cream} /> : <Text style={styles.submitBtnText}>Save profile</Text>}
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
+
       {/* ── Feedback Modal ─────────────────────────────────────────── */}
       <Modal visible={feedbackVisible} transparent animationType="slide">
         <KeyboardAvoidingView
@@ -778,6 +902,15 @@ const styles = StyleSheet.create({
   profileInfo: { flex: 1 },
   profileName: { fontFamily: font.displaySemi, fontSize: 20, color: color.ink, marginBottom: 4 },
   profileEmail: { fontFamily: font.body, fontSize: 14, color: color.inkSoft },
+  profileEdit: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  profileEditText: { fontFamily: font.bodySemi, fontSize: 13, color: color.forest },
+  profileInput: {
+    backgroundColor: color.cream2, borderRadius: 12,
+    borderWidth: 1, borderColor: color.line,
+    paddingHorizontal: 16, paddingVertical: 14,
+    fontFamily: font.body, fontSize: 16, color: color.ink,
+    marginBottom: 20,
+  },
   detailsCard: {
     backgroundColor: color.card, borderRadius: 16,
     borderWidth: 1, borderColor: color.line,
@@ -804,6 +937,10 @@ const styles = StyleSheet.create({
   menuLabel: { fontFamily: font.bodyMed, fontSize: 15, color: color.ink },
   menuSubtitle: { fontFamily: font.body, fontSize: 12, color: color.inkSoft, marginTop: 2 },
   separator: { height: 1, backgroundColor: color.line, marginLeft: 42 },
+  countryHint: {
+    fontFamily: font.body, fontSize: 12, color: color.inkFaint,
+    paddingBottom: 14, marginTop: 2,
+  },
   segment: {
     flexDirection: 'row',
     gap: 6,

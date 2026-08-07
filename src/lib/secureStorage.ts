@@ -26,6 +26,68 @@ import * as SecureStore from 'expo-secure-store';
 // SecureStore key constraints: alphanumerics, ".", "-", "_". The legacy
 // AsyncStorage names are already compliant so we re-use them verbatim.
 const MIGRATION_FLAG_PREFIX = '__ari_migrated_';
+const CHUNK_SIZE = 1800;
+const CHUNK_META_SUFFIX = '.__chunks';
+const CHUNK_KEY_SUFFIX = '.__chunk_';
+
+async function chunkCount(key: string): Promise<number> {
+  try {
+    const raw = await SecureStore.getItemAsync(key + CHUNK_META_SUFFIX);
+    const count = raw ? Number(raw) : 0;
+    return Number.isInteger(count) && count > 0 ? count : 0;
+  } catch {
+    return 0;
+  }
+}
+
+async function removeChunks(key: string): Promise<void> {
+  const count = await chunkCount(key);
+  await Promise.all(
+    Array.from({ length: count }, (_, i) =>
+      SecureStore.deleteItemAsync(`${key}${CHUNK_KEY_SUFFIX}${i}`).catch(() => {})
+    )
+  );
+  await SecureStore.deleteItemAsync(key + CHUNK_META_SUFFIX).catch(() => {});
+}
+
+async function readSecureValue(key: string): Promise<string | null> {
+  const count = await chunkCount(key);
+  if (count > 0) {
+    const chunks = await Promise.all(
+      Array.from({ length: count }, (_, i) =>
+        SecureStore.getItemAsync(`${key}${CHUNK_KEY_SUFFIX}${i}`)
+      )
+    );
+    return chunks.every((part): part is string => part != null) ? chunks.join('') : null;
+  }
+  return SecureStore.getItemAsync(key);
+}
+
+async function writeSecureValue(key: string, value: string): Promise<void> {
+  if (value.length <= CHUNK_SIZE) {
+    await SecureStore.setItemAsync(key, value);
+    await removeChunks(key);
+    return;
+  }
+
+  const oldCount = await chunkCount(key);
+  const chunks = Array.from(
+    { length: Math.ceil(value.length / CHUNK_SIZE) },
+    (_, i) => value.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE)
+  );
+  await Promise.all(
+    chunks.map((part, i) => SecureStore.setItemAsync(`${key}${CHUNK_KEY_SUFFIX}${i}`, part))
+  );
+  await SecureStore.setItemAsync(key + CHUNK_META_SUFFIX, String(chunks.length));
+  await SecureStore.deleteItemAsync(key).catch(() => {});
+  if (oldCount > chunks.length) {
+    await Promise.all(
+      Array.from({ length: oldCount - chunks.length }, (_, i) =>
+        SecureStore.deleteItemAsync(`${key}${CHUNK_KEY_SUFFIX}${chunks.length + i}`).catch(() => {})
+      )
+    );
+  }
+}
 
 async function migrateOnce(key: string): Promise<string | null> {
   const flag = MIGRATION_FLAG_PREFIX + key;
@@ -46,7 +108,7 @@ async function migrateOnce(key: string): Promise<string | null> {
 
   if (legacy) {
     try {
-      await SecureStore.setItemAsync(key, legacy);
+      await writeSecureValue(key, legacy);
     } catch {
       // If SecureStore write fails (e.g. user disabled biometric), bail
       // without flagging migration done so we'll try again next launch.
@@ -66,7 +128,7 @@ async function migrateOnce(key: string): Promise<string | null> {
 export const secureStorage = {
   async getItem(key: string): Promise<string | null> {
     try {
-      const v = await SecureStore.getItemAsync(key);
+      const v = await readSecureValue(key);
       if (v != null) return v;
     } catch {
       /* fall through to migration */
@@ -77,7 +139,7 @@ export const secureStorage = {
   },
 
   async setItem(key: string, value: string): Promise<void> {
-    await SecureStore.setItemAsync(key, value);
+    await writeSecureValue(key, value);
     // If we just wrote a new value, mark migration done so we never copy
     // a stale legacy value over the new one on a subsequent read.
     try {
@@ -94,6 +156,7 @@ export const secureStorage = {
     } catch {
       /* noop — already gone */
     }
+    await removeChunks(key);
     try {
       await AsyncStorage.removeItem(key);
     } catch {

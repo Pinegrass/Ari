@@ -19,6 +19,7 @@ import TaxEstimatorScreen from '../screens/accountant/TaxEstimatorScreen';
 import PnlReportScreen from '../screens/accountant/PnlReportScreen';
 import TodoNotesScreen from '../screens/TodoNotesScreen';
 import BillsScreen from '../screens/BillsScreen';
+import RecurringPaymentsScreen from '../screens/RecurringPaymentsScreen';
 import DailyHeatmapScreen from '../screens/DailyHeatmapScreen';
 import PaywallScreen from '../screens/PaywallScreen';
 import GroupsListScreen from '../screens/GroupsListScreen';
@@ -64,10 +65,11 @@ const fab = StyleSheet.create({
   plus: { color: color.card, fontSize: 28, lineHeight: 32, fontFamily: font.body },
 });
 
-type RealTab = { name: Exclude<keyof TabParamList, 'Add'>; icon: IconName; label: string; component: React.ComponentType<any> };
+type RealTab = { name: Exclude<keyof TabParamList, 'Add' | 'Transactions'>; icon: IconName; label: string; component: React.ComponentType<any> };
+const AccountantTabScreen = () => <AccountantScreen embedded />;
 const TABS: RealTab[] = [
   { name: 'Dashboard',    icon: 'home',    label: 'Home',   component: DashboardScreen },
-  { name: 'Transactions', icon: 'trending-up', label: 'Trends', component: TransactionsScreen },
+  { name: 'Accountant',   icon: 'briefcase', label: 'Accountant', component: AccountantTabScreen },
   { name: 'Tomo',         icon: 'bot',     label: 'Tomo',   component: TomoScreen },
   { name: 'Settings',     icon: 'settings', label: 'More', component: SettingsScreen },
 ];
@@ -147,6 +149,14 @@ function TabNavigator() {
           }}
         />
       ))}
+
+      {/* Trends remains a routable tab destination for Home and Accountant,
+          but does not consume a sixth bottom-bar slot. */}
+      <Tab.Screen
+        name="Transactions"
+        component={TransactionsScreen}
+        options={{ tabBarButton: () => null, tabBarItemStyle: { display: 'none' } }}
+      />
     </Tab.Navigator>
   );
 }
@@ -172,6 +182,7 @@ export default function MainNavigator() {
       <Stack.Screen name="PnlReport" component={PnlReportScreen} />
       <Stack.Screen name="TodoNotes" component={TodoNotesScreen} />
       <Stack.Screen name="Bills" component={BillsScreen} />
+      <Stack.Screen name="RecurringPayments" component={RecurringPaymentsScreen} />
       <Stack.Screen name="DailyHeatmap" component={DailyHeatmapScreen} />
       <Stack.Screen
         name="Paywall"

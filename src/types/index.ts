@@ -35,6 +35,11 @@ export interface Transaction {
   // Accountant: Smart Ledger fields
   isRecurring?: boolean;
   recurrenceRule?: 'monthly' | 'weekly' | 'biweekly' | 'quarterly' | 'yearly';
+  // Paused recurring template: excluded from generation and projections.
+  isPaused?: boolean;
+  // Stamped when a paused template resumes: due dates before this day are
+  // skipped, so the pause window is never backfilled. 'YYYY-MM-DD'.
+  resumeFrom?: string | null;
   tags?: string[];
   incomeSource?: string;
   parentRecurringId?: string;
@@ -63,7 +68,25 @@ export interface Budget {
   spent: number;
   remaining: number;
   percentage: number;
+  /** Amount carried from last month: positive = underspend, negative = overspend. */
+  rollover: number;
+  /** Effective budget for the month: limit + rollover. */
+  available: number;
   createdAt: string;
+}
+
+export interface OverallBudget {
+  id: string | null;
+  userId: string;
+  month: string;
+  /** null when no overall budget is set for the month. */
+  limit: number | null;
+  /** Sum of ALL expenses for the month, regardless of category budgets. */
+  spent: number;
+  remaining: number | null;
+  percentage: number | null;
+  createdAt: string | null;
+  updatedAt: string | null;
 }
 
 export interface Nudge {

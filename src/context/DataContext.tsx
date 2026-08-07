@@ -26,6 +26,7 @@ import type {
   Transaction,
   Summary,
   Budget,
+  OverallBudget,
   Nudge,
   Insight,
   ChatMessage,
@@ -36,6 +37,7 @@ interface DataContextValue {
   transactions: Transaction[];
   summary: Summary | null;
   budgets: Budget[];
+  overallBudget: OverallBudget | null;
   nudge: Nudge | null;
   insights: Insight[];
   chatHistory: ChatMessage[];
@@ -79,10 +81,13 @@ interface DataContextValue {
       description?: string;
       note?: string;
       date?: string;
+      recurrenceRule?: Transaction['recurrenceRule'];
+      isPaused?: boolean;
     }
   ) => Promise<SaveOutcome>;
   saveBudget: (data: { category: string; limit: number; month: string }) => Promise<void>;
   deleteBudget: (id: string) => Promise<void>;
+  saveOverallBudget: (data: { month: string; limit: number | null }) => Promise<void>;
   createSavingsGoal: (data: {
     name: string;
     targetAmount: number;
@@ -126,6 +131,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [budgets, setBudgets] = useState<Budget[]>([]);
+  const [overallBudget, setOverallBudget] = useState<OverallBudget | null>(null);
   const [nudge, setNudge] = useState<Nudge | null>(null);
   const [insights, setInsights] = useState<Insight[]>([]);
   const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>([]);
@@ -253,6 +259,10 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         budgetApi.getBudgets(month)
       );
       setBudgets(data);
+      const overall = await fetchWithCache(`budgets_overall_${month}`, () =>
+        budgetApi.getOverallBudget(month)
+      );
+      setOverallBudget(overall);
     } catch (err) {
       handleError(err);
     }
@@ -275,6 +285,15 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       handleError(err);
     }
   }, [handleError, fetchWithCache]);
+
+  const refreshDerivedFinancialData = useCallback(async () => {
+    await Promise.all([
+      fetchSummary(),
+      fetchDailyData(),
+      fetchNudge(),
+      fetchInsights(),
+    ]);
+  }, [fetchSummary, fetchDailyData, fetchNudge, fetchInsights]);
 
   const fetchUserCategories = useCallback(async () => {
     try {
@@ -405,7 +424,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           userId: server.userId,
         });
         setTransactions(await localStore.getAll());
-        await fetchSummary();
+        await refreshDerivedFinancialData();
         return { ok: true, queued: false };
       } catch (err) {
         handleError(err);
@@ -449,7 +468,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         return { ok: true, queued: true };
       }
     },
-    [fetchSummary, handleError]
+    [refreshDerivedFinancialData, handleError]
   );
 
   const deleteTransaction = useCallback(
@@ -466,12 +485,12 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       try {
         await txnApi.deleteTransaction(id);
         await localStore.removeRow(id);
-        await fetchSummary();
+        await refreshDerivedFinancialData();
       } catch (err) {
         handleError(err);
       }
     },
-    [fetchSummary, handleError]
+    [refreshDerivedFinancialData, handleError]
   );
 
   const updateTransaction = useCallback(
@@ -484,6 +503,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         description?: string;
         note?: string;
         date?: string;
+        recurrenceRule?: Transaction['recurrenceRule'];
+        isPaused?: boolean;
+        resumeFrom?: string | null;
       }
     ): Promise<SaveOutcome> => {
       // Read the current updatedAt BEFORE patching — it's the LWW baseline we
@@ -499,6 +521,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         description: patch.description,
         note: patch.note,
         date: patch.date,
+        recurrenceRule: patch.recurrenceRule,
+        isPaused: patch.isPaused,
+        resumeFrom: patch.resumeFrom,
       });
       // Row disappeared (e.g. deleted concurrently) — nothing to edit. Not a
       // failure the user needs to see; the screen just returns.
@@ -521,7 +546,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           userId: server.userId,
         });
         setTransactions(await localStore.getAll());
-        await fetchSummary();
+        await refreshDerivedFinancialData();
         return { ok: true, queued: false };
       } catch (err) {
         handleError(err);
@@ -571,7 +596,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         return { ok: true, queued: true };
       }
     },
-    [fetchSummary, handleError, transactions]
+    [refreshDerivedFinancialData, handleError, transactions]
   );
 
   const saveBudget = useCallback(
@@ -594,6 +619,14 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     await budgetApi.deleteBudget(id);
     setBudgets((prev) => prev.filter((b) => b.id !== id));
   }, []);
+
+  const saveOverallBudget = useCallback(
+    async (data: { month: string; limit: number | null }) => {
+      const overall = await budgetApi.saveOverallBudget(data);
+      setOverallBudget(overall);
+    },
+    []
+  );
 
   // ── Savings Goals ────────────────────────────────────────────────────
 
@@ -679,6 +712,18 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           { role: 'assistant', content: response },
         ]);
       } catch (err) {
+        // Free-tier quota exhausted — let the screen route to the paywall
+        // instead of showing a generic connectivity error.
+        if (
+          err instanceof ApiError &&
+          err.status === 403 &&
+          (err.body as { code?: string } | undefined)?.code === 'tomo_free_limit_reached'
+        ) {
+          // Drop the user message we optimistically appended — it never
+          // reached Tomo, and leaving it implies a reply is coming.
+          setChatHistory(chatHistory);
+          throw err;
+        }
         track('tomo_response_received', {
           latency_ms: Date.now() - startedAt,
           response_length: 0,
@@ -711,6 +756,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         transactions,
         summary,
         budgets,
+        overallBudget,
         nudge,
         insights,
         chatHistory,
@@ -734,6 +780,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         updateTransaction,
         saveBudget,
         deleteBudget,
+        saveOverallBudget,
         createSavingsGoal,
         updateSavingsGoal,
         contributeToGoal,

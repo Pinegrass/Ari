@@ -5,10 +5,12 @@ import {
   TouchableOpacity,
   Alert,
   Share,
+  ScrollView,
   StyleSheet,
 } from 'react-native';
 import ScreenShell from '../components/ScreenShell';
 import { useData } from '../context/DataContext';
+import * as authApi from '../api/auth';
 import { color, font } from '../theme/tokens';
 import { useHaptics } from '../hooks/useHaptics';
 import Button from '../components/ui/Button';
@@ -23,6 +25,7 @@ export default function ExportScreen({ onBack }: Props) {
   const { transactions } = useData();
   const haptics = useHaptics();
   const [exporting, setExporting] = useState(false);
+  const [exportingFull, setExportingFull] = useState(false);
 
   const generateCSV = (): string => {
     const header = 'Date,Type,Category,Description,Amount,Note';
@@ -73,6 +76,28 @@ export default function ExportScreen({ onBack }: Props) {
     }
   };
 
+  // Full account dump from the server (profile, budgets, goals, tax profile,
+  // notes — not just transactions). This is the DPDP §11 / GDPR Art. 15+20
+  // access + portability export promised in the privacy policy.
+  const handleFullExport = async () => {
+    setExportingFull(true);
+    haptics.light();
+
+    try {
+      const data = await authApi.exportMyData();
+      await Share.share({
+        message: JSON.stringify(data, null, 2),
+        title: 'Ari Full Data Export',
+      });
+      haptics.success();
+    } catch {
+      Alert.alert('Export Failed', 'Could not export your data. Please try again.');
+      haptics.error();
+    } finally {
+      setExportingFull(false);
+    }
+  };
+
   return (
     <ScreenShell edges={['top']}>
       <View style={styles.header}>
@@ -83,7 +108,10 @@ export default function ExportScreen({ onBack }: Props) {
         <View style={{ width: 60 }} />
       </View>
 
-      <View style={styles.content}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
         <AnimatedEntry delay={100}>
           <View style={styles.card}>
             <Icon name="pie-chart" size={48} color={color.forest} />
@@ -104,6 +132,24 @@ export default function ExportScreen({ onBack }: Props) {
           </Button>
         </AnimatedEntry>
 
+        <AnimatedEntry delay={350}>
+          <View style={styles.card}>
+            <Icon name="download" size={48} color={color.forest} />
+            <Text style={styles.cardTitle}>Full Account Export</Text>
+            <Text style={styles.cardDesc}>
+              Everything we hold about you — profile, transactions, budgets,
+              goals, tax profile, and notes — as one JSON file. This is the
+              data-portability export from our privacy policy.
+            </Text>
+          </View>
+        </AnimatedEntry>
+
+        <AnimatedEntry delay={450}>
+          <Button onPress={handleFullExport} loading={exportingFull} fullWidth accessibilityLabel="Export full account data" accessibilityRole="button">
+            Export Everything (JSON)
+          </Button>
+        </AnimatedEntry>
+
         <AnimatedEntry delay={400}>
           <View style={styles.infoBox}>
             <Text style={styles.infoText}>
@@ -112,7 +158,7 @@ export default function ExportScreen({ onBack }: Props) {
             </Text>
           </View>
         </AnimatedEntry>
-      </View>
+      </ScrollView>
     </ScreenShell>
   );
 }
@@ -129,7 +175,7 @@ const styles = StyleSheet.create({
   },
   backText: { fontSize: 16, color: color.inkSoft, fontFamily: font.body },
   title: { fontSize: 17, fontFamily: font.bodyBold, color: color.ink },
-  content: { flex: 1, paddingHorizontal: 20, paddingTop: 24, gap: 20 },
+  content: { paddingHorizontal: 20, paddingTop: 24, paddingBottom: 48, gap: 20 },
   card: {
     backgroundColor: color.card,
     borderRadius: 16,

@@ -87,6 +87,34 @@ describe('syncEngine.flushPending', () => {
     expect(await localStore.getPending()).toHaveLength(0);
   });
 
+  it('flushes a recurring template create with its recurrence fields intact', async () => {
+    // Regression: the create flush used to drop isRecurring/recurrenceRule/
+    // isPaused, so an offline-created template synced as a plain transaction.
+    const rec = await localStore.create({
+      ...input,
+      isRecurring: true,
+      recurrenceRule: 'monthly',
+    });
+    await localStore.update(rec.id, { isPaused: true }); // still a pending create
+    (txnApi.addTransaction as jest.Mock).mockResolvedValue({
+      id: rec.id,
+      userId: 'u1',
+      updatedAt: '2026-06-18T10:00:00Z',
+    });
+
+    await flushPending();
+
+    expect(txnApi.addTransaction).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: rec.id,
+        isRecurring: true,
+        recurrenceRule: 'monthly',
+        isPaused: true,
+      })
+    );
+    expect(await localStore.getPending()).toHaveLength(0);
+  });
+
   it('sends a tombstone delete and removes the row', async () => {
     const rec = await localStore.create(input);
     await localStore.markSynced(rec.id);

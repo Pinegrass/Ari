@@ -2,10 +2,13 @@ import Purchases from 'react-native-purchases';
 import {
   ARI_PRO_ENTITLEMENT,
   hasAriPro,
+  hasCurrentStoreOffering,
   isAriPro,
   isRevenueCatAvailable,
+  refreshEntitlements,
   syncRevenueCatUser,
 } from '../revenuecat';
+import { reconcileEntitlement } from '../../api/billing';
 
 const mockedPurchases = Purchases as jest.Mocked<typeof Purchases>;
 let mockPlatformOS: string;
@@ -27,9 +30,16 @@ jest.mock('react-native-purchases', () => ({
     logIn: jest.fn().mockResolvedValue(undefined),
     logOut: jest.fn().mockResolvedValue(undefined),
     getCustomerInfo: jest.fn(),
+    getOfferings: jest.fn(),
   },
   LOG_LEVEL: { DEBUG: 'DEBUG', ERROR: 'ERROR' },
 }));
+
+jest.mock('../../api/billing', () => ({
+  reconcileEntitlement: jest.fn(),
+}));
+
+const mockedReconcile = reconcileEntitlement as jest.Mock;
 
 describe('isRevenueCatAvailable', () => {
   beforeEach(() => {
@@ -71,6 +81,33 @@ describe('hasAriPro', () => {
   it('returns false when the entitlement is missing', () => {
     const info = { entitlements: { active: {} } };
     expect(hasAriPro(info as never)).toBe(false);
+  });
+});
+
+describe('hasCurrentStoreOffering', () => {
+  beforeEach(() => {
+    mockPlatformOS = 'android';
+    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY = 'key';
+    jest.clearAllMocks();
+  });
+
+  it('returns true when the current offering has a store package', async () => {
+    mockedPurchases.getOfferings.mockResolvedValueOnce({
+      current: { availablePackages: [{}] },
+    } as never);
+    await expect(hasCurrentStoreOffering()).resolves.toBe(true);
+  });
+
+  it('returns false when only non-current or empty offerings exist', async () => {
+    mockedPurchases.getOfferings.mockResolvedValueOnce({
+      current: { availablePackages: [] },
+    } as never);
+    await expect(hasCurrentStoreOffering()).resolves.toBe(false);
+  });
+
+  it('returns false when the store lookup fails', async () => {
+    mockedPurchases.getOfferings.mockRejectedValueOnce(new Error('store unavailable'));
+    await expect(hasCurrentStoreOffering()).resolves.toBe(false);
   });
 });
 
@@ -155,5 +192,59 @@ describe('syncRevenueCatUser', () => {
     await syncRevenueCatUser('user-1');
     await expect(syncRevenueCatUser(null)).resolves.toBe(true);
     expect(mockedPurchases.logOut).toHaveBeenCalled();
+  });
+});
+
+describe('refreshEntitlements', () => {
+  beforeEach(() => {
+    mockPlatformOS = 'ios';
+    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY = 'key';
+    delete process.env.EXPO_PUBLIC_MAESTRO_E2E;
+    jest.clearAllMocks();
+  });
+
+  it('short-circuits to true in Maestro E2E builds', async () => {
+    process.env.EXPO_PUBLIC_MAESTRO_E2E = '1';
+    await expect(refreshEntitlements('user-1', 'free')).resolves.toBe(true);
+    expect(mockedPurchases.getCustomerInfo).not.toHaveBeenCalled();
+  });
+
+  it('falls back to the server tier when RevenueCat is not configured', async () => {
+    delete process.env.EXPO_PUBLIC_REVENUECAT_API_KEY;
+    await expect(refreshEntitlements('user-1', 'pro')).resolves.toBe(true);
+    await expect(refreshEntitlements('user-1', 'free')).resolves.toBe(false);
+  });
+
+  it('returns the SDK status when it agrees with the server', async () => {
+    mockedPurchases.getCustomerInfo.mockResolvedValueOnce({
+      entitlements: { active: { [ARI_PRO_ENTITLEMENT]: {} as never } },
+    } as never);
+    await expect(refreshEntitlements('user-1', 'pro')).resolves.toBe(true);
+    expect(mockedReconcile).not.toHaveBeenCalled();
+  });
+
+  it('reconciles with the backend when SDK says Pro but server says free', async () => {
+    mockedPurchases.getCustomerInfo.mockResolvedValueOnce({
+      entitlements: { active: { [ARI_PRO_ENTITLEMENT]: {} as never } },
+    } as never);
+    mockedReconcile.mockResolvedValueOnce({ tier: 'pro', pro: true });
+    await expect(refreshEntitlements('user-1', 'free')).resolves.toBe(true);
+    expect(mockedReconcile).toHaveBeenCalled();
+  });
+
+  it('does not reconcile when the SDK has no active entitlement', async () => {
+    mockedPurchases.getCustomerInfo.mockResolvedValueOnce({
+      entitlements: { active: {} },
+    } as never);
+    await expect(refreshEntitlements('user-1', 'free')).resolves.toBe(false);
+    expect(mockedReconcile).not.toHaveBeenCalled();
+  });
+
+  it('keeps the server tier when reconcile fails (503 / offline)', async () => {
+    mockedPurchases.getCustomerInfo.mockResolvedValueOnce({
+      entitlements: { active: { [ARI_PRO_ENTITLEMENT]: {} as never } },
+    } as never);
+    mockedReconcile.mockRejectedValueOnce(new Error('503'));
+    await expect(refreshEntitlements('user-1', 'free')).resolves.toBe(false);
   });
 });
