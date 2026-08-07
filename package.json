@@ -12,6 +12,7 @@
     "test:coverage": "jest --coverage",
     "typecheck": "tsc --noEmit --skipLibCheck",
     "lint": "npx expo lint",
+    "eas-build-pre-install": "node scripts/verify-release-env.mjs",
     "e2e": "maestro test .maestro"
   },
   "dependencies": {
