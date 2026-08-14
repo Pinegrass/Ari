@@ -284,6 +284,9 @@ workflows:
         - $HOME/Library/Caches/CocoaPods
     scripts:
       - <<: *install_deps
+      - name: Verify production iOS environment
+        script: |
+          EAS_BUILD_PROFILE=production PINEGRASS_BUILD_PLATFORM=ios node scripts/verify-release-env.mjs
       - <<: *prebuild_ios
       - <<: *diagnose_entitlements
       - <<: *modular_headers   # Ari uses Firebase — keep this step

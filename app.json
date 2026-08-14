@@ -7,7 +7,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "scheme": "ari",
     "splash": {
       "image": "./assets/splash-icon.png",
@@ -92,7 +92,7 @@
       "enabled": true,
       "checkAutomatically": "ON_LOAD"
     },
-    "runtimeVersion": { "policy": "appVersion" },
+    "runtimeVersion": { "policy": "fingerprint" },
     "extra": {
       "eas": {
         "projectId": "ae18eabf-124f-4b0a-a09e-a2a40dfb473b"
