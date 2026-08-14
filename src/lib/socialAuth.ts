@@ -1,13 +1,15 @@
 /**
- * Google sign-in via Google Play Services native SDK.
+ * Google sign-in via the native SDK on Android and Supabase browser OAuth on iOS.
  *
  * Why @react-native-google-signin/google-signin and not expo-auth-session:
  *   - Android OAuth clients block custom-URI redirects by default (security
  *     hardening 2022+). We hit "Custom URI scheme is not enabled" with the
  *     web-flow path even after the GCP toggle.
- *   - The native SDK uses Google Play Services' system account picker —
+ *   - Android's native SDK uses Google Play Services' system account picker —
  *     no custom URIs, no browser handoff, faster UX, Google's recommended
  *     long-term path.
+ *   - The shipped iOS build has Ari's app URL scheme but not Google's reversed
+ *     client scheme, so iOS returns through ari://auth/callback.
  *
  * Configuration:
  *   - WEB OAuth client (created in GCP) — its id is what the SDK passes
@@ -26,7 +28,9 @@ import {
   isErrorWithCode,
   isSuccessResponse,
 } from '@react-native-google-signin/google-signin';
-import { supabase } from './supabase';
+import { Platform } from 'react-native';
+import * as WebBrowser from 'expo-web-browser';
+import { isSupabaseConfigured, supabase } from './supabase';
 import { secureStorage } from './secureStorage';
 import { addBreadcrumb, captureError, Sentry } from '../config/sentry';
 
@@ -34,6 +38,65 @@ import { addBreadcrumb, captureError, Sentry } from '../config/sentry';
 let _configured = false;
 const GOOGLE_TEMPORARY_ERROR =
   'Google sign-in is temporarily unavailable. Please use your email and password, or try again later.';
+const ARI_IOS_OAUTH_REDIRECT = 'ari://auth/callback';
+
+type OAuthTokens = {
+  accessToken: string;
+  refreshToken: string;
+};
+
+export function parseOAuthTokens(url: string): OAuthTokens {
+  const parsed = new URL(url);
+  if (`${parsed.protocol}//${parsed.host}${parsed.pathname}` !== ARI_IOS_OAUTH_REDIRECT) {
+    throw new Error('Unexpected OAuth callback.');
+  }
+  const params = new URLSearchParams(parsed.search);
+  const hashParams = new URLSearchParams(parsed.hash.replace(/^#/, ''));
+  const error = hashParams.get('error_description') ?? params.get('error_description');
+  if (error) throw new Error(decodeURIComponent(error.replace(/\+/g, ' ')));
+
+  const accessToken = hashParams.get('access_token') ?? params.get('access_token');
+  const refreshToken = hashParams.get('refresh_token') ?? params.get('refresh_token');
+  if (!accessToken || !refreshToken) throw new Error('Google did not return a complete session.');
+  return { accessToken, refreshToken };
+}
+
+async function signInWithGoogleOnIOS(): Promise<GoogleAuthResult> {
+  if (!isSupabaseConfigured()) {
+    return { ok: false, error: 'Google sign-in is not configured for this build.' };
+  }
+
+  try {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: ARI_IOS_OAUTH_REDIRECT,
+        skipBrowserRedirect: true,
+      },
+    });
+    if (error || !data.url) throw error ?? new Error('Google did not return an authorization URL.');
+
+    const result = await WebBrowser.openAuthSessionAsync(data.url, ARI_IOS_OAUTH_REDIRECT);
+    if (result.type !== 'success') return { ok: false, cancelled: true };
+
+    const tokens = parseOAuthTokens(result.url);
+    const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
+      access_token: tokens.accessToken,
+      refresh_token: tokens.refreshToken,
+    });
+    if (sessionError || !sessionData.session) {
+      throw sessionError ?? new Error('Supabase did not create a session.');
+    }
+    await secureStorage.setItem('ari_token', sessionData.session.access_token);
+    addBreadcrumb('auth', 'google: iOS browser session adopted');
+    return { ok: true };
+  } catch (e) {
+    captureError(e instanceof Error ? e : new Error('google_ios_oauth_failed'), {
+      where: 'socialAuth.signInWithGoogleOnIOS',
+    });
+    return { ok: false, error: GOOGLE_TEMPORARY_ERROR };
+  }
+}
 
 function _ensureConfigured(): boolean {
   if (_configured) return true;
@@ -62,6 +125,8 @@ export interface GoogleAuthResult {
 
 
 export async function signInWithGoogle(): Promise<GoogleAuthResult> {
+  if (Platform.OS === 'ios') return signInWithGoogleOnIOS();
+
   if (!_ensureConfigured()) {
     Sentry.captureMessage('google_sign_in_not_configured', { level: 'error' });
     return { ok: false, error: 'Google sign-in is not available on this build. Please use your email and password.' };
@@ -169,7 +234,7 @@ export function useGoogleSignIn(): {
   signIn: () => Promise<GoogleAuthResult>;
 } {
   return {
-    ready: _ensureConfigured(),
+    ready: Platform.OS === 'ios' ? isSupabaseConfigured() : _ensureConfigured(),
     signIn: signInWithGoogle,
   };
 }
