@@ -276,8 +276,11 @@ workflows:
       xcode: 26.4
       cocoapods: default
       ios_signing:
-        distribution_type: app_store
-        bundle_identifier: "com.pinegrass.ari"
+        provisioning_profiles:
+          - AriApple
+          - AriShareExtV2
+        certificates:
+          - Pinecert
     cache:
       cache_paths:
         - $CM_BUILD_DIR/node_modules
