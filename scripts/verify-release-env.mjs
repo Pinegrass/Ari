@@ -16,7 +16,8 @@ const required = [
 ];
 
 if (platform === 'ios') {
-  required.push('EXPO_PUBLIC_REVENUECAT_IOS_API_KEY');
+  // RevenueCat is optional until the App Store public SDK key is provisioned.
+  // The app intentionally runs with purchases disabled when it is absent.
 } else {
   required.push('EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY', 'GOOGLE_SERVICES_JSON');
 }
@@ -36,7 +37,7 @@ if (platform !== 'ios' && !process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY.st
   throw new Error('[release-env] RevenueCat Android key must be a Play public SDK key.');
 }
 
-if (platform === 'ios' && !process.env.EXPO_PUBLIC_REVENUECAT_IOS_API_KEY.startsWith('appl_')) {
+if (platform === 'ios' && process.env.EXPO_PUBLIC_REVENUECAT_IOS_API_KEY && !process.env.EXPO_PUBLIC_REVENUECAT_IOS_API_KEY.startsWith('appl_')) {
   throw new Error('[release-env] RevenueCat iOS key must be an App Store public SDK key.');
 }
 
