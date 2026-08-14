@@ -34,7 +34,7 @@ export default function PrivacyPolicyScreen({ onBack }: Props) {
 
           <Text style={styles.sectionTitle}>2. Information We Collect</Text>
           <Text style={styles.body}>
-            <Text style={styles.bold}>Account Information:</Text> When you sign up, we collect your name, email address, and authentication credentials via Google Sign-In or email/password. Your authentication is managed through Supabase.
+            <Text style={styles.bold}>Account Information:</Text> When you sign up, we collect your name, email address, and authentication credentials via Apple, Google Sign-In, or email/password. Your authentication is managed through Supabase. Apple may provide a private relay email address if you choose Hide My Email.
           </Text>
           <Text style={styles.body}>
             <Text style={styles.bold}>Financial Data:</Text> You provide transaction details including amounts, categories, merchants, dates, and payment methods. This data is essential for Ari to provide budgeting, tracking, and insights.
@@ -66,7 +66,7 @@ export default function PrivacyPolicyScreen({ onBack }: Props) {
             • Supabase — authentication and database hosting{'\n'}
             • Sentry — crash and error reporting{'\n'}
             • PostHog — product analytics{'\n'}
-            • Google — authentication (Sign-In)
+            • Apple and Google — authentication (Sign-In)
           </Text>
 
           <Text style={styles.sectionTitle}>5. Data Storage and Security</Text>

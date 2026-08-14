@@ -17,6 +17,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.pinegrass.ari",
+      "usesAppleSignIn": true,
       "infoPlist": {
         "NSFaceIDUsageDescription": "Ari uses Face ID to secure your app access.",
         "NSUserNotificationUsageDescription": "Ari sends you daily reminders and budget alerts.",
@@ -60,6 +61,7 @@
         }
       ],
       "expo-web-browser",
+      "expo-apple-authentication",
       "@react-native-google-signin/google-signin",
       "expo-secure-store",
       [

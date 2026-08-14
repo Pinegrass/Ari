@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -19,6 +19,8 @@ import ErrorBanner from '../components/ui/ErrorBanner';
 import { color, font } from '../theme/tokens';
 import Icon from '../components/ui/Icon';
 import { useGoogleSignIn } from '../lib/socialAuth';
+import * as AppleAuthentication from 'expo-apple-authentication';
+import { isAppleSignInAvailable, signInWithApple } from '../lib/appleAuth';
 import * as authApi from '../api/auth';
 import { Sentry, addBreadcrumb } from '../config/sentry';
 
@@ -55,8 +57,13 @@ export default function LoginScreen({ navigation }: Props) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [socialLoading, setSocialLoading] = useState<'google' | null>(null);
+  const [socialLoading, setSocialLoading] = useState<'google' | 'apple' | null>(null);
+  const [appleAvailable, setAppleAvailable] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    void isAppleSignInAvailable().then(setAppleAvailable);
+  }, []);
 
   const handleGoogle = async () => {
     setError('');
@@ -75,6 +82,29 @@ export default function LoginScreen({ navigation }: Props) {
       // failure cases). Log, show generic.
       Sentry.captureException(e instanceof Error ? e : new Error(String(e)), {
         tags: { where: 'LoginScreen.handleGoogle' },
+      });
+      setError('Sign-in failed. Please try again or use your email.');
+    } finally {
+      setSocialLoading(null);
+    }
+  };
+
+  const handleApple = async () => {
+    if (socialLoading !== null) return;
+    setError('');
+    setSocialLoading('apple');
+    addBreadcrumb('auth', 'LoginScreen: apple tapped');
+    try {
+      const res = await signInWithApple();
+      if (!res.ok) {
+        if (!res.cancelled) setError(res.error ?? 'Apple sign-in failed. Please try again.');
+        return;
+      }
+      const me = await authApi.getMe();
+      await refreshFromSession(me);
+    } catch (e) {
+      Sentry.captureException(e instanceof Error ? e : new Error(String(e)), {
+        tags: { where: 'LoginScreen.handleApple' },
       });
       setError('Sign-in failed. Please try again or use your email.');
     } finally {
@@ -178,6 +208,17 @@ export default function LoginScreen({ navigation }: Props) {
               </Text>
             </TouchableOpacity>
 
+            {appleAvailable && (
+              <AppleAuthentication.AppleAuthenticationButton
+                buttonType={AppleAuthentication.AppleAuthenticationButtonType.CONTINUE}
+                buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+                cornerRadius={10}
+                onPress={() => void handleApple()}
+                style={[styles.appleBtn, socialLoading !== null && styles.socialDisabled]}
+                pointerEvents={socialLoading === null ? 'auto' : 'none'}
+              />
+            )}
+
           </View>
 
           {/* Footer */}
@@ -230,6 +271,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   socialText: { fontFamily: font.bodySemi, fontSize: 14, color: color.ink },
+  appleBtn: { width: '100%', height: 48, marginBottom: 10 },
+  socialDisabled: { opacity: 0.5 },
   demoBtn: {
     marginTop: 16,
     alignItems: 'center',
