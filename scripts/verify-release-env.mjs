@@ -6,15 +6,20 @@ if (!releaseProfiles.has(profile)) {
   process.exit(0);
 }
 
+const platform = process.env.EAS_BUILD_PLATFORM ?? process.env.PINEGRASS_BUILD_PLATFORM;
 const required = [
   'EXPO_PUBLIC_API_URL',
   'EXPO_PUBLIC_SENTRY_DSN',
   'EXPO_PUBLIC_SUPABASE_URL',
   'EXPO_PUBLIC_SUPABASE_ANON_KEY',
   'EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID',
-  'EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY',
-  'GOOGLE_SERVICES_JSON',
 ];
+
+if (platform === 'ios') {
+  required.push('EXPO_PUBLIC_REVENUECAT_IOS_API_KEY');
+} else {
+  required.push('EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY', 'GOOGLE_SERVICES_JSON');
+}
 const missing = required.filter((name) => !process.env[name]?.trim());
 
 if (missing.length > 0) {
@@ -27,8 +32,12 @@ for (const name of ['EXPO_PUBLIC_API_URL', 'EXPO_PUBLIC_SUPABASE_URL']) {
   }
 }
 
-if (!process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY.startsWith('goog_')) {
+if (platform !== 'ios' && !process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY.startsWith('goog_')) {
   throw new Error('[release-env] RevenueCat Android key must be a Play public SDK key.');
+}
+
+if (platform === 'ios' && !process.env.EXPO_PUBLIC_REVENUECAT_IOS_API_KEY.startsWith('appl_')) {
+  throw new Error('[release-env] RevenueCat iOS key must be an App Store public SDK key.');
 }
 
 console.log(`[release-env] ${profile} configuration is complete.`);
