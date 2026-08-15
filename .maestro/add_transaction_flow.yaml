@@ -31,11 +31,10 @@ tags:
     element:
       text: "−₹500"
     direction: DOWN
-# Tap the row itself (testID txn-row-0 = most recent) to open edit.
-# Using tapOn instead of longPressOn because the long-press gesture
-# is unreliable on non-clickable child Text elements under Fabric.
+# Tap the visible amount. The child press bubbles to TransactionItem's
+# TouchableOpacity; React Native testID is not reliably exposed in release APKs.
 - tapOn:
-    id: "txn-row-0"
+    text: "−₹500"
 - assertVisible: "Update entry"
 - tapOn: "0"          # 500 -> 5000
 - tapOn: "Update entry"
