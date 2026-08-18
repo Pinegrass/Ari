@@ -80,6 +80,7 @@ ota-update*.err
 
 # QA screenshots
 .qa-shots/
+artifacts/
 
 # Stray device database files
 *.db
