@@ -53,9 +53,6 @@ jobs:
   security-audit:
     name: Dependency Audit
     runs-on: ubuntu-latest
-    # Non-blocking for now — advisories surface without failing the pipeline.
-    # Drop continue-on-error to enforce once the tree is clean.
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -63,4 +60,4 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci --legacy-peer-deps
-      - run: npm audit --audit-level=high
+      - run: npx --yes better-npm-audit audit --level high
