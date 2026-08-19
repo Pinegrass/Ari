@@ -54,6 +54,9 @@ firebase-adminsdk-*.json
 /android
 scripts/__pycache__/
 
+# Flask backend — separate repo (github.com/Pinegrass/ari-backend)
+backend/
+
 # Supabase CLI temp files
 supabase/.temp/
 
