@@ -374,6 +374,19 @@ export default function SettingsScreen() {
       onPress: () => { haptics.light(); setSubScreen('upi'); },
     },
     {
+      icon: 'wallet',
+      label: 'Link bank account',
+      subtitle: 'Auto-import bank transactions via Setu',
+      onPress: () => {
+        haptics.light();
+        if (isSubscribed) {
+          navigation.navigate('LinkBank');
+        } else {
+          navigation.navigate('Paywall', { source: 'aa_gate' });
+        }
+      },
+    },
+    {
       icon: 'user',
       label: 'Shared expenses',
       subtitle: 'Split with friends, settle via UPI',
