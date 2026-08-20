@@ -26,6 +26,9 @@ import GroupsListScreen from '../screens/GroupsListScreen';
 import GroupDetailScreen from '../screens/GroupDetailScreen';
 import AddSharedExpenseScreen from '../screens/AddSharedExpenseScreen';
 import ShareCaptureScreen from '../screens/ShareCaptureScreen';
+import LinkBankScreen from '../screens/LinkBankScreen';
+import LinkBankConsentScreen from '../screens/LinkBankConsentScreen';
+import LinkBankConsentDetailScreen from '../screens/LinkBankConsentDetailScreen';
 import Icon from '../components/ui/Icon';
 import type { IconName } from '../components/ui/Icon';
 import { color, font } from '../theme/tokens';
@@ -201,6 +204,10 @@ export default function MainNavigator() {
         component={ShareCaptureScreen}
         options={{ presentation: 'transparentModal', cardStyle: { backgroundColor: 'transparent' } }}
       />
+      {/* Account Aggregator — Setu bank linking */}
+      <Stack.Screen name="LinkBank" component={LinkBankScreen} />
+      <Stack.Screen name="LinkBankConsent" component={LinkBankConsentScreen} />
+      <Stack.Screen name="LinkBankConsentDetail" component={LinkBankConsentDetailScreen} />
     </Stack.Navigator>
   );
 }

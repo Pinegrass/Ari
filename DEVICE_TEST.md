@@ -69,7 +69,12 @@ All steps with **demo@ari.app / demo123** unless noted.
 
 ### Setu AA (23)
 
-23. Once we flip `SETU_ENABLED=1`, tap the "Link bank" CTA (not yet built). For now `GET /api/aa/status` returns `{"enabled": false, "linked": false, "provider": "setu"}` and the mobile should show nothing.
+23. Once we flip `SETU_ENABLED=1`, tap the "Link bank" CTA in Settings
+    (Pro users only; free users get the `aa_gate` paywall). While
+    `SETU_ENABLED=0` the backend still returns 200 from `GET /api/aa/status`
+    with `{"enabled": false, ...}` and the Link bank screen shows the
+    "not available yet" state. With it on: VUA consent → in-app bank
+    approval → poll → Linked → Sync imports `aa_sync` rows.
 
 ### Logout (24)
 

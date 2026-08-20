@@ -54,6 +54,10 @@ export type MainStackParamList = {
   Groups: undefined;
   GroupDetail: { groupId: string };
   AddSharedExpense: { groupId: string };
+  // Account Aggregator — Setu bank linking (gated by SETU_ENABLED server-side)
+  LinkBank: undefined;
+  LinkBankConsent: undefined;
+  LinkBankConsentDetail: { consentHandle: string };
 };
 
 export type RootStackParamList = {
