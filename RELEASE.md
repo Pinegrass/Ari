@@ -127,7 +127,13 @@ without first verifying the diff vs. the last release tag.
 
 - Doppler for unified secrets (currently `.env` + Railway dashboard)
 - Phase 4b (AuthContext full Supabase session swap) — dual-path tokens
-  work fine, low priority.
+  work fine, low priority. Legacy HS256 server-side path is now OFF by
+  default in production (Supabase configured) — see `LEGACY_JWT_ENABLED`.
 - Sentry DSN on Railway (`SENTRY_DSN=...`) once you've created a project.
 - Setu mobile "Link bank" flow — ✅ shipped (3 screens behind the `aa_gate`
   Pro gate). Production cutover still needs KYC + `SETU_WEBHOOK_SIGNATURE_MODE=rsa`.
+- Pen-test hardening — ✅ shipped: JSON error bodies, security headers
+  (nosniff/DENY/no-referrer/no-store), route inventory removed from `/`,
+  constant-time webhook secret compare, per-IP budget on the remote token
+  fallback, prod CORS wildcard warning. Regression-tested in
+  `backend/tests/test_security_hardening.py`.
