@@ -60,13 +60,18 @@ describe('isRevenueCatAvailable', () => {
   });
 
   it('uses the platform-specific key when present', () => {
-    process.env.EXPO_PUBLIC_REVENUECAT_IOS_API_KEY = 'ios_key';
+    process.env.EXPO_PUBLIC_REVENUECAT_IOS_API_KEY = 'appl_ios_key';
     expect(isRevenueCatAvailable()).toBe(true);
   });
 
   it('falls back to the legacy key when platform key is absent', () => {
-    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY = 'legacy_key';
+    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY = 'appl_legacy_key';
     expect(isRevenueCatAvailable()).toBe(true);
+  });
+
+  it('rejects a legacy key for the wrong store', () => {
+    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY = 'goog_android_key';
+    expect(isRevenueCatAvailable()).toBe(false);
   });
 });
 
@@ -87,7 +92,7 @@ describe('hasAriPro', () => {
 describe('hasCurrentStoreOffering', () => {
   beforeEach(() => {
     mockPlatformOS = 'android';
-    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY = 'key';
+    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY = 'goog_key';
     jest.clearAllMocks();
   });
 
@@ -131,7 +136,7 @@ describe('isAriPro', () => {
   });
 
   it('returns true when the customer has the Pro entitlement', async () => {
-    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY = 'key';
+    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY = 'appl_key';
     mockedPurchases.getCustomerInfo.mockResolvedValueOnce({
       entitlements: { active: { [ARI_PRO_ENTITLEMENT]: {} as never } },
     } as never);
@@ -139,7 +144,7 @@ describe('isAriPro', () => {
   });
 
   it('returns false when the customer does not have the Pro entitlement', async () => {
-    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY = 'key';
+    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY = 'appl_key';
     mockedPurchases.getCustomerInfo.mockResolvedValueOnce({
       entitlements: { active: {} },
     } as never);
@@ -147,7 +152,7 @@ describe('isAriPro', () => {
   });
 
   it('returns false when getCustomerInfo rejects', async () => {
-    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY = 'key';
+    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY = 'appl_key';
     mockedPurchases.getCustomerInfo.mockRejectedValueOnce(new Error('network'));
     await expect(isAriPro()).resolves.toBe(false);
   });
@@ -163,7 +168,7 @@ describe('syncRevenueCatUser', () => {
 
   it('returns false in Maestro E2E builds without touching the SDK', async () => {
     process.env.EXPO_PUBLIC_MAESTRO_E2E = '1';
-    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY = 'key';
+    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY = 'appl_key';
     await expect(syncRevenueCatUser('user-1')).resolves.toBe(false);
     expect(mockedPurchases.configure).not.toHaveBeenCalled();
   });
@@ -173,22 +178,22 @@ describe('syncRevenueCatUser', () => {
   });
 
   it('configures the SDK on first call and returns true', async () => {
-    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY = 'key';
+    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY = 'appl_key';
     await expect(syncRevenueCatUser('user-1')).resolves.toBe(true);
     expect(mockedPurchases.configure).toHaveBeenCalledWith(
-      expect.objectContaining({ apiKey: 'key', appUserID: 'user-1' }),
+      expect.objectContaining({ apiKey: 'appl_key', appUserID: 'user-1' }),
     );
   });
 
   it('logs in when the user id changes', async () => {
-    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY = 'key';
+    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY = 'appl_key';
     await syncRevenueCatUser('user-1');
     await expect(syncRevenueCatUser('user-2')).resolves.toBe(true);
     expect(mockedPurchases.logIn).toHaveBeenCalledWith('user-2');
   });
 
   it('logs out when the user id is cleared', async () => {
-    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY = 'key';
+    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY = 'appl_key';
     await syncRevenueCatUser('user-1');
     await expect(syncRevenueCatUser(null)).resolves.toBe(true);
     expect(mockedPurchases.logOut).toHaveBeenCalled();
@@ -198,7 +203,7 @@ describe('syncRevenueCatUser', () => {
 describe('refreshEntitlements', () => {
   beforeEach(() => {
     mockPlatformOS = 'ios';
-    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY = 'key';
+    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY = 'appl_key';
     delete process.env.EXPO_PUBLIC_MAESTRO_E2E;
     jest.clearAllMocks();
   });

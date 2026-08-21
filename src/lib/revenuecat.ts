@@ -8,12 +8,17 @@ let configured = false;
 let identifiedUserId: string | null = null;
 
 function publicApiKey(): string {
-  const legacyKey = process.env.EXPO_PUBLIC_REVENUECAT_API_KEY;
-  return (Platform.select({
+  const legacyKey = process.env.EXPO_PUBLIC_REVENUECAT_API_KEY?.trim() ?? '';
+  const candidate = (Platform.select({
     ios: process.env.EXPO_PUBLIC_REVENUECAT_IOS_API_KEY?.trim() || legacyKey,
     android: process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY?.trim() || legacyKey,
     default: '',
   }) ?? '').trim();
+
+  // RevenueCat public SDK keys are store-specific. Never configure an iOS
+  // build with a Google Play key (or vice versa) through the legacy fallback.
+  const expectedPrefix = Platform.OS === 'ios' ? 'appl_' : Platform.OS === 'android' ? 'goog_' : '';
+  return expectedPrefix && candidate.startsWith(expectedPrefix) ? candidate : '';
 }
 
 export function isRevenueCatAvailable(): boolean {
