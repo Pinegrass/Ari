@@ -54,12 +54,12 @@
     "production": {
       "android": {
         "serviceAccountKeyPath": "./google-service-account.json",
-        "track": "internal"
+        "track": "production",
+        "releaseStatus": "inProgress",
+        "rollout": 0.1
       },
       "ios": {
-        "appleId": "your-apple-id@example.com",
-        "ascAppId": "your-asc-app-id",
-        "appleTeamId": "your-team-id"
+        "ascAppId": "6789322260"
       }
     }
   }

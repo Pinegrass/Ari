@@ -17,9 +17,11 @@ import type { Transaction } from '../types';
 export async function pushWidgetUpdate(): Promise<void> {
   if (Platform.OS !== 'android') return;
   try {
-    // Lazy require so non-Android / test bundles never load the native module.
-    const { requestWidgetUpdate } = require('react-native-android-widget');
-    const { renderAriWidget, ARI_WIDGET_NAME } = require('./AriWidget');
+    // Lazy imports so non-Android / test bundles never load the native module.
+    const [{ requestWidgetUpdate }, { renderAriWidget, ARI_WIDGET_NAME }] = await Promise.all([
+      import('react-native-android-widget'),
+      import('./AriWidget'),
+    ]);
     const snapshot = await loadWidgetSnapshot();
     await requestWidgetUpdate({
       widgetName: ARI_WIDGET_NAME,

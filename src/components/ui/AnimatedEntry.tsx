@@ -20,7 +20,7 @@ export default function AnimatedEntry({
   const translateY = useRef(new Animated.Value(slideFrom)).current;
 
   useEffect(() => {
-    Animated.parallel([
+    const animation = Animated.parallel([
       Animated.timing(opacity, {
         toValue: 1,
         duration,
@@ -34,8 +34,10 @@ export default function AnimatedEntry({
         tension: 65,
         friction: 10,
       }),
-    ]).start();
-  }, []);
+    ]);
+    animation.start();
+    return () => animation.stop();
+  }, [delay, duration, opacity, translateY]);
 
   return (
     <Animated.View style={[{ opacity, transform: [{ translateY }] }, style]}>

@@ -63,7 +63,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
   const initialType: TransactionType = editTxn?.type ?? (params as { type?: 'expense' | 'income' } | undefined)?.type ?? 'expense';
 
   const { addTransaction, updateTransaction, userCategories, fetchUserCategories } = useData();
-  const { locale, formatCurrency } = useLocale();
+  const { locale } = useLocale();
   const haptics = useHaptics();
   const insets = useSafeAreaInsets();
   const c = useColors();

@@ -33,7 +33,7 @@ describe('Button', () => {
   });
 
   it('shows loading indicator when loading', () => {
-    const { queryByText, UNSAFE_getByType } = render(
+    const { queryByText } = render(
       <Button onPress={() => {}} loading>
         Loading
       </Button>
@@ -45,7 +45,7 @@ describe('Button', () => {
 
   it('does not call onPress when loading', () => {
     const onPress = jest.fn();
-    const { getByTestId } = render(
+    render(
       <Button onPress={onPress} loading>
         Save
       </Button>

@@ -13,14 +13,16 @@ export default function AnimatedFAB({ onPress }: Props) {
   const scale = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.spring(scale, {
+    const animation = Animated.spring(scale, {
       toValue: 1,
       delay: 300,
       useNativeDriver: true,
       tension: 60,
       friction: 7,
-    }).start();
-  }, []);
+    });
+    animation.start();
+    return () => animation.stop();
+  }, [scale]);
 
   // Position above tab bar: 60px tab + insets.bottom + 16px gap
   const bottomPosition = 60 + insets.bottom + 16;

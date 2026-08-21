@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { View, Text, TouchableOpacity, Animated, StyleSheet, Dimensions } from 'react-native';
 import ScreenShell from '../components/ScreenShell';
 import type { StackScreenProps } from '@react-navigation/stack';
@@ -22,12 +22,12 @@ export default function SplashScreen({ navigation }: Props) {
   const f0 = useRef(new Animated.Value(0)).current;
   const f1 = useRef(new Animated.Value(0)).current;
   const f2 = useRef(new Animated.Value(0)).current;
-  const featureOpacities = [f0, f1, f2];
+  const featureOpacities = useMemo(() => [f0, f1, f2], [f0, f1, f2]);
   const buttonsY = useRef(new Animated.Value(40)).current;
   const buttonsOpacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.sequence([
+    const animation = Animated.sequence([
       Animated.parallel([
         Animated.spring(logoScale, {
           toValue: 1,
@@ -51,8 +51,10 @@ export default function SplashScreen({ navigation }: Props) {
         Animated.spring(buttonsY, { toValue: 0, useNativeDriver: true, tension: 60, friction: 10 }),
         Animated.timing(buttonsOpacity, { toValue: 1, duration: 400, useNativeDriver: true }),
       ]),
-    ]).start();
-  }, []);
+    ]);
+    animation.start();
+    return () => animation.stop();
+  }, [buttonsOpacity, buttonsY, featureOpacities, logoOpacity, logoScale]);
 
   return (
     <View style={styles.root}>

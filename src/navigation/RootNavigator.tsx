@@ -54,11 +54,16 @@ export default function RootNavigator() {
   const [onboardingChecked, setOnboardingChecked] = useState(false);
 
   useEffect(() => {
-    AsyncStorage.getItem(ONBOARDING_KEY).then((val) => {
-      if (!val && !user) setShowOnboarding(true);
+    let cancelled = false;
+    void AsyncStorage.getItem(ONBOARDING_KEY).then((val) => {
+      if (cancelled) return;
+      setShowOnboarding(!val && !user);
       setOnboardingChecked(true);
     });
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   const completeOnboarding = async () => {
     await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
