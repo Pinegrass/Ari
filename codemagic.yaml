@@ -12,7 +12,7 @@ definitions:
         pnpm install --frozen-lockfile
       elif [ -f package-lock.json ]; then
         echo "=== Detected npm ==="
-        npm ci
+        npm ci --legacy-peer-deps
       else
         echo "=== No lockfile match, falling back to npm install ==="
         npm install
@@ -257,11 +257,20 @@ definitions:
     app_store_connect:
       auth: integration
       submit_to_testflight: true
+      submit_to_app_store: true
+      release_type: MANUAL
+      phased_release: true
 
 workflows:
   ari-ios-workflow:
-    name: Ari - iOS TestFlight
+    name: Ari - iOS App Store release
     max_build_duration: 90
+    triggering:
+      events:
+        - tag
+      tag_patterns:
+        - pattern: 'v*'
+          include: true
     integrations:
       app_store_connect: Pinegrasscm
     environment:
@@ -276,14 +285,20 @@ workflows:
       xcode: 26.4
       cocoapods: default
       ios_signing:
-        distribution_type: app_store
-        bundle_identifier: "com.pinegrass.ari"
+        provisioning_profiles:
+          - AriApple
+          - AriShareExtV2
+        certificates:
+          - Pinecert
     cache:
       cache_paths:
         - $CM_BUILD_DIR/node_modules
         - $HOME/Library/Caches/CocoaPods
     scripts:
       - <<: *install_deps
+      - name: Verify production iOS environment
+        script: |
+          EAS_BUILD_PROFILE=production PINEGRASS_BUILD_PLATFORM=ios node scripts/verify-release-env.mjs
       - <<: *prebuild_ios
       - <<: *diagnose_entitlements
       - <<: *modular_headers   # Ari uses Firebase — keep this step

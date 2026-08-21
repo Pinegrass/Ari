@@ -11,6 +11,8 @@ import {
 import ScreenShell from '../components/ScreenShell';
 import { useData } from '../context/DataContext';
 import * as authApi from '../api/auth';
+import { getPnlReport } from '../api/reports';
+import { buildPnlCsv, buildTransactionsCsv, saveOrShareFile } from '../utils/exportFiles';
 import { color, font } from '../theme/tokens';
 import { useHaptics } from '../hooks/useHaptics';
 import Button from '../components/ui/Button';
@@ -24,22 +26,26 @@ interface Props {
 export default function ExportScreen({ onBack }: Props) {
   const { transactions } = useData();
   const haptics = useHaptics();
-  const [exporting, setExporting] = useState(false);
-  const [exportingFull, setExportingFull] = useState(false);
+  const [exporting, setExporting] = useState<'transactions' | 'pnl' | 'full' | null>(null);
 
-  const generateCSV = (): string => {
-    const header = 'Date,Type,Category,Description,Amount,Note';
-    const rows = transactions.map((t) =>
-      [
-        t.date,
-        t.type,
-        t.category,
-        `"${(t.description || '').replace(/"/g, '""')}"`,
-        t.type === 'income' ? t.amount : -t.amount,
-        `"${(t.note || '').replace(/"/g, '""')}"`,
-      ].join(',')
-    );
-    return [header, ...rows].join('\n');
+  const today = () => new Date().toISOString().slice(0, 10);
+
+  const deliverFile = async (
+    filename: string,
+    contents: string,
+    mimeType: string,
+    fallbackTitle: string,
+  ) => {
+    try {
+      const outcome = await saveOrShareFile(filename, contents, mimeType);
+      if (outcome === 'saved') {
+        Alert.alert('Export Complete', `${filename} saved. Open it in Excel, Sheets, or Files.`);
+      }
+      if (outcome !== 'cancelled') haptics.success();
+    } catch {
+      await Share.share({ message: contents, title: fallbackTitle });
+      haptics.success();
+    }
   };
 
   const handleExport = async () => {
@@ -48,31 +54,44 @@ export default function ExportScreen({ onBack }: Props) {
       return;
     }
 
-    setExporting(true);
+    setExporting('transactions');
     haptics.light();
 
     try {
-      const csv = generateCSV();
-      const totalIncome = transactions
-        .filter((t) => t.type === 'income')
-        .reduce((s, t) => s + t.amount, 0);
-      const totalExpenses = transactions
-        .filter((t) => t.type === 'expense')
-        .reduce((s, t) => s + t.amount, 0);
-
-      const summary = `Ari - Transaction Export\n${transactions.length} transactions\nIncome: Rs.${totalIncome}\nExpenses: Rs.${totalExpenses}\nBalance: Rs.${totalIncome - totalExpenses}`;
-
-      await Share.share({
-        message: `${summary}\n\n--- CSV Data ---\n\n${csv}`,
-        title: 'Ari Transactions Export',
-      });
-
-      haptics.success();
+      await deliverFile(
+        `ari-transactions-${today()}.csv`,
+        buildTransactionsCsv(transactions),
+        'text/csv',
+        'Ari Transactions Export',
+      );
     } catch {
       Alert.alert('Export Failed', 'Could not export your data. Please try again.');
       haptics.error();
     } finally {
-      setExporting(false);
+      setExporting(null);
+    }
+  };
+
+  const handlePnlExport = async () => {
+    setExporting('pnl');
+    haptics.light();
+    try {
+      const report = await getPnlReport(12);
+      if (report.months.length === 0) {
+        Alert.alert('No Data', 'Add some transactions first to build a P&L report.');
+        return;
+      }
+      await deliverFile(
+        `ari-pnl-${today()}.csv`,
+        buildPnlCsv(report),
+        'text/csv',
+        'Ari P&L Export',
+      );
+    } catch {
+      Alert.alert('Export Failed', 'Could not build your P&L report. Check your connection and try again.');
+      haptics.error();
+    } finally {
+      setExporting(null);
     }
   };
 
@@ -80,21 +99,22 @@ export default function ExportScreen({ onBack }: Props) {
   // notes — not just transactions). This is the DPDP §11 / GDPR Art. 15+20
   // access + portability export promised in the privacy policy.
   const handleFullExport = async () => {
-    setExportingFull(true);
+    setExporting('full');
     haptics.light();
 
     try {
       const data = await authApi.exportMyData();
-      await Share.share({
-        message: JSON.stringify(data, null, 2),
-        title: 'Ari Full Data Export',
-      });
-      haptics.success();
+      await deliverFile(
+        `ari-full-export-${today()}.json`,
+        JSON.stringify(data, null, 2),
+        'application/json',
+        'Ari Full Data Export',
+      );
     } catch {
       Alert.alert('Export Failed', 'Could not export your data. Please try again.');
       haptics.error();
     } finally {
-      setExportingFull(false);
+      setExporting(null);
     }
   };
 
@@ -117,8 +137,7 @@ export default function ExportScreen({ onBack }: Props) {
             <Icon name="pie-chart" size={48} color={color.forest} />
             <Text style={styles.cardTitle}>Export as CSV</Text>
             <Text style={styles.cardDesc}>
-              Share your transaction data via text, email, or save it. Perfect for
-              spreadsheets or backup.
+              Save spreadsheet-ready transaction data or a 12-month P&L report.
             </Text>
             <Text style={styles.txnCount}>
               {transactions.length} transaction{transactions.length !== 1 ? 's' : ''} available
@@ -127,8 +146,14 @@ export default function ExportScreen({ onBack }: Props) {
         </AnimatedEntry>
 
         <AnimatedEntry delay={250}>
-          <Button onPress={handleExport} loading={exporting} fullWidth accessibilityLabel="Export and share data" accessibilityRole="button">
-            Export & Share
+          <Button onPress={handleExport} loading={exporting === 'transactions'} disabled={exporting !== null} fullWidth accessibilityLabel="Export transactions as CSV" accessibilityRole="button">
+            Export Transactions (CSV)
+          </Button>
+        </AnimatedEntry>
+
+        <AnimatedEntry delay={325}>
+          <Button onPress={handlePnlExport} loading={exporting === 'pnl'} disabled={exporting !== null} variant="secondary" fullWidth accessibilityLabel="Export profit and loss report as CSV" accessibilityRole="button">
+            Export P&L Report (CSV)
           </Button>
         </AnimatedEntry>
 
@@ -145,7 +170,7 @@ export default function ExportScreen({ onBack }: Props) {
         </AnimatedEntry>
 
         <AnimatedEntry delay={450}>
-          <Button onPress={handleFullExport} loading={exportingFull} fullWidth accessibilityLabel="Export full account data" accessibilityRole="button">
+          <Button onPress={handleFullExport} loading={exporting === 'full'} disabled={exporting !== null} fullWidth accessibilityLabel="Export full account data" accessibilityRole="button">
             Export Everything (JSON)
           </Button>
         </AnimatedEntry>

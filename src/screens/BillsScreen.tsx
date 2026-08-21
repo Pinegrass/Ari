@@ -67,7 +67,7 @@ function nextDueLabel(bill: Bill, localeTag: string): string {
 }
 
 export default function BillsScreen() {
-  const { locale, formatCurrency, formatDate } = useLocale();
+  const { locale, formatCurrency } = useLocale();
   const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
   const haptics = useHaptics();
   const insets = useSafeAreaInsets();

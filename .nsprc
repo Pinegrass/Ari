@@ -1,0 +1,12 @@
+{
+  "1138808": {
+    "active": true,
+    "notes": "high — Expo/Metro/RN toolchain or image-size (build-time/unpatchable); no safe upgrade path via overrides.",
+    "expiry": "2026-11-01"
+  },
+  "1138809": {
+    "active": true,
+    "notes": "high — Expo/Metro/RN toolchain or image-size (build-time/unpatchable); no safe upgrade path via overrides.",
+    "expiry": "2026-11-01"
+  }
+}

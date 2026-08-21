@@ -41,7 +41,9 @@ fallback."
 | `SETU_CLIENT_ID` | `setu-xyz` | Issued by Setu after sandbox onboarding. |
 | `SETU_CLIENT_SECRET` | *(secret)* | HMAC signing of outbound requests. |
 | `SETU_BASE_URL` | `https://fiu-sandbox.setu.co` | Sandbox; flip to prod when approved. |
-| `SETU_WEBHOOK_SECRET` | *(secret)* | Validates inbound webhook requests. |
+| `SETU_WEBHOOK_SECRET` | *(secret)* | Validates inbound webhook requests (sandbox HMAC). |
+| `SETU_WEBHOOK_SIGNATURE_MODE` | `rsa` | Production only — switches the webhook verifier to Setu's detached-JWS (RS256) mode. Anything else keeps sandbox HMAC. |
+| `SETU_JWKS_URL` | `https://fiu.setu.co/jwks` | Setu's published JWKS endpoint for production webhook signatures. |
 | `SETU_PURPOSE_CODE` | `101` | Personal finance management — this is the AA-framework purpose code for spending insights. |
 
 ## What's already in place (commit `17a14b7`)
@@ -78,10 +80,13 @@ fallback."
    - Open redirect in webview → user approves on Setu's UI
    - Setu fires `consent.notification` → our webhook stamps ACTIVE
    - `POST /api/aa/sync/<handle>` → `imported: N` rows in expenses
-4. Build the mobile "Link bank" flow (3 screens — TODO; backend is ready).
-5. Production cutover: KYC with Setu, swap `SETU_BASE_URL` to prod,
-   replace HMAC verifier in `setu_client.verify_jws_signature` with
-   their RSA-JWKS verifier.
+4. Build the mobile "Link bank" flow (3 screens) — ✅ shipped:
+   `LinkBank` (status CTA + consent list), `LinkBankConsent` (VUA + FI
+   types + in-app bank approval), `LinkBankConsentDetail` (sync). Pro-gated
+   via the `aa_gate` paywall source; hidden while `SETU_ENABLED=0`.
+5. Production cutover: KYC with Setu, swap `SETU_BASE_URL` to prod, and set
+   `SETU_WEBHOOK_SIGNATURE_MODE=rsa` + `SETU_JWKS_URL` — the verifier in
+   `setu_client.verify_jws_signature` already supports both modes.
 
 ## Why the scaffold ships before the real integration
 

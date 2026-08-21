@@ -8,6 +8,17 @@
  * module under test never touches UTC, so these tests are timezone-safe.
  */
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { toLocalISODate } from '../../utils/dateHelpers';
+import {
+  computeStreaks,
+  shiftISODate,
+  writeStreakCache,
+  readStreakCache,
+  STREAK_CACHE_KEY,
+  type LoggedDay,
+} from '../streaks';
+
 // In-memory AsyncStorage (jest.mock factory vars must be `mock`-prefixed).
 const mockStore = new Map<string, string>();
 jest.mock('@react-native-async-storage/async-storage', () => ({
@@ -24,17 +35,6 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
     }),
   },
 }));
-
-import {
-  computeStreaks,
-  shiftISODate,
-  writeStreakCache,
-  readStreakCache,
-  STREAK_CACHE_KEY,
-  type LoggedDay,
-} from '../streaks';
-import { toLocalISODate } from '../../utils/dateHelpers';
-
 const TODAY = toLocalISODate(new Date());
 
 /** Build a LoggedDay list from date strings (count 1 each). */
@@ -202,7 +202,6 @@ describe('streak cache', () => {
 
   it('write failure is swallowed (best-effort)', async () => {
     // Sabotage the store: setItem throws.
-    const AsyncStorage = require('@react-native-async-storage/async-storage').default;
     (AsyncStorage.setItem as jest.Mock).mockRejectedValueOnce(new Error('disk full'));
     await expect(
       writeStreakCache({ current: 1, longest: 1, loggedToday: true })

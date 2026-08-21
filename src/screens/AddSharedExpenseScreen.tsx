@@ -26,7 +26,7 @@ export default function AddSharedExpenseScreen() {
   const { params } = useRoute<Rt>();
   const haptics = useHaptics();
   const { user } = useAuth();
-  const { locale, formatCurrency } = useLocale();
+  const { locale } = useLocale();
 
   const [group, setGroup] = useState<GroupDetail | null>(null);
   const [amount, setAmount] = useState('');

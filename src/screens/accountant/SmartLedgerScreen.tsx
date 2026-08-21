@@ -55,7 +55,7 @@ type FilterType = 'all' | 'income' | 'expense';
 type SortBy = 'date' | 'amount';
 
 export default function SmartLedgerScreen() {
-  const { locale, formatDate } = useLocale();
+  const { locale } = useLocale();
   const navigation = useNavigation();
   const haptics = useHaptics();
   const { formatAmount } = usePrivacy();

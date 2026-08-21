@@ -140,6 +140,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Wrap the React setter so anywhere we update `user`, the AsyncStorage
+  // cache stays in lockstep. Avoids subtle drift between cache + state.
+  const setUserAndCache = useCallback((u: User | null) => {
+    setUser(u);
+    void cacheUser(u);
+  }, []);
+
   useEffect(() => {
     if (!user) {
       void syncRevenueCatUser(null).catch((error) => {
@@ -158,14 +165,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .catch((error) => {
         if (__DEV__) console.warn('[RevenueCat] entitlement refresh failed', error);
       });
-  }, [user?.id]);
-
-  // Wrap the React setter so anywhere we update `user`, the AsyncStorage
-  // cache stays in lockstep. Avoids subtle drift between cache + state.
-  const setUserAndCache = useCallback((u: User | null) => {
-    setUser(u);
-    void cacheUser(u);
-  }, []);
+  }, [setUserAndCache, user]);
 
   // Cold-start hydration. The order matters:
   //   1. Read the cached User row first so the navigator can render Main

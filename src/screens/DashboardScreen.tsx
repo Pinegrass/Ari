@@ -104,7 +104,7 @@ export default function DashboardScreen() {
         day: 'numeric',
         month: 'long',
       }),
-    []
+    [formatDate]
   );
 
   const handleAddEntry = useCallback(() => {
