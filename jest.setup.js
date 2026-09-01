@@ -1,3 +1,13 @@
+// Jest has no native Expo runtime. Keeping EXPO_OS on a native platform makes
+// Expo 57's lazy fetch polyfill initialize the native JS logger during Jest's
+// teardown, after the test console is already closed.
+process.env.EXPO_OS = 'web';
+globalThis.expo ??= {};
+globalThis.expo.modules ??= {};
+globalThis.expo.modules.ExpoModulesCoreJSLogger = {
+  addListener: jest.fn(),
+};
+
 // Mock expo modules
 jest.mock('expo-haptics', () => ({
   impactAsync: jest.fn(),
@@ -20,7 +30,7 @@ jest.mock('expo-notifications', () => ({
   cancelAllScheduledNotificationsAsync: jest.fn(),
   cancelScheduledNotificationAsync: jest.fn(),
   getAllScheduledNotificationsAsync: jest.fn().mockResolvedValue([]),
-  SchedulableTriggerInputTypes: { DAILY: 'daily', DATE: 'date' },
+  SchedulableTriggerInputTypes: { DAILY: 'daily', WEEKLY: 'weekly', DATE: 'date' },
 }));
 
 jest.mock('expo-device', () => ({

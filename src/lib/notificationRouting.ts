@@ -14,14 +14,33 @@
  */
 
 export type NotificationRouteTarget =
-  | { kind: 'stack'; screen: 'BudgetPlanner' | 'SmartLedger' }
-  | { kind: 'tab'; tab: 'Dashboard' };
+  | { kind: 'stack'; screen: 'BudgetPlanner' | 'SmartLedger' | 'PeriodicReports' }
+  | { kind: 'tab'; tab: 'Dashboard' | 'Tomo' };
 
 /** Extract the discriminator from an arbitrary push data payload. */
 export function notificationTypeOf(data: unknown): string | null {
   if (!data || typeof data !== 'object') return null;
   const type = (data as { type?: unknown }).type;
   return typeof type === 'string' ? type : null;
+}
+
+export type NudgeNotificationContext = {
+  nudgeId: string;
+  trigger: string;
+  experimentVariant: string;
+};
+
+/** Read only the non-financial attribution fields from a push payload. */
+export function nudgeContextOf(data: unknown): NudgeNotificationContext | null {
+  if (!data || typeof data !== 'object') return null;
+  const value = data as Record<string, unknown>;
+  if (typeof value.nudgeId !== 'string') return null;
+  return {
+    nudgeId: value.nudgeId,
+    trigger: typeof value.nudgeTrigger === 'string' ? value.nudgeTrigger : 'unknown',
+    experimentVariant:
+      typeof value.experimentVariant === 'string' ? value.experimentVariant : 'unknown',
+  };
 }
 
 /**
@@ -38,6 +57,10 @@ export function routeForNotificationData(data: unknown): NotificationRouteTarget
       return { kind: 'tab', tab: 'Dashboard' };
     case 'subscription_leak':
       return { kind: 'stack', screen: 'SmartLedger' };
+    case 'tomo_checkin':
+      return { kind: 'tab', tab: 'Tomo' };
+    case 'reactivation':
+      return { kind: 'stack', screen: 'PeriodicReports' };
     default:
       return null;
   }

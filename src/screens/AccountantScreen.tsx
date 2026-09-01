@@ -75,6 +75,13 @@ const MODULES: ModuleItem[] = [
     countries: ['IN'],
   },
   {
+    key: 'PeriodicReports',
+    icon: 'activity',
+    iconColor: color.forest,
+    title: 'Daily, Weekly & Monthly',
+    subtitle: 'Visual reports for every money rhythm',
+  },
+  {
     key: 'PnlReport',
     icon: 'bar-chart',
     iconColor: color.gold,

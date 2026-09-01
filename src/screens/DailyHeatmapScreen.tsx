@@ -60,7 +60,7 @@ export default function DailyHeatmapScreen() {
   useEffect(() => { load(month); }, [month, load]);
 
   // Streak history is month-independent — fetch once. Also snapshot it to
-  // `ari_streak_cache` so the daily reminder can use streak-save copy.
+  // `ari_streak_cache` so streak state remains available across app sessions.
   useEffect(() => {
     let active = true;
     (async () => {

@@ -22,6 +22,11 @@ import { checkAndGenerateDue } from '../lib/recurringEngine';
 import { refreshAriWidget } from '../widgets/updateWidget';
 import { track, bucketAmount } from '../lib/analytics';
 import { addBreadcrumb } from '../config/sentry';
+import { useAuth } from './AuthContext';
+import {
+  dismissNudgeForUser,
+  isNudgeRecentlyDismissed,
+} from '../lib/nudgeDismissals';
 import type {
   Transaction,
   Summary,
@@ -53,6 +58,7 @@ interface DataContextValue {
   fetchAll: () => Promise<void>;
   fetchBudgets: () => Promise<void>;
   fetchNudge: () => Promise<void>;
+  dismissNudge: (nudge: Nudge) => Promise<void>;
   fetchInsights: () => Promise<void>;
   fetchSavingsGoals: () => Promise<void>;
   fetchUserCategories: () => Promise<void>;
@@ -99,7 +105,7 @@ interface DataContextValue {
   updateSavingsGoal: (id: string, data: Partial<SavingsGoal>) => Promise<SavingsGoal>;
   contributeToGoal: (id: string, amount: number) => Promise<SavingsGoal>;
   deleteSavingsGoal: (id: string) => Promise<void>;
-  askTomo: (message: string) => Promise<void>;
+  askTomo: (message: string) => Promise<boolean>;
   clearChat: () => void;
   refresh: () => Promise<void>;
 }
@@ -125,7 +131,20 @@ const INITIAL_TOMO_MESSAGE: ChatMessage = {
     "Hey! 👋 I'm Tomo, your personal finance coach. How can I help you build better money habits today?",
 };
 
+function normalizeNudge(data: Nudge): Nudge {
+  if (data.id && data.trigger && data.actionPrompt) return data;
+  return {
+    ...data,
+    id: `legacy:${data.type || 'unknown'}`,
+    trigger: 'legacy',
+    action: 'open_tomo',
+    actionPrompt: data.message,
+    experimentVariant: 'legacy',
+  };
+}
+
 export function DataProvider({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
   const { fetchWithCache } = useOfflineCache();
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -270,12 +289,27 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
   const fetchNudge = useCallback(async () => {
     try {
-      const data = await fetchWithCache('nudge', () => tomoApi.getNudge());
-      setNudge(data);
+      const cacheOwner = user?.id ?? 'anonymous';
+      const raw = await fetchWithCache(`nudge_${cacheOwner}`, () => tomoApi.getNudge());
+      const data = normalizeNudge(raw);
+      const dismissed = user
+        ? await isNudgeRecentlyDismissed(user.id, data.id)
+        : false;
+      setNudge(dismissed ? null : data);
     } catch (err) {
       handleError(err);
     }
-  }, [handleError, fetchWithCache]);
+  }, [handleError, fetchWithCache, user]);
+
+  const dismissNudge = useCallback(async (item: Nudge) => {
+    setNudge((current) => current?.id === item.id ? null : current);
+    if (!user) return;
+    try {
+      await dismissNudgeForUser(user.id, item.id);
+    } catch {
+      /* best effort — the card still stays hidden for this session */
+    }
+  }, [user]);
 
   const fetchInsights = useCallback(async () => {
     try {
@@ -693,7 +727,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
       // Send-side event fires before the round-trip so we can attribute
       // network failures to the right user-action. history_depth is the
-      // number of prior messages (Tomo only sends last 8 to Gemini).
+      // number of prior messages (Tomo only sends the last 8 to the provider).
       track('tomo_message_sent', {
         message_length: message.length,
         history_depth: chatHistory.length,
@@ -711,6 +745,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           ...prev,
           { role: 'assistant', content: response },
         ]);
+        return true;
       } catch (err) {
         // Free-tier quota exhausted — let the screen route to the paywall
         // instead of showing a generic connectivity error.
@@ -739,6 +774,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
               "Sorry, I'm having trouble connecting right now. Please try again in a moment.",
           },
         ]);
+        return false;
       } finally {
         setTomoLoading(false);
       }
@@ -772,6 +808,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         fetchAll,
         fetchBudgets,
         fetchNudge,
+        dismissNudge,
         fetchInsights,
         fetchSavingsGoals,
         fetchUserCategories,

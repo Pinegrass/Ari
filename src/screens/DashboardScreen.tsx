@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -23,6 +23,7 @@ import MonthSpendChart from '../components/dashboard/MonthSpendChart';
 import CategoryBreakdown from '../components/dashboard/CategoryBreakdown';
 import UpcomingBillsCard from '../components/dashboard/UpcomingBillsCard';
 import StreakChip from '../components/StreakChip';
+import EngagementCard from '../components/EngagementCard';
 import { SkeletonList } from '../components/ui/Skeleton';
 import EmptyState from '../components/ui/EmptyState';
 import AnimatedEntry from '../components/ui/AnimatedEntry';
@@ -33,6 +34,7 @@ import { todayISO } from '../utils/dateHelpers';
 import { useHaptics } from '../hooks/useHaptics';
 import { useLocale } from '../hooks/useLocale';
 import type { TabParamList, MainStackParamList } from '../navigation/navigationTypes';
+import { track } from '../lib/analytics';
 
 type Nav = CompositeNavigationProp<
   BottomTabNavigationProp<TabParamList, 'Dashboard'>,
@@ -67,11 +69,24 @@ export default function DashboardScreen() {
     refreshing,
     fetchAll,
     fetchNudge,
+    dismissNudge,
     refresh,
   } = useData();
   const haptics = useHaptics();
   const c = useColors();
   const styles = useMemo(() => makeStyles(c), [c]);
+  const presentedNudges = useRef(new Set<string>());
+
+  useEffect(() => {
+    if (!nudge || presentedNudges.current.has(nudge.id)) return;
+    presentedNudges.current.add(nudge.id);
+    track('nudge_presented', {
+      nudge_id: nudge.id,
+      trigger: nudge.trigger,
+      experiment_variant: nudge.experimentVariant,
+      surface: 'dashboard',
+    });
+  }, [nudge]);
 
   useFocusEffect(
     useCallback(() => {
@@ -117,9 +132,36 @@ export default function DashboardScreen() {
   }, [navigation]);
 
   const handleNudgePress = useCallback(() => {
+    if (!nudge) return;
     haptics.light();
-    navigation.navigate('Tabs', { screen: 'Tomo' });
-  }, [haptics, navigation]);
+    track('nudge_opened', {
+      nudge_id: nudge.id,
+      trigger: nudge.trigger,
+      experiment_variant: nudge.experimentVariant,
+      surface: 'dashboard',
+    });
+    navigation.navigate('Tabs', {
+      screen: 'Tomo',
+      params: {
+        prompt: nudge.actionPrompt,
+        nudgeId: nudge.id,
+        nudgeTrigger: nudge.trigger,
+        experimentVariant: nudge.experimentVariant,
+      },
+    });
+  }, [haptics, navigation, nudge]);
+
+  const handleNudgeDismiss = useCallback(() => {
+    if (!nudge) return;
+    haptics.light();
+    track('nudge_dismissed', {
+      nudge_id: nudge.id,
+      trigger: nudge.trigger,
+      experiment_variant: nudge.experimentVariant,
+      surface: 'dashboard',
+    });
+    void dismissNudge(nudge);
+  }, [dismissNudge, haptics, nudge]);
 
   const bottom = shellPad.tab(insets);
 
@@ -175,12 +217,20 @@ export default function DashboardScreen() {
         </AnimatedEntry>
 
         <AnimatedEntry delay={200}>
+          <EngagementCard />
+        </AnimatedEntry>
+
+        <AnimatedEntry delay={220}>
           <CoachingBriefCard />
         </AnimatedEntry>
 
         {nudge && (
           <AnimatedEntry delay={230}>
-            <NudgeCard nudge={nudge} onPress={handleNudgePress} />
+            <NudgeCard
+              nudge={nudge}
+              onPress={handleNudgePress}
+              onDismiss={handleNudgeDismiss}
+            />
           </AnimatedEntry>
         )}
 

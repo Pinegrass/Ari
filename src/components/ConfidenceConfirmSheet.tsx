@@ -93,7 +93,11 @@ export default function ConfidenceConfirmSheet({
 
 const styles = StyleSheet.create({
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
     backgroundColor: 'rgba(35,41,31,0.55)',
   },
   sheetWrapper: {

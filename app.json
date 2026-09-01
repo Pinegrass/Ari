@@ -6,18 +6,13 @@
     "version": "1.3.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "dark",
-    "newArchEnabled": false,
+    "userInterfaceStyle": "light",
     "scheme": "ari",
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#061313"
-    },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.pinegrass.ari",
       "usesAppleSignIn": true,
+      "associatedDomains": ["applinks:aritomo.in"],
       "infoPlist": {
         "NSFaceIDUsageDescription": "Ari uses Face ID to secure your app access.",
         "NSUserNotificationUsageDescription": "Ari sends you daily reminders and budget alerts.",
@@ -31,8 +26,15 @@
         "backgroundColor": "#061313"
       },
       "package": "com.pinegrass.ari",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [{ "scheme": "https", "host": "aritomo.in", "pathPrefix": "/invite" }],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ],
       "googleServicesFile": "./google-services.json",
-      "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
     "plugins": [

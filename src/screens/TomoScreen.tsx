@@ -18,9 +18,9 @@ import { font } from '../theme/tokens';
 import { useColors } from '../context/ThemeContext';
 import type { Palette } from '../theme/palettes';
 import { useHaptics } from '../hooks/useHaptics';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import type { MainStackParamList } from '../navigation/navigationTypes';
+import type { MainStackParamList, TabParamList } from '../navigation/navigationTypes';
 import { ApiError } from '../api/client';
 import { track } from '../lib/analytics';
 
@@ -97,6 +97,31 @@ export default function TomoScreen() {
   const listRef = useRef<FlatList>(null);
   const [input, setInput] = useState('');
   const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
+  const route = useRoute<RouteProp<TabParamList, 'Tomo'>>();
+  const lastNudgeId = useRef<string | null>(null);
+  const pendingNudge = useRef<{
+    id: string;
+    trigger: string;
+    experimentVariant: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const params = route.params;
+    if (!params?.nudgeId || params.nudgeId === lastNudgeId.current) return;
+    lastNudgeId.current = params.nudgeId;
+    pendingNudge.current = {
+      id: params.nudgeId,
+      trigger: params.nudgeTrigger ?? 'unknown',
+      experimentVariant: params.experimentVariant ?? 'unknown',
+    };
+    if (params.prompt) setInput(params.prompt);
+    track('nudge_action_started', {
+      nudge_id: params.nudgeId,
+      trigger: params.nudgeTrigger ?? 'unknown',
+      experiment_variant: params.experimentVariant ?? 'unknown',
+      action: 'open_tomo',
+    });
+  }, [route.params]);
 
   const showQuickPrompts = chatHistory.length <= 1;
 
@@ -116,7 +141,16 @@ export default function TomoScreen() {
     try {
       // Free users get a small daily quota, enforced server-side. The paywall
       // shows only when the server says today's free messages are used up.
-      await askTomo(text);
+      const answered = await askTomo(text);
+      if (answered && pendingNudge.current) {
+        track('nudge_action_completed', {
+          nudge_id: pendingNudge.current.id,
+          trigger: pendingNudge.current.trigger,
+          experiment_variant: pendingNudge.current.experimentVariant,
+          action: 'tomo_message_answered',
+        });
+        pendingNudge.current = null;
+      }
     } catch (err) {
       if (
         err instanceof ApiError &&

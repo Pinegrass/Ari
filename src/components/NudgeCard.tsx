@@ -8,6 +8,8 @@ interface Props {
   nudge: Nudge;
   /** Tap opens Tomo chat so the user can act on the nudge. */
   onPress?: () => void;
+  /** Autonomy-preserving 24-hour dismissal. */
+  onDismiss?: () => void;
 }
 
 /**
@@ -15,29 +17,41 @@ interface Props {
  * cards (flat `card` surface, hairline border, 22 radius — see
  * CoachingBriefCard); a chevron hints that tapping opens the Tomo tab.
  */
-export default function NudgeCard({ nudge, onPress }: Props) {
+export default function NudgeCard({ nudge, onPress, onDismiss }: Props) {
   return (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={onPress}
-      activeOpacity={onPress ? 0.8 : 1}
-      disabled={!onPress}
-      accessibilityRole={onPress ? 'button' : undefined}
-      accessibilityLabel={`Tomo nudge: ${nudge.title}`}
-    >
-      <View style={styles.header}>
-        {nudge.emoji ? (
-          <Text style={styles.emoji}>{nudge.emoji}</Text>
-        ) : (
-          <Icon name="zap" size={20} color={color.forest} />
-        )}
-        <Text style={styles.badgeText}>Tomo says</Text>
-        <View style={styles.spacer} />
-        {onPress && <Icon name="chevron-right" size={16} color={color.inkFaint} />}
-      </View>
-      <Text style={styles.title}>{nudge.title}</Text>
-      <Text style={styles.message}>{nudge.message}</Text>
-    </TouchableOpacity>
+    <View style={styles.card}>
+      <TouchableOpacity
+        style={styles.main}
+        onPress={onPress}
+        activeOpacity={onPress ? 0.8 : 1}
+        disabled={!onPress}
+        accessibilityRole={onPress ? 'button' : undefined}
+        accessibilityLabel={`Tomo nudge: ${nudge.title}`}
+      >
+        <View style={styles.header}>
+          {nudge.emoji ? (
+            <Text style={styles.emoji}>{nudge.emoji}</Text>
+          ) : (
+            <Icon name="zap" size={20} color={color.forest} />
+          )}
+          <Text style={styles.badgeText}>Tomo noticed</Text>
+          <View style={styles.spacer} />
+          {onPress ? <Icon name="chevron-right" size={16} color={color.inkFaint} /> : null}
+        </View>
+        <Text style={styles.title}>{nudge.title}</Text>
+        <Text style={styles.message}>{nudge.message}</Text>
+      </TouchableOpacity>
+      {onDismiss ? (
+        <TouchableOpacity
+          style={styles.dismiss}
+          onPress={onDismiss}
+          accessibilityRole="button"
+          accessibilityLabel="Hide this Tomo nudge for 24 hours"
+        >
+          <Text style={styles.dismissText}>Not now</Text>
+        </TouchableOpacity>
+      ) : null}
+    </View>
   );
 }
 
@@ -49,8 +63,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: color.line,
     borderRadius: 22,
-    padding: 18,
+    overflow: 'hidden',
   },
+  main: { padding: 18 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -79,5 +94,17 @@ const styles = StyleSheet.create({
     fontSize: type.body,
     color: color.inkSoft,
     lineHeight: 20,
+  },
+  dismiss: {
+    borderTopWidth: 1,
+    borderTopColor: color.line,
+    paddingHorizontal: 18,
+    paddingVertical: 11,
+    alignItems: 'flex-end',
+  },
+  dismissText: {
+    fontFamily: font.bodySemi,
+    fontSize: type.caption,
+    color: color.moss,
   },
 });

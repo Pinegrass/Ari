@@ -1,13 +1,13 @@
 # Ari — Project Specs & Developer Reference
 
 ## Overview
-Ari is a personal finance management app for Indian users (salaried + freelancers). React Native/Expo frontend with a Flask backend. AI-powered financial coaching via Google Gemini 2.5 Flash.
+Ari is a personal finance management app for Indian users (salaried + freelancers). React Native/Expo frontend with a Flask backend. AI-powered financial coaching uses DeepSeek V3 with Gemini 2.5 Flash fallback.
 
 ## Quick Start
 
 ### Frontend (Expo)
 ```bash
-cd C:\Users\Augustus Rex\Projects\Workex\Ari
+cd D:\Codex\Workex\Ari
 npm start            # Expo dev server
 npm run android      # Android dev
 npm test             # Jest tests
@@ -19,7 +19,7 @@ npm run lint         # ESLint
 ```bash
 cd backend
 py app.py            # Dev server on :5000
-# Requires: .env with SECRET_KEY, DATABASE_URL, GEMINI_API_KEY
+# Requires: .env with SECRET_KEY, DATABASE_URL, and at least one AI provider key
 ```
 
 ### Build & Deploy
@@ -39,25 +39,25 @@ cd backend && git push origin master
 ## Architecture
 
 ### Frontend
-- **Framework**: React Native 0.81.5 + Expo SDK 54 + TypeScript 5.9
+- **Framework**: React Native 0.86.3 + Expo SDK 57 + TypeScript 6.0
 - **Navigation**: React Navigation v6 (Stack + Bottom Tabs)
 - **State**: React Context (AuthContext, DataContext)
 - **Styling**: StyleSheet.create (no external CSS-in-JS)
-- **New Architecture**: Enabled (Fabric + TurboModules) — required by Reanimated 4.x. Razorpay autolinking disabled via `react-native.config.js` (paywall flag-gated off in v1)
+- **New Architecture**: Enabled by default on Expo SDK 57 (Fabric + TurboModules) and used by Reanimated 4.x. Razorpay autolinking is disabled via `react-native.config.js` (paywall flag-gated off in v1)
 - **Edge-to-edge**: Enabled on Android
-- **OTA Updates**: expo-updates configured (runtimeVersion: appVersion)
+- **OTA Updates**: expo-updates configured (runtimeVersion: fingerprint)
 
 ### Backend
 - **Framework**: Flask 3.1 + SQLAlchemy 2.0
 - **Database**: PostgreSQL (Railway prod) / SQLite (local dev)
-- **Auth**: JWT (PyJWT) + bcrypt password hashing
-- **AI**: Google Gemini 2.5 Flash via google-genai SDK
+- **Auth**: Supabase Auth access/refresh sessions; Flask verifies bearer JWTs
+- **AI**: DeepSeek V3 primary via its OpenAI-compatible API; Google Gemini 2.5 Flash fallback
 - **Hosting**: Railway (auto-deploy from GitHub master)
 - **WSGI**: Gunicorn with 2 workers
 
 ### Repo Structure
-- Frontend: local only (no git remote) at `C:\Users\Augustus Rex\Projects\Workex\Ari`
-- Backend: `github.com/ejjy/ari-backend` (master branch) at `Ari/backend/`
+- Frontend: `github.com/Pinegrass/Ari` (master branch) at `D:\Codex\Workex\Ari`
+- Backend: `github.com/Pinegrass/ari-backend` (master branch) at `Ari/backend/`
 - Backend is a separate git repo nested inside the frontend directory
 
 ---
@@ -67,12 +67,12 @@ cd backend && git push origin master
 ### Frontend Dependencies
 | Package | Purpose |
 |---------|---------|
-| expo ~54.0.33 | Core framework |
-| react-native 0.81.5 | Mobile runtime |
+| expo ^57.0.18 | Core framework |
+| react-native 0.86.3 | Mobile runtime |
 | @react-navigation/native ^6.1.18 | Navigation |
 | @react-navigation/stack ^6.4.1 | Stack navigator |
 | @react-navigation/bottom-tabs ^6.6.1 | Tab navigator |
-| react-native-reanimated ~4.1.1 | Animations |
+| react-native-reanimated 4.5.1 | Animations |
 | react-native-gesture-handler ~2.28.0 | Gestures |
 | react-native-safe-area-context ~5.6.0 | Safe area |
 | react-native-screens ~4.16.0 | Native screens |
@@ -94,6 +94,7 @@ cd backend && git push origin master
 | PyJWT 2.10.1 | JWT tokens |
 | bcrypt 4.2.1 | Password hashing |
 | google-genai | Gemini AI SDK |
+| openai | OpenAI-compatible client used to call DeepSeek (not the OpenAI service) |
 | gunicorn 23.0.0 | Production WSGI |
 
 ---
@@ -403,7 +404,7 @@ src/
 ```
 backend/
 ├── app.py              # Flask app factory, blueprint registration, migrations
-├── config.py           # Config from env vars (SECRET_KEY, DATABASE_URL, GEMINI_API_KEY)
+├── config.py           # Config from env vars (SECRET_KEY, DATABASE_URL, AI provider keys)
 ├── models.py           # SQLAlchemy models (User, Transaction, Budget, SavingsGoal, TaxProfile, UserCategory, TodoNote)
 ├── auth_helpers.py     # @token_required decorator, JWT validation
 ├── seed.py             # Database seed script
@@ -421,7 +422,7 @@ backend/
     ├── tax_profile.py      # Get/upsert tax profile
     ├── reports.py          # P&L aggregation, category trends
     ├── todos.py            # CRUD to-do notes
-    ├── tomo.py             # Gemini AI chat + nudge + insights
+    ├── tomo.py             # Multi-provider AI chat + deterministic nudge + insights
     └── feedback.py         # User feedback
 ```
 
@@ -596,4 +597,4 @@ npm run typecheck        # TypeScript validation
 9. **Animations**: AnimatedEntry wraps elements for staggered fade-in with delay prop.
 10. **Backend Blueprint Pattern**: Each route file exports a Blueprint with `url_prefix="/api"`.
 11. **Auth Decorator**: `@token_required` passes `current_user` as first arg to route handlers.
-12. **No OpenAI**: App exclusively uses Google Gemini 2.5 Flash. No OpenAI dependency.
+12. **AI providers**: DeepSeek V3 is primary and Gemini 2.5 Flash is fallback. The `openai` package is used only as DeepSeek's OpenAI-compatible client; Ari does not call the OpenAI service.

@@ -18,6 +18,12 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { addBreadcrumb, captureError, setUserContext, clearUserContext } from '../config/sentry';
 import type { User, RegisterPayload } from '../types';
 import { refreshEntitlements, syncRevenueCatUser } from '../lib/revenuecat';
+import {
+  authApiErrorCode,
+  trackAuthAttempt,
+  trackAuthResult,
+  type AuthProvider as AuthMethodProvider,
+} from '../lib/authTelemetry';
 
 interface AuthContextValue {
   user: User | null;
@@ -30,7 +36,7 @@ interface AuthContextValue {
   updateProfile: (patch: authApi.PatchMePayload) => Promise<void>;
   /** Hydrate the context from an already-persisted session (e.g. after
    * Google OAuth or phone-OTP stash the access_token themselves). */
-  refreshFromSession: (user: User) => Promise<void>;
+  refreshFromSession: (user: User, provider?: Exclude<AuthMethodProvider, 'email'>) => Promise<void>;
 }
 
 export interface RegisterFormData {
@@ -253,15 +259,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = useCallback(async (email: string, password: string) => {
     addBreadcrumb('auth', 'login: attempt');
-    const { token, refresh_token, user: u } = await authApi.login(email, password);
-    await secureStorage.setItem('ari_token', token);
-    await adoptSessionIntoSupabase(token, refresh_token);
-    setUserAndCache(u);
-    setUserContext({ id: u.id, email: u.email, name: u.name });
-    identifyUser(u.id, { tier: u.tier ?? 'free', age_group: u.ageGroup });
-    track('login_success');
-    addBreadcrumb('auth', 'login: success');
-    attemptPushRegister();
+    trackAuthAttempt({ provider: 'email', flow: 'password', stage: 'credential_exchange' });
+    try {
+      const { token, refresh_token, user: u } = await authApi.login(email, password);
+      trackAuthResult({
+        provider: 'email',
+        flow: 'password',
+        stage: 'credential_exchange',
+        outcome: 'success',
+      });
+      await secureStorage.setItem('ari_token', token);
+      await adoptSessionIntoSupabase(token, refresh_token);
+      setUserAndCache(u);
+      setUserContext({ id: u.id, email: u.email, name: u.name });
+      identifyUser(u.id, { tier: u.tier ?? 'free', age_group: u.ageGroup });
+      track('login_success', { provider: 'email' });
+      addBreadcrumb('auth', 'login: success');
+      attemptPushRegister();
+    } catch (error) {
+      trackAuthResult({
+        provider: 'email',
+        flow: 'password',
+        stage: 'credential_exchange',
+        outcome: 'failed',
+        errorCode: authApiErrorCode(error instanceof ApiError ? error.status : null),
+      });
+      throw error;
+    }
   }, [setUserAndCache]);
 
   const register = useCallback(async (formData: RegisterFormData) => {
@@ -309,10 +333,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     addBreadcrumb('auth', 'logout: complete');
   }, []);
 
-  const refreshFromSession = useCallback(async (u: User) => {
+  const refreshFromSession = useCallback(async (
+    u: User,
+    provider?: Exclude<AuthMethodProvider, 'email'>,
+  ) => {
     setUserAndCache(u);
     setUserContext({ id: u.id, email: u.email, name: u.name });
     identifyUser(u.id, { tier: u.tier ?? 'free', age_group: u.ageGroup });
+    if (provider) track('login_success', { provider });
     attemptPushRegister();
   }, [setUserAndCache]);
 

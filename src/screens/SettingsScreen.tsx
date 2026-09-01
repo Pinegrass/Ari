@@ -354,6 +354,12 @@ export default function SettingsScreen() {
 
   const menuItems: MenuItem[] = [
     {
+      icon: 'gift',
+      label: 'Invite Friends',
+      subtitle: 'Grow your circle and track accepted invites',
+      onPress: () => { haptics.light(); navigation.navigate('InviteFriends'); },
+    },
+    {
       icon: 'refresh-cw',
       label: 'Recurring Payments',
       subtitle: 'Pause, edit or stop repeating entries',
@@ -479,11 +485,11 @@ export default function SettingsScreen() {
                 <Icon name="bell" size={20} color={color.inkFaint} />
               </View>
               <View style={styles.menuText}>
-                <Text style={styles.menuLabel}>Daily Reminders</Text>
+                <Text style={styles.menuLabel}>Tomo Check-ins</Text>
                 <Text style={styles.menuSubtitle}>
                   {notificationsEnabled
-                    ? `Tomo reminds you at ${formatTime12h(reminderHour, reminderMinute)}`
-                    : 'Get nudged to log expenses'}
+                    ? `Twice a week at ${formatTime12h(reminderHour, reminderMinute)}`
+                    : 'Optional, low-pressure money check-ins'}
                 </Text>
               </View>
               <Switch
@@ -491,7 +497,7 @@ export default function SettingsScreen() {
                 onValueChange={handleNotifications}
                 trackColor={{ false: color.line, true: color.forest2 }}
                 thumbColor={notificationsEnabled ? color.forest : color.inkFaint}
-                accessibilityLabel="Toggle daily reminders"
+                accessibilityLabel="Toggle Tomo check-ins"
               />
             </View>
             {notificationsEnabled && (
@@ -508,8 +514,8 @@ export default function SettingsScreen() {
                     <Icon name="clock" size={20} color={color.inkFaint} />
                   </View>
                   <View style={styles.menuText}>
-                    <Text style={styles.menuLabel}>Reminder Time</Text>
-                    <Text style={styles.menuSubtitle}>Tap to change when Tomo nudges you</Text>
+                    <Text style={styles.menuLabel}>Check-in Time</Text>
+                    <Text style={styles.menuSubtitle}>Tap to change when Tomo checks in</Text>
                   </View>
                   <Text style={styles.timeValue}>
                     {formatTime12h(reminderHour, reminderMinute)}

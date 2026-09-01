@@ -1,6 +1,6 @@
 /**
  * Spec §7: client-side PII scrubber. MUST run before any raw user input is
- * forwarded to an AI provider (Gemini today, Claude tomorrow). Stripping
+ * forwarded to an AI provider (DeepSeek primary, Gemini fallback). Stripping
  * happens on the outbound payload only — the original input is preserved
  * locally for the user's own records.
  *

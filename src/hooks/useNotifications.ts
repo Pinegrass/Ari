@@ -3,26 +3,25 @@ import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
-import { readStreakCache, STREAK_REMINDER_MIN } from '../lib/streaks';
+import { track } from '../lib/analytics';
 
 const NOTIFICATIONS_ENABLED_KEY = 'ari_notifications_enabled';
 const REMINDER_TIME_KEY = 'ari_reminder_time'; // stored as "HH:MM" e.g. "20:00"
-const REMINDER_INDEX_KEY = 'ari_daily_reminder_msg_index'; // rotation cursor
+const REMINDER_INDEX_KEY = 'ari_checkin_msg_index'; // rotation cursor
 const DEFAULT_HOUR = 20; // 8 PM — same default as before to preserve UX for existing users
 const DEFAULT_MINUTE = 0;
-// Stable identifier for the daily "log your expenses" reminder. We cancel by
-// this id rather than cancelAllScheduledNotificationsAsync() so bill/EMI
-// reminders (src/lib/bills.ts, namespaced "bill:...") are never collateral.
-const DAILY_REMINDER_ID = 'ari_daily_reminder';
+// Cancel the legacy daily identifier during migration. We still cancel only
+// known Ari check-in ids so bill/EMI reminders are never collateral.
+const LEGACY_DAILY_REMINDER_ID = 'ari_daily_reminder';
+const CHECKIN_IDS = ['ari_tomo_checkin_tue', 'ari_tomo_checkin_fri'] as const;
+const CHECKIN_WEEKDAYS = [3, 6] as const; // Expo: Sunday=1, Tuesday=3, Friday=6
 
-// Daily reminder copy bank. A DAILY trigger repeats its content verbatim
-// forever, so instead of picking once at schedule time we rotate: each
-// (re)schedule consumes the next message and persists the cursor.
+// Check-in copy bank. Each foreground reschedule rotates the two messages.
 const REMINDER_MESSAGES = [
-  { title: "Hey! Did you log today's expenses? 📊", body: "Tomo is waiting to help you track your spending." },
-  { title: "Don't forget to log your spending! 💰", body: "Quick entry takes just 5 seconds." },
-  { title: "How's your budget looking? 🎯", body: "Check in with Tomo to stay on track." },
-  { title: "Your money diary needs an update! 📝", body: "Log today's expenses to keep your streak." },
+  { title: 'A quick money check-in? 🌿', body: 'Add anything that changed, or skip today if there is nothing to log.' },
+  { title: 'Want a two-minute review? 🧭', body: 'Tomo can show what changed and offer one optional next step.' },
+  { title: 'Your plan is ready when you are', body: 'Review your month, add an entry, or choose Not now.' },
+  { title: 'A calm check-in from Tomo', body: 'See what is on track and what—if anything—needs attention.' },
 ] as const;
 
 // Configure notification behavior
@@ -55,19 +54,6 @@ function formatReminderTime(hour: number, minute: number): string {
 
 /** Next message in the rotation; advances the persisted cursor. */
 async function nextReminderMessage(): Promise<{ title: string; body: string }> {
-  // Streak-save variant (Phase 4): when a streak of >= STREAK_REMINDER_MIN
-  // days is active and today isn't logged yet, nudge to save the streak
-  // instead of rotating. The cursor is left untouched so the normal rotation
-  // resumes exactly where it was once the streak is safe. Missing or stale
-  // cache (readStreakCache returns null) falls back to the normal rotation.
-  const streak = await readStreakCache();
-  if (streak && !streak.loggedToday && streak.current >= STREAK_REMINDER_MIN) {
-    return {
-      title: `Your ${streak.current}-day streak is on the line! 🔥`,
-      body: "Log today's expenses to keep it alive — takes 5 seconds.",
-    };
-  }
-
   const raw = await AsyncStorage.getItem(REMINDER_INDEX_KEY);
   const idx = raw ? parseInt(raw, 10) : 0;
   const safeIdx = Number.isFinite(idx) && idx >= 0 ? idx : 0;
@@ -85,34 +71,49 @@ async function nextReminderMessage(): Promise<{ title: string; body: string }> {
  * (toggle / time change) and the app-foreground rotation path share it.
  * Cancels by id only — bill/EMI reminders are never collateral.
  */
+async function cancelCheckIns(): Promise<void> {
+  await Promise.all([
+    Notifications.cancelScheduledNotificationAsync(LEGACY_DAILY_REMINDER_ID).catch(() => {}),
+    ...CHECKIN_IDS.map((id) => Notifications.cancelScheduledNotificationAsync(id).catch(() => {})),
+  ]);
+}
+
 async function scheduleReminderAt(hour: number, minute: number): Promise<void> {
-  await Notifications.cancelScheduledNotificationAsync(DAILY_REMINDER_ID).catch(() => {});
+  await cancelCheckIns();
 
-  const msg = await nextReminderMessage();
-
-  await Notifications.scheduleNotificationAsync({
-    identifier: DAILY_REMINDER_ID,
-    content: {
-      title: msg.title,
-      body: msg.body,
-      sound: 'default',
-    },
-    trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.DAILY,
-      hour,
-      minute,
-    },
-  });
+  for (let index = 0; index < CHECKIN_IDS.length; index += 1) {
+    const msg = await nextReminderMessage();
+    const weekday = CHECKIN_WEEKDAYS[index];
+    await Notifications.scheduleNotificationAsync({
+      identifier: CHECKIN_IDS[index],
+      content: {
+        title: msg.title,
+        body: msg.body,
+        sound: 'default',
+        data: {
+          type: 'tomo_checkin',
+          nudgeId: `local_checkin:${weekday}`,
+          nudgeTrigger: 'scheduled_checkin',
+          experimentVariant: 'contextual_v1',
+        },
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
+        weekday,
+        hour,
+        minute,
+      },
+    });
+  }
 }
 
 /**
- * Rotate the daily reminder copy. expo-notifications' DAILY trigger repeats
- * the same title/body forever, so on every app foreground we cancel +
- * reschedule the reminder with the next message in the rotation. No-op when
+ * Rotate the twice-weekly check-in copy. On every app foreground we cancel +
+ * reschedule the two weekly reminders with the next messages. No-op when
  * reminders are off or permission was revoked. Best-effort by design — a
  * failure just means the previous message repeats once more.
  */
-export async function rotateDailyReminderMessage(): Promise<void> {
+export async function refreshTomoCheckins(): Promise<void> {
   try {
     const enabled = await AsyncStorage.getItem(NOTIFICATIONS_ENABLED_KEY);
     if (enabled !== 'true') return;
@@ -177,7 +178,7 @@ export function useNotifications() {
    * Each (re)schedule consumes the next message in the rotation, so toggling,
    * changing the time, and foreground rotation all advance the copy.
    */
-  const scheduleDailyReminder = useCallback(
+  const scheduleCheckIns = useCallback(
     async (hour: number = reminderHour, minute: number = reminderMinute) => {
       await scheduleReminderAt(hour, minute);
     },
@@ -188,17 +189,19 @@ export function useNotifications() {
     if (!isEnabled) {
       const granted = await requestPermission();
       if (granted) {
-        await scheduleDailyReminder();
+        await scheduleCheckIns();
         await AsyncStorage.setItem(NOTIFICATIONS_ENABLED_KEY, 'true');
         setIsEnabled(true);
+        track('nudge_checkins_enabled', { cadence: 'twice_weekly' });
       }
     } else {
-      // Turn off only the daily reminder — bill reminders stay scheduled.
-      await Notifications.cancelScheduledNotificationAsync(DAILY_REMINDER_ID).catch(() => {});
+      // Turn off only Tomo check-ins — bill reminders stay scheduled.
+      await cancelCheckIns();
       await AsyncStorage.setItem(NOTIFICATIONS_ENABLED_KEY, 'false');
       setIsEnabled(false);
+      track('nudge_checkins_disabled', { cadence: 'twice_weekly' });
     }
-  }, [isEnabled, requestPermission, scheduleDailyReminder]);
+  }, [isEnabled, requestPermission, scheduleCheckIns]);
 
   /**
    * Persist a new reminder time and re-schedule if reminders are on.
@@ -213,22 +216,27 @@ export function useNotifications() {
       setReminderMinute(safeMinute);
       await AsyncStorage.setItem(REMINDER_TIME_KEY, formatReminderTime(safeHour, safeMinute));
       if (isEnabled && permissionGranted) {
-        await scheduleDailyReminder(safeHour, safeMinute);
+        await scheduleCheckIns(safeHour, safeMinute);
       }
     },
-    [isEnabled, permissionGranted, scheduleDailyReminder]
+    [isEnabled, permissionGranted, scheduleCheckIns]
   );
 
   const sendTestNotification = useCallback(async () => {
-    if (!permissionGranted) {
-      await requestPermission();
-    }
+    const granted = permissionGranted || await requestPermission();
+    if (!granted) return;
 
     await Notifications.scheduleNotificationAsync({
       content: {
         title: 'Tomo says hi! 🤖',
-        body: "Great job staying on top of your finances! Keep it up.",
+        body: 'Review your month, add an entry, or skip today—your choice.',
         sound: 'default',
+        data: {
+          type: 'tomo_checkin',
+          nudgeId: 'local_checkin:test',
+          nudgeTrigger: 'test_checkin',
+          experimentVariant: 'contextual_v1',
+        },
       },
       trigger: null, // Send immediately
     });

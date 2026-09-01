@@ -26,8 +26,12 @@ import * as Notifications from 'expo-notifications';
 import { initAnalytics, track } from './src/lib/analytics';
 import { checkAndApplyUpdate, registerOtaReloadHandler } from './src/lib/otaUpdates';
 import { reconcileBillReminders, type BillNotificationData } from './src/lib/bills';
-import { routeForNotificationData, notificationTypeOf } from './src/lib/notificationRouting';
-import { rotateDailyReminderMessage } from './src/hooks/useNotifications';
+import {
+  routeForNotificationData,
+  notificationTypeOf,
+  nudgeContextOf,
+} from './src/lib/notificationRouting';
+import { refreshTomoCheckins } from './src/hooks/useNotifications';
 import ErrorBoundary from './src/components/ErrorBoundary';
 import UpdateToast from './src/components/UpdateToast';
 import { AuthProvider } from './src/context/AuthContext';
@@ -38,6 +42,7 @@ import RootNavigator from './src/navigation/RootNavigator';
 import { useShareIntent } from 'expo-share-intent';
 import { getInitialSharedText, addShareIntentListener, sharedTextFromIntent } from './src/lib/shareIntentHandler';
 import type { RootStackParamList } from './src/navigation/navigationTypes';
+import { inviteCodeFromUrl } from './src/lib/referralLinks';
 
 const navigationRef = createNavigationContainerRef<RootStackParamList>();
 
@@ -90,15 +95,45 @@ function navigateForPushPayload(data: unknown) {
     return;
   }
   try {
+    const nudgeContext = nudgeContextOf(data);
     if (target.kind === 'tab') {
       (navigationRef as any).navigate('Main', {
         screen: 'Tabs',
-        params: { screen: target.tab },
+        params: {
+          screen: target.tab,
+          ...(target.tab === 'Tomo' && nudgeContext
+            ? {
+                params: {
+                  prompt: 'Give me a quick, optional review of what needs attention.',
+                  nudgeId: nudgeContext.nudgeId,
+                  nudgeTrigger: nudgeContext.trigger,
+                  experimentVariant: nudgeContext.experimentVariant,
+                },
+              }
+            : {}),
+        },
       });
     } else {
       (navigationRef as any).navigate('Main', { screen: target.screen });
     }
-    track('push_opened', { type: notificationTypeOf(data) ?? 'unknown' });
+    track('push_opened', {
+      type: notificationTypeOf(data) ?? 'unknown',
+      ...(nudgeContext
+        ? {
+            nudge_id: nudgeContext.nudgeId,
+            trigger: nudgeContext.trigger,
+            experiment_variant: nudgeContext.experimentVariant,
+          }
+        : {}),
+    });
+    if (nudgeContext) {
+      track('nudge_opened', {
+        nudge_id: nudgeContext.nudgeId,
+        trigger: nudgeContext.trigger,
+        experiment_variant: nudgeContext.experimentVariant,
+        surface: 'notification',
+      });
+    }
   } catch {
     // Navigator on Auth (logged out) — drop silently.
   }
@@ -106,6 +141,7 @@ function navigateForPushPayload(data: unknown) {
 
 /** Widget tap (ari://add) — open fast entry. Buffered until the nav is ready. */
 let _pendingOpenAdd = false;
+let _pendingInviteCode: string | null = null;
 function navigateToAdd() {
   if (!navigationRef.isReady()) {
     _pendingOpenAdd = true;
@@ -120,6 +156,22 @@ function navigateToAdd() {
     // Navigator on Auth (logged out) — drop silently.
   }
 }
+
+function navigateToInvite(code: string) {
+  if (!navigationRef.isReady()) {
+    _pendingInviteCode = code;
+    return;
+  }
+  const rootRoutes = navigationRef.getRootState().routeNames;
+  if (rootRoutes.includes('Main')) {
+    (navigationRef as any).navigate('Main', { screen: 'InviteFriends', params: { code } });
+  } else if (rootRoutes.includes('Auth')) {
+    (navigationRef as any).navigate('Auth', { screen: 'Register', params: { referralCode: code } });
+  } else {
+    _pendingInviteCode = code;
+  }
+}
+
 
 function navigateToShare(text: string) {
   if (!navigationRef.isReady()) {
@@ -158,10 +210,9 @@ checkAndApplyUpdate();
 // (idempotent: cancel-then-reschedule) is what makes reminders durable.
 reconcileBillReminders();
 
-// Rotate the daily reminder copy on cold start — a DAILY trigger repeats the
-// same title/body forever, so each foreground reschedules with the next
-// message. No-op when reminders are off.
-rotateDailyReminderMessage();
+// Refresh the two low-pressure Tomo check-ins on cold start so legacy daily
+// reminders are migrated and copy rotates. No-op when check-ins are off.
+refreshTomoCheckins();
 
 function App() {
   // Forest-on-cream design system uses Fraunces (display) + Inter (body).
@@ -232,8 +283,8 @@ function App() {
         // occurrence just fired gets its next month scheduled without waiting
         // for a cold start.
         reconcileBillReminders();
-        // Same resume pass rotates the daily reminder to its next message.
-        rotateDailyReminderMessage();
+        // Same resume pass refreshes the twice-weekly Tomo check-ins.
+        refreshTomoCheckins();
       }
 
       // active → background : measure session length. iOS fires 'inactive'
@@ -309,10 +360,14 @@ function App() {
     resetShareIntent();
   }, [hasShareIntent, shareIntent, resetShareIntent]);
 
-  // Widget deep link: ari://add (home-screen widget tap) opens fast entry.
+  // Widget and invite deep links. Verified HTTPS links use the same parser as
+  // ari://invite/CODE, so attribution survives whichever channel opened Ari.
   useEffect(() => {
     const handle = (url: string | null) => {
-      if (url && url.startsWith('ari://add')) navigateToAdd();
+      if (!url) return;
+      if (url.startsWith('ari://add')) navigateToAdd();
+      const inviteCode = inviteCodeFromUrl(url);
+      if (inviteCode) navigateToInvite(inviteCode);
     };
     Linking.getInitialURL().then(handle).catch(() => {});
     const sub = Linking.addEventListener('url', ({ url }) => handle(url));
@@ -346,6 +401,11 @@ function App() {
               if (_pendingOpenAdd) {
                 navigateToAdd();
                 _pendingOpenAdd = false;
+              }
+              if (_pendingInviteCode) {
+                const code = _pendingInviteCode;
+                _pendingInviteCode = null;
+                navigateToInvite(code);
               }
             }}
           >

@@ -18,6 +18,7 @@ import { renderHook, act } from '@testing-library/react-native';
 import { DataProvider, useData } from '../DataContext';
 import { localStore } from '../../lib/localStore';
 import * as txnApi from '../../api/transactions';
+import * as tomoApi from '../../api/tomo';
 
 jest.mock('@react-native-async-storage/async-storage', () => {
   let store: Record<string, string> = {};
@@ -66,6 +67,9 @@ jest.mock('../../api/transactions', () => ({
   getTransactions: jest.fn(),
   getSummary: jest.fn().mockResolvedValue(null),
 }));
+jest.mock('../../api/tomo', () => ({
+  chatWithTomo: jest.fn(),
+}));
 
 // Keep the provider's background machinery inert.
 jest.mock('../../lib/syncEngine', () => ({
@@ -85,6 +89,9 @@ jest.mock('../../lib/analytics', () => ({
   bucketAmount: jest.fn(() => '100-500'),
 }));
 jest.mock('../../config/sentry', () => ({ addBreadcrumb: jest.fn() }));
+jest.mock('../AuthContext', () => ({
+  useAuth: () => ({ user: { id: 'test-user' } }),
+}));
 
 const { ApiError } = jest.requireMock('../../api/client') as {
   ApiError: new (s: number, m: string, b?: unknown) => Error;
@@ -226,5 +233,31 @@ describe('DataContext.addTransaction — no silent failures (B1)', () => {
     // Not a user-facing failure — the conflict pass owns it.
     expect(outcome!.ok).toBe(true);
     if (outcome!.ok) expect(outcome!.queued).toBe(true);
+  });
+});
+
+describe('DataContext.askTomo — explicit completion signal', () => {
+  it('returns true only when the provider response succeeds', async () => {
+    (tomoApi.chatWithTomo as jest.Mock).mockResolvedValue({ response: 'A useful answer' });
+    const { result } = renderHook(() => useData(), { wrapper });
+
+    let completed = false;
+    await act(async () => {
+      completed = await result.current.askTomo('Review this month');
+    });
+
+    expect(completed).toBe(true);
+  });
+
+  it('returns false when the request fails so nudge completion is not recorded', async () => {
+    (tomoApi.chatWithTomo as jest.Mock).mockRejectedValue(new Error('offline'));
+    const { result } = renderHook(() => useData(), { wrapper });
+
+    let completed = true;
+    await act(async () => {
+      completed = await result.current.askTomo('Review this month');
+    });
+
+    expect(completed).toBe(false);
   });
 });

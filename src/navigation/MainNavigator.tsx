@@ -21,6 +21,8 @@ import TodoNotesScreen from '../screens/TodoNotesScreen';
 import BillsScreen from '../screens/BillsScreen';
 import RecurringPaymentsScreen from '../screens/RecurringPaymentsScreen';
 import DailyHeatmapScreen from '../screens/DailyHeatmapScreen';
+import PeriodicReportsScreen from '../screens/PeriodicReportsScreen';
+import InviteFriendsScreen from '../screens/InviteFriendsScreen';
 import PaywallScreen from '../screens/PaywallScreen';
 import GroupsListScreen from '../screens/GroupsListScreen';
 import GroupDetailScreen from '../screens/GroupDetailScreen';
@@ -187,6 +189,8 @@ export default function MainNavigator() {
       <Stack.Screen name="Bills" component={BillsScreen} />
       <Stack.Screen name="RecurringPayments" component={RecurringPaymentsScreen} />
       <Stack.Screen name="DailyHeatmap" component={DailyHeatmapScreen} />
+      <Stack.Screen name="PeriodicReports" component={PeriodicReportsScreen} />
+      <Stack.Screen name="InviteFriends" component={InviteFriendsScreen} />
       <Stack.Screen
         name="Paywall"
         component={PaywallScreen}

@@ -3,7 +3,7 @@ import type { NavigatorScreenParams } from '@react-navigation/native';
 export type AuthStackParamList = {
   Splash: undefined;
   Login: undefined;
-  Register: undefined;
+  Register: { referralCode?: string } | undefined;
 };
 
 export type TabParamList = {
@@ -11,7 +11,12 @@ export type TabParamList = {
   Transactions: undefined;
   Accountant: undefined;
   Add: undefined;      // FAB placeholder — button navigates to AddTransaction
-  Tomo: undefined;
+  Tomo: {
+    prompt?: string;
+    nudgeId?: string;
+    nudgeTrigger?: string;
+    experimentVariant?: string;
+  } | undefined;
   Settings: undefined;
 };
 
@@ -47,6 +52,8 @@ export type MainStackParamList = {
   Bills: undefined;
   RecurringPayments: undefined;
   DailyHeatmap: undefined;
+  PeriodicReports: undefined;
+  InviteFriends: { code?: string } | undefined;
   // `source` is the upstream surface that triggered the paywall — drives
   // funnel attribution in PostHog (paywall_viewed, pro_purchase_*).
   // Add new sources here as you wire more paywall entry points.

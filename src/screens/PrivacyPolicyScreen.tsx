@@ -8,7 +8,7 @@ import Icon from '../components/ui/Icon';
 
 interface Props { onBack: () => void; }
 
-const LAST_UPDATED = '2026-07-08';
+const LAST_UPDATED = '2026-09-01';
 
 export default function PrivacyPolicyScreen({ onBack }: Props) {
   return (
@@ -46,13 +46,17 @@ export default function PrivacyPolicyScreen({ onBack }: Props) {
             <Text style={styles.bold}>Usage Data:</Text> We collect anonymised app usage statistics (screens visited, features used) via PostHog to improve Ari. No financial data is sent to analytics.
           </Text>
           <Text style={styles.body}>
+            <Text style={styles.bold}>Engagement and Invites:</Text> We store the last time your account used Ari, notification cadence state, your invite code, invite share count, and accepted invite attribution. We do not reveal your financial data to invited users or inviters.
+          </Text>
+          <Text style={styles.body}>
             <Text style={styles.bold}>Device Information:</Text> Push notification tokens, device model, and OS version are collected for crash reporting (Sentry) and notification delivery.
           </Text>
 
           <Text style={styles.sectionTitle}>3. How We Use Your Data</Text>
           <Text style={styles.body}>• To provide and maintain the Ari service</Text>
           <Text style={styles.body}>• To categorise transactions, generate budgets, and deliver financial insights</Text>
-          <Text style={styles.body}>• To send push notifications for reminders, budget alerts, and weekly briefs</Text>
+          <Text style={styles.body}>• To send opted-in reminders, budget alerts, reports, and limited re-engagement messages</Text>
+          <Text style={styles.body}>• To attribute invite codes and show circle milestones</Text>
           <Text style={styles.body}>• To improve Ari through anonymised usage analytics</Text>
           <Text style={styles.body}>• To detect and prevent fraud, abuse, or security incidents</Text>
           <Text style={styles.body}>• To comply with legal obligations</Text>

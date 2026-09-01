@@ -23,6 +23,7 @@ import * as AppleAuthentication from 'expo-apple-authentication';
 import { isAppleSignInAvailable, signInWithApple } from '../lib/appleAuth';
 import * as authApi from '../api/auth';
 import { Sentry, addBreadcrumb } from '../config/sentry';
+import { trackAuthAttempt, trackAuthResult } from '../lib/authTelemetry';
 
 // Map backend / network failures to messages a user can actually act on.
 // Anything we don't recognise gets a generic fallback + a Sentry capture so
@@ -66,18 +67,45 @@ export default function LoginScreen({ navigation }: Props) {
   }, []);
 
   const handleGoogle = async () => {
+    let profileFetchStarted = false;
     setError('');
     setSocialLoading('google');
     addBreadcrumb('auth', 'LoginScreen: google tapped');
+    trackAuthAttempt({
+      provider: 'google',
+      flow: Platform.OS === 'ios' ? 'browser' : 'native',
+      stage: 'button_tapped',
+    });
     try {
       const res = await google.signIn();
       if (!res.ok) {
         if (!res.cancelled) setError(res.error ?? 'Google sign-in failed. Please try again.');
         return;
       }
+      trackAuthAttempt({
+        provider: 'google',
+        flow: Platform.OS === 'ios' ? 'browser' : 'native',
+        stage: 'profile_fetch',
+      });
+      profileFetchStarted = true;
       const me = await authApi.getMe();
-      await refreshFromSession(me);
+      trackAuthResult({
+        provider: 'google',
+        flow: Platform.OS === 'ios' ? 'browser' : 'native',
+        stage: 'profile_fetch',
+        outcome: 'success',
+      });
+      await refreshFromSession(me, 'google');
     } catch (e) {
+      if (profileFetchStarted) {
+        trackAuthResult({
+          provider: 'google',
+          flow: Platform.OS === 'ios' ? 'browser' : 'native',
+          stage: 'profile_fetch',
+          outcome: 'failed',
+          errorCode: 'profile_fetch_failed',
+        });
+      }
       // Anything reaching here is unexpected (socialAuth handles its own
       // failure cases). Log, show generic.
       Sentry.captureException(e instanceof Error ? e : new Error(String(e)), {
@@ -90,19 +118,38 @@ export default function LoginScreen({ navigation }: Props) {
   };
 
   const handleApple = async () => {
+    let profileFetchStarted = false;
     if (socialLoading !== null) return;
     setError('');
     setSocialLoading('apple');
     addBreadcrumb('auth', 'LoginScreen: apple tapped');
+    trackAuthAttempt({ provider: 'apple', flow: 'native', stage: 'button_tapped' });
     try {
       const res = await signInWithApple();
       if (!res.ok) {
         if (!res.cancelled) setError(res.error ?? 'Apple sign-in failed. Please try again.');
         return;
       }
+      trackAuthAttempt({ provider: 'apple', flow: 'native', stage: 'profile_fetch' });
+      profileFetchStarted = true;
       const me = await authApi.getMe();
-      await refreshFromSession(me);
+      trackAuthResult({
+        provider: 'apple',
+        flow: 'native',
+        stage: 'profile_fetch',
+        outcome: 'success',
+      });
+      await refreshFromSession(me, 'apple');
     } catch (e) {
+      if (profileFetchStarted) {
+        trackAuthResult({
+          provider: 'apple',
+          flow: 'native',
+          stage: 'profile_fetch',
+          outcome: 'failed',
+          errorCode: 'profile_fetch_failed',
+        });
+      }
       Sentry.captureException(e instanceof Error ? e : new Error(String(e)), {
         tags: { where: 'LoginScreen.handleApple' },
       });

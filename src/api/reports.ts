@@ -21,3 +21,32 @@ export interface DailyAnalytics {
 
 export const getDailyAnalytics = (month: string) =>
   apiRequest<DailyAnalytics>(`/analytics/daily?month=${month}`);
+
+export type ReportPeriod = 'daily' | 'weekly' | 'monthly';
+
+export interface PeriodicReport {
+  period: ReportPeriod;
+  label: string;
+  start: string;
+  end: string;
+  totals: {
+    income: number;
+    expenses: number;
+    net: number;
+    savingsRate: number;
+    transactionCount: number;
+  };
+  comparison: {
+    expensesChange: number | null;
+    incomeChange: number | null;
+    previousExpenses: number;
+    previousIncome: number;
+  };
+  categories: { name: string; amount: number; share: number }[];
+  timeline: { date: string; label: string; income: number; expenses: number }[];
+  highlight: string;
+  goals: { id: string; name: string; current: number; target: number; progress: number }[];
+}
+
+export const getPeriodicReport = (period: ReportPeriod) =>
+  apiRequest<PeriodicReport>(`/reports/periodic?period=${period}`);

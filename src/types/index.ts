@@ -90,10 +90,15 @@ export interface OverallBudget {
 }
 
 export interface Nudge {
+  id: string;
   type: string;
   emoji: string;
   title: string;
   message: string;
+  trigger: string;
+  action: 'open_tomo';
+  actionPrompt: string;
+  experimentVariant: string;
 }
 
 export interface Insight {
@@ -138,6 +143,7 @@ export interface RegisterPayload {
   mainGoal: string;
   role?: string;
   country?: string;  // ISO 3166-1 alpha-2
+  referralCode?: string;
 }
 
 // ---------------------------------------------------------------------------

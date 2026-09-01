@@ -49,9 +49,10 @@ interface FormData {
   incomeBracket: string;
   mainGoal: string;
   country: string;
+  referralCode: string;
 }
 
-export default function RegisterScreen({ navigation }: Props) {
+export default function RegisterScreen({ navigation, route }: Props) {
   const { register } = useAuth();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<FormData>({
@@ -62,6 +63,7 @@ export default function RegisterScreen({ navigation }: Props) {
     incomeBracket: '15k-30k',
     mainGoal: 'save_more',
     country: getDefaultCountry(),
+    referralCode: route.params?.referralCode ?? '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -181,6 +183,15 @@ export default function RegisterScreen({ navigation }: Props) {
                 value={form.password}
                 onChangeText={(v) => setField('password', v)}
                 showPasswordToggle
+                returnKeyType="done"
+              />
+              <Input
+                label="Invite Code (optional)"
+                placeholder="ARI123ABC"
+                value={form.referralCode}
+                onChangeText={(v) => setField('referralCode', v.toUpperCase())}
+                autoCapitalize="characters"
+                autoCorrect={false}
                 returnKeyType="done"
               />
               <Button onPress={nextStep} fullWidth accessibilityLabel="Continue to next step" accessibilityRole="button">

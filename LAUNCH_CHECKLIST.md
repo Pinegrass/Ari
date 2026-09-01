@@ -1,8 +1,52 @@
-# Ari - Pre-Launch Checklist
+# Ari — Release Checklist
 
-Last updated: 2026-04-06
+Last updated: 2026-09-01 for Ari 1.3.x / Expo SDK 57.
 
-This document is the step-by-step path from current state to live on the Play Store. Follow in order. Do not skip steps.
+This section is the current release gate. The original v1.0 checklist is retained
+below as historical reference and must not be used for current release decisions.
+
+## Automated gates
+
+- [x] Expo SDK 57 dependency set is aligned (`npx expo install --check`).
+- [x] Expo config resolves successfully.
+- [x] TypeScript passes (`npm run typecheck`).
+- [x] ESLint passes (`npm run lint`).
+- [x] Frontend Jest suite passes.
+- [x] Backend pytest suite passes.
+- [x] `npm audit` reports zero known vulnerabilities.
+- [x] Production `/api/health` returns healthy.
+- [ ] Generate native projects or an EAS preview build and verify the SDK 57
+      native dependency upgrade on Android and iOS.
+
+## Release environment
+
+- [ ] Preview and production EAS environments contain the required variables
+      checked by `scripts/verify-release-env.mjs`.
+- [ ] Railway contains `SECRET_KEY`, `DATABASE_URL`, at least one AI provider
+      key, `SCHEDULER_TOKEN`, and the RevenueCat server secrets used in production.
+- [ ] PostHog receives authentication and nudge events without tokens, email
+      addresses, transaction details, or raw OAuth/provider messages.
+- [ ] Sentry release and alerts are configured for the new native fingerprint.
+
+## Device and store gates
+
+- [ ] Run the Google authentication matrix in
+      `docs/auth-retention-release-gate.md` on TestFlight and a Play-signed build.
+- [ ] Run the pinning, share-import, widget, UPI, TalkBack, reminders, and Maestro
+      checks in `docs/sprint-4-release-handoff.md`.
+- [ ] Smoke-test add/edit/delete transactions, budgets, Tomo, offline recovery,
+      notifications, biometric lock, account export, and account deletion.
+- [ ] Confirm privacy policy, Data Safety disclosures, account-deletion URL,
+      screenshots, release notes, and support contact are current.
+- [ ] Start with the configured staged rollout and expand only after crash-free,
+      authentication, pinning, and privacy telemetry remain healthy.
+
+---
+
+## Archived v1.0 checklist (2026-04-06)
+
+The content below describes the original pre-launch process. Counts, providers,
+versions, paths, and screenshots may be obsolete.
 
 ---
 
@@ -470,6 +514,18 @@ eas build --platform android --profile production
 ---
 
 ## Phase 9: Post-Launch (Day 12+)
+
+### Engagement and invite release gate
+
+- [ ] Apply `supabase/migrations/20260901000001_engagement_referrals.sql` before backend deploy
+- [ ] Verify the daily `reactivation` scheduled job with a test user
+- [ ] Publish `assetlinks.json` and `apple-app-site-association` for `aritomo.in`
+- [ ] Build a new native binary for App Links / Universal Links entitlements
+- [ ] Test daily, weekly, and monthly reports with empty, income-only, and mixed data
+- [ ] Test invite cold start, warm start, manual code entry, repeat redemption, and self-referral rejection
+- [ ] Confirm notification opt-out blocks reactivation messages
+
+See `docs/engagement-reports-referrals.md` for payloads, deployment order, and measurement guardrails.
 
 ### 9.1 Monitor
 

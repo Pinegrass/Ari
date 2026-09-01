@@ -28,7 +28,7 @@ const CACHE_KEY = 'streak_days'; // useOfflineCache 30-min TTL, prefix added ins
 /**
  * Compact streak pill for the Home header. Fetches the logged-day history
  * (30-min offline cache), computes the streak, and snapshots it to
- * `ari_streak_cache` so the daily reminder can use streak-save copy.
+ * `ari_streak_cache` so streak state remains available across app sessions.
  * Tap → Daily heatmap. Renders nothing until the user has a streak going,
  * so Home stays clean for brand-new users.
  */

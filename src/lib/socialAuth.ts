@@ -33,6 +33,13 @@ import * as WebBrowser from 'expo-web-browser';
 import { isSupabaseConfigured, supabase } from './supabase';
 import { secureStorage } from './secureStorage';
 import { addBreadcrumb, captureError, Sentry } from '../config/sentry';
+import {
+  sanitizeAuthErrorCode,
+  trackAuthAttempt,
+  trackAuthResult,
+  type AuthFlow,
+  type AuthStage,
+} from './authTelemetry';
 
 
 let _configured = false;
@@ -48,25 +55,51 @@ type OAuthTokens = {
 export function parseOAuthTokens(url: string): OAuthTokens {
   const parsed = new URL(url);
   if (`${parsed.protocol}//${parsed.host}${parsed.pathname}` !== ARI_IOS_OAUTH_REDIRECT) {
-    throw new Error('Unexpected OAuth callback.');
+    const error = new Error('Unexpected OAuth callback.');
+    error.name = 'callback_mismatch';
+    throw error;
   }
   const params = new URLSearchParams(parsed.search);
   const hashParams = new URLSearchParams(parsed.hash.replace(/^#/, ''));
   const error = hashParams.get('error_description') ?? params.get('error_description');
-  if (error) throw new Error(decodeURIComponent(error.replace(/\+/g, ' ')));
+  if (error) {
+    const providerError = new Error('Google returned an OAuth error.');
+    providerError.name = 'callback_provider_error';
+    throw providerError;
+  }
 
   const accessToken = hashParams.get('access_token') ?? params.get('access_token');
   const refreshToken = hashParams.get('refresh_token') ?? params.get('refresh_token');
-  if (!accessToken || !refreshToken) throw new Error('Google did not return a complete session.');
+  if (!accessToken || !refreshToken) {
+    const incomplete = new Error('Google did not return a complete session.');
+    incomplete.name = 'callback_incomplete_session';
+    throw incomplete;
+  }
   return { accessToken, refreshToken };
 }
 
+function authFlow(): AuthFlow {
+  return Platform.OS === 'ios' ? 'browser' : 'native';
+}
+
+function authResult(
+  stage: AuthStage,
+  outcome: 'success' | 'failed' | 'cancelled',
+  errorCode?: string,
+): void {
+  trackAuthResult({ provider: 'google', flow: authFlow(), stage, outcome, errorCode });
+}
+
 async function signInWithGoogleOnIOS(): Promise<GoogleAuthResult> {
+  trackAuthAttempt({ provider: 'google', flow: 'browser', stage: 'configuration' });
   if (!isSupabaseConfigured()) {
+    authResult('configuration', 'failed', 'not_configured');
     return { ok: false, error: 'Google sign-in is not configured for this build.' };
   }
+  authResult('configuration', 'success');
 
   try {
+    trackAuthAttempt({ provider: 'google', flow: 'browser', stage: 'provider_picker' });
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -74,20 +107,50 @@ async function signInWithGoogleOnIOS(): Promise<GoogleAuthResult> {
         skipBrowserRedirect: true,
       },
     });
-    if (error || !data.url) throw error ?? new Error('Google did not return an authorization URL.');
+    if (error || !data.url) {
+      authResult('provider_picker', 'failed', 'provider_error');
+      throw error ?? new Error('Google did not return an authorization URL.');
+    }
+    authResult('provider_picker', 'success');
 
     const result = await WebBrowser.openAuthSessionAsync(data.url, ARI_IOS_OAUTH_REDIRECT);
-    if (result.type !== 'success') return { ok: false, cancelled: true };
+    if (result.type !== 'success') {
+      authResult('provider_callback', 'cancelled', 'provider_cancelled');
+      return { ok: false, cancelled: true };
+    }
 
-    const tokens = parseOAuthTokens(result.url);
+    let tokens: OAuthTokens;
+    try {
+      tokens = parseOAuthTokens(result.url);
+      authResult('provider_callback', 'success');
+    } catch (error) {
+      authResult(
+        'provider_callback',
+        'failed',
+        error instanceof Error ? error.name : 'provider_error',
+      );
+      throw error;
+    }
+
+    trackAuthAttempt({ provider: 'google', flow: 'browser', stage: 'supabase_exchange' });
     const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
       access_token: tokens.accessToken,
       refresh_token: tokens.refreshToken,
     });
     if (sessionError || !sessionData.session) {
+      authResult('supabase_exchange', 'failed', 'supabase_exchange_failed');
       throw sessionError ?? new Error('Supabase did not create a session.');
     }
-    await secureStorage.setItem('ari_token', sessionData.session.access_token);
+    authResult('supabase_exchange', 'success');
+    try {
+      await secureStorage.setItem('ari_token', sessionData.session.access_token);
+    } catch {
+      authResult('session_persisted', 'failed', 'session_persist_failed');
+      const persistError = new Error('Session storage failed.');
+      persistError.name = 'session_persist_failed';
+      throw persistError;
+    }
+    authResult('session_persisted', 'success');
     addBreadcrumb('auth', 'google: iOS browser session adopted');
     return { ok: true };
   } catch (e) {
@@ -127,30 +190,40 @@ export interface GoogleAuthResult {
 export async function signInWithGoogle(): Promise<GoogleAuthResult> {
   if (Platform.OS === 'ios') return signInWithGoogleOnIOS();
 
+  trackAuthAttempt({ provider: 'google', flow: 'native', stage: 'configuration' });
   if (!_ensureConfigured()) {
+    authResult('configuration', 'failed', 'not_configured');
     Sentry.captureMessage('google_sign_in_not_configured', { level: 'error' });
     return { ok: false, error: 'Google sign-in is not available on this build. Please use your email and password.' };
   }
+  authResult('configuration', 'success');
 
   // Make sure Play Services is available + up to date.
   try {
+    trackAuthAttempt({ provider: 'google', flow: 'native', stage: 'play_services' });
     await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
   } catch {
+    authResult('play_services', 'failed', 'play_services_unavailable');
     return { ok: false, error: 'Google Play Services is missing or out of date on this device.' };
   }
+  authResult('play_services', 'success');
 
   let response;
   try {
+    trackAuthAttempt({ provider: 'google', flow: 'native', stage: 'provider_picker' });
     response = await GoogleSignin.signIn();
   } catch (e) {
     if (isErrorWithCode(e)) {
       switch (e.code) {
         case statusCodes.SIGN_IN_CANCELLED:
         case statusCodes.IN_PROGRESS:
+          authResult('provider_picker', 'cancelled', 'provider_cancelled');
           return { ok: false, cancelled: true };
         case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
+          authResult('provider_picker', 'failed', 'play_services_unavailable');
           return { ok: false, error: 'Google Play Services is missing or out of date on this device.' };
         case statusCodes.SIGN_IN_REQUIRED:
+          authResult('provider_picker', 'failed', 'sign_in_required');
           return { ok: false, error: 'Please sign in to your Google account on this device first, then try again.' };
         default: {
           // DEVELOPER_ERROR ("code 10") is the famous SHA-1 / OAuth-client
@@ -161,6 +234,7 @@ export async function signInWithGoogle(): Promise<GoogleAuthResult> {
             `google_sign_in_failed:${String(e.code)}`,
             { level: 'error', extra: { code: e.code, message: e.message } },
           );
+          authResult('provider_picker', 'failed', sanitizeAuthErrorCode(String(e.code)));
           return { ok: false, error: GOOGLE_TEMPORARY_ERROR };
         }
       }
@@ -168,12 +242,15 @@ export async function signInWithGoogle(): Promise<GoogleAuthResult> {
     captureError(e instanceof Error ? e : new Error('google_sign_in_unknown'), {
       where: 'socialAuth.signIn',
     });
+    authResult('provider_picker', 'failed', 'unknown_error');
     return { ok: false, error: 'Google sign-in failed. Please try again or use your email.' };
   }
 
   if (!isSuccessResponse(response)) {
+    authResult('provider_picker', 'cancelled', 'provider_cancelled');
     return { ok: false, cancelled: true };
   }
+  authResult('provider_picker', 'success');
 
   let idToken = response.data?.idToken;
   if (!idToken) {
@@ -192,14 +269,17 @@ export async function signInWithGoogle(): Promise<GoogleAuthResult> {
 
   if (!idToken) {
     Sentry.captureMessage('google_sign_in_no_id_token', { level: 'error' });
+    authResult('provider_callback', 'failed', 'provider_error');
     return { ok: false, error: GOOGLE_TEMPORARY_ERROR };
   }
+  authResult('provider_callback', 'success');
 
   // Hand off to Supabase — this is the same call we used before. The
   // session that lands here is what powers autoRefreshToken; AuthContext's
   // onAuthStateChange hook mirrors the refreshed access_token into
   // 'ari_token' so apiRequest keeps working past the initial 1h window.
   try {
+    trackAuthAttempt({ provider: 'google', flow: 'native', stage: 'supabase_exchange' });
     addBreadcrumb('auth', 'google: exchanging id_token with Supabase');
     const { data, error } = await supabase.auth.signInWithIdToken({
       provider: 'google',
@@ -210,15 +290,28 @@ export async function signInWithGoogle(): Promise<GoogleAuthResult> {
         level: 'error',
         extra: { message: error?.message },
       });
+      authResult('supabase_exchange', 'failed', 'supabase_exchange_failed');
       return { ok: false, error: 'Sign-in failed. Please try again or use your email.' };
     }
-    await secureStorage.setItem('ari_token', data.session.access_token);
+    authResult('supabase_exchange', 'success');
+    try {
+      await secureStorage.setItem('ari_token', data.session.access_token);
+    } catch {
+      authResult('session_persisted', 'failed', 'session_persist_failed');
+      const persistError = new Error('Session storage failed.');
+      persistError.name = 'session_persist_failed';
+      throw persistError;
+    }
+    authResult('session_persisted', 'success');
     addBreadcrumb('auth', 'google: session adopted');
     return { ok: true };
   } catch (e) {
     captureError(e instanceof Error ? e : new Error('supabase_exchange_threw'), {
       where: 'socialAuth.signInWithIdToken',
     });
+    if (!(e instanceof Error && e.name === 'session_persist_failed')) {
+      authResult('supabase_exchange', 'failed', 'supabase_exchange_failed');
+    }
     return { ok: false, error: 'Sign-in failed. Please try again or use your email.' };
   }
 }

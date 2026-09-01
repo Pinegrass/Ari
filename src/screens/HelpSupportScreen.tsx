@@ -61,8 +61,8 @@ const FAQS: Faq[] = [
     a: 'Yes — Settings → Export Data lets you download all your transactions as CSV. Your data is yours; you can take it with you any time.',
   },
   {
-    q: 'How do I change the daily reminder time?',
-    a: 'Settings → Daily Reminders. Toggle reminders on, then tap the time below to pick when Tomo should nudge you each day.',
+    q: 'How do I change Tomo’s check-in time?',
+    a: 'Settings → Tomo Check-ins. Turn check-ins on, then tap the time below. Tomo checks in twice a week and you can always ignore or disable them.',
   },
   {
     q: 'How do I delete my account?',
