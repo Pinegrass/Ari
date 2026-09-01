@@ -22,19 +22,16 @@ tags:
 # Back on Home — the entry is reflected in the ledger / recent list
 - assertVisible: "Home"
 
-# Edit: the Recent list is windowed — rows enter the hierarchy only when
-# scrolled on screen (a scroll to the 'Recent' header is NOT enough, and
-# 'Food' matches the Spending-by-category legend first). The row amount
-# is '−₹500' with a Unicode minus (U+2212), unique on this screen —
-# hero/month cards use ASCII '-' or bare '₹500'.
+# Edit: target the row's accessibility label rather than its visible amount.
+# The dashboard's "Net today" summary can also render "−₹500" and caused
+# Maestro to tap the non-interactive summary instead of the transaction row.
 - scrollUntilVisible:
     element:
-      text: "−₹500"
+      text: ".*minus ₹500.*"
     direction: DOWN
-# Tap the visible amount. The child press bubbles to TransactionItem's
-# TouchableOpacity; React Native testID is not reliably exposed in release APKs.
+# TransactionItem exposes a stable label containing "minus <amount>".
 - tapOn:
-    text: "−₹500"
+    text: ".*minus ₹500.*"
 - assertVisible: "Update entry"
 - tapOn: "0"          # 500 -> 5000
 - tapOn: "Update entry"
