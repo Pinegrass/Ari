@@ -1,6 +1,7 @@
 # Ari — iOS App Store Metadata
 
-> Prepared for v1.0.2 submission. Replace placeholder URLs with production values before submitting.
+> Prepared for the v1.3.0 TestFlight candidate. Apple signing must be configured
+> before the first iOS production build.
 
 ## App Information
 
@@ -37,19 +38,19 @@ budget,expense,tracker,money,finance,india,savings,spender,account,wealth
 
 Start building better money habits today.
 
-## What's New (v1.0.2)
+## What's New (v1.3.0)
 
-- Full iOS safe-area and Dynamic Island support.
-- Redesigned Dashboard with "This Month" spending chart and category breakdown.
-- New Trends tab with income vs. expense charts, category comparison, and AI-powered insights.
-- Improved keyboard handling when adding notes to entries.
-- iOS privacy manifest and permission declarations ready for App Store review.
+- Daily, weekly, and monthly visual money reports.
+- Helpful check-ins that make it easier to return after time away.
+- Invite links and friend-circle milestones.
+- Improved coaching, recurring-payment controls, and budget planning.
+- Reliability, accessibility, and privacy improvements throughout Ari.
 
 ## Support & Marketing URLs
 
-- Support URL: `https://pinegrass.tech/ari/support` *(placeholder)*
-- Marketing URL: `https://pinegrass.tech/ari` *(placeholder)*
-- Privacy Policy URL: `https://pinegrass.tech/ari/privacy` *(placeholder)*
+- Support URL: `https://aritomo.in/support`
+- Marketing URL: `https://aritomo.in`
+- Privacy Policy URL: `https://aritomo.in/privacy`
 
 ## Screenshot Requirements
 
@@ -94,7 +95,7 @@ Prepare screenshots for the following device sizes:
 
 ## Privacy Manifest Checklist
 
-Expo SDK 54 generates the base `PrivacyInfo.xcprivacy` during `expo prebuild`. Verify the following required reason APIs are declared:
+Expo SDK 57 generates the base `PrivacyInfo.xcprivacy` during `expo prebuild`. Verify the following required reason APIs are declared:
 
 | API Category | Used By | Required Reason |
 |--------------|---------|-----------------|
@@ -118,11 +119,11 @@ npx expo prebuild -p ios
 # Run on a local iOS simulator (requires macOS + Xcode)
 npx expo run:ios
 
-# Build for internal TestFlight distribution
-npx eas build --platform ios --profile preview
+# Build the App Store-signed binary used by TestFlight
+npx eas build --platform ios --profile production
 
-# Submit to App Store (after TestFlight validation)
-npx eas submit --platform ios
+# Submit that binary to App Store Connect / TestFlight
+npx eas submit --platform ios --profile internal --latest
 ```
 
 ## HIG Compliance Notes
@@ -130,4 +131,13 @@ npx eas submit --platform ios
 - Minimum touch target: 44×44 pt across all interactive elements.
 - Status bar text remains readable due to safe-area insets and cream/forest contrast.
 - Modal presentations use bottom-sheet style with clear dismiss affordances.
-- App supports both light and dark system appearances through `userInterfaceStyle: "dark"` and consistent theming.
+- App currently ships the approved light paper theme through `userInterfaceStyle: "light"`.
+
+## First TestFlight blockers
+
+- Configure an Apple distribution certificate and provisioning profiles for
+  `com.pinegrass.ari` and `com.pinegrass.ari.share-extension` in EAS.
+- Configure an App Store Connect API key (App Manager role recommended).
+- Record the Apple Team ID and publish
+  `https://aritomo.in/.well-known/apple-app-site-association` for invite links.
+- Confirm the App Store Connect privacy answers and reviewer contact details.
