@@ -28,7 +28,7 @@
       "android": {
         "buildType": "apk",
         "autoIncrement": false,
-        "gradleCommand": ":app:assembleRelease -x :app:lintVitalRelease -x lintVitalAnalyzeRelease"
+        "gradleCommand": ":app:assembleRelease -PreactNativeArchitectures=x86_64 -x :app:lintVitalRelease -x lintVitalAnalyzeRelease"
       },
       "env": {
         "APP_VARIANT": "preview",
