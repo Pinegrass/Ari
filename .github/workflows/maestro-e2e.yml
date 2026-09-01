@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [master]
   workflow_dispatch:
+    inputs:
+      build_id:
+        description: Reuse a finished Android EAS build instead of creating another one
+        required: false
+        type: string
   schedule:
     # Run E2E nightly at 2 AM UTC
     - cron: '0 2 * * *'
@@ -61,9 +66,15 @@ jobs:
       # build is proven green; download the APK artifact and spend the
       # job budget on the emulator and flows instead.
       - name: Build release APK (EAS cloud) and download
-        timeout-minutes: 40
+        timeout-minutes: 60
+        env:
+          EAS_BUILD_ID: ${{ inputs.build_id || '' }}
         run: |
-          eas build --platform android --profile e2e --non-interactive --json > build.json
+          if [ -n "$EAS_BUILD_ID" ]; then
+            eas build:view "$EAS_BUILD_ID" --json > build.json
+          else
+            eas build --platform android --profile e2e --non-interactive --json > build.json
+          fi
           URL=$(node -e "const b=require('./build.json');const a=Array.isArray(b)?b[0]:b;const u=a.artifacts&&(a.artifacts.buildUrl||a.artifacts.applicationArchiveUrl);if(!u){console.error('No artifact URL in build.json');process.exit(1)}console.log(u)")
           curl -fL "$URL" -o app.apk
           ls -lh app.apk
