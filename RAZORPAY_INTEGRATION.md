@@ -1,9 +1,14 @@
 # Razorpay Subscriptions — Integration Guide
 
-**Status:** code shipped, awaiting Razorpay account + plan creation.
+**Status:** code shipped (web payment rail), awaiting Razorpay account +
+plan creation.
 
 Spec reference: §2 (Payments row), Sprint 3 ("Razorpay subscription
 paywall"), §1 revenue target (₹99 pilot → ₹129 Pro at scale, ₹249 Family).
+
+Web users pay through Razorpay Subscriptions (UPI/cards/netbanking).
+Android users pay through Google Play IAP (RevenueCat) — both rails write
+the same `ari_users.tier` so one account is Pro everywhere.
 
 ## Activating payments — one-time setup
 
