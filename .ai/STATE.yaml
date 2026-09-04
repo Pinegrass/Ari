@@ -1,0 +1,14 @@
+project: Ari
+updated_at: 2026-09-05
+active_branch: master
+head_commit: ef1a3c6f6dc0
+last_verified_commit: ef1a3c6f6dc0
+active_task: cross-repository release verification
+development_stage: release_candidate
+release_status: testflight_and_web_billing_reported_not_reverified
+last_full_audit: 2026-09-04
+last_handoff: 2026-09-05
+verification: {lint: not_run, typecheck: not_run, tests: not_run, build: not_run}
+known_blockers: [external release and payment access]
+important_paths: [src, supabase, backend, aritomo-web, docs]
+continuity_schema_version: 1
