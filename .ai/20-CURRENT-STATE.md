@@ -8,3 +8,7 @@ Product: a mobile/web personal-finance tracker and bounded AI coaching system.
 - Web parity and Razorpay checkout — VERIFIED IN NESTED CODE at the newer nested web HEAD.
 - Flask/Railway API, PostgreSQL models, Tomo/coaching/jobs, RevenueCat and Razorpay endpoints — VERIFIED IN NESTED CODE; provider/deployment health UNVERIFIED.
 - Release — PARTIAL: handoffs report TestFlight and live web Razorpay, not independently exercised here.
+
+## Checkpoint — 2026-09-05
+
+Local release verification is VERIFIED: parent lint/typecheck and 485 Jest tests pass; nested authoritative web lint/typecheck, 5 Vitest tests and production build pass; backend 225-test pytest suite passes. TestFlight, Railway and Razorpay behavior remain UNVERIFIED/BLOCKED on external access.

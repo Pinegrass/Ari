@@ -1,24 +1,24 @@
 # Latest Session Handoff
 Updated: 2026-09-05
 Branch: `master`
-HEAD: `ef1a3c6f6dc0` (parent)
-Active task: release verification across mobile, web and backend
+HEAD: `ac641b622586` (parent); nested web `be5f32a2deeb`; nested backend `b3dc6589e7c0`
+Active task: external release verification across mobile, web and backend
 
 ## Objective
-Create a three-repository-aware Ari checkpoint and compact mandatory startup context.
+Record completed local release verification and hand off the external checks.
 ## Completed
-Inspected parent/nested repo status/history/structure; selected nested current web over older standalone checkout; installed parent continuity docs; moved detailed legacy root guidance to `.ai/guides/development-reference.md`.
+VERIFIED parent lint/typecheck and 35 suites/485 Jest tests; nested web lint/typecheck, 1 file/5 Vitest tests and Next production build; backend 225 pytest tests. The newer nested web remains authoritative.
 ## Files materially changed
-Parent `AGENTS.md` and `.ai/` only. Nested repositories were not modified.
+Continuity files only. Nested repositories were not modified.
 ## Verification performed
-Inspection only; no executable, TestFlight, payment or deployment smoke.
+All three local code gates passed. TestFlight, payment and deployment smoke remain UNVERIFIED.
 ## Decisions made
 Cross-surface tasks checkpoint all three Git repositories.
 ## Remaining work
-Run each repo’s gates and verify live payment/entitlement plus mobile build.
+Verify TestFlight installation, Railway health and Razorpay checkout/webhook/entitlement reconciliation.
 ## Blockers
 Apple, Railway, Razorpay and deployment access.
 ## Exact next action
-Run parent lint/typecheck/tests, then nested web and backend suites.
+Obtain authorized staging/release access and run the TestFlight install plus Razorpay entitlement reconciliation smoke.
 ## Do not repeat
-Do not use the older standalone web checkout as current evidence.
+Do not rerun local gates absent a code delta or use the older standalone web checkout.

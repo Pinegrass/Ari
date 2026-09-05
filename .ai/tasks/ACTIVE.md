@@ -20,4 +20,4 @@ Parent tests/typecheck/lint; web quality/build; backend tests; staging/live smok
 ## Dependencies / Blockers
 External service/release access.
 ## Next Executable Step
-Run local gates in each repository and record exact HEAD/result.
+With all three local repository gates green, obtain authorized staging/release access and verify TestFlight install plus Razorpay entitlement/webhook reconciliation. Do not claim these external checks from local evidence.
