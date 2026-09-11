@@ -41,7 +41,7 @@ export default function PeriodicReportsScreen() {
   }, [period, language, anchor]);
   useFocusEffect(useCallback(() => { void load(); return () => { requestId.current += 1; }; }, [load]));
   return (
-    <ScreenShell edges={['top']}>
+    <ScreenShell>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} accessibilityRole="button" accessibilityLabel={t('back')} style={{ padding: 12 }}><Text>←</Text></TouchableOpacity>
         <View style={{ flex: 1 }}><Text style={styles.headerTitle}>{t('reports')}</Text><Text style={styles.headerSub}>{t('reportSubtitle')}</Text></View>

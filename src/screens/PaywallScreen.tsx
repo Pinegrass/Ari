@@ -50,7 +50,7 @@ export default function PaywallScreen() {
 
   if (error) {
     return (
-      <ScreenShell scrollable edges={['top']}>
+      <ScreenShell scrollable>
         <View style={styles.fallback}>
           <Text style={styles.title}>{phrase("Ari Pro")}</Text>
           <Text style={styles.body}>{phrase(error)}</Text>

@@ -31,7 +31,7 @@ export default function NudgeInboxScreen() {
     if(item.action==='report' && item.period && item.anchor) navigation.navigate('PeriodicReports',{period:item.period,anchor:item.anchor});
     else navigation.navigate(item.action==='recurring'?'RecurringPayments':'SmartLedger');
   };
-  return <ScreenShell edges={['top']} scrollable backgroundColor={c.cream} contentContainerStyle={{padding:20,gap:16}}>
+  return <ScreenShell scrollable backgroundColor={c.cream} contentContainerStyle={{padding:20,gap:16}}>
     <TouchableOpacity accessibilityRole="button" onPress={()=>navigation.goBack()} style={{paddingVertical:12}}><Text style={{color:c.ink}}>{t('back')}</Text></TouchableOpacity>
     <Text accessibilityRole="header" style={{fontSize:26,fontWeight:'700',color:c.ink}}>{t('updates')}</Text>
     <Text style={{color:c.inkSoft}}>{t('updatesHelp')}</Text>
