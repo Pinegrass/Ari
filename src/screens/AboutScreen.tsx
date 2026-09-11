@@ -34,7 +34,7 @@ function statusColor(status: ReturnType<typeof useOTAUpdates>['status']) {
 }
 
 export default function AboutScreen({ onBack }: Props) {
-  const { status, message, runtimeVersion, channel, checkManually } = useOTAUpdates();
+  const { status, message, runtimeVersion, updateId, isEmbeddedLaunch, channel, checkManually } = useOTAUpdates();
   const isBusy = status === 'checking' || status === 'downloading';
 
   return (
@@ -62,6 +62,8 @@ export default function AboutScreen({ onBack }: Props) {
               <Text style={styles.meta}>Runtime: {runtimeVersion}</Text>
             )}
             {channel && <Text style={styles.meta}>Channel: {channel}</Text>}
+            <Text selectable style={styles.meta}>Bundle: {isEmbeddedLaunch ? 'embedded' : 'downloaded'}</Text>
+            {updateId && <Text selectable style={styles.meta}>Update: {updateId}</Text>}
             <Text style={styles.tagline}>Your Money, Your Future</Text>
           </View>
         </AnimatedEntry>

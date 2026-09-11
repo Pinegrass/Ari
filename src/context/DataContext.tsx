@@ -204,16 +204,14 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
   const fetchTransactions = useCallback(async () => {
     try {
-      // First run on this device: seed the local store from the server's full
-      // history (no month filter — G6). Merges, so offline-born rows survive.
-      // Offline first-run just stays empty and seeds on a later online open.
-      if (!(await localStore.isSeeded())) {
-        try {
-          const server = await txnApi.getTransactions();
-          await localStore.seed(server);
-        } catch (err) {
-          handleError(err);
-        }
+      // Render cached data first, then pull changes made on other devices.
+      await refreshFromLocal();
+      const startedAt = await localStore.beginRefresh();
+      try {
+        const server = await txnApi.getTransactions();
+        await localStore.reconcile(server, startedAt);
+      } catch (err) {
+        handleError(err);
       }
       await refreshFromLocal();
       // Generate any due recurring instances (idempotent — safe to call often).
@@ -233,11 +231,11 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   // On app foreground, also check for newly-due recurring instances.
   useEffect(() => {
     const onAppState = (state: AppStateStatus) => {
-      if (state === 'active') void runRecurringCheck();
+      if (state === 'active') void fetchTransactions();
     };
     const sub = AppState.addEventListener('change', onAppState);
     return () => sub.remove();
-  }, [runRecurringCheck]);
+  }, [fetchTransactions]);
 
   // Keep the Android home-screen widget (D6) in sync with every change to
   // spend/budget. Guarded + no-op off Android, so this is safe everywhere.

@@ -4,6 +4,11 @@
     "appVersionSource": "remote"
   },
   "build": {
+    "internal-release": {
+      "extends": "production",
+      "environment": "production",
+      "channel": "internal-release"
+    },
     "development": {
       "developmentClient": true,
       "distribution": "internal",

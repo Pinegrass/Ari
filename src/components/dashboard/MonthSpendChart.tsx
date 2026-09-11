@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { LineChart } from 'react-native-gifted-charts';
 import { color, font, type as ftype } from '../../theme/tokens';
 import { Skeleton } from '../ui/Skeleton';
-import { useLocale } from '../../hooks/useLocale';
+import { usePrivacy } from '../../context/PrivacyContext';
 import ErrorBoundary from '../ErrorBoundary';
 import type { DailyAnalytics } from '../../api/reports';
 
@@ -13,7 +13,7 @@ interface Props {
 }
 
 export default function MonthSpendChart({ data, loading }: Props) {
-  const { formatCurrency } = useLocale();
+  const { formatAmount } = usePrivacy();
   const chartData = useMemo(() => {
     if (!data) return [];
     return Object.entries(data.days)
@@ -79,7 +79,7 @@ export default function MonthSpendChart({ data, loading }: Props) {
       </ErrorBoundary>
       <View style={styles.footer}>
         <Text style={styles.footerText}>
-          Total <Text style={styles.footerBold}>{formatCurrency(data.total)}</Text>
+          Total <Text style={styles.footerBold}>{formatAmount(data.total)}</Text>
         </Text>
       </View>
     </View>

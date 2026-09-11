@@ -42,6 +42,52 @@ jest.mock('expo-crypto', () => {
 
 const STORE_KEY = 'ari_txn_store_v1';
 
+const remote = (id: string, amount = 100): Transaction => ({
+  id, amount, userId: 'u1', type: 'expense', category: 'food',
+  description: 'remote', note: '', date: '2026-09-11', month: '2026-09',
+  createdAt: '2026-09-11T10:00:00Z', updatedAt: '2026-09-11T10:00:00Z',
+});
+
+describe('incoming reconciliation', () => {
+  it('imports additions, edits and deletions from the complete server history', async () => {
+    await localStore.seed([remote('edited'), remote('removed')]);
+    await localStore.reconcile([remote('edited', 250), remote('added')], await localStore.beginRefresh());
+    expect((await localStore.getAll()).map(t => [t.id, t.amount]).sort()).toEqual([
+      ['added', 100], ['edited', 250],
+    ]);
+  });
+
+  it('preserves pending creates, failed edits and deletion tombstones', async () => {
+    await localStore.seed([remote('edit'), remote('delete')]);
+    const created = await localStore.create(input());
+    await localStore.update('edit', { amount: 350 });
+    await localStore.markFailed('edit', 'offline');
+    await localStore.softDelete('delete');
+    await localStore.reconcile([remote('edit'), remote('delete'), remote('added')], await localStore.beginRefresh());
+    const all = await localStore.getAll();
+    expect(all.find(t => t.id === 'edit')?.amount).toBe(350);
+    expect(all.some(t => t.id === created.id)).toBe(true);
+    expect(all.some(t => t.id === 'delete')).toBe(false);
+    expect(await localStore.getPending()).toHaveLength(3);
+  });
+
+  it('discards a response racing a completed local delete', async () => {
+    await localStore.seed([remote('delete')]);
+    const start = await localStore.beginRefresh();
+    await localStore.softDelete('delete');
+    await localStore.removeRow('delete');
+    expect(await localStore.reconcile([remote('delete')], start)).toBe(false);
+    expect(await localStore.getAll()).toEqual([]);
+  });
+
+  it('does not import an old account response after logout', async () => {
+    const start = await localStore.beginRefresh();
+    await localStore.clear();
+    expect(await localStore.reconcile([remote('old-account')], start)).toBe(false);
+    expect(await localStore.getAll()).toEqual([]);
+  });
+});
+
 function input(over: Partial<Parameters<typeof localStore.create>[0]> = {}) {
   return {
     type: 'expense' as const,

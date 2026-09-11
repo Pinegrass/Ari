@@ -89,6 +89,8 @@ export interface UpdateInput {
 // In-memory cache of the full row set. Loaded once, kept in sync with every
 // persist so reads never touch disk after the first.
 let cache: LocalTxn[] | null = null;
+// Invalidates a server snapshot if a local write or logout happens in flight.
+let revision = 0;
 
 // Serialize all mutations: AsyncStorage holds the rows as one JSON blob, so two
 // concurrent read-modify-write cycles would clobber each other. Every mutation
@@ -115,6 +117,7 @@ async function load(): Promise<LocalTxn[]> {
 }
 
 async function persist(rows: LocalTxn[]): Promise<void> {
+  revision += 1;
   cache = rows;
   await AsyncStorage.setItem(STORE_KEY, JSON.stringify(rows));
 }
@@ -195,6 +198,29 @@ function sortRows(rows: LocalTxn[]): LocalTxn[] {
 }
 
 export const localStore = {
+  async beginRefresh(): Promise<number> {
+    return withLock(async () => revision);
+  },
+
+  /** Reconcile a complete server history without losing unsent local work.
+   * A response racing a local write/logout is discarded and retried on the
+   * next refresh. Never use a filtered/paginated response here.
+   */
+  async reconcile(serverTxns: Transaction[], startedAt: number): Promise<boolean> {
+    return withLock(async () => {
+      if (revision !== startedAt) return false;
+      const rows = await load();
+      const unsent = rows.filter((r) => r.syncStatus !== 'synced');
+      const protectedIds = new Set(unsent.map((r) => r.id));
+      await persist([
+        ...unsent,
+        ...serverTxns.filter((t) => !protectedIds.has(t.id)).map(fromServer),
+      ]);
+      await AsyncStorage.setItem(META_KEY, JSON.stringify({ seeded: true, lastSyncAt: nowISO() }));
+      return true;
+    });
+  },
+
   /** Non-deleted rows, newest first, in the UI's Transaction shape. */
   async getAll(): Promise<Transaction[]> {
     const rows = await load();
@@ -373,6 +399,7 @@ export const localStore = {
   /** Wipe everything (called on logout so the next user starts clean). */
   async clear(): Promise<void> {
     return withLock(async () => {
+      revision += 1;
       cache = [];
       await AsyncStorage.multiRemove([STORE_KEY, META_KEY]);
     });
