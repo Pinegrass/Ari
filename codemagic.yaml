@@ -286,7 +286,7 @@ workflows:
       cocoapods: default
       ios_signing:
         provisioning_profiles:
-          - AriApple
+          - AriAppleLinks20260911
           - AriShareExtV2
         certificates:
           - Pinecert
