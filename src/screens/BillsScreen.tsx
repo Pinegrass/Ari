@@ -1,3 +1,5 @@
+
+import { useLanguage } from '../i18n/LanguageContext';
 import React, { useState, useCallback } from 'react';
 import {
   View,
@@ -67,6 +69,8 @@ function nextDueLabel(bill: Bill, localeTag: string): string {
 }
 
 export default function BillsScreen() {
+ const {phrase:localizeCopy}=useLanguage();
+  const { phrase } = useLanguage();
   const { locale, formatCurrency } = useLocale();
   const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
   const haptics = useHaptics();
@@ -128,15 +132,15 @@ export default function BillsScreen() {
     const day = parseInt(dueDay, 10);
 
     if (!trimmedName) {
-      Alert.alert('Name required', 'Give this bill a name, e.g. "Rent" or "Credit card".');
+      Alert.alert(phrase('Name required'), phrase('Give this bill a name, e.g. "Rent" or "Credit card".'));
       return;
     }
     if (!Number.isFinite(amt) || amt <= 0) {
-      Alert.alert('Amount required', 'Enter the bill amount in rupees.');
+      Alert.alert(phrase('Amount required'), phrase('Enter the bill amount.'));
       return;
     }
     if (!Number.isFinite(day) || day < 1 || day > 31) {
-      Alert.alert('Due day', 'Enter a due day between 1 and 31.');
+      Alert.alert(phrase('Due day'), phrase('Enter a due day between 1 and 31.'));
       return;
     }
 
@@ -172,7 +176,7 @@ export default function BillsScreen() {
       await load();
     } catch {
       haptics.error();
-      Alert.alert('Could not save', 'Something went wrong saving this bill. Please try again.');
+      Alert.alert(phrase('Could not save'), phrase('Something went wrong saving this bill. Please try again.'));
     } finally {
       setSaving(false);
     }
@@ -195,14 +199,14 @@ export default function BillsScreen() {
   return (
     <ScreenShell edges={['top']}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn} accessibilityLabel="Go back">
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn} accessibilityLabel={phrase("Go back")}>
           <Icon name="arrow-left" size={22} color={color.ink} />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
-          <Text style={styles.headerTitle}>Bills & reminders</Text>
-          <Text style={styles.headerSub}>Never miss rent, EMI or a bill</Text>
+          <Text style={styles.headerTitle}>{phrase("Bills & reminders")}</Text>
+          <Text style={styles.headerSub}>{phrase("Plan for rent, EMI and bills")}</Text>
         </View>
-        <TouchableOpacity onPress={openAdd} style={styles.addBtnHeader} accessibilityLabel="Add bill">
+        <TouchableOpacity onPress={openAdd} style={styles.addBtnHeader} accessibilityLabel={phrase("Add bill")}>
           <Icon name="plus" size={18} color={color.cream} />
         </TouchableOpacity>
       </View>
@@ -213,7 +217,7 @@ export default function BillsScreen() {
         ) : bills.length === 0 ? (
           <EmptyState
             emoji="🔔"
-            title="No bills yet"
+            title={phrase("No bills yet")}
             subtitle="Add a bill and Ari will remind you the day before and the day it's due — so nothing slips."
             actionLabel="Add your first bill"
             onAction={openAdd}
@@ -257,9 +261,9 @@ export default function BillsScreen() {
           <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={() => setShowModal(false)} />
           <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, 24) + 8 }]}>
             <View style={styles.handle} />
-            <Text style={styles.sheetTitle}>{editing ? 'Edit bill' : 'New bill'}</Text>
+            <Text style={styles.sheetTitle}>{editing ? phrase("Edit bill") : phrase("New bill")}</Text>
 
-            <Input label="Name" placeholder="Rent, Credit card, Netflix…" value={name} onChangeText={setName} />
+            <Input label={phrase("Name")} placeholder={phrase("Rent, Credit card, Netflix…")} value={name} onChangeText={setName} />
             <Input
               label={`Amount (${locale.symbol})`}
               placeholder="0"
@@ -268,14 +272,14 @@ export default function BillsScreen() {
               keyboardType="number-pad"
             />
             <Input
-              label="Due day of month (1–31)"
+              label={phrase("Due day of month (1–31)")}
               placeholder="1"
               value={dueDay}
               onChangeText={(t) => setDueDay(t.replace(/[^0-9]/g, '').slice(0, 2))}
               keyboardType="number-pad"
             />
 
-            <Text style={styles.fieldLabel}>Category</Text>
+            <Text style={styles.fieldLabel}>{phrase("Category")}</Text>
             <View style={styles.chips}>
               {BILL_CATEGORIES.map((c) => {
                 const active = c.key === category;
@@ -289,7 +293,7 @@ export default function BillsScreen() {
                     style={[styles.chip, active && styles.chipActive]}
                   >
                     <Text style={[styles.chipText, active && styles.chipTextActive]}>
-                      {c.emoji} {c.label}
+                    {c.emoji} {phrase(c.label)}
                     </Text>
                   </TouchableOpacity>
                 );
@@ -298,7 +302,7 @@ export default function BillsScreen() {
 
             <View style={styles.repeatRow}>
               <View style={{ flex: 1 }}>
-                <Text style={styles.repeatTitle}>Repeat monthly</Text>
+                <Text style={styles.repeatTitle}>{phrase("Repeat monthly")}</Text>
                 <Text style={styles.repeatSub}>
                   {repeatMonthly ? 'Reminds you every month' : 'One-time reminder only'}
                 </Text>
@@ -315,7 +319,7 @@ export default function BillsScreen() {
             </View>
 
             <Button onPress={handleSave} loading={saving} fullWidth>
-              {editing ? 'Save changes' : 'Add bill'}
+              {editing ? localizeCopy("Save changes") : phrase("Add bill")}
             </Button>
           </View>
         </KeyboardAvoidingView>
@@ -323,7 +327,7 @@ export default function BillsScreen() {
 
       <DeleteConfirmSheet
         visible={!!deleteTarget}
-        title="Delete bill?"
+        title={phrase("Delete bill?")}
         message={`This removes "${deleteTarget?.name}" and cancels its reminders.`}
         onConfirm={handleDelete}
         onCancel={() => setDeleteTarget(null)}

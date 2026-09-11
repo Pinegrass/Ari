@@ -1,3 +1,5 @@
+
+import { useLanguage } from '../i18n/LanguageContext';
 import React, { useMemo, useState } from 'react';
 import {
   View,
@@ -58,6 +60,7 @@ function formatDueDate(iso: string, localeTag: string): string {
  * template; past child instances are kept).
  */
 export default function RecurringPaymentsScreen() {
+  const { phrase } = useLanguage();
   const navigation = useNavigation<Nav>();
   const { transactions, updateTransaction, deleteTransaction } = useData();
   const { locale, formatCurrency } = useLocale();
@@ -147,27 +150,27 @@ export default function RecurringPaymentsScreen() {
         activeOpacity={0.85}
         onPress={() => openActions(item)}
         accessibilityRole="button"
-        accessibilityLabel={`${item.description || cat.label}, ${RULE_LABELS[item.recurrenceRule]}, ${formatCurrency(item.amount)}${paused ? ', paused' : ''}`}
+        accessibilityLabel={`${item.description || phrase(cat.label)}, ${phrase(RULE_LABELS[item.recurrenceRule])}, ${formatCurrency(item.amount)}${paused ? `, ${phrase('Paused')}` : ''}`}
       >
         <View style={[styles.emojiDot, { backgroundColor: cat.color + '22' }]}>
           <Text style={styles.emoji}>{cat.emoji}</Text>
         </View>
         <View style={{ flex: 1 }}>
           <Text style={[styles.name, paused && styles.namePaused]} numberOfLines={1}>
-            {item.description || cat.label}
+            {item.description || phrase(cat.label)}
           </Text>
           <Text style={styles.meta}>
-            {RULE_LABELS[item.recurrenceRule]}
+            {phrase(RULE_LABELS[item.recurrenceRule])}
             {paused
-              ? ' · Paused'
+              ? ` · ${phrase('Paused')}`
               : nextDue
-                ? ` · Next ${formatDueDate(nextDue.nextDueDate, locale.localeTag)}`
+                ? ` · ${phrase('Next')} ${formatDueDate(nextDue.nextDueDate, locale.localeTag)}`
                 : ''}
           </Text>
         </View>
         {paused && (
           <View style={styles.pausedBadge}>
-            <Text style={styles.pausedBadgeText}>Paused</Text>
+            <Text style={styles.pausedBadgeText}>{phrase("Paused")}</Text>
           </View>
         )}
         <Text style={[styles.amount, item.type === 'income' && { color: color.forest2 }]}>
@@ -186,14 +189,14 @@ export default function RecurringPaymentsScreen() {
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backBtn}
-          accessibilityLabel="Go back"
+          accessibilityLabel={phrase("Go back")}
           accessibilityRole="button"
         >
           <Icon name="arrow-left" size={22} color={color.ink} />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
-          <Text style={styles.headerTitle}>Recurring Payments</Text>
-          <Text style={styles.headerSub}>Subscriptions & repeating entries</Text>
+          <Text style={styles.headerTitle}>{phrase("Recurring Payments")}</Text>
+          <Text style={styles.headerSub}>{phrase("Subscriptions & repeating entries")}</Text>
         </View>
       </View>
 
@@ -205,14 +208,13 @@ export default function RecurringPaymentsScreen() {
         ListHeaderComponent={
           templates.length > 0 ? (
             <View style={styles.summaryCard}>
-              <Text style={styles.summaryLabel}>ACTIVE RECURRING COST</Text>
+              <Text style={styles.summaryLabel}>{phrase("ACTIVE RECURRING COST")}</Text>
               <Text style={styles.summaryAmount}>
                 {formatCurrency(Math.round(monthlyCost))}
-                <Text style={styles.summaryPer}> / month</Text>
+                <Text style={styles.summaryPer}> {phrase("/ month")}</Text>
               </Text>
               <Text style={styles.summaryMeta}>
-                {activeCount} active
-                {pausedCount > 0 ? ` · ${pausedCount} paused` : ''}
+                {activeCount} {phrase("active")}{pausedCount > 0 ? ` · ${pausedCount} ${phrase('Paused')}` : ''}
               </Text>
             </View>
           ) : null
@@ -220,7 +222,7 @@ export default function RecurringPaymentsScreen() {
         ListEmptyComponent={
           <EmptyState
             emoji="🔁"
-            title="No recurring payments"
+            title={phrase("No recurring payments")}
             subtitle="Mark a transaction as Repeat when adding it and it will show up here."
           />
         }
@@ -237,7 +239,7 @@ export default function RecurringPaymentsScreen() {
           style={styles.sheetBackdrop}
           activeOpacity={1}
           onPress={() => setActionFor(null)}
-          accessibilityLabel="Dismiss actions"
+          accessibilityLabel={phrase("Dismiss actions")}
         />
         <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, 16) + 18 }]}>
           <View style={styles.sheetHandle} />
@@ -247,24 +249,24 @@ export default function RecurringPaymentsScreen() {
                 {actionFor.description || getCategoryDef(actionFor.category).label}
               </Text>
               <Text style={styles.sheetMeta}>
-                {RULE_LABELS[actionFor.recurrenceRule]} · {formatCurrency(actionFor.amount)}
+                {phrase(RULE_LABELS[actionFor.recurrenceRule])} · {formatCurrency(actionFor.amount)}
               </Text>
 
               <TouchableOpacity
                 style={styles.sheetAction}
                 onPress={() => handleEdit(actionFor)}
                 accessibilityRole="button"
-                accessibilityLabel="Edit recurring payment"
+                accessibilityLabel={phrase("Edit recurring payment")}
               >
                 <Icon name="edit" size={18} color={color.forest} />
-                <Text style={styles.sheetActionText}>Edit amount, schedule or note</Text>
+                <Text style={styles.sheetActionText}>{phrase("Edit amount, schedule or note")}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.sheetAction}
                 onPress={() => handleTogglePause(actionFor)}
                 accessibilityRole="button"
-                accessibilityLabel={actionFor.isPaused ? 'Resume recurring payment' : 'Pause recurring payment'}
+                accessibilityLabel={actionFor.isPaused ? phrase("Resume recurring payment") : phrase("Pause recurring payment")}
               >
                 <Icon name={actionFor.isPaused ? 'play' : 'moon'} size={18} color={color.forest} />
                 <Text style={styles.sheetActionText}>
@@ -280,12 +282,11 @@ export default function RecurringPaymentsScreen() {
                   setActionFor(null);
                 }}
                 accessibilityRole="button"
-                accessibilityLabel="Stop recurring series"
+                accessibilityLabel={phrase("Stop recurring series")}
               >
                 <Icon name="trash" size={18} color={color.clay} />
                 <Text style={[styles.sheetActionText, { color: color.clay }]}>
-                  Stop series — no more repeats
-                </Text>
+                  {phrase("Stop series — no more repeats")}</Text>
               </TouchableOpacity>
             </>
           )}
@@ -294,7 +295,7 @@ export default function RecurringPaymentsScreen() {
 
       <DeleteConfirmSheet
         visible={!!stopFor}
-        title="Stop this recurring payment?"
+        title={phrase("Stop this recurring payment?")}
         message="This is a recurring payment. Deleting it stops all future repeats; past entries are kept."
         confirmLabel="Stop series"
         onConfirm={handleStopSeries}

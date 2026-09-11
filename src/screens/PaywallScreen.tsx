@@ -1,7 +1,10 @@
+
+import { useLanguage } from '../i18n/LanguageContext';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import RevenueCatUI from 'react-native-purchases-ui';
 import ScreenShell from '../components/ScreenShell';
+import TrialCard from '../components/TrialCard';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
 import { color, font } from '../theme/tokens';
@@ -14,6 +17,7 @@ import {
 
 
 export default function PaywallScreen() {
+  const { phrase } = useLanguage();
   const navigation = useNavigation();
   const route = useRoute<RouteProp<Record<string, { source?: string } | undefined>, string>>();
   const { user } = useAuth();
@@ -36,7 +40,7 @@ export default function PaywallScreen() {
           return;
         }
         if (!(await hasCurrentStoreOffering())) {
-          setError('Ari Pro is not available from Google Play yet. Please try again after the internal Play release is installed.');
+          setError('Paid plans are currently unavailable. Please try again later.');
           return;
         }
         setReady(true);
@@ -46,12 +50,13 @@ export default function PaywallScreen() {
 
   if (error) {
     return (
-      <ScreenShell edges={['top']}>
+      <ScreenShell scrollable edges={['top']}>
         <View style={styles.fallback}>
-          <Text style={styles.title}>Ari Pro</Text>
-          <Text style={styles.body}>{error}</Text>
+          <Text style={styles.title}>{phrase("Ari Pro")}</Text>
+          <Text style={styles.body}>{phrase(error)}</Text>
+          {user && <TrialCard />}
           <TouchableOpacity style={styles.close} onPress={() => navigation.goBack()} accessibilityRole="button">
-            <Text style={styles.closeText}>Go back</Text>
+            <Text style={styles.closeText}>{phrase("Go back")}</Text>
           </TouchableOpacity>
         </View>
       </ScreenShell>

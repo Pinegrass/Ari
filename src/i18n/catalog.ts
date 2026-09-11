@@ -1,0 +1,98 @@
+/** Language is independent of country/currency. New languages extend this registry. */
+export const en = {
+  planning: 'Plan to payday', planningHelp: 'Estimate from cash and obligations you confirm. Expected income is excluded. This is not a bank balance or a guarantee.',
+  cashNow: 'Available cash now', protectedReserve: 'Money to keep aside', nextPayday: 'Next payday (YYYY-MM-DD)', obligationAmount: 'Amount due', obligationDate: 'Due date (YYYY-MM-DD)',
+  addObligation: 'Add an obligation', removeObligation: 'Remove obligation', confirmPlanning: 'I checked my cash and included every obligation through payday.',
+  savePlanning: 'Confirm and calculate', clearPlanning: 'Delete planning inputs', planningRemaining: 'Estimated remainder', planningDaily: 'Average per day until payday',
+  planningMissing: 'Confirm your inputs to see an estimate.', planningStale: 'Confirm again: inputs expired, entries changed, or currency changed.', planningError: 'Could not save. Check amounts and dates, then try again.',
+  measurementTitle: 'Help improve Ari', measurementHelp: 'Optional feature-use counts stored by Ari for up to 90 days. No amounts, notes, merchants or recordings. Turning this off deletes your stored counts.',
+  measurementOn: 'Usage measurement on', measurementOff: 'Usage measurement off', trialTitle: 'Try Ari Pro for 14 days', trialHelp: 'Record an entry first, then start your one-time trial. No card required. No automatic charge when it ends.',
+  startTrial: 'Start free trial', trialActive: 'Your trial is active', trialUnavailable: 'Trial unavailable or already used. Add your first entry if needed.', trialError: 'Could not start the trial. Try again when connected.',
+  updates: 'Tomo updates', updatesHelp: 'A few useful things to review, whenever it suits you.',
+  updatesEmpty: 'No updates to review. Your notification preferences may also hide updates here.',
+  updatesError: 'Updates could not be loaded. Try again when connected.', updatesLoading: 'Loading updates…',
+  openUpdate: 'Review', dismissUpdate: 'Dismiss', dismissFailed: 'Could not dismiss this update. Try again.',
+  language: 'Language', english: 'English', hindi: 'हिन्दी',
+  home: 'Home', accountant: 'Accountant', tomo: 'Tomo', settings: 'Settings',
+  reports: 'Money reports', reportSubtitle: 'Review what happened. Decide what comes next.',
+  daily: 'Daily', weekly: 'Weekly', monthly: 'Monthly', quarterly: 'Quarterly', yearly: 'Yearly',
+  loading: 'Building your report…', unavailable: 'Report unavailable', retry: 'Try again',
+  back: 'Go back', net: 'Recorded net cash flow', income: 'Income', spending: 'Spending',
+  entries: 'Entries', evidence: 'What the records show', categories: 'Where it went',
+  changes: 'Biggest category changes', rhythm: 'Spending rhythm', goals: 'Goals today',
+  noCategories: 'No spending recorded in this period.', unknown: 'Not enough information',
+  limits: 'This review uses recorded entries. Bank balances, unrecorded bills, actual savings and safe-to-spend are not known.',
+  comparison: 'Compared with {start} – {end}', reviewEntries: 'Review entries',
+  addEntry: 'Add transaction', noBaseline: 'No previous spending to compare',
+  spendChange: '{change}% spending change', observed: 'Observed', calculated: 'Calculated',
+  predicted: 'Estimated', interpretation: 'Tomo interpretation', private: 'Amounts hidden in Private Mode',
+  periodEnding: 'Period ending', previous: 'Previous period', next: 'Next period',
+  today: 'Current period', dateHint: 'YYYY-MM-DD', currentGoals: 'Current goals, not historical balances',
+  frequency: 'Frequency', notifications: 'Notification preferences',
+  saved: 'Saved', save: 'Save', cancel: 'Cancel', error: 'Something went wrong. Please try again.',
+  reportsNotice: 'Reports', spendingNotice: 'Spending changes', billsNotice: 'Recurring charges',
+  habitNotice: 'Optional check-ins', push: 'Push notifications', inApp: 'In-app updates',
+  quietStart: 'Quiet hours start', quietEnd: 'Quiet hours end', timezone: 'Time zone',
+  maxPerWeek: 'Maximum pushes per week', notificationHelp: 'Financial amounts and merchant names stay out of server push previews. Local bill reminders have separate device controls.',
+  notificationUnavailable: 'Notification settings could not be loaded. Existing preferences have not changed.',
+  localLanguage: 'Language is saved on this device. Currency stays unchanged.',
+  entryCount_one: '{count} entry', entryCount_other: '{count} entries',
+  signIn: 'Sign in', signUp: 'Create account', email: 'Email', password: 'Password',
+  transactions: 'Transactions', budgets: 'Budgets', notes: 'Notes', taxes: 'Taxes',
+  security: 'Privacy and security', export: 'Export data', deleteAccount: 'Delete account',
+} as const;
+
+export type MessageKey = keyof typeof en;
+export const hi: Record<MessageKey, string> = {
+  planning: 'अगली आमदनी तक की योजना', planningHelp: 'आपके बताए नकद और देनदारियों से बना अनुमान। आने वाली आमदनी इसमें नहीं जुड़ती। यह बैंक बैलेंस या गारंटी नहीं है।',
+  cashNow: 'अभी उपलब्ध नकद', protectedReserve: 'अलग रखी जाने वाली रकम', nextPayday: 'अगली आमदनी की तारीख (YYYY-MM-DD)', obligationAmount: 'देय रकम', obligationDate: 'भुगतान की तारीख (YYYY-MM-DD)',
+  addObligation: 'देनदारी जोड़ें', removeObligation: 'देनदारी हटाएँ', confirmPlanning: 'मैंने नकद जाँचा है और अगली आमदनी तक की सभी देनदारियाँ शामिल की हैं।',
+  savePlanning: 'पुष्टि करके हिसाब देखें', clearPlanning: 'योजना की जानकारी मिटाएँ', planningRemaining: 'अनुमानित बची रकम', planningDaily: 'अगली आमदनी तक रोज़ का औसत',
+  planningMissing: 'अनुमान देखने के लिए जानकारी की पुष्टि करें।', planningStale: 'फिर पुष्टि करें: जानकारी पुरानी है, एंट्री बदली है या मुद्रा बदली है।', planningError: 'सेव नहीं हुआ। रकम और तारीखें जाँचकर फिर कोशिश करें।',
+  measurementTitle: 'एरी को बेहतर बनाने में मदद करें', measurementHelp: 'वैकल्पिक सुविधा-उपयोग की गिनती एरी में अधिकतम 90 दिन रहती है। रकम, नोट, दुकानों के नाम या रिकॉर्डिंग नहीं। बंद करने पर आपकी गिनती मिट जाती है।',
+  measurementOn: 'उपयोग की गिनती चालू', measurementOff: 'उपयोग की गिनती बंद', trialTitle: 'एरी प्रो 14 दिन मुफ़्त आज़माएँ', trialHelp: 'पहले एक एंट्री दर्ज करें, फिर एक बार मिलने वाला ट्रायल शुरू करें। कार्ड नहीं चाहिए। अंत में अपने-आप पैसे नहीं कटेंगे।',
+  startTrial: 'मुफ़्त ट्रायल शुरू करें', trialActive: 'आपका ट्रायल चालू है', trialUnavailable: 'ट्रायल उपलब्ध नहीं है या पहले इस्तेमाल हो चुका है। ज़रूरत हो तो पहली एंट्री जोड़ें।', trialError: 'ट्रायल शुरू नहीं हुआ। इंटरनेट मिलने पर फिर कोशिश करें।',
+  updates: 'टोमो के अपडेट', updatesHelp: 'जब समय हो, काम की कुछ बातें देखें।',
+  updatesEmpty: 'अभी कोई अपडेट नहीं है। आपकी नोटिफ़िकेशन सेटिंग्स भी यहाँ अपडेट छिपा सकती हैं।',
+  updatesError: 'अपडेट लोड नहीं हुए। इंटरनेट जुड़ने पर फिर कोशिश करें।', updatesLoading: 'अपडेट लोड हो रहे हैं…',
+  openUpdate: 'देखें', dismissUpdate: 'हटाएँ', dismissFailed: 'अपडेट हट नहीं पाया। फिर कोशिश करें।',
+  language: 'भाषा', english: 'English', hindi: 'हिन्दी',
+  home: 'होम', accountant: 'हिसाब-किताब', tomo: 'टोमो', settings: 'सेटिंग्स',
+  reports: 'पैसों की रिपोर्ट', reportSubtitle: 'हिसाब समझें। अगला कदम तय करें।',
+  daily: 'रोज़ाना', weekly: 'साप्ताहिक', monthly: 'मासिक', quarterly: 'तिमाही', yearly: 'सालाना',
+  loading: 'रिपोर्ट तैयार हो रही है…', unavailable: 'रिपोर्ट उपलब्ध नहीं है', retry: 'फिर कोशिश करें',
+  back: 'वापस जाएँ', net: 'दर्ज आमदनी और खर्च का अंतर', income: 'आमदनी', spending: 'खर्च',
+  entries: 'एंट्री', evidence: 'दर्ज हिसाब क्या बताता है', categories: 'खर्च कहाँ हुआ',
+  changes: 'श्रेणियों में सबसे बड़े बदलाव', rhythm: 'खर्च का क्रम', goals: 'आज के लक्ष्य',
+  noCategories: 'इस अवधि में कोई खर्च दर्ज नहीं है।', unknown: 'पर्याप्त जानकारी नहीं है',
+  limits: 'यह रिपोर्ट दर्ज एंट्री पर आधारित है। बैंक बैलेंस, बिना दर्ज बिल, वास्तविक बचत और खर्च के लिए उपलब्ध रकम की पूरी जानकारी नहीं है।',
+  comparison: '{start} – {end} से तुलना', reviewEntries: 'एंट्री देखें',
+  addEntry: 'एंट्री जोड़ें', noBaseline: 'तुलना के लिए पिछला खर्च दर्ज नहीं है',
+  spendChange: 'खर्च में {change}% बदलाव', observed: 'दर्ज जानकारी', calculated: 'गणना',
+  predicted: 'अनुमान', interpretation: 'टोमो की व्याख्या', private: 'प्राइवेट मोड में रकम छिपी है',
+  periodEnding: 'अवधि की आखिरी तारीख', previous: 'पिछली अवधि', next: 'अगली अवधि',
+  today: 'मौजूदा अवधि', dateHint: 'YYYY-MM-DD', currentGoals: 'आज के लक्ष्य, पुराने बैलेंस नहीं',
+  frequency: 'कितनी बार', notifications: 'नोटिफ़िकेशन की पसंद',
+  saved: 'सेव हो गया', save: 'सेव करें', cancel: 'रद्द करें', error: 'कुछ गड़बड़ हुई। फिर कोशिश करें।',
+  reportsNotice: 'रिपोर्ट', spendingNotice: 'खर्च में बदलाव', billsNotice: 'बार-बार होने वाले खर्च',
+  habitNotice: 'वैकल्पिक चेक-इन', push: 'पुश नोटिफ़िकेशन', inApp: 'ऐप में अपडेट',
+  quietStart: 'शांत समय की शुरुआत', quietEnd: 'शांत समय का अंत', timezone: 'समय क्षेत्र',
+  maxPerWeek: 'एक सप्ताह में अधिकतम पुश', notificationHelp: 'सर्वर के पुश प्रीव्यू में रकम और दुकानदार का नाम नहीं दिखता। स्थानीय बिल रिमाइंडर की सेटिंग अलग है।',
+  notificationUnavailable: 'नोटिफ़िकेशन की सेटिंग लोड नहीं हुई। आपकी मौजूदा पसंद नहीं बदली है।',
+  localLanguage: 'भाषा इस डिवाइस पर सेव होती है। मुद्रा नहीं बदलती।',
+  entryCount_one: '{count} एंट्री', entryCount_other: '{count} एंट्री',
+  signIn: 'साइन इन करें', signUp: 'खाता बनाएँ', email: 'ईमेल', password: 'पासवर्ड',
+  transactions: 'लेन-देन', budgets: 'बजट', notes: 'नोट्स', taxes: 'टैक्स',
+  security: 'गोपनीयता और सुरक्षा', export: 'डेटा एक्सपोर्ट करें', deleteAccount: 'खाता मिटाएँ',
+};
+
+export const catalogs = { en, hi };
+export type Language = keyof typeof catalogs;
+export function translate(language: Language, key: MessageKey, values: Record<string, string | number> = {}): string {
+  const message = catalogs[language]?.[key] ?? en[key];
+  return message.replace(/\{(\w+)\}/g, (token, name) => values[name] === undefined ? token : String(values[name]));
+}
+export function entryCount(language: Language, count: number): string {
+  const plural = new Intl.PluralRules(language).select(count);
+  return translate(language, plural === 'one' ? 'entryCount_one' : 'entryCount_other', { count });
+}

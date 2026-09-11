@@ -74,6 +74,15 @@ beforeEach(() => {
   mockScheduled.length = 0;
 });
 
+it('uses a Hindi preview without bill names or amounts', async () => {
+  mockStore.set('ari_language', 'hi');
+  await scheduleBillReminders(makeBill({name:'Private merchant',amount:12345}), NOW);
+  expect(mockScheduled.length).toBeGreaterThan(0);
+  const content = mockScheduled[0].content as {title:string;body:string};
+  expect(content.title).toContain('एरी');
+  expect(content.title + content.body).not.toMatch(/Private merchant|12345/);
+});
+
 describe('persistence', () => {
   it('getBills returns [] when nothing is stored', async () => {
     expect(await getBills()).toEqual([]);

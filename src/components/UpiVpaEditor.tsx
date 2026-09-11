@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../i18n/LanguageContext';
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, StyleSheet, TouchableOpacity, Alert,
@@ -15,6 +16,7 @@ import { useHaptics } from '../hooks/useHaptics';
 /** Settings sub-screen — set/clear the user's UPI VPA so other group
  * members can pay them back via UPI. Validates basic shape (`name@bank`). */
 export default function UpiVpaEditor({ onBack }: { onBack: () => void }) {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const { user, refreshFromSession } = useAuth();
   const haptics = useHaptics();
   const [vpa, setVpa] = useState(user?.upiVpa ?? '');
@@ -81,8 +83,7 @@ export default function UpiVpaEditor({ onBack }: { onBack: () => void }) {
           </Text>
 
           <Button onPress={save} loading={saving} fullWidth style={{ marginTop: 24 }}>
-            Save
-          </Button>
+            {localizeCopy("Save")}</Button>
 
           {user?.upiVpa && (
             <TouchableOpacity

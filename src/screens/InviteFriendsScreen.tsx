@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../i18n/LanguageContext';
 import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, Alert, Share, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
@@ -13,6 +14,7 @@ import { color, font, type } from '../theme/tokens';
 import type { MainStackParamList } from '../navigation/navigationTypes';
 
 export default function InviteFriendsScreen() {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const navigation = useNavigation();
   const route = useRoute<RouteProp<MainStackParamList, 'InviteFriends'>>();
   const haptics = useHaptics();
@@ -64,7 +66,7 @@ export default function InviteFriendsScreen() {
   return (
     <ScreenShell edges={['top']} scrollable contentContainerStyle={styles.content}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.back} accessibilityLabel="Go back"><Icon name="arrow-left" size={22} /></TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.back} accessibilityLabel={localizeCopy("Go back")}><Icon name="arrow-left" size={22} /></TouchableOpacity>
         <View><Text style={styles.headerTitle}>Grow your circle</Text><Text style={styles.headerSub}>Invite people without pressure or spam</Text></View>
       </View>
 

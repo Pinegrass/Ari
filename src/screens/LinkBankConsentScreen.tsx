@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../i18n/LanguageContext';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
@@ -38,6 +39,7 @@ const FI_TYPES: { key: string; label: string; hint: string }[] = [
 ];
 
 export default function LinkBankConsentScreen() {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
   const haptics = useHaptics();
   const c = useColors();
@@ -161,7 +163,7 @@ export default function LinkBankConsentScreen() {
               navigation.goBack();
             }}
             style={styles.backRow}
-            accessibilityLabel="Go back"
+            accessibilityLabel={localizeCopy("Go back")}
             accessibilityRole="button"
           >
             <Icon name="arrow-left" size={22} color={c.inkSoft} />

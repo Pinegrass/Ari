@@ -1,138 +1,28 @@
-import PostHog from 'posthog-react-native';
-import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
+import {apiRequest} from '../api/client';
 
-/**
- * PostHog analytics for Day-1/7/30 retention tracking (spec §2 Analytics
- * row). Wrapped in a tiny facade so route/screen code doesn't import the
- * SDK directly — easier to swap providers later, easier to no-op in dev.
- *
- * Wired in App.tsx (init) + AuthContext (identify on login, reset on
- * logout) + the screens that fire interesting events (expense logged,
- * brief opened, paywall viewed).
- *
- * Privacy / Private Mode:
- *   When the user enables Private Mode (spec §7) we call PostHog's
- *   native opt-out (`client.optOut()`) AND set a module-level flag that
- *   `track()` / `identifyUser()` short-circuit on. Defense in depth — if
- *   PostHog batches an event before the opt-out propagates, the early
- *   return still drops it. The boot sequence reads the persisted Private
- *   Mode flag synchronously enough that no events fire before the SDK
- *   knows the user opted out.
- */
-
-const HOST = process.env.EXPO_PUBLIC_POSTHOG_HOST ?? 'https://app.posthog.com';
-const KEY = process.env.EXPO_PUBLIC_POSTHOG_KEY;
-const PRIVACY_STORAGE_KEY = 'ari_private_mode';
-
-let client: PostHog | null = null;
-let _privacyOptOut = false;
-
-// PostHog v2's typed PostHogEventProperties requires JSON-serialisable
-// values. We accept Record<string, unknown> from callers for ergonomics
-// then assert at the boundary — runtime we filter undefined/functions
-// to keep the JSON valid.
-type Json = string | number | boolean | null | Json[] | { [k: string]: Json };
-function _toJson(v: unknown): Json | undefined {
-  if (v === undefined) return undefined;
-  if (v === null) return null;
-  if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') return v;
-  if (Array.isArray(v)) return v.map((x) => _toJson(x) ?? null) as Json[];
-  if (typeof v === 'object') {
-    const out: Record<string, Json> = {};
-    for (const [k, val] of Object.entries(v as Record<string, unknown>)) {
-      const j = _toJson(val);
-      if (j !== undefined) out[k] = j;
-    }
-    return out;
-  }
-  return undefined;
+// First-party, explicit opt-in counts only. No third-party SDK, properties or replay.
+let privateMode=true;
+let privacyChoiceSet=false;
+let allowed=false;
+let generation=0;
+let accountId:string|null=null;
+export function setMeasurementAllowed(enabled:boolean):void{generation++;allowed=enabled;}
+export async function syncMeasurementConsent():Promise<void>{
+  const current=++generation;
+  try{const value=await apiRequest<{enabled:boolean}>('/measurement/consent');if(current===generation)setMeasurementAllowed(value.enabled);}catch{if(current===generation)setMeasurementAllowed(false);}
 }
-function _props(p: Record<string, unknown>): Record<string, Json> {
-  const out: Record<string, Json> = {};
-  for (const [k, v] of Object.entries(p)) {
-    const j = _toJson(v);
-    if (j !== undefined) out[k] = j;
-  }
-  return out;
+export async function initAnalytics():Promise<void>{
+  try{const saved=await AsyncStorage.getItem('ari_private_mode');if(!privacyChoiceSet)privateMode=saved==='1';}catch{return;}
+  await syncMeasurementConsent();
 }
-
-export async function initAnalytics(): Promise<void> {
-  if (!KEY || client) return;
-  // Hydrate the privacy flag BEFORE the client exists so the SDK can be
-  // opted-out the moment it's constructed. Failure here is fine — the
-  // default ('not in private mode') is the louder, safer-by-default state
-  // since track() also no-ops without a key.
-  try {
-    const persisted = await AsyncStorage.getItem(PRIVACY_STORAGE_KEY);
-    _privacyOptOut = persisted === '1';
-  } catch {
-    /* noop */
-  }
-  try {
-    client = new PostHog(KEY, {
-      host: HOST,
-      captureAppLifecycleEvents: true,
-    });
-    // Tag every event with build metadata so we can correlate retention
-    // dips with releases. Mirror Darelight's super-property set (platform +
-    // build_number) so PostHog dashboards can be defined identically across
-    // both apps (iOS vs Android slices, version-gated regression detection).
-    const buildNumber = Platform.OS === 'ios'
-      ? String(Constants.expoConfig?.ios?.buildNumber ?? '1')
-      : String(Constants.expoConfig?.android?.versionCode ?? 1);
-    client.register({
-      app_version: Constants.expoConfig?.version ?? 'dev',
-      runtime: Constants.expoConfig?.runtimeVersion?.toString() ?? 'unknown',
-      platform: Platform.OS,
-      build_number: buildNumber,
-    });
-    // If we restored opt-out from storage, propagate it into the SDK now.
-    if (_privacyOptOut) {
-      try { client.optOut(); } catch { /* noop */ }
-    }
-  } catch {
-    /* swallow — analytics is never critical */
-  }
+export function setPrivacyEnabled(enabled:boolean):void{privacyChoiceSet=true;privateMode=enabled;}
+export function isPrivacyEnabled():boolean{return privateMode;}
+export function identifyUser(userId:string,_traits:Record<string,unknown>={}):void{
+  if(accountId!==userId){setMeasurementAllowed(false);accountId=userId;}
+  void syncMeasurementConsent();
 }
-
-/**
- * Toggle analytics opt-out. Called by PrivacyContext whenever the user
- * flips Private Mode in Settings. Uses PostHog's SDK-native optOut/optIn
- * AND keeps a local flag so the early-return in track() catches anything
- * the SDK queues during the transition.
- */
-export function setPrivacyEnabled(enabled: boolean): void {
-  _privacyOptOut = enabled;
-  if (!client) return;
-  try {
-    if (enabled) client.optOut();
-    else client.optIn();
-  } catch {
-    /* noop */
-  }
-}
-
-/** True iff the user has Private Mode on (analytics opt-out). */
-export function isPrivacyEnabled(): boolean {
-  return _privacyOptOut;
-}
-
-export function identifyUser(userId: string, traits: Record<string, unknown> = {}): void {
-  if (!client || _privacyOptOut) return;
-  try {
-    client.identify(userId, _props(traits));
-  } catch { /* noop */ }
-}
-
-export function resetAnalytics(): void {
-  if (!client) return;
-  try {
-    client.reset();
-  } catch { /* noop */ }
-}
-
+export function resetAnalytics():void{accountId=null;setMeasurementAllowed(false);}
 export type AnalyticsEvent =
   | 'app_opened'
   | 'app_foregrounded'
@@ -185,6 +75,9 @@ export type AnalyticsEvent =
   | 'nudge_checkins_enabled'
   | 'nudge_checkins_disabled'
   | 'engagement_card_opened'
+  | 'report_action_started'
+  | 'language_changed'
+  | 'notification_preferences_updated'
   | 'periodic_report_viewed'
   | 'referral_shared'
   | 'referral_redeemed'
@@ -203,13 +96,11 @@ export type AnalyticsEvent =
   | 'sync_stuck'
   | 'sync_queue_depth';
 
-export function track(event: AnalyticsEvent, props: Record<string, unknown> = {}): void {
-  if (!client || _privacyOptOut) return;
-  try {
-    client.capture(event, _props(props));
-  } catch { /* noop */ }
+export function track(event:AnalyticsEvent,_props:Record<string,unknown>={}):void{
+  if(privateMode||!allowed)return;
+  const names:Record<string,string>={periodic_report_viewed:'report_opened',nudge_opened:'insight_opened',nudge_dismissed:'insight_dismissed',transaction_logged:'transaction_logged',notification_preferences_updated:'notification_preferences_updated'};
+  if(names[event])void apiRequest('/measurement/events',{method:'POST',body:JSON.stringify({event:names[event]})}).catch(()=>{});
 }
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /**

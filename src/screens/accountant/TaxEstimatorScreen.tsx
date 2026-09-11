@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../../i18n/LanguageContext';
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, TextInput,
@@ -26,6 +27,7 @@ const fmtInput = (n: number): string => (n > 0 ? n.toString() : '');
 type Section = 'income' | 'deductions' | 'result';
 
 export default function TaxEstimatorScreen() {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const navigation = useNavigation();
   const haptics = useHaptics();
   const { user } = useAuth();
@@ -125,7 +127,7 @@ export default function TaxEstimatorScreen() {
 
   if (loading) return (
     <ScreenShell edges={['top']}>
-      <View style={styles.loadingWrap}><ActivityIndicator size="large" color={color.forest} /><Text style={styles.loadingText}>Loading tax profile...</Text></View>
+      <View style={styles.loadingWrap}><ActivityIndicator size="large" color={color.forest} /><Text style={styles.loadingText}>{localizeCopy("Loading tax profile...")}</Text></View>
     </ScreenShell>
   );
 
@@ -135,9 +137,9 @@ export default function TaxEstimatorScreen() {
     <ScreenShell edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}><Icon name="arrow-left" size={22} color={color.ink} /></TouchableOpacity>
-        <View style={{ flex: 1 }}><Text style={styles.headerTitle}>Tax Estimator</Text><Text style={styles.headerSub}>{engine.label}</Text></View>
+        <View style={{ flex: 1 }}><Text style={styles.headerTitle}>{localizeCopy("Tax Estimator")}</Text><Text style={styles.headerSub}>{engine.label}</Text></View>
         <TouchableOpacity onPress={handleSave} disabled={saving} style={styles.saveHeaderBtn}>
-          {saving ? <ActivityIndicator size="small" color={color.forest} /> : <Text style={styles.saveHeaderText}>Save</Text>}
+          {saving ? <ActivityIndicator size="small" color={color.forest} /> : <Text style={styles.saveHeaderText}>{localizeCopy("Save")}</Text>}
         </TouchableOpacity>
       </View>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
@@ -146,12 +148,12 @@ export default function TaxEstimatorScreen() {
           {isIndia && comparison && (
             <AnimatedEntry delay={0}>
               <View style={styles.regimeCard}>
-                <Text style={styles.regimeLabel}>Tax Regime</Text>
+                <Text style={styles.regimeLabel}>{localizeCopy("Tax Regime")}</Text>
                 <View style={styles.regimeTabs}>
                   {(['new', 'old'] as const).map((r) => (
                     <TouchableOpacity key={r} style={[styles.regimeTab, regime === r && styles.regimeTabActive]} onPress={() => { haptics.light(); setRegime(r); }}>
                       <Text style={[styles.regimeTabText, regime === r && styles.regimeTabTextActive]}>{r === 'new' ? 'New' : 'Old'}</Text>
-                      {comparison.recommendedRegime === r && <View style={styles.recommendBadge}><Text style={styles.recommendText}>Best</Text></View>}
+                      {comparison.recommendedRegime === r && <View style={styles.recommendBadge}><Text style={styles.recommendText}>{localizeCopy("Best")}</Text></View>}
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -163,11 +165,11 @@ export default function TaxEstimatorScreen() {
             <AnimatedEntry delay={60}>
               <View style={styles.resultCard}>
                 <View style={styles.resultRow}>
-                  <View style={styles.resultCol}><Text style={styles.resultLabel}>Total Tax</Text><Text style={styles.resultAmount}>{fmt(estimate.totalTax)}</Text></View>
+                  <View style={styles.resultCol}><Text style={styles.resultLabel}>{localizeCopy("Total Tax")}</Text><Text style={styles.resultAmount}>{fmt(estimate.totalTax)}</Text></View>
                   <View style={styles.resultDivider} />
-                  <View style={styles.resultCol}><Text style={styles.resultLabel}>Monthly</Text><Text style={styles.resultAmount}>{fmt(estimate.monthlyTax)}</Text></View>
+                  <View style={styles.resultCol}><Text style={styles.resultLabel}>{localizeCopy("Monthly")}</Text><Text style={styles.resultAmount}>{fmt(estimate.monthlyTax)}</Text></View>
                   <View style={styles.resultDivider} />
-                  <View style={styles.resultCol}><Text style={styles.resultLabel}>Rate</Text><Text style={styles.resultAmount}>{estimate.effectiveTaxRate}%</Text></View>
+                  <View style={styles.resultCol}><Text style={styles.resultLabel}>{localizeCopy("Rate")}</Text><Text style={styles.resultAmount}>{estimate.effectiveTaxRate}%</Text></View>
                 </View>
                 <View style={styles.breakdownBar}>
                   <View style={[styles.barSegment, { flex: estimate.totalDeductions, backgroundColor: color.forest }]} />
@@ -175,9 +177,9 @@ export default function TaxEstimatorScreen() {
                   <View style={[styles.barSegment, { flex: Math.max(grossIncome - estimate.totalDeductions - estimate.totalTax, 0), backgroundColor: color.gold }]} />
                 </View>
                 <View style={styles.legendRow}>
-                  <View style={styles.legendItem}><View style={[styles.legendDot, { backgroundColor: color.forest }]} /><Text style={styles.legendText}>Deductions {fmt(estimate.totalDeductions)}</Text></View>
-                  <View style={styles.legendItem}><View style={[styles.legendDot, { backgroundColor: color.clay }]} /><Text style={styles.legendText}>Tax {fmt(estimate.totalTax)}</Text></View>
-                  <View style={styles.legendItem}><View style={[styles.legendDot, { backgroundColor: color.gold }]} /><Text style={styles.legendText}>Take Home</Text></View>
+                  <View style={styles.legendItem}><View style={[styles.legendDot, { backgroundColor: color.forest }]} /><Text style={styles.legendText}>{localizeCopy("Deductions")}{fmt(estimate.totalDeductions)}</Text></View>
+                  <View style={styles.legendItem}><View style={[styles.legendDot, { backgroundColor: color.clay }]} /><Text style={styles.legendText}>{localizeCopy("Tax")}{fmt(estimate.totalTax)}</Text></View>
+                  <View style={styles.legendItem}><View style={[styles.legendDot, { backgroundColor: color.gold }]} /><Text style={styles.legendText}>{localizeCopy("Take Home")}</Text></View>
                 </View>
               </View>
             </AnimatedEntry>
@@ -186,39 +188,39 @@ export default function TaxEstimatorScreen() {
           {comparison && isIndia && (
             <AnimatedEntry delay={100}>
               <View style={styles.comparisonCard}>
-                <Text style={styles.sectionTitle}>Regime Comparison</Text>
+                <Text style={styles.sectionTitle}>{localizeCopy("Regime Comparison")}</Text>
                 <View style={styles.compareRow}>
-                  <View style={styles.compareCol}><Text style={styles.compareLabel}>Old Regime</Text><Text style={[styles.compareAmount, comparison.recommendedRegime === 'old' && styles.compareWinner]}>{fmt(comparison.old.totalTax)}</Text><Text style={styles.compareRate}>{comparison.old.effectiveTaxRate}% rate</Text></View>
-                  <View style={styles.vsCircle}><Text style={styles.vsText}>VS</Text></View>
-                  <View style={styles.compareCol}><Text style={styles.compareLabel}>New Regime</Text><Text style={[styles.compareAmount, comparison.recommendedRegime === 'new' && styles.compareWinner]}>{fmt(comparison.new.totalTax)}</Text><Text style={styles.compareRate}>{comparison.new.effectiveTaxRate}% rate</Text></View>
+                  <View style={styles.compareCol}><Text style={styles.compareLabel}>{localizeCopy("Old Regime")}</Text><Text style={[styles.compareAmount, comparison.recommendedRegime === 'old' && styles.compareWinner]}>{fmt(comparison.old.totalTax)}</Text><Text style={styles.compareRate}>{comparison.old.effectiveTaxRate}{localizeCopy("% rate")}</Text></View>
+                  <View style={styles.vsCircle}><Text style={styles.vsText}>{localizeCopy("VS")}</Text></View>
+                  <View style={styles.compareCol}><Text style={styles.compareLabel}>{localizeCopy("New Regime")}</Text><Text style={[styles.compareAmount, comparison.recommendedRegime === 'new' && styles.compareWinner]}>{fmt(comparison.new.totalTax)}</Text><Text style={styles.compareRate}>{comparison.new.effectiveTaxRate}{localizeCopy("% rate")}</Text></View>
                 </View>
                 {comparison.savings > 0 && (
-                  <View style={styles.savingsBanner}><Icon name="trending-down" size={16} color={color.forest} /><Text style={styles.savingsText}>You save {fmt(comparison.savings)}/year with {comparison.recommendedRegime === 'old' ? 'Old' : 'New'} Regime</Text></View>
+                  <View style={styles.savingsBanner}><Icon name="trending-down" size={16} color={color.forest} /><Text style={styles.savingsText}>{localizeCopy("You save")}{fmt(comparison.savings)}{localizeCopy("/year with")}{comparison.recommendedRegime === 'old' ? 'Old' : 'New'} {localizeCopy("Regime")}</Text></View>
                 )}
               </View>
             </AnimatedEntry>
           )}
 
           <AnimatedEntry delay={140}>
-            <SectionAccordion title="Income Details" icon="💰" expanded={expandedSection === 'income'} onToggle={() => toggleSection('income')}>
-              <F label="Annual Salary" value={annualSalary} onChange={setAnnualSalary} placeholder={`e.g. ${fmt(1200000)}`} symbol={loc.symbol} />
+            <SectionAccordion title={localizeCopy("Income Details")} icon="💰" expanded={expandedSection === 'income'} onToggle={() => toggleSection('income')}>
+              <F label={localizeCopy("Annual Salary")} value={annualSalary} onChange={setAnnualSalary} placeholder={`e.g. ${fmt(1200000)}`} symbol={loc.symbol} />
               <F label={country === 'US' ? 'Freelance / 1099 Income' : 'Freelance / Self-Employed'} value={freelanceIncome} onChange={setFreelanceIncome} placeholder={`e.g. ${fmt(300000)}`} symbol={loc.symbol} />
-              <F label="Other Income (Interest, Rental, etc.)" value={otherIncome} onChange={setOtherIncome} placeholder={`e.g. ${fmt(50000)}`} symbol={loc.symbol} />
+              <F label={localizeCopy("Other Income (Interest, Rental, etc.)")} value={otherIncome} onChange={setOtherIncome} placeholder={`e.g. ${fmt(50000)}`} symbol={loc.symbol} />
             </SectionAccordion>
           </AnimatedEntry>
 
           <AnimatedEntry delay={180}>
-            <SectionAccordion title="Deductions" icon="📋" expanded={expandedSection === 'deductions'} onToggle={() => toggleSection('deductions')}>
+            <SectionAccordion title={localizeCopy("Deductions")} icon="📋" expanded={expandedSection === 'deductions'} onToggle={() => toggleSection('deductions')}>
               {deductionFields.map((f) => <F key={f.l} label={f.l} value={f.v} onChange={f.s} placeholder={f.p} symbol={loc.symbol} />)}
-              {isIndia && (<><F label="HRA Received (Annual)" value={hraReceived} onChange={setHraReceived} placeholder={`e.g. ${fmt(240000)}`} symbol={loc.symbol} /><F label="Rent Paid (Annual)" value={rentPaid} onChange={setRentPaid} placeholder={`e.g. ${fmt(360000)}`} symbol={loc.symbol} /></>)}
+              {isIndia && (<><F label={localizeCopy("HRA Received (Annual)")} value={hraReceived} onChange={setHraReceived} placeholder={`e.g. ${fmt(240000)}`} symbol={loc.symbol} /><F label={localizeCopy("Rent Paid (Annual)")} value={rentPaid} onChange={setRentPaid} placeholder={`e.g. ${fmt(360000)}`} symbol={loc.symbol} /></>)}
             </SectionAccordion>
           </AnimatedEntry>
 
           <AnimatedEntry delay={300}>
             <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={saving} activeOpacity={0.8}>
-              {saving ? <ActivityIndicator color={color.cream} size="small" /> : <Text style={styles.saveBtnText}>Save Tax Profile</Text>}
+              {saving ? <ActivityIndicator color={color.cream} size="small" /> : <Text style={styles.saveBtnText}>{localizeCopy("Save Tax Profile")}</Text>}
             </TouchableOpacity>
-            <Text style={styles.disclaimer}>Estimates only. Consult a tax professional for exact calculations. {isIndia && `Based on FY ${engine.financialYear} slabs.`}</Text>
+            <Text style={styles.disclaimer}>{localizeCopy("Estimates only. Consult a tax professional for exact calculations.")}{isIndia && `Based on FY ${engine.financialYear} slabs.`}</Text>
           </AnimatedEntry>
         </ScrollView>
       </KeyboardAvoidingView>

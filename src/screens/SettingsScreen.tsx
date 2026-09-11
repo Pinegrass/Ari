@@ -1,3 +1,5 @@
+
+import { useLanguage } from '../i18n/LanguageContext';
 import React, { useState } from 'react';
 import {
   View,
@@ -44,6 +46,10 @@ import { deleteAccount } from '../api/account';
 import { track } from '../lib/analytics';
 
 import CountryPicker from '../components/CountryPicker';
+import LanguageControl from '../components/LanguageControl';
+import NotificationPreferences from '../components/NotificationPreferences';
+import MeasurementConsent from '../components/MeasurementConsent';
+import TrialCard from '../components/TrialCard';
 import { getLocale } from '../utils/locale';
 
 const AGE_LABELS: Record<string, string> = {
@@ -86,6 +92,8 @@ function formatTime12h(hour: number, minute: number): string {
 }
 
 export default function SettingsScreen() {
+ const {phrase:localizeCopy}=useLanguage();
+  const { phrase } = useLanguage();
   const { user, logout, updateProfile } = useAuth();
   const haptics = useHaptics();
   const insets = useSafeAreaInsets();
@@ -370,7 +378,7 @@ export default function SettingsScreen() {
       label: isSubscribed ? `Ari ${tier[0].toUpperCase() + tier.slice(1)}` : 'Upgrade to Ari Pro',
       subtitle: isSubscribed
         ? 'Manage your subscription'
-        : '14-day free trial, then ₹99/month — cancel anytime',
+        : 'Review current plans and store terms',
       onPress: () => { haptics.light(); navigation.navigate('Paywall', { source: 'settings' }); },
     },
     {
@@ -414,7 +422,11 @@ export default function SettingsScreen() {
         contentContainerStyle={[styles.container, { paddingBottom: Math.max(insets.bottom, 20) + 20 }]}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={[styles.screenTitle, { color: c.ink }]}>Settings</Text>
+        <Text style={[styles.screenTitle, { color: c.ink }]}>{phrase("Settings")}</Text>
+        <LanguageControl />
+        <NotificationPreferences />
+        <MeasurementConsent />
+        <TrialCard />
 
         {/* Profile Card */}
         <AnimatedEntry delay={0}>
@@ -436,7 +448,7 @@ export default function SettingsScreen() {
             </View>
             <View style={styles.profileEdit}>
               <Icon name="edit" size={18} color={color.forest} />
-              <Text style={styles.profileEditText}>Edit</Text>
+              <Text style={styles.profileEditText}>{phrase("Edit")}</Text>
             </View>
           </TouchableOpacity>
         </AnimatedEntry>
@@ -445,15 +457,15 @@ export default function SettingsScreen() {
         <AnimatedEntry delay={80}>
           <View style={styles.detailsCard}>
             {[
-              { label: 'Age Group', value: AGE_LABELS[user?.ageGroup ?? ''] ?? user?.ageGroup, emoji: '📅' },
-              { label: 'Monthly Income', value: getIncomeLabels(user?.country)[user?.incomeBracket ?? ''] ?? user?.incomeBracket, emoji: '💰' },
-              { label: 'Main Goal', value: GOAL_LABELS[user?.mainGoal ?? ''] ?? user?.mainGoal, emoji: '🎯' },
+              { label: phrase("Age Group"), value: AGE_LABELS[user?.ageGroup ?? ''] ?? user?.ageGroup, emoji: '📅' },
+              { label: phrase("Monthly Income"), value: getIncomeLabels(user?.country)[user?.incomeBracket ?? ''] ?? user?.incomeBracket, emoji: '💰' },
+              { label: phrase("Main Goal"), value: GOAL_LABELS[user?.mainGoal ?? ''] ?? user?.mainGoal, emoji: '🎯' },
             ].map((item, i, arr) => (
               <View key={item.label}>
                 <View style={styles.detailRow}>
                   <Text style={styles.detailEmoji}>{item.emoji}</Text>
                   <View style={styles.detailText}>
-                    <Text style={styles.detailLabel}>{item.label}</Text>
+                    <Text style={styles.detailLabel}>{phrase(item.label)}</Text>
                     <Text style={styles.detailValue}>{item.value ?? '—'}</Text>
                   </View>
                 </View>
@@ -472,8 +484,7 @@ export default function SettingsScreen() {
               onChange={handleCountryChange}
             />
             <Text style={styles.countryHint}>
-              Sets your currency, number format, and locale-specific tools.
-            </Text>
+              {phrase("Sets your currency, number format, and locale-specific tools.")}</Text>
           </View>
         </AnimatedEntry>
 
@@ -485,7 +496,7 @@ export default function SettingsScreen() {
                 <Icon name="bell" size={20} color={color.inkFaint} />
               </View>
               <View style={styles.menuText}>
-                <Text style={styles.menuLabel}>Tomo Check-ins</Text>
+                <Text style={styles.menuLabel}>{phrase("Tomo Check-ins")}</Text>
                 <Text style={styles.menuSubtitle}>
                   {notificationsEnabled
                     ? `Twice a week at ${formatTime12h(reminderHour, reminderMinute)}`
@@ -497,7 +508,7 @@ export default function SettingsScreen() {
                 onValueChange={handleNotifications}
                 trackColor={{ false: color.line, true: color.forest2 }}
                 thumbColor={notificationsEnabled ? color.forest : color.inkFaint}
-                accessibilityLabel="Toggle Tomo check-ins"
+                accessibilityLabel={phrase("Toggle Tomo check-ins")}
               />
             </View>
             {notificationsEnabled && (
@@ -507,15 +518,15 @@ export default function SettingsScreen() {
                   style={styles.toggleRow}
                   onPress={handleOpenTimePicker}
                   activeOpacity={0.7}
-                  accessibilityLabel="Change reminder time"
+                  accessibilityLabel={phrase("Change reminder time")}
                   accessibilityRole="button"
                 >
                   <View style={styles.menuIconWrap}>
                     <Icon name="clock" size={20} color={color.inkFaint} />
                   </View>
                   <View style={styles.menuText}>
-                    <Text style={styles.menuLabel}>Check-in Time</Text>
-                    <Text style={styles.menuSubtitle}>Tap to change when Tomo checks in</Text>
+                    <Text style={styles.menuLabel}>{phrase("Check-in Time")}</Text>
+                    <Text style={styles.menuSubtitle}>{phrase("Tap to change when Tomo checks in")}</Text>
                   </View>
                   <Text style={styles.timeValue}>
                     {formatTime12h(reminderHour, reminderMinute)}
@@ -538,7 +549,7 @@ export default function SettingsScreen() {
                       style={styles.iosPickerDone}
                       onPress={() => setTimePickerVisible(false)}
                     >
-                      <Text style={styles.iosPickerDoneText}>Done</Text>
+                      <Text style={styles.iosPickerDoneText}>{phrase("Done")}</Text>
                     </TouchableOpacity>
                   </View>
                 )}
@@ -552,7 +563,7 @@ export default function SettingsScreen() {
                     <Icon name="fingerprint" size={20} color={color.inkFaint} />
                   </View>
                   <View style={styles.menuText}>
-                    <Text style={styles.menuLabel}>Biometric Lock</Text>
+                    <Text style={styles.menuLabel}>{phrase("Biometric Lock")}</Text>
                     <Text style={styles.menuSubtitle}>
                       {biometricEnabled ? 'App requires authentication' : 'Secure with fingerprint/face'}
                     </Text>
@@ -562,7 +573,7 @@ export default function SettingsScreen() {
                     onValueChange={handleBiometric}
                     trackColor={{ false: color.line, true: color.forest2 }}
                     thumbColor={biometricEnabled ? color.forest : color.inkFaint}
-                    accessibilityLabel="Toggle biometric lock"
+                    accessibilityLabel={phrase("Toggle biometric lock")}
                   />
                 </View>
               </>
@@ -573,7 +584,7 @@ export default function SettingsScreen() {
                 <Icon name={isPrivate ? 'eye-off' : 'eye'} size={20} color={color.inkFaint} />
               </View>
               <View style={styles.menuText}>
-                <Text style={styles.menuLabel}>Private Mode</Text>
+                <Text style={styles.menuLabel}>{phrase("Private Mode")}</Text>
                 <Text style={styles.menuSubtitle}>
                   {isPrivate ? 'Amounts hidden across the app' : 'Hide balances in public'}
                 </Text>
@@ -586,7 +597,7 @@ export default function SettingsScreen() {
                 }}
                 trackColor={{ false: color.line, true: color.forest2 }}
                 thumbColor={isPrivate ? color.forest : color.inkFaint}
-                accessibilityLabel="Toggle private mode"
+                accessibilityLabel={phrase("Toggle private mode")}
               />
             </View>
           </View>
@@ -600,7 +611,7 @@ export default function SettingsScreen() {
                 <Icon name="moon" size={20} color={color.inkFaint} />
               </View>
               <View style={styles.menuText}>
-                <Text style={styles.menuLabel}>Appearance</Text>
+                <Text style={styles.menuLabel}>{phrase("Appearance")}</Text>
                 <Text style={styles.menuSubtitle}>
                   {darkEnabled ? 'Choose how Ari looks' : 'Dark mode is coming soon'}
                 </Text>
@@ -634,7 +645,7 @@ export default function SettingsScreen() {
                     >
                       {opt === 'system' ? 'System' : opt === 'light' ? 'Light' : 'Dark'}
                     </Text>
-                    {disabled && <Text style={styles.soonBadge}>Soon</Text>}
+                    {disabled && <Text style={styles.soonBadge}>{phrase("Soon")}</Text>}
                   </TouchableOpacity>
                 );
               })}
@@ -651,7 +662,7 @@ export default function SettingsScreen() {
                   style={styles.menuRow}
                   onPress={item.onPress}
                   activeOpacity={0.7}
-                  accessibilityLabel={item.label}
+                  accessibilityLabel={phrase(item.label)}
                   accessibilityRole="button"
                 >
                   <View style={styles.menuIconWrap}>
@@ -659,10 +670,10 @@ export default function SettingsScreen() {
                   </View>
                   <View style={styles.menuText}>
                     <Text style={[styles.menuLabel, item.destructive && { color: color.clay }]}>
-                      {item.label}
+                      {phrase(item.label)}
                     </Text>
                     {item.subtitle && (
-                      <Text style={styles.menuSubtitle}>{item.subtitle}</Text>
+                      <Text style={styles.menuSubtitle}>{phrase(item.subtitle)}</Text>
                     )}
                   </View>
                   <Icon name="chevron-right" size={18} color={color.inkFaint} />
@@ -677,7 +688,7 @@ export default function SettingsScreen() {
         <AnimatedEntry delay={240}>
           <View style={styles.brandRow}>
             <Icon name="bot" size={18} color={color.inkFaint} />
-            <Text style={styles.brandText}>Powered by Tomo AI</Text>
+            <Text style={styles.brandText}>{phrase("Powered by Tomo AI")}</Text>
           </View>
         </AnimatedEntry>
 
@@ -688,12 +699,12 @@ export default function SettingsScreen() {
               style={styles.logoutBtn}
               onPress={handleLogout}
               activeOpacity={0.8}
-              accessibilityLabel="Sign Out"
+              accessibilityLabel={phrase("Sign Out")}
               accessibilityRole="button"
             >
               <View style={styles.logoutInner}>
                 <Icon name="log-out" size={18} color={color.clay} />
-                <Text style={styles.logoutText}>Sign Out</Text>
+                <Text style={styles.logoutText}>{phrase("Sign Out")}</Text>
               </View>
             </TouchableOpacity>
 
@@ -701,12 +712,12 @@ export default function SettingsScreen() {
               style={styles.deleteBtn}
               onPress={handleOpenDeleteAccount}
               activeOpacity={0.8}
-              accessibilityLabel="Delete Account"
+              accessibilityLabel={phrase("Delete Account")}
               accessibilityRole="button"
             >
               <View style={styles.logoutInner}>
                 <Icon name="trash" size={18} color={color.inkFaint} />
-                <Text style={styles.deleteText}>Delete Account</Text>
+                <Text style={styles.deleteText}>{phrase("Delete Account")}</Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -736,30 +747,30 @@ export default function SettingsScreen() {
         >
           <View style={[styles.modalContent, { paddingBottom: Math.max(insets.bottom, 24) }]}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Edit profile</Text>
+              <Text style={styles.modalTitle}>{phrase("Edit profile")}</Text>
               <TouchableOpacity
                 onPress={() => setProfileVisible(false)}
                 accessibilityRole="button"
-                accessibilityLabel="Close profile editor"
+                accessibilityLabel={phrase("Close profile editor")}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
                 <Icon name="x" size={22} color={color.inkSoft} />
               </TouchableOpacity>
             </View>
-            <Text style={styles.modalSubtitle}>This is the name Ari and Tomo use across the app.</Text>
-            <Text style={styles.fieldLabel}>Display name</Text>
+            <Text style={styles.modalSubtitle}>{phrase("This is the name Ari and Tomo use across the app.")}</Text>
+            <Text style={styles.fieldLabel}>{phrase("Display name")}</Text>
             <TextInput
               style={styles.profileInput}
               value={profileName}
               onChangeText={setProfileName}
-              placeholder="Your name"
+              placeholder={phrase("Your name")}
               placeholderTextColor={color.inkFaint}
               autoCapitalize="words"
               autoCorrect={false}
               maxLength={80}
               returnKeyType="done"
               onSubmitEditing={() => { void handleSaveProfile(); }}
-              accessibilityLabel="Profile display name"
+              accessibilityLabel={phrase("Profile display name")}
               testID="profile-name-input"
             />
             <TouchableOpacity
@@ -767,9 +778,9 @@ export default function SettingsScreen() {
               onPress={() => { void handleSaveProfile(); }}
               disabled={!profileName.trim() || profileLoading}
               accessibilityRole="button"
-              accessibilityLabel="Save profile"
+              accessibilityLabel={phrase("Save profile")}
             >
-              {profileLoading ? <ActivityIndicator color={color.cream} /> : <Text style={styles.submitBtnText}>Save profile</Text>}
+              {profileLoading ? <ActivityIndicator color={color.cream} /> : <Text style={styles.submitBtnText}>{phrase("Save profile")}</Text>}
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
@@ -783,19 +794,18 @@ export default function SettingsScreen() {
         >
           <View style={[styles.modalContent, { paddingBottom: Math.max(insets.bottom, 24) + 16 }]}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Send Feedback</Text>
+              <Text style={styles.modalTitle}>{phrase("Send Feedback")}</Text>
               <TouchableOpacity onPress={() => setFeedbackVisible(false)} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
                 <Icon name="x" size={22} color={color.inkSoft} />
               </TouchableOpacity>
             </View>
 
             <Text style={styles.modalSubtitle}>
-              We&apos;d love to hear from you! Tell us what you like, what could be better, or any feature ideas. Your feedback is sent securely to the Ari team and reviewed personally.
-            </Text>
+              {localizeCopy("We'd love to hear from you! Tell us what you like, what could be better, or any feature ideas. Your feedback is sent securely to the Ari team and reviewed personally.")}</Text>
 
             {/* Star Rating */}
             <View style={styles.ratingRow}>
-              <Text style={styles.ratingLabel}>How&apos;s your experience?</Text>
+              <Text style={styles.ratingLabel}>{localizeCopy("How's your experience?")}</Text>
               <View style={styles.starsRow}>
                 {[1, 2, 3, 4, 5].map((s) => (
                   <TouchableOpacity
@@ -813,7 +823,7 @@ export default function SettingsScreen() {
 
             <TextInput
               style={styles.feedbackInput}
-              placeholder="Write your feedback..."
+              placeholder={phrase("Write your feedback...")}
               placeholderTextColor={color.inkFaint}
               value={feedbackMessage}
               onChangeText={setFeedbackMessage}
@@ -834,7 +844,7 @@ export default function SettingsScreen() {
               {feedbackLoading ? (
                 <ActivityIndicator color={color.cream} size="small" />
               ) : (
-                <Text style={styles.submitBtnText}>Submit Feedback</Text>
+                <Text style={styles.submitBtnText}>{phrase("Submit Feedback")}</Text>
               )}
             </TouchableOpacity>
           </View>
@@ -849,7 +859,7 @@ export default function SettingsScreen() {
         >
           <View style={[styles.modalContent, { paddingBottom: Math.max(insets.bottom, 24) + 16 }]}>
             <View style={styles.modalHeader}>
-              <Text style={[styles.modalTitle, { color: color.clay }]}>Delete Account</Text>
+              <Text style={[styles.modalTitle, { color: color.clay }]}>{phrase("Delete Account")}</Text>
               <TouchableOpacity onPress={() => setDeleteVisible(false)} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
                 <Icon name="x" size={22} color={color.inkSoft} />
               </TouchableOpacity>
@@ -858,15 +868,14 @@ export default function SettingsScreen() {
             <View style={styles.warningBox}>
               <Icon name="alert-triangle" size={20} color={color.clay} />
               <Text style={styles.warningText}>
-                This will permanently delete your account, all transactions, budgets, savings goals, and financial data. This cannot be undone.
-              </Text>
+                {phrase("This will permanently delete your account, all transactions, budgets, savings goals, and financial data. This cannot be undone.")}</Text>
             </View>
 
-            <Text style={styles.fieldLabel}>Enter your password to confirm</Text>
+            <Text style={styles.fieldLabel}>{phrase("Enter your password to confirm")}</Text>
             <View style={styles.passwordRow}>
               <TextInput
                 style={styles.passwordInput}
-                placeholder="Password"
+                placeholder={phrase("Password")}
                 placeholderTextColor={color.inkFaint}
                 value={deletePassword}
                 onChangeText={setDeletePassword}
@@ -891,7 +900,7 @@ export default function SettingsScreen() {
               {deleteLoading ? (
                 <ActivityIndicator color={color.cream} size="small" />
               ) : (
-                <Text style={styles.deleteBtnConfirmText}>Permanently Delete My Account</Text>
+                <Text style={styles.deleteBtnConfirmText}>{phrase("Permanently Delete My Account")}</Text>
               )}
             </TouchableOpacity>
           </View>

@@ -1,4 +1,6 @@
 import React from 'react';
+import { useLanguage } from '../i18n/LanguageContext';
+import type { MessageKey } from '../i18n/catalog';
 import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -22,6 +24,8 @@ import BillsScreen from '../screens/BillsScreen';
 import RecurringPaymentsScreen from '../screens/RecurringPaymentsScreen';
 import DailyHeatmapScreen from '../screens/DailyHeatmapScreen';
 import PeriodicReportsScreen from '../screens/PeriodicReportsScreen';
+import NudgeInboxScreen from '../screens/NudgeInboxScreen';
+import PlanningScreen from '../screens/PlanningScreen';
 import InviteFriendsScreen from '../screens/InviteFriendsScreen';
 import PaywallScreen from '../screens/PaywallScreen';
 import GroupsListScreen from '../screens/GroupsListScreen';
@@ -81,6 +85,7 @@ const TABS: RealTab[] = [
 
 function TabNavigator() {
   const insets = useSafeAreaInsets();
+  const { t } = useLanguage();
 
   return (
     <Tab.Navigator
@@ -111,8 +116,8 @@ function TabNavigator() {
           name={tab.name}
           component={tab.component}
           options={{
-            tabBarLabel: tab.label,
-            tabBarAccessibilityLabel: `${tab.label} tab`,
+            tabBarLabel: t(tab.label.toLowerCase() as MessageKey),
+            tabBarAccessibilityLabel: t(tab.label.toLowerCase() as MessageKey),
             tabBarIcon: ({ focused }) => (
               <Icon
                 name={tab.icon}
@@ -142,8 +147,8 @@ function TabNavigator() {
           name={tab.name}
           component={tab.component}
           options={{
-            tabBarLabel: tab.label,
-            tabBarAccessibilityLabel: `${tab.label} tab`,
+            tabBarLabel: t(tab.label.toLowerCase() as MessageKey),
+            tabBarAccessibilityLabel: t(tab.label.toLowerCase() as MessageKey),
             tabBarIcon: ({ focused }) => (
               <Icon
                 name={tab.icon}
@@ -190,6 +195,8 @@ export default function MainNavigator() {
       <Stack.Screen name="RecurringPayments" component={RecurringPaymentsScreen} />
       <Stack.Screen name="DailyHeatmap" component={DailyHeatmapScreen} />
       <Stack.Screen name="PeriodicReports" component={PeriodicReportsScreen} />
+      <Stack.Screen name="NudgeInbox" component={NudgeInboxScreen} />
+      <Stack.Screen name="Planning" component={PlanningScreen} />
       <Stack.Screen name="InviteFriends" component={InviteFriendsScreen} />
       <Stack.Screen
         name="Paywall"

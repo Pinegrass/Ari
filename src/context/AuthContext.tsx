@@ -6,6 +6,7 @@ import React, {
   useCallback,
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AppState } from 'react-native';
 import * as authApi from '../api/auth';
 import { ApiError } from '../api/client';
 import { registerPushToken, clearPushToken } from '../api/push';
@@ -152,6 +153,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(u);
     void cacheUser(u);
   }, []);
+
+  useEffect(() => {
+    if (!user?.trialEndsAt) return;
+    let active = true;
+    const refresh = () => {
+      void authApi.getMe().then(me => {
+        if (active) setUserAndCache(me);
+      }).catch(() => { /* Backend still enforces trial expiry while offline. */ });
+    };
+    const remaining = Date.parse(user.trialEndsAt) - Date.now();
+    const timer = remaining > 0 ? setTimeout(refresh, Math.min(remaining + 1000, 2147483647)) : undefined;
+    const subscription = AppState.addEventListener('change', state => {
+      if (state === 'active') refresh();
+    });
+    return () => { active = false; if (timer) clearTimeout(timer); subscription.remove(); };
+  }, [user?.id, user?.trialEndsAt, setUserAndCache]);
 
   useEffect(() => {
     if (!user) {

@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../../i18n/LanguageContext';
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { color, font, type as ftype } from '../../theme/tokens';
@@ -9,21 +10,22 @@ interface Props {
 }
 
 export default function ThisMonthSummary({ income, expenses }: Props) {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const { formatAmount } = usePrivacy();
   const savings = income - expenses;
   const savingsRate = income > 0 ? Math.round((savings / income) * 100) : 0;
 
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>This month</Text>
+      <Text style={styles.title}>{localizeCopy("This month")}</Text>
       <View style={styles.row}>
         <View style={styles.cell}>
-          <Text style={styles.label}>Income</Text>
+          <Text style={styles.label}>{localizeCopy("Income")}</Text>
           <Text style={[styles.amount, styles.income]}>{formatAmount(income)}</Text>
         </View>
         <View style={styles.divider} />
         <View style={styles.cell}>
-          <Text style={styles.label}>Spent</Text>
+          <Text style={styles.label}>{localizeCopy("Spent")}</Text>
           <Text style={[styles.amount, styles.expense]}>{formatAmount(expenses)}</Text>
         </View>
         <View style={styles.divider} />

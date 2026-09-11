@@ -20,9 +20,7 @@ import {
   nextMonthlyOccurrence,
   toISODate,
   istToday,
-  type BillReminder,
 } from './billSchedule';
-import { formatCurrency } from '../utils/formatCurrency';
 
 const BILLS_KEY = 'ari_bills';
 const ID_PREFIX = 'bill:';
@@ -133,12 +131,6 @@ export async function ensureNotificationPermission(): Promise<boolean> {
   return req.status === 'granted';
 }
 
-function reminderTitle(bill: Bill, r: BillReminder): string {
-  return r.kind === 'day_of'
-    ? `${bill.name} is due today`
-    : `${bill.name} is due tomorrow`;
-}
-
 async function cancelByPrefix(prefix: string): Promise<void> {
   try {
     const scheduled = await Notifications.getAllScheduledNotificationsAsync();
@@ -164,6 +156,7 @@ export async function cancelBillReminders(billId: string): Promise<void> {
  */
 export async function scheduleBillReminders(bill: Bill, now: Date = new Date()): Promise<void> {
   await cancelBillReminders(bill.id);
+  const hindi = await AsyncStorage.getItem('ari_language').catch(() => null) === 'hi';
 
   const reminders = upcomingReminders(
     { dueDay: bill.dueDay, repeatMonthly: bill.repeatMonthly, oneTimeDate: bill.oneTimeDate },
@@ -184,8 +177,8 @@ export async function scheduleBillReminders(bill: Bill, now: Date = new Date()):
       await Notifications.scheduleNotificationAsync({
         identifier: `${ID_PREFIX}${bill.id}:${r.occurrenceDate}:${r.kind}`,
         content: {
-          title: reminderTitle(bill, r),
-          body: `${formatCurrency(bill.amount)} — tap to log it`,
+          title: hindi ? 'एरी से बिल रिमाइंडर' : 'A bill reminder from Ari',
+          body: hindi ? 'बिल देखने और भुगतान होने पर दर्ज करने के लिए एरी खोलें।' : 'Open Ari to review the bill and record a payment when made.',
           data: data as unknown as Record<string, unknown>,
           sound: 'default',
         },

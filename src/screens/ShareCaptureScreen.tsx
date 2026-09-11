@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../i18n/LanguageContext';
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -23,6 +24,7 @@ type Props = {
 };
 
 export default function ShareCaptureScreen({ navigation, route }: Props) {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const { text } = route.params;
   const { addTransaction } = useData();
 
@@ -123,7 +125,7 @@ export default function ShareCaptureScreen({ navigation, route }: Props) {
             <View style={styles.parsedRow}>
               <View>
                 <Text style={styles.parsedLabel}>
-                  {parsed.type === 'expense' ? 'Spent' : 'Received'}
+                  {parsed.type === 'expense' ? localizeCopy("Spent") : localizeCopy("Received")}
                 </Text>
                 <Text style={styles.parsedAmount}>
                   {parsed.amount > 0 ? formatCurrency(parsed.amount) : '—'}

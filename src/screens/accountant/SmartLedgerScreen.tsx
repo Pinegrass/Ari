@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../../i18n/LanguageContext';
 import React, { useState, useCallback, useMemo } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, TextInput,
@@ -55,6 +56,7 @@ type FilterType = 'all' | 'income' | 'expense';
 type SortBy = 'date' | 'amount';
 
 export default function SmartLedgerScreen() {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const { locale } = useLocale();
   const navigation = useNavigation();
   const haptics = useHaptics();
@@ -199,8 +201,8 @@ export default function SmartLedgerScreen() {
           <Icon name="arrow-left" size={22} color={color.ink} />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
-          <Text style={styles.headerTitle}>Smart Ledger</Text>
-          <Text style={styles.headerSub}>Detailed transaction analysis</Text>
+          <Text style={styles.headerTitle}>{localizeCopy("Smart Ledger")}</Text>
+          <Text style={styles.headerSub}>{localizeCopy("Detailed transaction analysis")}</Text>
         </View>
         <TouchableOpacity
           onPress={() => { haptics.light(); setShowFilters(!showFilters); }}
@@ -229,7 +231,7 @@ export default function SmartLedgerScreen() {
             <Icon name="search" size={16} color={color.inkFaint} />
             <TextInput
               style={styles.searchInput}
-              placeholder="Search by name, category, tags..."
+              placeholder={localizeCopy("Search by name, category, tags...")}
               placeholderTextColor={color.inkFaint}
               value={searchQuery}
               onChangeText={setSearchQuery}
@@ -261,7 +263,7 @@ export default function SmartLedgerScreen() {
               onPress={() => { haptics.light(); setShowRecurringOnly(!showRecurringOnly); }}
             >
               <Icon name="refresh-cw" size={12} color={showRecurringOnly ? color.cream : color.inkFaint} />
-              <Text style={[styles.chipText, showRecurringOnly && styles.chipTextActive]}>Recurring</Text>
+              <Text style={[styles.chipText, showRecurringOnly && styles.chipTextActive]}>{localizeCopy("Recurring")}</Text>
             </TouchableOpacity>
             {/* Manage recurring templates (pause/edit/stop) */}
             <TouchableOpacity
@@ -271,9 +273,9 @@ export default function SmartLedgerScreen() {
                 (navigation as { navigate: (screen: string) => void }).navigate('RecurringPayments');
               }}
               accessibilityRole="button"
-              accessibilityLabel="Manage recurring payments"
+              accessibilityLabel={localizeCopy("Manage recurring payments")}
             >
-              <Text style={styles.chipText}>Manage →</Text>
+              <Text style={styles.chipText}>{localizeCopy("Manage →")}</Text>
             </TouchableOpacity>
             <View style={styles.chipDivider} />
             <TouchableOpacity
@@ -293,7 +295,7 @@ export default function SmartLedgerScreen() {
                 style={[styles.chip, !categoryFilter && styles.chipActive]}
                 onPress={() => { haptics.light(); setCategoryFilter(null); }}
               >
-                <Text style={[styles.chipText, !categoryFilter && styles.chipTextActive]}>All Categories</Text>
+                <Text style={[styles.chipText, !categoryFilter && styles.chipTextActive]}>{localizeCopy("All Categories")}</Text>
               </TouchableOpacity>
               {categories.map((cat) => {
                 const ci = CATEGORY_ICONS[cat];
@@ -317,7 +319,7 @@ export default function SmartLedgerScreen() {
       {/* Stats bar */}
       <View style={styles.statsBar}>
         <View style={styles.statItem}>
-          <Text style={styles.statLabel}>{stats.count} txns</Text>
+          <Text style={styles.statLabel}>{stats.count} {localizeCopy("txns")}</Text>
         </View>
         <View style={styles.statItem}>
           <Text style={[styles.statVal, { color: color.forest }]}>↑ {formatAmount(stats.income)}</Text>

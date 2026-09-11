@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../i18n/LanguageContext';
 import React, { useCallback, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -32,6 +33,7 @@ function statusLabel(status: string): string {
 }
 
 export default function LinkBankScreen() {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
   const haptics = useHaptics();
   const c = useColors();
@@ -110,14 +112,14 @@ export default function LinkBankScreen() {
             navigation.goBack();
           }}
           style={styles.backRow}
-          accessibilityLabel="Go back"
+          accessibilityLabel={localizeCopy("Go back")}
           accessibilityRole="button"
         >
           <Icon name="arrow-left" size={22} color={c.inkSoft} />
-          <Text style={[styles.backText, { color: c.inkSoft }]}>Settings</Text>
+          <Text style={[styles.backText, { color: c.inkSoft }]}>{localizeCopy("Settings")}</Text>
         </TouchableOpacity>
 
-        <Text style={[styles.title, { color: c.ink }]}>Link bank account</Text>
+        <Text style={[styles.title, { color: c.ink }]}>{localizeCopy("Link bank account")}</Text>
         <Text style={[styles.subtitle, { color: c.inkSoft }]}>
           Securely import your bank transactions so Ari can track spending you didn’t type yourself.
         </Text>
@@ -139,11 +141,10 @@ export default function LinkBankScreen() {
                   haptics.light();
                   navigation.navigate('LinkBankConsent');
                 }}
-                accessibilityLabel="Link bank account"
+                accessibilityLabel={localizeCopy("Link bank account")}
                 style={styles.heroButton}
               >
-                Link bank account
-              </Button>
+                {localizeCopy("Link bank account")}</Button>
             )}
           </View>
         </AnimatedEntry>

@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../i18n/LanguageContext';
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -30,6 +31,7 @@ interface NetSummary {
 }
 
 export default function GroupBalanceCard() {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const navigation = useNavigation<Nav>();
   const { user } = useAuth();
   const { formatAmount } = usePrivacy();
@@ -87,7 +89,7 @@ export default function GroupBalanceCard() {
         <View style={[styles.iconWrap, { backgroundColor: color.cream2 }]}>
           <Icon name="user" size={16} color={color.forest2} />
         </View>
-        <Text style={styles.kicker}>Shared expenses</Text>
+        <Text style={styles.kicker}>{localizeCopy("Shared expenses")}</Text>
         <Icon name="chevron-right" size={14} color={color.inkFaint} />
       </View>
 

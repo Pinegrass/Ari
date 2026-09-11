@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../i18n/LanguageContext';
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import ProgressBar from './ui/ProgressBar';
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export default function BudgetCard({ budget, onDelete, onEdit }: Props) {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const cat = getCategoryDef(budget.category);
   // Progress is measured against the rollover-adjusted available amount
   // (available = limit + carry from last month), same as BudgetPlannerScreen —
@@ -35,7 +37,7 @@ export default function BudgetCard({ budget, onDelete, onEdit }: Props) {
         <View style={styles.info}>
           <Text style={styles.catName}>{cat.label}</Text>
           <Text style={styles.meta}>
-            {formatAmount(budget.spent)} of {formatAmount(available)}
+            {formatAmount(budget.spent)} {localizeCopy("of")}{formatAmount(available)}
           </Text>
           {carried && (
             <Text style={[styles.carried, { color: budget.rollover > 0 ? color.forest : color.clay }]}>

@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../i18n/LanguageContext';
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
@@ -43,6 +44,7 @@ interface Props {
 }
 
 export default function ManageCategoriesScreen({ onBack }: Props) {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const haptics = useHaptics();
   const insets = useSafeAreaInsets();
   const [categories, setCategories] = useState<UserCategoryData[]>([]);
@@ -182,7 +184,7 @@ export default function ManageCategoriesScreen({ onBack }: Props) {
         <TouchableOpacity onPress={onBack} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
           <Icon name="arrow-left" size={22} color={color.ink} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Manage Categories</Text>
+        <Text style={styles.headerTitle}>{localizeCopy("Manage Categories")}</Text>
         <TouchableOpacity onPress={handleAdd} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
           <Icon name="plus" size={22} color={color.forest} />
         </TouchableOpacity>
@@ -197,7 +199,7 @@ export default function ManageCategoriesScreen({ onBack }: Props) {
             onPress={() => { haptics.light(); setActiveTab(tab); }}
           >
             <Text style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>
-              {tab === 'expense' ? 'Expenses' : 'Income'}
+              {tab === 'expense' ? localizeCopy("Expenses") : localizeCopy("Income")}
             </Text>
           </TouchableOpacity>
         ))}
@@ -218,7 +220,7 @@ export default function ManageCategoriesScreen({ onBack }: Props) {
               </View>
               <View style={styles.catInfo}>
                 <Text style={styles.catName}>{cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}</Text>
-                <Text style={styles.catBadge}>Default</Text>
+                <Text style={styles.catBadge}>{localizeCopy("Default")}</Text>
               </View>
               <Icon name="edit" size={16} color={color.inkFaint} />
             </TouchableOpacity>
@@ -274,7 +276,7 @@ export default function ManageCategoriesScreen({ onBack }: Props) {
             </View>
 
             {/* Name */}
-            <Text style={styles.fieldLabel}>Name</Text>
+            <Text style={styles.fieldLabel}>{localizeCopy("Name")}</Text>
             <TextInput
               style={[styles.input, editingCat?.isDefault && styles.inputDisabled]}
               placeholder="e.g. Groceries, Pet, Gym..."
@@ -308,7 +310,7 @@ export default function ManageCategoriesScreen({ onBack }: Props) {
             </ScrollView>
 
             {/* Color */}
-            <Text style={[styles.fieldLabel, { marginTop: 16 }]}>Color</Text>
+            <Text style={[styles.fieldLabel, { marginTop: 16 }]}>{localizeCopy("Color")}</Text>
             <View style={styles.colorGrid}>
               {COLOR_OPTIONS.map((c) => (
                 <TouchableOpacity

@@ -1,3 +1,5 @@
+
+import { useLanguage } from '../i18n/LanguageContext';
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
@@ -53,6 +55,8 @@ const KEYS_DECIMAL = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', 'de
  * local-first (Commit 2), so Save returns instantly and works offline.
  */
 export default function AddTransactionScreen({ navigation, route }: Props) {
+ const {phrase:localizeCopy}=useLanguage();
+  const { phrase } = useLanguage();
   const params = route.params as
     | { type?: 'expense' | 'income'; prefill?: { amount?: number; description?: string; category?: string } }
     | { editTransaction: { id: string; type: 'expense' | 'income'; amount: number; category: string; description: string; note: string; date: string; isRecurring?: boolean; recurrenceRule?: Transaction['recurrenceRule'] } }
@@ -355,7 +359,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
         <TouchableOpacity
           style={styles.close}
           onPress={() => navigation.goBack()}
-          accessibilityLabel="Cancel"
+          accessibilityLabel={phrase("Cancel")}
           accessibilityRole="button"
         >
           <Text style={styles.closeText}>✕</Text>
@@ -371,14 +375,14 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
           onPress={() => handleTypeChange('expense')}
           accessibilityRole="button"
         >
-          <Text style={[styles.toggleLabel, type === 'expense' && styles.toggleLabelOn]}>Spent</Text>
+          <Text style={[styles.toggleLabel, type === 'expense' && styles.toggleLabelOn]}>{phrase("Spent")}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.toggleBtn, type === 'income' && styles.toggleIn]}
           onPress={() => handleTypeChange('income')}
           accessibilityRole="button"
         >
-          <Text style={[styles.toggleLabel, type === 'income' && styles.toggleLabelOn]}>Received</Text>
+          <Text style={[styles.toggleLabel, type === 'income' && styles.toggleLabelOn]}>{phrase("Received")}</Text>
         </TouchableOpacity>
       </View>
 
@@ -405,7 +409,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
             haptics.light();
             setShowCategory(true);
           }}
-          accessibilityLabel="Category"
+          accessibilityLabel={phrase("Category")}
           accessibilityRole="button"
         >
           {parseSource && <Text style={styles.chipAi}>✦</Text>}
@@ -420,7 +424,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
             haptics.light();
             setShowNote(true);
           }}
-          accessibilityLabel="Add a note"
+          accessibilityLabel={localizeCopy("Add a note")}
           accessibilityRole="button"
         >
           <Text style={styles.chipText}>{description ? '✎ Note' : '＋ Note'}</Text>
@@ -444,18 +448,18 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
         <View>
           {!isEdit && (
             <View style={styles.recurringRow}>
-              <Text style={styles.recurringLabel}>Repeat</Text>
+              <Text style={styles.recurringLabel}>{phrase("Repeat")}</Text>
               <Switch
                 value={isRecurring}
                 onValueChange={(v) => { haptics.light(); setIsRecurring(v); }}
                 trackColor={{ false: c.line, true: c.forest2 }}
                 thumbColor={c.cream}
-                accessibilityLabel="Repeat this transaction"
+                accessibilityLabel={localizeCopy("Repeat this transaction")}
               />
             </View>
           )}
           {editingTemplate && (
-            <Text style={styles.recurringLabelRow}>Repeats</Text>
+            <Text style={styles.recurringLabelRow}>{phrase("Repeats")}</Text>
           )}
           {((!isEdit && isRecurring) || editingTemplate) && (
             <ScrollView
@@ -464,11 +468,11 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
               contentContainerStyle={styles.rulePills}
             >
               {([
-                { value: 'monthly', label: 'Monthly' },
-                { value: 'weekly', label: 'Weekly' },
-                { value: 'biweekly', label: 'Biweekly' },
-                { value: 'quarterly', label: 'Quarterly' },
-                { value: 'yearly', label: 'Yearly' },
+                { value: 'monthly', label: phrase("Monthly") },
+                { value: 'weekly', label: phrase("Weekly") },
+                { value: 'biweekly', label: phrase("Biweekly") },
+                { value: 'quarterly', label: phrase("Quarterly") },
+                { value: 'yearly', label: phrase("Yearly") },
               ] as const).map((opt) => {
                 const active = recurrenceRule === opt.value;
                 return (
@@ -499,7 +503,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
             activeOpacity={k === '' ? 1 : 0.7}
             onPress={() => press(k)}
             disabled={k === ''}
-            accessibilityLabel={k === 'del' ? 'Delete' : k || undefined}
+            accessibilityLabel={k === 'del' ? phrase("Delete") : k || undefined}
             accessibilityRole={k === '' ? undefined : 'button'}
           >
             <Text style={[styles.keyText, k === 'del' && styles.keyFn]}>
@@ -542,7 +546,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
               showsVerticalScrollIndicator={false}
             >
               <View style={styles.sheet}>
-                <Text style={styles.sheetTitle}>What was this for?</Text>
+                <Text style={styles.sheetTitle}>{phrase("What was this for?")}</Text>
                 <View style={styles.noteRow}>
                   <TextInput
                     style={styles.noteInput}
@@ -551,7 +555,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
                       setEntryType('manual');
                       handleDescriptionChange(t);
                     }}
-                    placeholder={voice.isListening ? 'Listening…' : 'e.g. groceries, auto, electricity'}
+                    placeholder={voice.isListening ? phrase("Listening…") : phrase("e.g. groceries, auto, electricity")}
                     placeholderTextColor={c.inkFaint}
                     autoFocus
                     editable={!voice.isListening}
@@ -581,13 +585,13 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
                   style={[styles.noteInput, styles.noteInputExtra]}
                   value={note}
                   onChangeText={setNote}
-                  placeholder="Extra note (optional)"
+                  placeholder={phrase("Extra note (optional)")}
                   placeholderTextColor={c.inkFaint}
                   returnKeyType="done"
                   onSubmitEditing={() => setShowNote(false)}
                 />
                 <TouchableOpacity style={styles.sheetDone} onPress={() => setShowNote(false)}>
-                  <Text style={styles.sheetDoneText}>Done</Text>
+                  <Text style={styles.sheetDoneText}>{phrase("Done")}</Text>
                 </TouchableOpacity>
               </View>
             </ScrollView>
@@ -609,7 +613,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
               showsVerticalScrollIndicator={false}
             >
               <View style={styles.sheet}>
-                <Text style={styles.sheetTitle}>Category</Text>
+                <Text style={styles.sheetTitle}>{phrase("Category")}</Text>
                 <CategoryPicker
                   selected={category}
                   type={type}
@@ -621,7 +625,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
                   customCategories={userCategories}
                 />
                 <TouchableOpacity style={styles.sheetDone} onPress={() => setShowCategory(false)}>
-                  <Text style={styles.sheetDoneText}>Done</Text>
+                  <Text style={styles.sheetDoneText}>{phrase("Done")}</Text>
                 </TouchableOpacity>
               </View>
             </ScrollView>

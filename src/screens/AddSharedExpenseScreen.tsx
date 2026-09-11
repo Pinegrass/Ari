@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../i18n/LanguageContext';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet,
@@ -22,6 +23,7 @@ type Nav = StackNavigationProp<MainStackParamList>;
 type Rt = RouteProp<MainStackParamList, 'AddSharedExpense'>;
 
 export default function AddSharedExpenseScreen() {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const navigation = useNavigation<Nav>();
   const { params } = useRoute<Rt>();
   const haptics = useHaptics();
@@ -118,7 +120,7 @@ export default function AddSharedExpenseScreen() {
       >
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Text style={styles.cancel}>Cancel</Text>
+            <Text style={styles.cancel}>{localizeCopy("Cancel")}</Text>
           </TouchableOpacity>
           <Text style={styles.title}>Add to {group.name}</Text>
           <View style={{ width: 60 }} />
@@ -176,8 +178,7 @@ export default function AddSharedExpenseScreen() {
           })}
 
           <Button onPress={handleSave} loading={saving} fullWidth style={{ marginTop: 24 }}>
-            Save
-          </Button>
+            {localizeCopy("Save")}</Button>
         </ScrollView>
       </KeyboardAvoidingView>
     </ScreenShell>

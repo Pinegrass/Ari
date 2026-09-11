@@ -5,6 +5,7 @@ import React, {
   useState,
   useCallback,
   useMemo,
+  useRef,
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { formatCurrency } from '../utils/formatCurrency';
@@ -34,18 +35,18 @@ interface PrivacyContextValue {
 const PrivacyContext = createContext<PrivacyContextValue | null>(null);
 
 export function PrivacyProvider({ children }: { children: React.ReactNode }) {
-  const [isPrivate, setPrivateState] = useState(false);
+  const [isPrivate, setPrivateState] = useState(true);
+  const changed = useRef(false);
 
-  // Restore persisted setting on mount. Failure is silent — default (off)
-  // is the safer fallback if AsyncStorage is unavailable. Mirrors the
-  // hydrated state into the analytics layer so PostHog opts out / opts in
-  // BEFORE any screen has a chance to fire a track() call.
+  // Mask while the saved choice is unknown. A late read must not overwrite
+  // a choice the user made during hydration.
   useEffect(() => {
     (async () => {
       try {
         const raw = await AsyncStorage.getItem(STORAGE_KEY);
+        if (changed.current) return;
         const v = raw === '1';
-        if (v) setPrivateState(true);
+        setPrivateState(v);
         setPrivacyEnabled(v);
       } catch {
         /* noop */
@@ -54,6 +55,7 @@ export function PrivacyProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const setPrivate = useCallback((v: boolean) => {
+    changed.current = true;
     setPrivateState(v);
     // Tell PostHog to opt out / opt back in. Synchronous so any track()
     // calls fired in the same tick (e.g. from this same toggle button)

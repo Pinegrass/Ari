@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../../i18n/LanguageContext';
 import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -21,6 +22,7 @@ function dueLabel(daysUntil: number): string {
  * committed outflow at a glance.
  */
 export default function UpcomingChargesSection() {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const { formatCurrency } = useLocale();
   const { transactions } = useData();
   const [charges, setCharges] = useState<UpcomingCharge[] | null>(null);
@@ -54,7 +56,7 @@ export default function UpcomingChargesSection() {
           <View style={{ flex: 1 }}>
             <Text style={styles.name}>{charge.name}</Text>
             <Text style={styles.meta}>
-              Due {dueLabel(charge.daysUntil)}
+              {localizeCopy("Due")}{dueLabel(charge.daysUntil)}
               {charge.source === 'recurring' ? ' · recurring' : ' · bill'}
             </Text>
           </View>

@@ -121,6 +121,7 @@ export interface User {
   tier?: 'free' | 'pilot' | 'pro' | 'family';
   subscriptionStatus?: string;
   tierValidUntil?: string | null;
+  trialEndsAt?: string | null;
   monthlyIncome?: number | null;
   pushNotificationsEnabled?: boolean;
   hasPushToken?: boolean;

@@ -1,3 +1,5 @@
+
+import { useLanguage } from '../i18n/LanguageContext';
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -24,6 +26,7 @@ import { isAppleSignInAvailable, signInWithApple } from '../lib/appleAuth';
 import * as authApi from '../api/auth';
 import { Sentry, addBreadcrumb } from '../config/sentry';
 import { trackAuthAttempt, trackAuthResult } from '../lib/authTelemetry';
+import LanguageControl from '../components/LanguageControl';
 
 // Map backend / network failures to messages a user can actually act on.
 // Anything we don't recognise gets a generic fallback + a Sentry capture so
@@ -53,6 +56,8 @@ function humanizeLoginError(err: unknown): string {
 type Props = StackScreenProps<AuthStackParamList, 'Login'>;
 
 export default function LoginScreen({ navigation }: Props) {
+ const {phrase:localizeCopy}=useLanguage();
+  const { phrase } = useLanguage();
   const { login, refreshFromSession } = useAuth();
   const google = useGoogleSignIn();
   const [email, setEmail] = useState('');
@@ -190,24 +195,25 @@ export default function LoginScreen({ navigation }: Props) {
           <TouchableOpacity
             onPress={() => navigation.goBack()}
             style={styles.back}
-            accessibilityLabel="Go back"
+            accessibilityLabel={phrase("Go back")}
             accessibilityRole="button"
           >
-            <Text style={styles.backText}>← Back</Text>
+            <Text style={styles.backText}>{phrase("← Back")}</Text>
           </TouchableOpacity>
 
           {/* Header */}
           <View style={styles.header}>
             <Icon name="user" size={48} color={color.forest} />
-            <Text style={styles.title}>Welcome back!</Text>
-            <Text style={styles.subtitle}>Sign in to continue your journey</Text>
+            <Text style={styles.title}>{phrase("Welcome back!")}</Text>
+            <Text style={styles.subtitle}>{phrase("Sign in to continue your journey")}</Text>
           </View>
 
           {/* Form */}
           <View style={styles.form}>
-            <ErrorBanner message={error} />
+            <LanguageControl />
+            <ErrorBanner message={phrase(error)} />
             <Input
-              label="Email"
+              label={phrase("Email")}
               placeholder="you@example.com"
               value={email}
               onChangeText={setEmail}
@@ -217,8 +223,8 @@ export default function LoginScreen({ navigation }: Props) {
               returnKeyType="next"
             />
             <Input
-              label="Password"
-              placeholder="Your password"
+              label={phrase("Password")}
+              placeholder={phrase("Your password")}
               value={password}
               onChangeText={setPassword}
               showPasswordToggle
@@ -230,15 +236,14 @@ export default function LoginScreen({ navigation }: Props) {
               onPress={handleLogin}
               loading={loading}
               fullWidth
-              accessibilityLabel="Sign In"
+              accessibilityLabel={phrase("Sign In")}
               accessibilityRole="button"
             >
-              Sign In
-            </Button>
+              {phrase("Sign In")}</Button>
 
             <View style={styles.divider}>
               <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>or</Text>
+              <Text style={styles.dividerText}>{phrase("or")}</Text>
               <View style={styles.dividerLine} />
             </View>
 
@@ -247,11 +252,11 @@ export default function LoginScreen({ navigation }: Props) {
               style={styles.socialBtn}
               disabled={socialLoading !== null}
               accessibilityRole="button"
-              accessibilityLabel="Continue with Google"
+              accessibilityLabel={phrase("Continue with Google")}
             >
               <Icon name="user" size={16} color={color.ink} />
               <Text style={styles.socialText}>
-                {socialLoading === 'google' ? 'Signing in…' : 'Continue with Google'}
+                {socialLoading === 'google' ? phrase("Signing in…") : phrase("Continue with Google")}
               </Text>
             </TouchableOpacity>
 
@@ -275,8 +280,8 @@ export default function LoginScreen({ navigation }: Props) {
             accessibilityRole="button"
           >
             <Text style={styles.footerText}>
-              Don&apos;t have an account?{' '}
-              <Text style={styles.footerLink}>Sign up free</Text>
+              {localizeCopy("Don't have an account?")}{' '}
+              <Text style={styles.footerLink}>{phrase("Sign up free")}</Text>
             </Text>
           </TouchableOpacity>
         </ScrollView>

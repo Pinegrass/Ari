@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../i18n/LanguageContext';
 /* eslint-disable react/no-unescaped-entities */
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
@@ -11,13 +12,14 @@ interface Props { onBack: () => void; }
 const LAST_UPDATED = '2026-07-08';
 
 export default function TermsScreen({ onBack }: Props) {
+ const {phrase:localizeCopy}=useCopyLanguage();
   return (
     <ScreenShell edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.backBtn}>
           <Icon name="chevron-left" size={24} color={color.ink} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Terms of Service</Text>
+        <Text style={styles.headerTitle}>{localizeCopy("Terms of Service")}</Text>
         <View style={styles.backBtn} />
       </View>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>

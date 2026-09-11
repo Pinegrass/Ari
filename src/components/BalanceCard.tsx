@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../i18n/LanguageContext';
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { color, onForest, font, type } from '../theme/tokens';
@@ -22,6 +23,7 @@ interface Props {
  * Mirrors `.hero` in docs/ari-v2-forest.html.
  */
 export default function BalanceCard({ spentToday, moneyIn, moneyOut, netToday }: Props) {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const { isPrivate } = usePrivacy();
   const { locale, formatCurrency } = useLocale();
 
@@ -37,7 +39,7 @@ export default function BalanceCard({ spentToday, moneyIn, moneyOut, netToday }:
 
       {/* Read the label + amount as one unit under TalkBack. */}
       <View accessible accessibilityRole="summary" accessibilityLabel={`Spent today, ${isPrivate ? 'hidden' : locale.symbol + amt(spentToday)}`}>
-        <Text style={styles.label}>Spent today</Text>
+        <Text style={styles.label}>{localizeCopy("Spent today")}</Text>
         {/* adjustsFontSizeToFit keeps the hero number on one line at OS font
             scales up to 1.3× instead of wrapping/clipping. */}
         <Text style={styles.amount} numberOfLines={1} adjustsFontSizeToFit>

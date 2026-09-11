@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../../i18n/LanguageContext';
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { font, type as ftype } from '../../theme/tokens';
@@ -23,6 +24,7 @@ const MONTH_SHORT: Record<string, string> = {
 };
 
 export default function TrendLineChart({ report, loading }: Props) {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const c = useColors();
   const styles = useMemo(() => makeStyles(c), [c]);
 
@@ -53,7 +55,7 @@ export default function TrendLineChart({ report, loading }: Props) {
   if (loading) {
     return (
       <View style={styles.card}>
-        <Text style={styles.title}>Income vs Expenses</Text>
+        <Text style={styles.title}>{localizeCopy("Income vs Expenses")}</Text>
         <Skeleton width="100%" height={CHART_HEIGHT} radius={12} style={{ marginTop: 12 }} />
       </View>
     );
@@ -62,7 +64,7 @@ export default function TrendLineChart({ report, loading }: Props) {
   if (!report || report.months.length === 0) {
     return (
       <View style={styles.card}>
-        <Text style={styles.title}>Income vs Expenses</Text>
+        <Text style={styles.title}>{localizeCopy("Income vs Expenses")}</Text>
         <Text style={styles.empty}>Add transactions to see trends.</Text>
       </View>
     );
@@ -70,7 +72,7 @@ export default function TrendLineChart({ report, loading }: Props) {
 
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>Income vs Expenses</Text>
+      <Text style={styles.title}>{localizeCopy("Income vs Expenses")}</Text>
 
       <View style={styles.chartArea}>
         {/* Guide lines */}
@@ -101,11 +103,11 @@ export default function TrendLineChart({ report, loading }: Props) {
       <View style={styles.legend}>
         <View style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: c.forest2 }]} />
-          <Text style={styles.legendText}>Income</Text>
+          <Text style={styles.legendText}>{localizeCopy("Income")}</Text>
         </View>
         <View style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: c.clay }]} />
-          <Text style={styles.legendText}>Expenses</Text>
+          <Text style={styles.legendText}>{localizeCopy("Expenses")}</Text>
         </View>
       </View>
     </View>

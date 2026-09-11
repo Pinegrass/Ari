@@ -1,3 +1,5 @@
+
+import { useLanguage } from '../i18n/LanguageContext';
 import React, { useState, useRef } from 'react';
 import {
   View,
@@ -53,6 +55,8 @@ interface FormData {
 }
 
 export default function RegisterScreen({ navigation, route }: Props) {
+ const {phrase:localizeCopy}=useLanguage();
+  const { phrase } = useLanguage();
   const { register } = useAuth();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<FormData>({
@@ -148,7 +152,7 @@ export default function RegisterScreen({ navigation, route }: Props) {
         >
           {/* Back */}
           <TouchableOpacity onPress={prevStep} style={styles.back}>
-            <Text style={styles.backText}>← {step === 1 ? 'Back' : 'Previous'}</Text>
+            <Text style={styles.backText}>← {step === 1 ? localizeCopy("Back") : 'Previous'}</Text>
           </TouchableOpacity>
 
           <ErrorBanner message={error} />
@@ -156,11 +160,11 @@ export default function RegisterScreen({ navigation, route }: Props) {
           {/* Step 1: Account Info */}
           {step === 1 && (
             <View>
-              <Text style={styles.stepLabel}>Step 1 of 3</Text>
-              <Text style={styles.title}>Create your account</Text>
-              <Text style={styles.subtitle}>Your financial journey starts here</Text>
+              <Text style={styles.stepLabel}>{localizeCopy("Step 1 of 3")}</Text>
+              <Text style={styles.title}>{localizeCopy("Create your account")}</Text>
+              <Text style={styles.subtitle}>{localizeCopy("Your financial journey starts here")}</Text>
               <Input
-                label="Full Name"
+                label={localizeCopy("Full Name")}
                 placeholder="Rahul Sharma"
                 value={form.name}
                 onChangeText={(v) => setField('name', v)}
@@ -168,7 +172,7 @@ export default function RegisterScreen({ navigation, route }: Props) {
                 autoCorrect={false}
               />
               <Input
-                label="Email"
+                label={phrase("Email")}
                 placeholder="rahul@example.com"
                 value={form.email}
                 onChangeText={(v) => setField('email', v)}
@@ -178,15 +182,15 @@ export default function RegisterScreen({ navigation, route }: Props) {
                 returnKeyType="next"
               />
               <Input
-                label="Password"
-                placeholder="At least 6 characters"
+                label={phrase("Password")}
+                placeholder={phrase("At least 6 characters")}
                 value={form.password}
                 onChangeText={(v) => setField('password', v)}
                 showPasswordToggle
                 returnKeyType="done"
               />
               <Input
-                label="Invite Code (optional)"
+                label={localizeCopy("Invite Code (optional)")}
                 placeholder="ARI123ABC"
                 value={form.referralCode}
                 onChangeText={(v) => setField('referralCode', v.toUpperCase())}
@@ -194,18 +198,17 @@ export default function RegisterScreen({ navigation, route }: Props) {
                 autoCorrect={false}
                 returnKeyType="done"
               />
-              <Button onPress={nextStep} fullWidth accessibilityLabel="Continue to next step" accessibilityRole="button">
-                Continue →
-              </Button>
+              <Button onPress={nextStep} fullWidth accessibilityLabel={localizeCopy("Continue to next step")} accessibilityRole="button">
+                {localizeCopy("Continue →")}</Button>
             </View>
           )}
 
           {/* Step 2: Country, Age & Income */}
           {step === 2 && (
             <View>
-              <Text style={styles.stepLabel}>Step 2 of 3</Text>
-              <Text style={styles.title}>Tell us about yourself</Text>
-              <Text style={styles.subtitle}>So Tomo can give you relevant advice</Text>
+              <Text style={styles.stepLabel}>{localizeCopy("Step 2 of 3")}</Text>
+              <Text style={styles.title}>{localizeCopy("Tell us about yourself")}</Text>
+              <Text style={styles.subtitle}>{localizeCopy("So Tomo can give you relevant advice")}</Text>
 
               <CountryPicker
                 value={form.country}
@@ -216,7 +219,7 @@ export default function RegisterScreen({ navigation, route }: Props) {
                 }}
               />
 
-              <Text style={styles.sectionLabel}>Age Group</Text>
+              <Text style={styles.sectionLabel}>{phrase("Age Group")}</Text>
               <View style={styles.grid2}>
                 {AGE_OPTIONS.map((opt) => (
                   <TouchableOpacity
@@ -243,7 +246,7 @@ export default function RegisterScreen({ navigation, route }: Props) {
                 ))}
               </View>
 
-              <Text style={styles.sectionLabel}>Monthly Income</Text>
+              <Text style={styles.sectionLabel}>{phrase("Monthly Income")}</Text>
               <View style={styles.incomeList}>
                 {incomeOptions.map((opt) => (
                   <TouchableOpacity
@@ -272,18 +275,17 @@ export default function RegisterScreen({ navigation, route }: Props) {
                 ))}
               </View>
 
-              <Button onPress={nextStep} fullWidth accessibilityLabel="Continue to next step" accessibilityRole="button">
-                Continue →
-              </Button>
+              <Button onPress={nextStep} fullWidth accessibilityLabel={localizeCopy("Continue to next step")} accessibilityRole="button">
+                {localizeCopy("Continue →")}</Button>
             </View>
           )}
 
           {/* Step 3: Goal */}
           {step === 3 && (
             <View>
-              <Text style={styles.stepLabel}>Step 3 of 3</Text>
-              <Text style={styles.title}>Your main goal?</Text>
-              <Text style={styles.subtitle}>We&apos;ll personalise Tomo&apos;s coaching for you</Text>
+              <Text style={styles.stepLabel}>{localizeCopy("Step 3 of 3")}</Text>
+              <Text style={styles.title}>{localizeCopy("Your main goal?")}</Text>
+              <Text style={styles.subtitle}>{localizeCopy("We'll personalise Tomo's coaching for you")}</Text>
 
               <View style={styles.grid2}>
                 {GOAL_OPTIONS.map((opt) => (
@@ -311,9 +313,8 @@ export default function RegisterScreen({ navigation, route }: Props) {
                 ))}
               </View>
 
-              <Button onPress={handleSubmit} loading={loading} fullWidth style={{ marginTop: 8 }} accessibilityLabel="Start my journey" accessibilityRole="button">
-                Start My Journey
-              </Button>
+              <Button onPress={handleSubmit} loading={loading} fullWidth style={{ marginTop: 8 }} accessibilityLabel={localizeCopy("Start my journey")} accessibilityRole="button">
+                {localizeCopy("Start My Journey")}</Button>
             </View>
           )}
 
@@ -323,7 +324,7 @@ export default function RegisterScreen({ navigation, route }: Props) {
             style={styles.loginLink}
           >
             <Text style={styles.loginLinkText}>
-              Already have an account? <Text style={styles.loginLinkHighlight}>Sign in</Text>
+              {phrase("Already have an account?")}<Text style={styles.loginLinkHighlight}>{phrase("Sign in")}</Text>
             </Text>
           </TouchableOpacity>
         </ScrollView>

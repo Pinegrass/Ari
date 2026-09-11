@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { track } from '../lib/analytics';
+import { phrase } from '../i18n/phrases';
 
 const NOTIFICATIONS_ENABLED_KEY = 'ari_notifications_enabled';
 const REMINDER_TIME_KEY = 'ari_reminder_time'; // stored as "HH:MM" e.g. "20:00"
@@ -62,7 +63,8 @@ async function nextReminderMessage(): Promise<{ title: string; body: string }> {
     REMINDER_INDEX_KEY,
     String((safeIdx + 1) % REMINDER_MESSAGES.length)
   );
-  return msg;
+  const language = await AsyncStorage.getItem('ari_language');
+  return { title: phrase(language ?? 'en', msg.title), body: phrase(language ?? 'en', msg.body) };
 }
 
 /**

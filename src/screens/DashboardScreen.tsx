@@ -35,6 +35,8 @@ import { useHaptics } from '../hooks/useHaptics';
 import { useLocale } from '../hooks/useLocale';
 import type { TabParamList, MainStackParamList } from '../navigation/navigationTypes';
 import { track } from '../lib/analytics';
+import { usePrivacy } from '../context/PrivacyContext';
+import { useLanguage } from '../i18n/LanguageContext';
 
 type Nav = CompositeNavigationProp<
   BottomTabNavigationProp<TabParamList, 'Dashboard'>,
@@ -56,6 +58,8 @@ function getGreeting(): string {
  * existing bottom tabs until the nav/FAB restructure (Commit 6).
  */
 export default function DashboardScreen() {
+  const {t} = useLanguage();
+  const { isPrivate } = usePrivacy();
   const navigation = useNavigation<Nav>();
   const { user } = useAuth();
   const { formatDate } = useLocale();
@@ -190,6 +194,8 @@ export default function DashboardScreen() {
           {getGreeting()}, {user?.name?.split(' ')[0] || 'there'}
         </Text>
         <StreakChip />
+        <TouchableOpacity accessibilityRole="button" onPress={()=>navigation.navigate('NudgeInbox')} style={{paddingVertical:14}}><Text style={{color:c.forest}}>{t('updates')} →</Text></TouchableOpacity>
+        <TouchableOpacity accessibilityRole="button" onPress={()=>navigation.navigate('Planning')} style={{paddingVertical:14}}><Text style={{color:c.forest}}>{t('planning')} →</Text></TouchableOpacity>
       </AnimatedEntry>
 
         <AnimatedEntry delay={80}>
@@ -221,10 +227,10 @@ export default function DashboardScreen() {
         </AnimatedEntry>
 
         <AnimatedEntry delay={220}>
-          <CoachingBriefCard />
+          {!isPrivate && <CoachingBriefCard />}
         </AnimatedEntry>
 
-        {nudge && (
+        {nudge && !isPrivate && (
           <AnimatedEntry delay={230}>
             <NudgeCard
               nudge={nudge}

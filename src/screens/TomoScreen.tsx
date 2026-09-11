@@ -1,3 +1,5 @@
+
+import { useLanguage } from '../i18n/LanguageContext';
 import React, { useRef, useEffect, useState, useMemo } from 'react';
 import {
   View,
@@ -90,6 +92,7 @@ const makeTyping = (c: Palette) => StyleSheet.create({
 });
 
 export default function TomoScreen() {
+  const { phrase } = useLanguage();
   const { chatHistory, tomoLoading, askTomo, clearChat } = useData();
   const haptics = useHaptics();
   const c = useColors();
@@ -175,17 +178,17 @@ export default function TomoScreen() {
           <View style={styles.headerLeft}>
             <View style={styles.avatarBox}><Icon name="bot" size={22} color={c.forest} /></View>
             <View>
-              <Text style={styles.headerName}>Tomo</Text>
-              <Text style={styles.headerSub}>Your AI Finance Coach</Text>
+              <Text style={styles.headerName}>{phrase("Tomo")}</Text>
+              <Text style={styles.headerSub}>{phrase("Your AI Finance Coach")}</Text>
             </View>
           </View>
           <TouchableOpacity
             onPress={() => { haptics.light(); clearChat(); }}
             style={styles.clearBtn}
             accessibilityRole="button"
-            accessibilityLabel="Clear chat history"
+            accessibilityLabel={phrase("Clear chat history")}
           >
-            <Text style={styles.clearText}>Clear</Text>
+            <Text style={styles.clearText}>{phrase("Clear")}</Text>
           </TouchableOpacity>
         </View>
 
@@ -203,17 +206,17 @@ export default function TomoScreen() {
               {tomoLoading && <TypingIndicator />}
               {showQuickPrompts && !tomoLoading && (
                 <View style={styles.prompts}>
-                  <Text style={styles.promptsLabel}>Try asking:</Text>
+                  <Text style={styles.promptsLabel}>{phrase("Try asking:")}</Text>
                   {QUICK_PROMPTS.map((p) => (
                     <TouchableOpacity
                       key={p}
-                      onPress={() => handleSend(p)}
+                      onPress={() => handleSend(phrase(p))}
                       style={styles.promptBtn}
                       activeOpacity={0.75}
                       accessibilityRole="button"
                       accessibilityLabel={p}
                     >
-                      <Text style={styles.promptText}>{p}</Text>
+                      <Text style={styles.promptText}>{phrase(p)}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -228,7 +231,7 @@ export default function TomoScreen() {
             style={styles.input}
             value={input}
             onChangeText={setInput}
-            placeholder="Ask Tomo anything..."
+            placeholder={phrase("Ask Tomo anything...")}
             placeholderTextColor={c.inkFaint}
             returnKeyType="send"
             onSubmitEditing={() => handleSend()}
@@ -241,7 +244,7 @@ export default function TomoScreen() {
             style={[styles.sendBtn, (!input.trim() || tomoLoading) && styles.sendBtnDisabled]}
             activeOpacity={0.75}
             accessibilityRole="button"
-            accessibilityLabel="Send message"
+            accessibilityLabel={phrase("Send message")}
           >
             <Icon name="send" size={18} color={c.cream} />
           </TouchableOpacity>

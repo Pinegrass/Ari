@@ -1,3 +1,5 @@
+
+import { useLanguage } from '../i18n/LanguageContext';
 import React from 'react';
 import {
   View,
@@ -78,7 +80,7 @@ const MODULES: ModuleItem[] = [
     key: 'PeriodicReports',
     icon: 'activity',
     iconColor: color.forest,
-    title: 'Daily, Weekly & Monthly',
+    title: 'Daily to yearly reviews',
     subtitle: 'Visual reports for every money rhythm',
   },
   {
@@ -122,6 +124,7 @@ interface AccountantScreenProps {
 }
 
 export default function AccountantScreen({ embedded = false }: AccountantScreenProps) {
+  const { phrase } = useLanguage();
   const navigation = useNavigation<Nav>();
   const haptics = useHaptics();
   const { user } = useAuth();
@@ -137,14 +140,14 @@ export default function AccountantScreen({ embedded = false }: AccountantScreenP
             onPress={() => navigation.goBack()}
             style={styles.backBtn}
             accessibilityRole="button"
-            accessibilityLabel="Go back"
+            accessibilityLabel={phrase("Go back")}
           >
             <Icon name="arrow-left" size={22} color={color.ink} />
           </TouchableOpacity>
         )}
         <View>
-          <Text style={styles.headerTitle}>Ari Accountant</Text>
-          <Text style={styles.headerSub}>Your personal finance toolkit</Text>
+          <Text style={styles.headerTitle}>{phrase("Ari Accountant")}</Text>
+          <Text style={styles.headerSub}>{phrase("Your personal finance toolkit")}</Text>
         </View>
       </View>
 
@@ -158,7 +161,7 @@ export default function AccountantScreen({ embedded = false }: AccountantScreenP
             style={styles.moduleCard}
             activeOpacity={0.75}
             accessibilityRole="button"
-            accessibilityLabel={mod.title}
+            accessibilityLabel={phrase(mod.title)}
             onPress={() => {
               haptics.light();
               if (mod.key === 'Transactions') {
@@ -172,11 +175,11 @@ export default function AccountantScreen({ embedded = false }: AccountantScreenP
               <Icon name={mod.icon} size={24} color={mod.iconColor} />
             </View>
             <View style={styles.moduleText}>
-              <Text style={styles.moduleTitle}>{mod.title}</Text>
+              <Text style={styles.moduleTitle}>{phrase(mod.title)}</Text>
               <Text style={styles.moduleSub}>
                 {mod.key === 'Groups' && country !== 'IN'
-                  ? 'Split expenses with friends'
-                  : mod.subtitle}
+                  ? phrase('Split expenses with friends')
+                  : phrase(mod.subtitle)}
               </Text>
             </View>
             <Icon name="chevron-right" size={18} color={color.inkFaint} />

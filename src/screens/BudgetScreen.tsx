@@ -1,3 +1,5 @@
+
+import { useLanguage } from '../i18n/LanguageContext';
 import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
@@ -36,6 +38,8 @@ import { effectiveProgress } from '../utils/budgetRollover';
 import type { Budget } from '../types';
 
 export default function BudgetScreen() {
+ const {phrase:localizeCopy}=useLanguage();
+  const { phrase } = useLanguage();
   const { budgets, overallBudget, loadingData, refreshing, fetchBudgets, saveBudget, deleteBudget, saveOverallBudget, refresh, userCategories, fetchUserCategories } =
     useData();
   const { locale } = useLocale();
@@ -183,9 +187,9 @@ export default function BudgetScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>Budget</Text>
+          <Text style={styles.title}>{phrase("Budget")}</Text>
           <TouchableOpacity style={styles.addBtn} onPress={openAdd} activeOpacity={0.8}>
-            <Text style={styles.addBtnText}>+ Add</Text>
+            <Text style={styles.addBtnText}>{phrase("+ Add")}</Text>
           </TouchableOpacity>
         </View>
 
@@ -193,18 +197,18 @@ export default function BudgetScreen() {
         {overallSet && overallProg ? (
           <View style={styles.overallCard}>
             <View style={styles.overallHeader}>
-              <Text style={styles.overallTitle}>Overall Monthly Budget</Text>
+              <Text style={styles.overallTitle}>{phrase("Overall Monthly Budget")}</Text>
               <TouchableOpacity
                 onPress={openOverallEdit}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                accessibilityLabel="Edit overall budget"
+                accessibilityLabel={phrase("Edit overall budget")}
                 accessibilityRole="button"
               >
                 <Icon name="edit" size={16} color={c.inkSoft} />
               </TouchableOpacity>
             </View>
             <Text style={styles.overallMeta}>
-              {formatAmount(overallBudget!.spent)} of {formatAmount(overallBudget!.limit!)}
+              {formatAmount(overallBudget!.spent)} {phrase("of")}{formatAmount(overallBudget!.limit!)}
             </Text>
             <ProgressBar
               percentage={overallProg.percentage}
@@ -222,10 +226,10 @@ export default function BudgetScreen() {
             onPress={openOverallEdit}
             activeOpacity={0.8}
             accessibilityRole="button"
-            accessibilityLabel="Set an overall monthly budget"
+            accessibilityLabel={phrase("Set an overall monthly budget")}
           >
             <Icon name="target" size={18} color={c.forest} />
-            <Text style={styles.overallSetText}>Set an overall monthly budget</Text>
+            <Text style={styles.overallSetText}>{phrase("Set an overall monthly budget")}</Text>
             <Icon name="chevron-right" size={16} color={c.inkFaint} />
           </TouchableOpacity>
         )}
@@ -235,12 +239,12 @@ export default function BudgetScreen() {
           <View style={styles.summaryCard}>
             <View style={styles.summaryRow}>
               <View style={styles.summaryItem}>
-                <Text style={styles.summaryLabel}>Total Budgeted</Text>
+                <Text style={styles.summaryLabel}>{phrase("Total Budgeted")}</Text>
                 <Text style={styles.summaryValue}>{formatAmount(totalBudget)}</Text>
               </View>
               <View style={styles.summaryDivider} />
               <View style={styles.summaryItem}>
-                <Text style={styles.summaryLabel}>Total Spent</Text>
+                <Text style={styles.summaryLabel}>{phrase("Total Spent")}</Text>
                 <Text
                   style={[
                     styles.summaryValue,
@@ -254,8 +258,7 @@ export default function BudgetScreen() {
             {overBudgetCount > 0 && (
               <View style={styles.overWarning}>
                 <Text style={styles.overWarningText}>
-                  ⚠️ {overBudgetCount} {overBudgetCount === 1 ? 'category' : 'categories'} over budget
-                </Text>
+                  ⚠️ {overBudgetCount} {overBudgetCount === 1 ? 'category' : 'categories'} {phrase("over budget")}</Text>
               </View>
             )}
           </View>
@@ -267,7 +270,7 @@ export default function BudgetScreen() {
         ) : budgets.length === 0 ? (
           <EmptyState
             emoji="🎯"
-            title="No budgets set"
+            title={phrase("No budgets set")}
             subtitle="Set spending limits for each category to stay on track"
             actionLabel="Create Budget"
             onAction={openAdd}
@@ -307,7 +310,7 @@ export default function BudgetScreen() {
 
             <ErrorBanner message={error} />
 
-            <Text style={styles.sectionLabel}>Category</Text>
+            <Text style={styles.sectionLabel}>{phrase("Category")}</Text>
             <CategoryPicker
               selected={category}
               type="expense"
@@ -315,7 +318,7 @@ export default function BudgetScreen() {
               customCategories={userCategories}
             />
 
-            <Text style={[styles.sectionLabel, { marginTop: 20 }]}>Monthly Limit ({locale.symbol})</Text>
+            <Text style={[styles.sectionLabel, { marginTop: 20 }]}>{localizeCopy("Monthly Limit (")}{locale.symbol})</Text>
             <View style={styles.limitRow}>
               <Text style={styles.rupee}>{locale.symbol}</Text>
               <TextInput
@@ -351,11 +354,11 @@ export default function BudgetScreen() {
           />
           <View style={[styles.modalSheet, { paddingBottom: Math.max(insets.bottom, 24) + 16 }]}>
             <View style={styles.modalHandle} />
-            <Text style={styles.modalTitle}>Overall Monthly Budget</Text>
+            <Text style={styles.modalTitle}>{phrase("Overall Monthly Budget")}</Text>
 
             <ErrorBanner message={overallError} />
 
-            <Text style={styles.sectionLabel}>Total spending limit ({locale.symbol})</Text>
+            <Text style={styles.sectionLabel}>{localizeCopy("Total spending limit (")}{locale.symbol})</Text>
             <View style={styles.limitRow}>
               <Text style={styles.rupee}>{locale.symbol}</Text>
               <TextInput
@@ -381,7 +384,7 @@ export default function BudgetScreen() {
                 disabled={savingOverall}
                 accessibilityRole="button"
               >
-                <Text style={styles.clearBtnText}>Clear overall budget</Text>
+                <Text style={styles.clearBtnText}>{phrase("Clear overall budget")}</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -390,7 +393,7 @@ export default function BudgetScreen() {
 
       <DeleteConfirmSheet
         visible={!!toDelete}
-        title="Delete Budget?"
+        title={phrase("Delete Budget?")}
         message="This will remove the budget limit for this category."
         onConfirm={handleDeleteConfirm}
         onCancel={() => setToDelete(null)}

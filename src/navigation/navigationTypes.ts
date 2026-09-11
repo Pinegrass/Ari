@@ -52,7 +52,9 @@ export type MainStackParamList = {
   Bills: undefined;
   RecurringPayments: undefined;
   DailyHeatmap: undefined;
-  PeriodicReports: undefined;
+  PeriodicReports: {period: 'weekly'|'monthly'; anchor: string} | undefined;
+  NudgeInbox: undefined;
+  Planning: undefined;
   InviteFriends: { code?: string } | undefined;
   // `source` is the upstream surface that triggered the paywall — drives
   // funnel attribution in PostHog (paywall_viewed, pro_purchase_*).

@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../../i18n/LanguageContext';
 import React, { useState, useCallback } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity,
@@ -32,6 +33,7 @@ function monthLabel(m: string): string {
 }
 
 export default function PnlReportScreen() {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const navigation = useNavigation();
   const haptics = useHaptics();
   const { formatAmount } = usePrivacy();
@@ -66,7 +68,7 @@ export default function PnlReportScreen() {
         <Header onBack={() => navigation.goBack()} />
         <View style={styles.loadingWrap}>
           <ActivityIndicator size="large" color={color.forest} />
-          <Text style={styles.loadingText}>Generating report...</Text>
+          <Text style={styles.loadingText}>{localizeCopy("Generating report...")}</Text>
         </View>
       </ScreenShell>
     );
@@ -78,7 +80,7 @@ export default function PnlReportScreen() {
         <Header onBack={() => navigation.goBack()} />
         <EmptyState
           emoji="📊"
-          title="No Data Yet"
+          title={localizeCopy("No Data Yet")}
           subtitle="Add some transactions to see your P&L report"
         />
       </ScreenShell>
@@ -120,17 +122,17 @@ export default function PnlReportScreen() {
         {/* ── Summary Cards ───────────────────────────────────────── */}
         <AnimatedEntry delay={60}>
           <View style={styles.summaryRow}>
-            <SummaryCard label="Total Income" amount={totals.income} cardColor={color.forest} />
-            <SummaryCard label="Total Expenses" amount={totals.expenses} cardColor={color.clay} />
+            <SummaryCard label={localizeCopy("Total Income")} amount={totals.income} cardColor={color.forest} />
+            <SummaryCard label={localizeCopy("Total Expenses")} amount={totals.expenses} cardColor={color.clay} />
           </View>
           <View style={styles.summaryRow}>
             <SummaryCard
-              label="Net Savings"
+              label={localizeCopy("Recorded net cash flow")}
               amount={totals.net}
               cardColor={totals.net >= 0 ? color.forest : color.clay}
             />
             <SummaryCard
-              label="Avg Savings Rate"
+              label={localizeCopy("Average net cash flow rate")}
               amount={totals.avgSavingsRate}
               isSuffix="%"
               cardColor={totals.avgSavingsRate >= 20 ? color.forest : color.gold}
@@ -142,17 +144,17 @@ export default function PnlReportScreen() {
         {(trends.expenseChange !== 0 || trends.incomeChange !== 0) && (
           <AnimatedEntry delay={100}>
             <View style={styles.trendsCard}>
-              <Text style={styles.sectionTitle}>Month-over-Month</Text>
+              <Text style={styles.sectionTitle}>{localizeCopy("Month-over-Month")}</Text>
               <View style={styles.trendRow}>
                 {trends.incomeChange !== 0 && (
                   <TrendBadge
-                    label="Income"
+                    label={localizeCopy("Income")}
                     change={trends.incomeChange}
                   />
                 )}
                 {trends.expenseChange !== 0 && (
                   <TrendBadge
-                    label="Expenses"
+                    label={localizeCopy("Expenses")}
                     change={trends.expenseChange}
                     invertColor
                   />
@@ -165,7 +167,7 @@ export default function PnlReportScreen() {
         {/* ── Bar Chart ───────────────────────────────────────────── */}
         <AnimatedEntry delay={140}>
           <View style={styles.chartCard}>
-            <Text style={styles.sectionTitle}>Income vs Expenses</Text>
+            <Text style={styles.sectionTitle}>{localizeCopy("Income vs Expenses")}</Text>
             <View style={styles.chart}>
               {pnlMonths.map((m, i) => {
                 const barW = Math.max((CHART_WIDTH / pnlMonths.length) - 8, 20);
@@ -191,20 +193,20 @@ export default function PnlReportScreen() {
             <View style={styles.chartLegend}>
               <View style={styles.legendItem}>
                 <View style={[styles.legendDot, { backgroundColor: color.forest }]} />
-                <Text style={styles.legendText}>Income</Text>
+                <Text style={styles.legendText}>{localizeCopy("Income")}</Text>
               </View>
               <View style={styles.legendItem}>
                 <View style={[styles.legendDot, { backgroundColor: color.clay }]} />
-                <Text style={styles.legendText}>Expenses</Text>
+                <Text style={styles.legendText}>{localizeCopy("Expenses")}</Text>
               </View>
             </View>
           </View>
         </AnimatedEntry>
 
-        {/* ── Net Savings Trend ────────────────────────────────────── */}
+        {/* ── Net cash flow trend ────────────────────────────────────── */}
         <AnimatedEntry delay={180}>
           <View style={styles.chartCard}>
-            <Text style={styles.sectionTitle}>Net Savings Trend</Text>
+            <Text style={styles.sectionTitle}>{localizeCopy("Net cash flow trend")}</Text>
             <View style={styles.savingsChart}>
               {pnlMonths.map((m, i) => {
                 const maxNet = Math.max(...pnlMonths.map((pm) => Math.abs(pm.net)), 1);
@@ -233,7 +235,7 @@ export default function PnlReportScreen() {
         {catEntries.length > 0 && (
           <AnimatedEntry delay={220}>
             <View style={styles.breakdownCard}>
-              <Text style={styles.sectionTitle}>Expense Breakdown</Text>
+              <Text style={styles.sectionTitle}>{localizeCopy("Expense Breakdown")}</Text>
               {catEntries.map(([cat, amount], i) => {
                 const pct = totalCatAmount > 0 ? Math.round((amount / totalCatAmount) * 100) : 0;
                 const catInfo = CATEGORY_ICONS[cat];
@@ -262,7 +264,7 @@ export default function PnlReportScreen() {
         {incEntries.length > 0 && (
           <AnimatedEntry delay={260}>
             <View style={styles.breakdownCard}>
-              <Text style={styles.sectionTitle}>Income Sources</Text>
+              <Text style={styles.sectionTitle}>{localizeCopy("Income Sources")}</Text>
               {incEntries.map(([src, amount]) => {
                 const pct = totalIncAmount > 0 ? Math.round((amount / totalIncAmount) * 100) : 0;
                 const catInfo = CATEGORY_ICONS[src];
@@ -290,12 +292,12 @@ export default function PnlReportScreen() {
         {/* ── Monthly Detail Table ─────────────────────────────────── */}
         <AnimatedEntry delay={300}>
           <View style={styles.tableCard}>
-            <Text style={styles.sectionTitle}>Monthly Detail</Text>
+            <Text style={styles.sectionTitle}>{localizeCopy("Monthly Detail")}</Text>
             <View style={styles.tableHeader}>
-              <Text style={[styles.tableCell, styles.tableHeadText, { flex: 1.2 }]}>Month</Text>
-              <Text style={[styles.tableCell, styles.tableHeadText]}>Income</Text>
-              <Text style={[styles.tableCell, styles.tableHeadText]}>Expense</Text>
-              <Text style={[styles.tableCell, styles.tableHeadText]}>Net</Text>
+              <Text style={[styles.tableCell, styles.tableHeadText, { flex: 1.2 }]}>{localizeCopy("Month")}</Text>
+              <Text style={[styles.tableCell, styles.tableHeadText]}>{localizeCopy("Income")}</Text>
+              <Text style={[styles.tableCell, styles.tableHeadText]}>{localizeCopy("Expense")}</Text>
+              <Text style={[styles.tableCell, styles.tableHeadText]}>{localizeCopy("Net")}</Text>
             </View>
             {pnlMonths.map((m, i) => (
               <View key={m.month} style={[styles.tableRow, i % 2 === 0 && styles.tableRowAlt]}>
@@ -317,14 +319,15 @@ export default function PnlReportScreen() {
 // ── Sub-components ────────────────────────────────────────────────────
 
 function Header({ onBack }: { onBack: () => void }) {
+ const {phrase:localizeCopy}=useCopyLanguage();
   return (
     <View style={styles.header}>
       <TouchableOpacity onPress={onBack} style={styles.backBtn}>
         <Icon name="arrow-left" size={22} color={color.ink} />
       </TouchableOpacity>
       <View>
-        <Text style={styles.headerTitle}>P&L Reports</Text>
-        <Text style={styles.headerSub}>Income vs expense analysis</Text>
+        <Text style={styles.headerTitle}>{localizeCopy("P&L Reports")}</Text>
+        <Text style={styles.headerSub}>{localizeCopy("Income vs expense analysis")}</Text>
       </View>
     </View>
   );

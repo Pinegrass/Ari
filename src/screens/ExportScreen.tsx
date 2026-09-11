@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../i18n/LanguageContext';
 import React, { useState } from 'react';
 import {
   View,
@@ -24,6 +25,7 @@ interface Props {
 }
 
 export default function ExportScreen({ onBack }: Props) {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const { transactions } = useData();
   const haptics = useHaptics();
   const [exporting, setExporting] = useState<'transactions' | 'pnl' | 'full' | null>(null);
@@ -121,10 +123,10 @@ export default function ExportScreen({ onBack }: Props) {
   return (
     <ScreenShell edges={['top']}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} accessibilityLabel="Go back" accessibilityRole="button">
-          <Text style={styles.backText}>← Back</Text>
+        <TouchableOpacity onPress={onBack} accessibilityLabel={localizeCopy("Go back")} accessibilityRole="button">
+          <Text style={styles.backText}>{localizeCopy("← Back")}</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>Export Data</Text>
+        <Text style={styles.title}>{localizeCopy("Export Data")}</Text>
         <View style={{ width: 60 }} />
       </View>
 

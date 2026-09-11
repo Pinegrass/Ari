@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../i18n/LanguageContext';
 import React, { useCallback, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useRoute, useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -15,6 +16,7 @@ import { getAaConsent, syncAaConsent, type AaConsentDetail } from '../api/aa';
 import type { MainStackParamList } from '../navigation/navigationTypes';
 
 export default function LinkBankConsentDetailScreen() {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const route = useRoute<RouteProp<MainStackParamList, 'LinkBankConsentDetail'>>();
   const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
   const haptics = useHaptics();
@@ -100,7 +102,7 @@ export default function LinkBankConsentDetailScreen() {
             navigation.goBack();
           }}
           style={styles.backRow}
-          accessibilityLabel="Go back"
+          accessibilityLabel={localizeCopy("Go back")}
           accessibilityRole="button"
         >
           <Icon name="arrow-left" size={22} color={c.inkSoft} />

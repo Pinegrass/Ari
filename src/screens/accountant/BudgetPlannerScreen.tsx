@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../../i18n/LanguageContext';
 import React, { useState, useCallback } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, Modal, TextInput,
@@ -25,6 +26,7 @@ import { effectiveProgress, hasRollover } from '../../utils/budgetRollover';
 import type { Budget, OverallBudget } from '../../types';
 
 export default function BudgetPlannerScreen() {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const navigation = useNavigation();
   const haptics = useHaptics();
   const insets = useSafeAreaInsets();
@@ -214,8 +216,8 @@ export default function BudgetPlannerScreen() {
           <Icon name="arrow-left" size={22} color={color.ink} />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
-          <Text style={styles.headerTitle}>Budget Planner</Text>
-          <Text style={styles.headerSub}>Monthly targets & tracking</Text>
+          <Text style={styles.headerTitle}>{localizeCopy("Budget Planner")}</Text>
+          <Text style={styles.headerSub}>{localizeCopy("Monthly targets & tracking")}</Text>
         </View>
         <TouchableOpacity onPress={openAdd} style={styles.addBtnHeader}>
           <Icon name="plus" size={18} color={color.cream} />
@@ -229,7 +231,7 @@ export default function BudgetPlannerScreen() {
         </TouchableOpacity>
         <TouchableOpacity onPress={() => setMonth(getCurrentMonth())} activeOpacity={0.7}>
           <Text style={styles.monthLabel}>{monthLabel}</Text>
-          {!isCurrentMonth && <Text style={styles.monthHint}>Tap to go to current</Text>}
+          {!isCurrentMonth && <Text style={styles.monthHint}>{localizeCopy("Tap to go to current")}</Text>}
         </TouchableOpacity>
         <TouchableOpacity onPress={() => changeMonth(1)} style={styles.monthArrow}>
           <Icon name="chevron-right" size={22} color={color.ink} />
@@ -254,13 +256,13 @@ export default function BudgetPlannerScreen() {
                 onPress={openOverallEdit}
                 activeOpacity={0.8}
                 accessibilityRole="button"
-                accessibilityLabel="Edit overall monthly budget"
+                accessibilityLabel={localizeCopy("Edit overall monthly budget")}
               >
                 <View style={styles.overallBudgetHeader}>
                   <View>
-                    <Text style={styles.overallBudgetTitle}>Overall monthly budget</Text>
+                    <Text style={styles.overallBudgetTitle}>{localizeCopy("Overall monthly budget")}</Text>
                     <Text style={styles.overallBudgetMeta}>
-                      {formatAmount(overallBudget!.spent)} of {formatAmount(overallBudget!.limit!)}
+                      {formatAmount(overallBudget!.spent)} {localizeCopy("of")}{formatAmount(overallBudget!.limit!)}
                     </Text>
                   </View>
                   <Icon name="edit" size={16} color={color.inkSoft} />
@@ -287,10 +289,10 @@ export default function BudgetPlannerScreen() {
                 onPress={openOverallEdit}
                 activeOpacity={0.8}
                 accessibilityRole="button"
-                accessibilityLabel="Set an overall monthly budget"
+                accessibilityLabel={localizeCopy("Set an overall monthly budget")}
               >
                 <Icon name="target" size={18} color={color.forest} />
-                <Text style={styles.overallBudgetSetText}>Set an overall monthly budget</Text>
+                <Text style={styles.overallBudgetSetText}>{localizeCopy("Set an overall monthly budget")}</Text>
                 <Icon name="chevron-right" size={16} color={color.inkFaint} />
               </TouchableOpacity>
             )}
@@ -301,19 +303,19 @@ export default function BudgetPlannerScreen() {
                 <View style={styles.summaryCard}>
                   <View style={styles.summaryRow}>
                     <View style={styles.summaryItem}>
-                      <Text style={styles.summaryLabel}>Budgeted</Text>
+                      <Text style={styles.summaryLabel}>{localizeCopy("Budgeted")}</Text>
                       <Text style={styles.summaryValue}>{formatAmount(totalAvailable)}</Text>
                     </View>
                     <View style={styles.summaryDivider} />
                     <View style={styles.summaryItem}>
-                      <Text style={styles.summaryLabel}>Spent</Text>
+                      <Text style={styles.summaryLabel}>{localizeCopy("Spent")}</Text>
                       <Text style={[styles.summaryValue, totalSpent > totalAvailable && { color: color.clay }]}>
                         {formatAmount(totalSpent)}
                       </Text>
                     </View>
                     <View style={styles.summaryDivider} />
                     <View style={styles.summaryItem}>
-                      <Text style={styles.summaryLabel}>Remaining</Text>
+                      <Text style={styles.summaryLabel}>{localizeCopy("Remaining")}</Text>
                       <Text style={[styles.summaryValue, { color: totalRemaining >= 0 ? color.forest : color.clay }]}>
                         {formatAmount(Math.abs(totalRemaining))}
                       </Text>
@@ -322,7 +324,7 @@ export default function BudgetPlannerScreen() {
 
                   {totalAvailable !== totalBudget && (
                     <Text style={styles.carriedHint}>
-                      Includes {formatAmount(Math.abs(totalAvailable - totalBudget))}{' '}
+                      {localizeCopy("Includes")}{formatAmount(Math.abs(totalAvailable - totalBudget))}{' '}
                       {totalAvailable > totalBudget ? 'carried from last month' : 'overspend carried from last month'}
                     </Text>
                   )}
@@ -339,8 +341,7 @@ export default function BudgetPlannerScreen() {
                   {overBudgetCount > 0 && (
                     <View style={styles.overWarning}>
                       <Text style={styles.overWarningText}>
-                        {overBudgetCount} {overBudgetCount === 1 ? 'category' : 'categories'} over budget
-                      </Text>
+                        {overBudgetCount} {overBudgetCount === 1 ? 'category' : 'categories'} {localizeCopy("over budget")}</Text>
                     </View>
                   )}
                 </View>
@@ -380,10 +381,10 @@ export default function BudgetPlannerScreen() {
             <Text style={styles.modalTitle}>{editBudget ? 'Edit Budget' : 'New Budget'}</Text>
             <ErrorBanner message={formError} />
 
-            <Text style={styles.fieldLabel}>Category</Text>
+            <Text style={styles.fieldLabel}>{localizeCopy("Category")}</Text>
             <CategoryPicker selected={category} type="expense" onSelect={setCategory} />
 
-            <Text style={[styles.fieldLabel, { marginTop: 20 }]}>Monthly Limit</Text>
+            <Text style={[styles.fieldLabel, { marginTop: 20 }]}>{localizeCopy("Monthly Limit")}</Text>
             <View style={styles.amountRow}>
               <Text style={styles.rupee}>{locale.symbol}</Text>
               <TextInput
@@ -412,10 +413,10 @@ export default function BudgetPlannerScreen() {
           <TouchableOpacity style={styles.modalOverlay} onPress={() => setShowOverallModal(false)} activeOpacity={1} />
           <View style={[styles.modalSheet, { paddingBottom: Math.max(insets.bottom, 24) + 16 }]}>
             <View style={styles.modalHandle} />
-            <Text style={styles.modalTitle}>Overall Monthly Budget</Text>
+            <Text style={styles.modalTitle}>{localizeCopy("Overall Monthly Budget")}</Text>
             <ErrorBanner message={overallError} />
 
-            <Text style={styles.fieldLabel}>Total spending limit</Text>
+            <Text style={styles.fieldLabel}>{localizeCopy("Total spending limit")}</Text>
             <View style={styles.amountRow}>
               <Text style={styles.rupee}>{locale.symbol}</Text>
               <TextInput
@@ -428,7 +429,7 @@ export default function BudgetPlannerScreen() {
                 selectionColor={color.forest}
                 returnKeyType="done"
                 onSubmitEditing={handleSaveOverall}
-                accessibilityLabel="Overall monthly budget amount"
+                accessibilityLabel={localizeCopy("Overall monthly budget amount")}
               />
             </View>
 
@@ -442,7 +443,7 @@ export default function BudgetPlannerScreen() {
                 disabled={savingOverall}
                 accessibilityRole="button"
               >
-                <Text style={styles.clearOverallText}>Clear overall budget</Text>
+                <Text style={styles.clearOverallText}>{localizeCopy("Clear overall budget")}</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -451,7 +452,7 @@ export default function BudgetPlannerScreen() {
 
       <DeleteConfirmSheet
         visible={!!deleteTarget}
-        title="Delete Budget?"
+        title={localizeCopy("Delete Budget?")}
         message="This will remove the budget limit for this category."
         onConfirm={handleDelete}
         onCancel={() => setDeleteTarget(null)}
@@ -465,6 +466,7 @@ export default function BudgetPlannerScreen() {
 // BudgetCard Component
 // ---------------------------------------------------------------------------
 function BudgetCard({ budget, onEdit, onDelete }: { budget: Budget; onEdit: () => void; onDelete: () => void }) {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const { formatAmount } = usePrivacy();
   const catInfo = CATEGORY_ICONS[budget.category] || { icon: 'package' as const, color: color.inkFaint };
   const available = budget.available ?? budget.limit;
@@ -482,7 +484,7 @@ function BudgetCard({ budget, onEdit, onDelete }: { budget: Budget; onEdit: () =
         </View>
         <View style={{ flex: 1 }}>
           <Text style={styles.catName}>{budget.category.charAt(0).toUpperCase() + budget.category.slice(1)}</Text>
-          <Text style={styles.budgetLimit}>Limit: {formatAmount(budget.limit)}</Text>
+          <Text style={styles.budgetLimit}>{localizeCopy("Limit:")}{formatAmount(budget.limit)}</Text>
           {carried && (
             <Text style={[styles.carried, { color: budget.rollover > 0 ? color.forest : color.clay }]}>
               {budget.rollover > 0

@@ -1,3 +1,5 @@
+
+import { useLanguage } from '../i18n/LanguageContext';
 import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
@@ -14,6 +16,7 @@ import { track } from '../lib/analytics';
 import { useHaptics } from '../hooks/useHaptics';
 import { getLocale } from '../utils/locale';
 import { getDefaultCountry } from '../utils/detectCountry';
+import LanguageControl from '../components/LanguageControl';
 
 /**
  * Onboarding — Sprint 3 (D4). Value-first, ≤3 skippable steps, ending in a live
@@ -45,6 +48,7 @@ const FEATURES: { icon: IconName; title: string; desc: string }[] = [
 const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'del'];
 
 export default function OnboardingScreen({ onComplete }: Props) {
+  const { phrase } = useLanguage();
   const haptics = useHaptics();
   const loc = getLocale(getDefaultCountry());
   const [step, setStep] = useState(0);
@@ -60,9 +64,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
   const elapsedMs = () => Date.now() - startedAt.current;
 
   const finish = () => {
-    // Completing onboarding implies ToS / Privacy consent (links shown on the
-    // value step). Kept as a discrete event for the DPDPA audit trail.
-    track('consent_accepted', { flow: 'onboarding' });
+    // Completing or skipping a demo is not consent to terms or data processing.
     track('onboarding_completed', { elapsed_ms: elapsedMs(), logged_demo: logged });
     onComplete();
   };
@@ -105,6 +107,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
   return (
     <View style={styles.screen}>
       <ScreenShell edges={['top', 'bottom']}>
+        <View style={{ paddingHorizontal: 24 }}><LanguageControl compact /></View>
         {/* Header: progress dots + skip */}
         <View style={styles.top}>
           <View style={styles.dots}>
@@ -112,8 +115,8 @@ export default function OnboardingScreen({ onComplete }: Props) {
               <View key={i} style={[styles.dot, i === step && styles.dotActive]} />
             ))}
           </View>
-          <TouchableOpacity onPress={skip} accessibilityRole="button" accessibilityLabel="Skip">
-            <Text style={styles.skip}>Skip</Text>
+          <TouchableOpacity onPress={skip} accessibilityRole="button" accessibilityLabel={phrase("Skip")}>
+            <Text style={styles.skip}>{phrase("Skip")}</Text>
           </TouchableOpacity>
         </View>
 
@@ -123,23 +126,22 @@ export default function OnboardingScreen({ onComplete }: Props) {
               <View style={styles.ring}>
                 <Icon name="sprout" size={52} color={color.forest} />
               </View>
-              <Text style={styles.h1}>Money, tracked{'\n'}in seconds</Text>
+              <Text style={styles.h1}>{phrase('Money, tracked\nin seconds')}</Text>
               <Text style={styles.sub}>
-                Ari is the fastest way for Indians to log spending, catch bills, and
-                stay on budget — no spreadsheets, no fuss.
+                {phrase('Capture spending, review bills and understand your budget at your own pace.')}
               </Text>
               {/* Demo dashboard glimpse — show, don't ask */}
               <View style={styles.glimpse}>
-                <Text style={styles.glimpseLabel}>Spent today</Text>
+                <Text style={styles.glimpseLabel}>{phrase("Spent today")}</Text>
                 <Text style={styles.glimpseAmount}>{loc.symbol}0</Text>
-                <Text style={styles.glimpseHint}>{"Let's change that in a moment →"}</Text>
+                <Text style={styles.glimpseHint}>{phrase("Let's change that in a moment →")}</Text>
               </View>
             </View>
           )}
 
           {step === 1 && (
             <View style={styles.center}>
-              <Text style={styles.h1}>Everything your{'\n'}money needs</Text>
+              <Text style={styles.h1}>{phrase('Everything your\nmoney needs')}</Text>
               <View style={styles.features}>
                 {FEATURES.map((f) => (
                   <View key={f.title} style={styles.featureRow}>
@@ -147,8 +149,8 @@ export default function OnboardingScreen({ onComplete }: Props) {
                       <Icon name={f.icon} size={22} color={color.forest} />
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.featureTitle}>{f.title}</Text>
-                      <Text style={styles.featureDesc}>{f.desc}</Text>
+                      <Text style={styles.featureTitle}>{phrase(f.title)}</Text>
+                      <Text style={styles.featureDesc}>{phrase(f.desc)}</Text>
                     </View>
                   </View>
                 ))}
@@ -158,15 +160,15 @@ export default function OnboardingScreen({ onComplete }: Props) {
 
           {step === 2 && (
             <View style={styles.center}>
-              <Text style={styles.h1}>Try it — log a spend</Text>
-              <Text style={styles.sub}>This is the whole flow. Punch in an amount.</Text>
+              <Text style={styles.h1}>{phrase("Try it — log a spend")}</Text>
+              <Text style={styles.sub}>{phrase("This is the whole flow. Punch in an amount.")}</Text>
 
               <Text style={styles.amount}>{loc.symbol}{amount ? Number(amount).toLocaleString(loc.localeTag) : '0'}</Text>
 
               {logged ? (
                 <View style={styles.doneRow}>
                   <Icon name="check-circle" size={22} color={color.forest} />
-                  <Text style={styles.doneText}>That fast. Create your account to save it.</Text>
+                  <Text style={styles.doneText}>{phrase("That fast. Create your account to save it.")}</Text>
                 </View>
               ) : (
                 <View style={styles.keypad}>
@@ -176,7 +178,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
                       style={[styles.key, !k && styles.keyEmpty]}
                       disabled={!k}
                       onPress={() => pressKey(k)}
-                      accessibilityLabel={k === 'del' ? 'Delete' : k}
+                      accessibilityLabel={k === 'del' ? phrase("Delete") : k}
                     >
                       {k === 'del' ? (
                         <Icon name="x" size={20} color={color.ink} />
@@ -200,12 +202,12 @@ export default function OnboardingScreen({ onComplete }: Props) {
               disabled={!amount}
               activeOpacity={0.85}
             >
-              <Text style={styles.ctaText}>Log it</Text>
+              <Text style={styles.ctaText}>{phrase("Log it")}</Text>
             </TouchableOpacity>
           ) : (
             <TouchableOpacity style={styles.cta} onPress={next} activeOpacity={0.85}>
               <Text style={styles.ctaText}>
-                {step < 2 ? 'Next' : 'Create account'}
+                {step < 2 ? phrase("Next") : phrase("Create account")}
               </Text>
             </TouchableOpacity>
           )}

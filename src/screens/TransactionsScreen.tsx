@@ -1,3 +1,5 @@
+
+import { useLanguage } from '../i18n/LanguageContext';
 import React, { useState, useMemo, useCallback } from 'react';
 import {
   View,
@@ -50,6 +52,7 @@ const PERIODS: { value: PeriodType; label: string }[] = [
 ];
 
 export default function TransactionsScreen() {
+  const { phrase } = useLanguage();
   const navigation = useNavigation<Nav>();
   const c = useColors();
   const styles = useMemo(() => makeStyles(c), [c]);
@@ -187,7 +190,7 @@ export default function TransactionsScreen() {
           <View>
             {/* Header */}
             <AnimatedEntry delay={0}>
-              <Text style={styles.screenTitle}>Trends</Text>
+              <Text style={styles.screenTitle}>{phrase("Trends")}</Text>
             </AnimatedEntry>
 
             {/* Period selector */}
@@ -217,11 +220,11 @@ export default function TransactionsScreen() {
             <AnimatedEntry delay={80}>
               <View style={styles.summaryGrid}>
                 <View style={styles.summaryCard}>
-                  <Text style={styles.summaryLabel}>Income</Text>
+                  <Text style={styles.summaryLabel}>{phrase("Income")}</Text>
                   <Text style={[styles.summaryAmount, styles.incomeText]}>{formatAmount(income)}</Text>
                 </View>
                 <View style={styles.summaryCard}>
-                  <Text style={styles.summaryLabel}>Expenses</Text>
+                  <Text style={styles.summaryLabel}>{phrase("Expenses")}</Text>
                   <Text style={[styles.summaryAmount, styles.expenseText]}>{formatAmount(expenses)}</Text>
                 </View>
                 <View style={styles.summaryCard}>
@@ -231,7 +234,7 @@ export default function TransactionsScreen() {
                   </Text>
                 </View>
                 <View style={styles.summaryCard}>
-                  <Text style={styles.summaryLabel}>Saved %</Text>
+                  <Text style={styles.summaryLabel}>{phrase("Saved %")}</Text>
                   <Text style={[styles.summaryAmount, savingsRate >= 20 ? styles.incomeText : styles.expenseText]}>
                     {savingsRate}%
                   </Text>
@@ -268,17 +271,17 @@ export default function TransactionsScreen() {
                 <Icon name="search" size={16} color={c.inkFaint} />
                 <TextInput
                   style={styles.searchInput}
-                  placeholder="Search transactions..."
+                  placeholder={phrase("Search transactions...")}
                   placeholderTextColor={c.inkFaint}
                   value={search}
                   onChangeText={setSearch}
                   selectionColor={c.forest}
-                  accessibilityLabel="Search transactions"
+                  accessibilityLabel={phrase("Search transactions")}
                 />
                 {search.length > 0 && (
                   <TouchableOpacity
                     onPress={() => setSearch('')}
-                    accessibilityLabel="Clear search"
+                    accessibilityLabel={phrase("Clear search")}
                     accessibilityRole="button"
                   >
                     <Icon name="x" size={18} color={c.inkSoft} />
@@ -298,7 +301,7 @@ export default function TransactionsScreen() {
                     activeOpacity={0.75}
                     accessibilityRole="tab"
                     accessibilityState={{ selected: filter === f }}
-                    accessibilityLabel={`${f === 'all' ? 'All' : f === 'expense' ? 'Expenses' : 'Income'} filter`}
+                    accessibilityLabel={`${f === 'all' ? 'All' : f === 'expense' ? phrase("Expenses") : phrase("Income")} filter`}
                   >
                     <Text
                       style={[
@@ -306,7 +309,7 @@ export default function TransactionsScreen() {
                         filter === f && styles.filterTextActive,
                       ]}
                     >
-                      {f === 'all' ? 'All' : f === 'expense' ? 'Expenses' : 'Income'}
+                      {f === 'all' ? 'All' : f === 'expense' ? phrase("Expenses") : phrase("Income")}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -314,7 +317,7 @@ export default function TransactionsScreen() {
             </AnimatedEntry>
 
             <AnimatedEntry delay={320}>
-              <Text style={styles.listHeading}>Recent transactions</Text>
+              <Text style={styles.listHeading}>{phrase("Recent transactions")}</Text>
             </AnimatedEntry>
           </View>
         }
@@ -326,7 +329,7 @@ export default function TransactionsScreen() {
           ) : (
             <EmptyState
               emoji="💳"
-              title="No transactions found"
+              title={phrase("No transactions found")}
               subtitle={
                 search || filter !== 'all'
                   ? 'Try changing your search or filter'
@@ -343,7 +346,7 @@ export default function TransactionsScreen() {
         visible={!!toDelete}
         title={
           toDelete?.isRecurring && !toDelete?.parentRecurringId
-            ? 'Stop this recurring payment?'
+            ? phrase("Stop this recurring payment?")
             : 'Delete Transaction?'
         }
         message={
@@ -354,7 +357,7 @@ export default function TransactionsScreen() {
             : ''
         }
         confirmLabel={
-          toDelete?.isRecurring && !toDelete?.parentRecurringId ? 'Stop series' : 'Delete'
+          toDelete?.isRecurring && !toDelete?.parentRecurringId ? 'Stop series' : phrase("Delete")
         }
         onConfirm={handleDeleteConfirm}
         onCancel={() => setToDelete(null)}

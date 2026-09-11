@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../i18n/LanguageContext';
 import React, { useState } from 'react';
 import {
   View,
@@ -73,6 +74,7 @@ const FAQS: Faq[] = [
 const SUPPORT_EMAIL = 'support@aritomo.in';
 
 export default function HelpSupportScreen({ onBack }: Props) {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const toggle = (i: number) => {
@@ -97,10 +99,10 @@ export default function HelpSupportScreen({ onBack }: Props) {
   return (
     <ScreenShell edges={['top']}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} accessibilityLabel="Go back" accessibilityRole="button">
-          <Text style={styles.backText}>← Back</Text>
+        <TouchableOpacity onPress={onBack} accessibilityLabel={localizeCopy("Go back")} accessibilityRole="button">
+          <Text style={styles.backText}>{localizeCopy("← Back")}</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>Help & Support</Text>
+        <Text style={styles.title}>{localizeCopy("Help & Support")}</Text>
         <View style={{ width: 60 }} />
       </View>
 

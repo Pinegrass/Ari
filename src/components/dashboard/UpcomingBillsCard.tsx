@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../../i18n/LanguageContext';
 import React, { useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -31,6 +32,7 @@ function dueLabel(daysUntil: number): string {
  * so Home stays clean for users with neither.
  */
 export default function UpcomingBillsCard() {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const { formatCurrency } = useLocale();
   const navigation = useNavigation<Nav>();
   const { transactions } = useData();
@@ -58,9 +60,9 @@ export default function UpcomingBillsCard() {
           <TouchableOpacity
             onPress={() => navigation.navigate('RecurringPayments')}
             accessibilityRole="link"
-            accessibilityLabel="Manage recurring payments"
+            accessibilityLabel={localizeCopy("Manage recurring payments")}
           >
-            <Text style={styles.manage}>Recurring</Text>
+            <Text style={styles.manage}>{localizeCopy("Recurring")}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => navigation.navigate('Bills')}

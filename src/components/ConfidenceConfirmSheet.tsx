@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../i18n/LanguageContext';
 import React from 'react';
 import {
   Modal,
@@ -40,6 +41,7 @@ export default function ConfidenceConfirmSheet({
   onConfirm,
   onCancel,
 }: Props) {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const insets = useSafeAreaInsets();
   const { formatCurrency } = useLocale();
   const pct = Math.round(confidence * 100);
@@ -74,8 +76,7 @@ export default function ConfidenceConfirmSheet({
               style={styles.btn}
               accessibilityLabel="Edit manually"
             >
-              Edit
-            </Button>
+              {localizeCopy("Edit")}</Button>
             <Button
               variant="primary"
               onPress={onConfirm}

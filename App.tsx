@@ -38,6 +38,7 @@ import { AuthProvider } from './src/context/AuthContext';
 import { DataProvider } from './src/context/DataContext';
 import { PrivacyProvider } from './src/context/PrivacyContext';
 import { ThemeProvider } from './src/context/ThemeContext';
+import { LanguageProvider } from './src/i18n/LanguageContext';
 import RootNavigator from './src/navigation/RootNavigator';
 import { useShareIntent } from 'expo-share-intent';
 import { getInitialSharedText, addShareIntentListener, sharedTextFromIntent } from './src/lib/shareIntentHandler';
@@ -409,7 +410,7 @@ function App() {
               }
             }}
           >
-            <ThemeProvider>
+            <LanguageProvider><ThemeProvider>
               <AuthProvider>
                 <DataProvider>
                   <PrivacyProvider>
@@ -419,7 +420,7 @@ function App() {
                   </PrivacyProvider>
                 </DataProvider>
               </AuthProvider>
-            </ThemeProvider>
+            </ThemeProvider></LanguageProvider>
           </NavigationContainer>
         </SafeAreaProvider>
       </ErrorBoundary>

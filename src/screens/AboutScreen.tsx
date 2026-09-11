@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../i18n/LanguageContext';
 import React from 'react';
 import {
   View,
@@ -34,16 +35,17 @@ function statusColor(status: ReturnType<typeof useOTAUpdates>['status']) {
 }
 
 export default function AboutScreen({ onBack }: Props) {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const { status, message, runtimeVersion, updateId, isEmbeddedLaunch, channel, checkManually } = useOTAUpdates();
   const isBusy = status === 'checking' || status === 'downloading';
 
   return (
     <ScreenShell edges={['top']}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} accessibilityLabel="Go back" accessibilityRole="button">
-          <Text style={styles.backText}>← Back</Text>
+        <TouchableOpacity onPress={onBack} accessibilityLabel={localizeCopy("Go back")} accessibilityRole="button">
+          <Text style={styles.backText}>{localizeCopy("← Back")}</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>About</Text>
+        <Text style={styles.title}>{localizeCopy("About")}</Text>
         <View style={{ width: 60 }} />
       </View>
 

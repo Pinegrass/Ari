@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../../i18n/LanguageContext';
 import React, { useState, useCallback } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, Modal, TextInput,
@@ -34,6 +35,7 @@ const GOAL_ICONS: { icon: IconName; label: string; color: string }[] = [
 ];
 
 export default function SavingsGoalsScreen() {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const navigation = useNavigation();
   const haptics = useHaptics();
   const insets = useSafeAreaInsets();
@@ -208,8 +210,8 @@ export default function SavingsGoalsScreen() {
           <Icon name="arrow-left" size={22} color={color.ink} />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
-          <Text style={styles.headerTitle}>Savings Goals</Text>
-          <Text style={styles.headerSub}>Track your financial dreams</Text>
+          <Text style={styles.headerTitle}>{localizeCopy("Savings Goals")}</Text>
+          <Text style={styles.headerSub}>{localizeCopy("Track your financial dreams")}</Text>
         </View>
         <TouchableOpacity onPress={openAdd} style={styles.addBtnHeader}>
           <Icon name="plus" size={18} color={color.cream} />
@@ -232,19 +234,19 @@ export default function SavingsGoalsScreen() {
                 <View style={styles.summaryCard}>
                   <View style={styles.summaryRow}>
                     <View style={styles.summaryItem}>
-                      <Text style={styles.summaryLabel}>Total Saved</Text>
+                      <Text style={styles.summaryLabel}>{localizeCopy("Total Saved")}</Text>
                       <Text style={[styles.summaryValue, { color: color.forest }]}>
                         {formatAmount(totalSaved)}
                       </Text>
                     </View>
                     <View style={styles.summaryDivider} />
                     <View style={styles.summaryItem}>
-                      <Text style={styles.summaryLabel}>Total Target</Text>
+                      <Text style={styles.summaryLabel}>{localizeCopy("Total Target")}</Text>
                       <Text style={styles.summaryValue}>{formatAmount(totalTarget)}</Text>
                     </View>
                     <View style={styles.summaryDivider} />
                     <View style={styles.summaryItem}>
-                      <Text style={styles.summaryLabel}>Progress</Text>
+                      <Text style={styles.summaryLabel}>{localizeCopy("Progress")}</Text>
                       <Text style={[styles.summaryValue, { color: color.gold }]}>{overallPct}%</Text>
                     </View>
                   </View>
@@ -254,8 +256,7 @@ export default function SavingsGoalsScreen() {
                   </View>
                   {completedGoals.length > 0 && (
                     <Text style={styles.completedCount}>
-                      {completedGoals.length} goal{completedGoals.length > 1 ? 's' : ''} achieved
-                    </Text>
+                      {completedGoals.length} {localizeCopy("goal")}{completedGoals.length > 1 ? 's' : ''} {localizeCopy("achieved")}</Text>
                   )}
                 </View>
               </AnimatedEntry>
@@ -265,7 +266,7 @@ export default function SavingsGoalsScreen() {
             {activeGoals.length === 0 && completedGoals.length === 0 ? (
               <EmptyState
                 emoji="🎯"
-                title="No savings goals yet"
+                title={localizeCopy("No savings goals yet")}
                 subtitle="Set a goal — dream car, vacation, emergency fund — and watch your savings grow!"
                 actionLabel="Create Your First Goal"
                 onAction={openAdd}
@@ -286,7 +287,7 @@ export default function SavingsGoalsScreen() {
                 {/* Completed Goals */}
                 {completedGoals.length > 0 && (
                   <>
-                    <Text style={styles.sectionTitle}>Achieved Goals</Text>
+                    <Text style={styles.sectionTitle}>{localizeCopy("Achieved Goals")}</Text>
                     {completedGoals.map((goal, i) => (
                       <AnimatedEntry key={goal.id} delay={80 + (activeGoals.length + i) * 60}>
                         <GoalCard
@@ -316,17 +317,17 @@ export default function SavingsGoalsScreen() {
             <ScrollView showsVerticalScrollIndicator={false} bounces={false} keyboardShouldPersistTaps="handled">
               <ErrorBanner message={formError} />
 
-              <Text style={styles.fieldLabel}>Goal Name</Text>
+              <Text style={styles.fieldLabel}>{localizeCopy("Goal Name")}</Text>
               <TextInput
                 style={styles.textInput}
                 value={goalName}
                 onChangeText={setGoalName}
-                placeholder="e.g., Dream Car, Emergency Fund"
+                placeholder={localizeCopy("e.g., Dream Car, Emergency Fund")}
                 placeholderTextColor={color.inkFaint}
                 selectionColor={color.forest}
               />
 
-              <Text style={styles.fieldLabel}>Target Amount</Text>
+              <Text style={styles.fieldLabel}>{localizeCopy("Target Amount")}</Text>
               <View style={styles.amountRow}>
                 <Text style={styles.rupee}>{locale.symbol}</Text>
                 <TextInput
@@ -340,7 +341,7 @@ export default function SavingsGoalsScreen() {
                 />
               </View>
 
-              <Text style={styles.fieldLabel}>Target Date (Optional)</Text>
+              <Text style={styles.fieldLabel}>{localizeCopy("Target Date (Optional)")}</Text>
               <TextInput
                 style={styles.textInput}
                 value={targetDate}
@@ -350,7 +351,7 @@ export default function SavingsGoalsScreen() {
                 selectionColor={color.forest}
               />
 
-              <Text style={styles.fieldLabel}>Icon</Text>
+              <Text style={styles.fieldLabel}>{localizeCopy("Icon")}</Text>
               <View style={styles.iconGrid}>
                 {GOAL_ICONS.map((item, i) => (
                   <TouchableOpacity
@@ -381,8 +382,7 @@ export default function SavingsGoalsScreen() {
             <Text style={styles.modalTitle}>Add to &quot;{contributeGoal?.name}&quot;</Text>
             {contributeGoal && (
               <Text style={styles.contributeStatus}>
-                {formatAmount(contributeGoal.currentAmount)} of {formatAmount(contributeGoal.targetAmount)} saved
-              </Text>
+                {formatAmount(contributeGoal.currentAmount)} {localizeCopy("of")}{formatAmount(contributeGoal.targetAmount)} {localizeCopy("saved")}</Text>
             )}
 
             <View style={[styles.amountRow, { marginTop: 16 }]}>
@@ -415,8 +415,7 @@ export default function SavingsGoalsScreen() {
             </View>
 
             <Button onPress={handleContribute} loading={contributing} fullWidth style={{ marginTop: 20 }}>
-              Add Savings
-            </Button>
+              {localizeCopy("Add Savings")}</Button>
           </View>
         </KeyboardAvoidingView>
       </Modal>
@@ -424,7 +423,7 @@ export default function SavingsGoalsScreen() {
       {/* Delete Confirmation */}
       <DeleteConfirmSheet
         visible={!!deleteTarget}
-        title="Delete Goal?"
+        title={localizeCopy("Delete Goal?")}
         message={`This will permanently remove "${deleteTarget?.name}" and its progress.`}
         onConfirm={handleDelete}
         onCancel={() => setDeleteTarget(null)}
@@ -446,6 +445,7 @@ function GoalCard({
   onDelete: () => void;
   completed?: boolean;
 }) {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const { formatAmount } = usePrivacy();
   const progressColor = completed
     ? color.forest
@@ -472,7 +472,7 @@ function GoalCard({
                 {daysLeft > 0 ? `${daysLeft} days left` : 'Past due'}
               </Text>
             )}
-            {completed && <Text style={[styles.goalMeta, { color: color.forest }]}>Achieved!</Text>}
+            {completed && <Text style={[styles.goalMeta, { color: color.forest }]}>{localizeCopy("Achieved!")}</Text>}
           </View>
         </View>
         {!completed && (
@@ -505,16 +505,15 @@ function GoalCard({
           <View>
             {goal.monthlyRequired > 0 && (
               <Text style={styles.goalMonthly}>
-                {formatAmount(goal.monthlyRequired)}/mo needed
-              </Text>
+                {formatAmount(goal.monthlyRequired)}{localizeCopy("/mo needed")}</Text>
             )}
             {goal.remainingAmount > 0 && (
-              <Text style={styles.goalRemaining}>{formatAmount(goal.remainingAmount)} to go</Text>
+              <Text style={styles.goalRemaining}>{formatAmount(goal.remainingAmount)} {localizeCopy("to go")}</Text>
             )}
           </View>
           <TouchableOpacity style={styles.contributeBtn} onPress={onContribute} activeOpacity={0.8}>
             <Icon name="plus" size={14} color={color.cream} />
-            <Text style={styles.contributeBtnText}>Add</Text>
+            <Text style={styles.contributeBtnText}>{localizeCopy("Add")}</Text>
           </TouchableOpacity>
         </View>
       )}

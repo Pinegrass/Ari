@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../i18n/LanguageContext';
 import React, { useCallback, useState } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert,
@@ -17,6 +18,7 @@ import type { MainStackParamList } from '../navigation/navigationTypes';
 type Nav = StackNavigationProp<MainStackParamList>;
 
 export default function GroupsListScreen() {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const navigation = useNavigation<Nav>();
   const haptics = useHaptics();
   const [groups, setGroups] = useState<GroupSummary[]>([]);
@@ -76,7 +78,7 @@ export default function GroupsListScreen() {
         <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={8}>
           <Icon name="arrow-left" size={22} color={color.ink} />
         </TouchableOpacity>
-        <Text style={styles.title}>Shared expenses</Text>
+        <Text style={styles.title}>{localizeCopy("Shared expenses")}</Text>
         <View style={{ width: 22 }} />
       </View>
 

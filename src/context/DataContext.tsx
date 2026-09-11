@@ -289,6 +289,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     try {
       const cacheOwner = user?.id ?? 'anonymous';
       const raw = await fetchWithCache(`nudge_${cacheOwner}`, () => tomoApi.getNudge());
+      if (!raw) { setNudge(null); return; }
       const data = normalizeNudge(raw);
       const dismissed = user
         ? await isNudgeRecentlyDismissed(user.id, data.id)

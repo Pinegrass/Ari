@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../i18n/LanguageContext';
 import React, { useState, useCallback } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, TextInput,
@@ -32,6 +33,7 @@ const NOTE_COLORS = [
 type Filter = 'all' | 'active' | 'done' | 'pinned';
 
 export default function TodoNotesScreen() {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const navigation = useNavigation();
   const haptics = useHaptics();
   const { locale } = useLocale();
@@ -457,7 +459,7 @@ export default function TodoNotesScreen() {
               />
 
               {/* Color */}
-              <Text style={[styles.fieldLabel, { marginTop: 14 }]}>Color</Text>
+              <Text style={[styles.fieldLabel, { marginTop: 14 }]}>{localizeCopy("Color")}</Text>
               <View style={styles.colorRow}>
                 {NOTE_COLORS.map((c) => (
                   <TouchableOpacity

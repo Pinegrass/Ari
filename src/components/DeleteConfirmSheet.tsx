@@ -1,3 +1,4 @@
+import {useLanguage as useCopyLanguage} from '../i18n/LanguageContext';
 import React from 'react';
 import {
   Modal,
@@ -31,6 +32,7 @@ export default function DeleteConfirmSheet({
   onCancel,
   loading,
 }: Props) {
+ const {phrase:localizeCopy}=useCopyLanguage();
   const insets = useSafeAreaInsets();
   return (
     <Modal
@@ -58,8 +60,7 @@ export default function DeleteConfirmSheet({
               disabled={loading}
               accessibilityLabel="Cancel deletion"
             >
-              Cancel
-            </Button>
+              {localizeCopy("Cancel")}</Button>
             <Button
               variant="danger"
               onPress={onConfirm}
