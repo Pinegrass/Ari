@@ -1,0 +1,25 @@
+import React from 'react';
+import {act,fireEvent,render,waitFor} from '@testing-library/react-native';
+import TrialCard from '../TrialCard';
+import {apiRequest} from '../../api/client';
+let mockFocus:()=>void|(()=>void);
+const mockRefresh=jest.fn().mockResolvedValue(undefined);
+jest.mock('@react-navigation/native',()=>({useFocusEffect:(callback:()=>void|(()=>void))=>{mockFocus=callback;require('react').useEffect(callback,[callback]);}}));
+jest.mock('../../api/client',()=>({apiRequest:jest.fn()}));
+jest.mock('../../context/AuthContext',()=>({useAuth:()=>({user:{id:1},refreshFromSession:mockRefresh})}));
+jest.mock('../../i18n/LanguageContext',()=>({useLanguage:()=>({t:(key:string)=>key})}));
+jest.mock('../../context/ThemeContext',()=>({useColors:()=>({ink:'#000',inkSoft:'#444',forest:'#060'})}));
+it('rechecks eligibility on return and activates the available trial',async()=>{
+ (apiRequest as jest.Mock).mockResolvedValueOnce({eligible:false,active:false});
+ const screen=render(<TrialCard/>);
+ await waitFor(()=>expect(screen.getByText('trialUnavailable')).toBeTruthy());
+ (apiRequest as jest.Mock).mockResolvedValueOnce({eligible:true,active:false});
+ await act(async()=>{mockFocus();});
+ await waitFor(()=>expect(screen.getByText('startTrial')).toBeTruthy());
+ const user={id:1,tier:'pro'};
+ (apiRequest as jest.Mock).mockResolvedValueOnce({eligible:false,active:true,endsAt:'2026-09-25',user});
+ fireEvent.press(screen.getByText('startTrial'));
+ await waitFor(()=>expect(screen.getByText(/trialActive/)).toBeTruthy());
+ expect(apiRequest).toHaveBeenLastCalledWith('/billing/trial',{method:'POST'});
+ expect(mockRefresh).toHaveBeenCalledWith(user);
+});

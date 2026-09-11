@@ -50,6 +50,7 @@ export interface LocalTxn {
   deleted: boolean;
   retryCount: number;
   lastError: string | null;
+  retryableFailure?: boolean;
   isRecurring?: boolean;
   recurrenceRule?: 'monthly' | 'weekly' | 'biweekly' | 'quarterly' | 'yearly';
   parentRecurringId?: string;
@@ -368,7 +369,7 @@ export const localStore = {
   },
 
   /** Mark a row failed (network/5xx — still retryable; 4xx surfaces it). */
-  async markFailed(id: string, error: string): Promise<void> {
+  async markFailed(id: string, error: string, retryable = false): Promise<void> {
     return withLock(async () => {
       const rows = await load();
       const r = rows.find((x) => x.id === id);
@@ -376,6 +377,7 @@ export const localStore = {
       r.syncStatus = 'failed';
       r.retryCount += 1;
       r.lastError = error;
+      r.retryableFailure = retryable;
       await persist(rows);
     });
   },

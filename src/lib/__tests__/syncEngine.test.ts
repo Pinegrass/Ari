@@ -268,7 +268,7 @@ describe('syncEngine.flushPending', () => {
     it('escalates a stuck row to Sentry once retries are exhausted', async () => {
       const rec = await localStore.create(input);
       for (let i = 0; i < 5; i++) await localStore.markFailed(rec.id, 'x'); // retryCount = 5
-      (txnApi.addTransaction as jest.Mock).mockRejectedValue(new Error('network'));
+      (txnApi.addTransaction as jest.Mock).mockRejectedValue(new ApiError(400, 'invalid'));
 
       await flushPending(); // 5 + 1 >= GIVE_UP_AFTER(6) → stuck
 
@@ -276,7 +276,7 @@ describe('syncEngine.flushPending', () => {
         expect.any(Error),
         expect.objectContaining({ area: 'sync', op: 'create' }),
       );
-      expect(track).toHaveBeenCalledWith('sync_stuck', { op: 'create', status: 0 });
+      expect(track).toHaveBeenCalledWith('sync_stuck', { op: 'create', status: 400 });
     });
   });
 });
@@ -346,4 +346,23 @@ describe('syncEngine.startAutoFlush', () => {
 
     expect(removeMock).toHaveBeenCalled();
   });
+});
+
+describe('offline retry recovery',()=>{
+ it.each([0,401,408,429,503])('keeps status %s retryable beyond six attempts',async(status)=>{
+  const rec=await localStore.create(input);
+  (txnApi.addTransaction as jest.Mock).mockRejectedValue(new ApiError(status,'temporary'));
+  for(let i=0;i<7;i++) await flushPending();
+  expect(captureError).not.toHaveBeenCalled();
+  (txnApi.addTransaction as jest.Mock).mockResolvedValue({id:rec.id,userId:'u1',updatedAt:'x'});
+  await flushPending();
+  expect(await localStore.getPending()).toHaveLength(0);
+ });
+ it('recovers a previously exhausted offline row after an app update',async()=>{
+  const rec=await localStore.create(input);
+  for(let i=0;i<6;i++) await localStore.markFailed(rec.id,'Network unavailable');
+  (txnApi.addTransaction as jest.Mock).mockResolvedValue({id:rec.id,userId:'u1',updatedAt:'x'});
+  await flushPending();
+  expect(await localStore.getPending()).toHaveLength(0);
+ });
 });

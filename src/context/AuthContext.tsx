@@ -208,7 +208,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         const cached = await readCachedUser();
-        if (cached && !cancelled) setUser(cached);
+        if (cached && !cancelled) {
+          setUser(cached);
+          // Cached data is usable offline; server validation must not block navigation.
+          setLoading(false);
+        }
 
         addBreadcrumb('auth', 'startup: validating cached session');
         try {

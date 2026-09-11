@@ -17,7 +17,7 @@
  * live flush racing this one) lands exactly once — no dedupe needed here.
  */
 import { AppState, type AppStateStatus } from 'react-native';
-import { localStore } from './localStore';
+import { localStore, type LocalTxn } from './localStore';
 import * as txnApi from '../api/transactions';
 import { ApiError } from '../api/client';
 import { addBreadcrumb, captureError } from '../config/sentry';
@@ -28,6 +28,13 @@ const SAFETY_INTERVAL_MS = 60_000;
 const BASE_BACKOFF_MS = 2_000;
 const MAX_BACKOFF_MS = 300_000; // 5 min ceiling
 const GIVE_UP_AFTER = 6; // stop auto-retrying a row that keeps failing (likely a 4xx)
+
+// Older installs did not persist the failure class. Recover their known
+// offline failures as well, without re-enabling exhausted validation errors.
+function exhausted(r: LocalTxn): boolean {
+  return r.syncStatus === 'failed' && r.retryCount >= GIVE_UP_AFTER
+    && !r.retryableFailure && r.lastError !== 'Network unavailable';
+}
 
 let flushing = false;
 
@@ -45,7 +52,7 @@ export async function flushPending(): Promise<{ changed: boolean }> {
     for (const r of pending) {
       // A row that has failed repeatedly is almost certainly a permanent
       // (4xx) error — stop hammering it; it stays visible as 'failed'.
-      if (r.syncStatus === 'failed' && r.retryCount >= GIVE_UP_AFTER) continue;
+      if (exhausted(r)) continue;
 
       try {
         if (r.op === 'delete') {
@@ -132,7 +139,8 @@ export async function flushPending(): Promise<{ changed: boolean }> {
       } catch (err) {
         const status = err instanceof ApiError ? err.status : 0;
         const msg = err instanceof Error ? err.message : 'sync failed';
-        await localStore.markFailed(r.id, msg);
+        const retryable = status === 0 || status >= 500 || [401, 408, 425, 429].includes(status);
+        await localStore.markFailed(r.id, msg, retryable);
         changed = true; // status flip is a change worth reflecting
 
         // Telemetry — make silent sync rot visible (B6). Every failure leaves a
@@ -140,7 +148,7 @@ export async function flushPending(): Promise<{ changed: boolean }> {
         // stuck write (usually a persistent 4xx) and is escalated to Sentry.
         addBreadcrumb('sync', `flush failed op=${r.op} status=${status}`, 'warning');
         track('sync_failed', { op: r.op, status });
-        if (r.retryCount + 1 >= GIVE_UP_AFTER) {
+        if (!retryable && r.retryCount + 1 >= GIVE_UP_AFTER) {
           captureError(new Error(`sync row stuck after ${GIVE_UP_AFTER} tries: ${msg}`), {
             area: 'sync',
             op: r.op,
@@ -149,7 +157,7 @@ export async function flushPending(): Promise<{ changed: boolean }> {
           track('sync_stuck', { op: r.op, status });
         }
 
-        if (status >= 400 && status < 500) {
+        if (!retryable && status >= 400 && status < 500) {
           // Validation error on this row — skip it, keep draining the rest.
           continue;
         }
@@ -188,7 +196,7 @@ export function startAutoFlush(onChange: () => void): () => void {
     // If work remains, schedule an exponential-backoff retry with jitter so a
     // fleet of clients reconnecting at once doesn't thunder the server.
     const remaining = (await localStore.getPending()).filter(
-      (r) => !(r.syncStatus === 'failed' && r.retryCount >= GIVE_UP_AFTER)
+      (r) => !exhausted(r)
     ).length;
 
     // Queue-depth telemetry (B6). Emit only on change so a healthy idle app
