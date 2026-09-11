@@ -1,0 +1,80 @@
+project: Ari
+updated_at: 2026-09-11
+active_branch: master
+head_commit: 0cae851a99322870b1115920baf0277d612c6e42
+last_verified_commit: 0cae851a99322870b1115920baf0277d612c6e42
+android_candidate_commit: 4b4ae8e0a5139e3cfb3b61d80d9e4124f6cdb15c
+backend_head: a4014a860d8f6efd17df26f5d1d27e3efb53f717
+web_head: 7d11e4f5d28a6defed8613a15123044a5c6e1663
+ios_candidate_commit: 5ee13d35c41142680a4cae3c062c9ae2f4279585
+ios_candidate_branch: codex/ari-release-ios-20260911
+active_task: ARI-ANDROID-PRODUCT-COMPLETION
+development_stage: release_candidate
+release_status: android_v59_building_v58_recovered_internal_update
+last_full_audit: 2026-09-04
+last_handoff: 2026-09-11
+verification: {mobile_tests: 490_pass, backend_tests: 232_pass, web_tests: 5_pass, lint: pass, typecheck: pass, web_build: pass, ios_workflow_config: pass}
+historical_release_verification_before_product_changes:
+  android_aab: verified_finished_v57_downloaded_validated
+  android_build_id: babe43bf-4a4f-4dc9-aacf-c9e31eb27841
+  android_runtime: 84cc28590bb0a1fffcf4a346d97bd40e18faac45
+  android_channel: internal-release
+  play_internal: verified_v57_draft4_saved_not_rolled_out
+  play_production: v57_release8_full_rollout_submitted_quick_checks_running_managed_publishing_off
+  play_previous_production: v51_halted_at_10_percent_to_enable_replacement
+  android_device: owner_keeps_phone_free_v55_unchanged_v57_retest_blocked
+  ios: build23_finished_testflight_1_3_0_build6_approved_aritester_internal
+  codemagic_build_id: 6aa40ac794b18d69f22eed8b
+  ios_ipa_sha256: 17961633fa88b9df0385eac6d7a8b1a7d790ebf991debaea53f931c001a81797
+  ios_runtime: 10ed459ae0b1c274c2365f51dfadc4f353286aae
+  ios_channel: internal-release
+  railway_health: verified_200
+  railway_running_revision: 1d5ba6bb8eb02da05fbbd910db36d7bbdc563bfe
+  railway_deployment: ad50abee-fa85-42ae-b7e7-f71e74eedb34
+  database: previously_verified_12_migrations_18_model_tables
+  scheduled_jobs: verified_latest_run_34581962910_success
+  razorpay: source_fixes_pass_test_secret_unavailable_checkout_unverified
+  revenuecat: server_key_valid_webhook_200_duplicate_dedup_play_credentials_valid
+  google_notifications: verified_delivery_2026_09_11_1338_utc
+  play_merchant: blocked_billdesk_verification_both_accounts_issue
+  store_catalog: play_and_ios_subscriptions_absent_rc_android_products_not_found
+  revenuecat_ios: app446098f465_created_existing_purchase_key_valid
+  apple_notifications: sandbox_test_delivery_success_production_test_401_unverified
+  android_association: verified_live_200_play_and_upload_fingerprints
+  apple_association: verified_live_200_team_47WKL6Q47D
+  public_rollout_this_session: owner_authorized_android_v57_submitted_not_yet_live
+known_blockers: [phone availability and v57 retest, physical iOS install, existing Razorpay Test secret and isolated checkout, BillDesk merchant verification, store product pricing and catalog, actual store purchase and restore, Apple production notification test]
+concurrent_product_work: shared_worktrees_dirty_do_not_deploy
+evidence: docs/release-blocker-resolution-2026-09-11.md
+important_paths: [src, supabase, backend, aritomo-web, docs]
+continuity_schema_version: 1
+product_programme:
+  checkpoint: 2026-09-11
+  status: phase3_backend_local_verified_full_programme_incomplete
+  evidence: docs/product-programme-2026-09/README.md
+  validation: docs/product-programme-2026-09/validation.md
+  phase2_evidence: docs/product-programme-2026-09/phase-2.md
+  phase3_evidence: docs/product-programme-2026-09/phase-3.md
+  phase3_checks: {backend_tests: 284_pass, scoped_ruff: pass, postgres_migrations: pass, postgres_worker_concurrency: pass, live_delivery: unverified}
+  checks: {mobile_tests: 500_pass, backend_tests: 272_pass, web_tests: 9_pass, web_build: pass, scoped_lint: pass, typecheck: pass, postgres_migrations: isolated_pass}
+  deployment: none_by_product_task
+  pending: [complete Hindi migration, native and staging QA, confirmed payday and obligations, outbox staging throughput and live receipts, ledger retention policy, analytics pipeline, owner commercial review]
+
+android_product_completion:
+  owner_priority: android_now_ios_later_codemagic
+  device_authorized: true
+  pricing: {monthly_inr: 149, yearly_inr: 1499, trial_days: 14, card_required: false}
+  candidate_commit: 0cae851a99322870b1115920baf0277d612c6e42
+  build_id: 4e6aea52-62cb-4c22-bac9-f09e8a2de5d2
+  version_code: 59
+  status: building
+  backend_release: a4014a860d8f6efd17df26f5d1d27e3efb53f717
+  backend_deployment: ef35a25b-a2d1-4a05-a972-3741b6f44f7f
+  checks: {mobile_tests: 506_pass, backend_tests: 299_pass, postgres: 66_pass, live_api: 29_pass, cleanup: verified}
+  database_migrations: applied_4_rls_verified
+  automatic_outbox: gated_off
+  merchant: billdesk_incomplete_google_catalog_permission_denied
+  evidence: docs/product-programme-2026-09/android-completion.md
+
+  recovery_update: 01a09179-e0af-7302-99fa-7c4ccd472c60
+  physical_smoke: v58_recovered_home_and_more_pass_further_qa_waiting_owner_ready

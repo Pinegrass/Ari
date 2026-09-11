@@ -1,14 +1,51 @@
 project: Ari
-updated_at: 2026-09-05
+updated_at: 2026-09-12
 active_branch: master
-head_commit: ac641b622586
-last_verified_commit: ac641b622586
-active_task: external cross-repository release verification
-development_stage: release_candidate
-release_status: local_gates_verified_external_release_unverified
-last_full_audit: 2026-09-04
-last_handoff: 2026-09-05
-verification: {lint: passed, typecheck: passed, tests: passed, build: passed}
-known_blockers: [Apple Railway Razorpay and deployment access]
+source_commit: e9d1cb4e6263b0760a2ca9d07646774f65658498
+last_verified_commit: e9d1cb4e6263b0760a2ca9d07646774f65658498
+backend_head: a4014a860d8f6efd17df26f5d1d27e3efb53f717
+web_head: 7d11e4f5d28a6defed8613a15123044a5c6e1663
+active_task: ARI-ANDROID-PRODUCT-COMPLETION
+development_stage: android_release_verification
+release_status: v61_device_verified_play_submission_permission_blocked
+verification: {mobile_tests: 516_pass, mobile_suites: 45_pass, backend_tests: 299_pass, postgres_feature_checks: 66_pass, live_api_checks: 29_pass, web_tests: 9_pass, lint: pass, typecheck: pass, web_build: pass}
+android:
+  candidate_commit: e9d1cb4e6263b0760a2ca9d07646774f65658498
+  candidate_branch: codex/ari-android-product-20260911
+  build_id: 51376781-e083-42f3-9724-8bd16cc006fd
+  version_code: 61
+  channel: internal-release
+  runtime: f82b9c561785202f8057920d7a8a052d15c1ed33
+  update_id: 01a091a7-599c-792a-8f93-d20073fa2834
+  update_group: d0a2b486-de7e-47c7-8629-c9eeb03110e2
+  phone: SM_M166P_API36
+  physical: v61_installed_session_home_more_embedded_identity_safe_area_pass
+  testing_constraint: final_phone_access_resolved
+  production_track: v57_completed_verified_api
+  internal_track: v57_draft_v5_completed_verified_api
+  new_distribution: samsung_direct_install_only
+  submission_id: 348b172e-aef5-49c1-bc11-0e59926a0cc9
+  submission_status: failed_missing_service_account_permission
+  emulator: flows_and_fresh_embedded_v61_pass_cleaned_stopped
+backend:
+  revision: a4014a860d8f6efd17df26f5d1d27e3efb53f717
+  deployment: ef35a25b-a2d1-4a05-a972-3741b6f44f7f
+  health: exact_revision_verified
+  additive_migrations: four_applied_rls_verified
+  outbox_scheduler: gated_off
+  provider_delivery: unverified
+  synthetic_accounts: deleted
+  local_postgres_container: stopped
+commercial:
+  approved: {monthly_inr: 149, yearly_inr: 1499, trial_days: 14, card_required: false}
+  trial: live_api_verified_after_first_entry_no_automatic_charge
+  billdesk: incomplete_owner_confirmed
+  play_catalog: metadata_permission_denied_no_products_created
+  release_access: temporary_edit_and_tracks_verified_discarded
+  paid_purchase_restore: blocked
+web_product: local_verified_not_deployed
+ios: deferred_by_owner_to_codemagic_or_later
+known_blockers: [Google Play submission permission, BillDesk verification, store catalog, real purchase and restore, actual push delivery and receipts, full Hindi native review]
+evidence: docs/product-programme-2026-09/android-completion.md
 important_paths: [src, supabase, backend, aritomo-web, docs]
 continuity_schema_version: 1

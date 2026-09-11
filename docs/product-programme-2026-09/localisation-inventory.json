@@ -1,0 +1,4799 @@
+{
+  "note": "Static JSX and UI-copy fields. Dynamic strings, server errors, provider-hosted UI and legal documents require separate review; this is not proof of complete translation.",
+  "rows": [
+    {
+      "file": "src/api/client.ts",
+      "line": 80,
+      "kind": "copy",
+      "text": "Network unavailable"
+    },
+    {
+      "file": "src/api/client.ts",
+      "line": 87,
+      "kind": "copy",
+      "text": "Invalid server response"
+    },
+    {
+      "file": "src/components/BalanceCard.tsx",
+      "line": 53,
+      "kind": "jsx",
+      "text": "Money out"
+    },
+    {
+      "file": "src/components/BalanceCard.tsx",
+      "line": 57,
+      "kind": "jsx",
+      "text": "Money in"
+    },
+    {
+      "file": "src/components/BalanceCard.tsx",
+      "line": 61,
+      "kind": "jsx",
+      "text": "Net today"
+    },
+    {
+      "file": "src/components/BudgetCard.tsx",
+      "line": 55,
+      "kind": "copy",
+      "text": "Edit budget"
+    },
+    {
+      "file": "src/components/BudgetCard.tsx",
+      "line": 63,
+      "kind": "copy",
+      "text": "Delete budget"
+    },
+    {
+      "file": "src/components/BudgetCard.tsx",
+      "line": 75,
+      "kind": "jsx",
+      "text": "% used"
+    },
+    {
+      "file": "src/components/CoachingBriefCard.tsx",
+      "line": 61,
+      "kind": "copy",
+      "text": "Weekly coaching brief"
+    },
+    {
+      "file": "src/components/CoachingBriefCard.tsx",
+      "line": 88,
+      "kind": "jsx",
+      "text": "Next steps"
+    },
+    {
+      "file": "src/components/ConfidenceConfirmSheet.tsx",
+      "line": 65,
+      "kind": "jsx",
+      "text": "Confirm this category?"
+    },
+    {
+      "file": "src/components/ConfidenceConfirmSheet.tsx",
+      "line": 67,
+      "kind": "jsx",
+      "text": "Our AI is"
+    },
+    {
+      "file": "src/components/ConfidenceConfirmSheet.tsx",
+      "line": 67,
+      "kind": "jsx",
+      "text": "% confident this is a"
+    },
+    {
+      "file": "src/components/ConfidenceConfirmSheet.tsx",
+      "line": 77,
+      "kind": "copy",
+      "text": "Edit manually"
+    },
+    {
+      "file": "src/components/ConfidenceConfirmSheet.tsx",
+      "line": 84,
+      "kind": "copy",
+      "text": "Confirm the AI's parse"
+    },
+    {
+      "file": "src/components/ConfidenceConfirmSheet.tsx",
+      "line": 86,
+      "kind": "jsx",
+      "text": "Confirm"
+    },
+    {
+      "file": "src/components/CountryPicker.tsx",
+      "line": 65,
+      "kind": "jsx",
+      "text": "Country"
+    },
+    {
+      "file": "src/components/CountryPicker.tsx",
+      "line": 99,
+      "kind": "jsx",
+      "text": "Select your country"
+    },
+    {
+      "file": "src/components/dashboard/CategoryBreakdown.tsx",
+      "line": 38,
+      "kind": "jsx",
+      "text": "Spending by category"
+    },
+    {
+      "file": "src/components/dashboard/CategoryBreakdown.tsx",
+      "line": 39,
+      "kind": "jsx",
+      "text": "Add expenses to see the breakdown."
+    },
+    {
+      "file": "src/components/dashboard/CategoryBreakdown.tsx",
+      "line": 46,
+      "kind": "jsx",
+      "text": "Spending by category"
+    },
+    {
+      "file": "src/components/dashboard/MonthSpendChart.tsx",
+      "line": 34,
+      "kind": "jsx",
+      "text": "Daily spending"
+    },
+    {
+      "file": "src/components/dashboard/MonthSpendChart.tsx",
+      "line": 43,
+      "kind": "jsx",
+      "text": "Daily spending"
+    },
+    {
+      "file": "src/components/dashboard/MonthSpendChart.tsx",
+      "line": 44,
+      "kind": "jsx",
+      "text": "No spending this month yet."
+    },
+    {
+      "file": "src/components/dashboard/MonthSpendChart.tsx",
+      "line": 53,
+      "kind": "jsx",
+      "text": "Daily spending"
+    },
+    {
+      "file": "src/components/dashboard/MonthSpendChart.tsx",
+      "line": 82,
+      "kind": "jsx",
+      "text": "Total"
+    },
+    {
+      "file": "src/components/dashboard/ThisMonthSummary.tsx",
+      "line": 37,
+      "kind": "jsx",
+      "text": "% saved"
+    },
+    {
+      "file": "src/components/dashboard/UpcomingBillsCard.tsx",
+      "line": 58,
+      "kind": "jsx",
+      "text": "Upcoming charges"
+    },
+    {
+      "file": "src/components/dashboard/UpcomingBillsCard.tsx",
+      "line": 70,
+      "kind": "copy",
+      "text": "Manage bills"
+    },
+    {
+      "file": "src/components/dashboard/UpcomingBillsCard.tsx",
+      "line": 72,
+      "kind": "jsx",
+      "text": "Manage"
+    },
+    {
+      "file": "src/components/DeleteConfirmSheet.tsx",
+      "line": 61,
+      "kind": "copy",
+      "text": "Cancel deletion"
+    },
+    {
+      "file": "src/components/DeleteConfirmSheet.tsx",
+      "line": 69,
+      "kind": "copy",
+      "text": "Confirm deletion"
+    },
+    {
+      "file": "src/components/EngagementCard.tsx",
+      "line": 44,
+      "kind": "jsx",
+      "text": "Your rhythm"
+    },
+    {
+      "file": "src/components/EngagementCard.tsx",
+      "line": 49,
+      "kind": "jsx",
+      "text": "day streak"
+    },
+    {
+      "file": "src/components/EngagementCard.tsx",
+      "line": 51,
+      "kind": "jsx",
+      "text": "entries logged"
+    },
+    {
+      "file": "src/components/EngagementCard.tsx",
+      "line": 54,
+      "kind": "jsx",
+      "text": "Next milestone"
+    },
+    {
+      "file": "src/components/ErrorBoundary.tsx",
+      "line": 42,
+      "kind": "jsx",
+      "text": "Something went wrong"
+    },
+    {
+      "file": "src/components/ErrorBoundary.tsx",
+      "line": 44,
+      "kind": "jsx",
+      "text": "Don&apos;t worry, your data is safe. The error has been reported and we&apos;ll fix it soon."
+    },
+    {
+      "file": "src/components/ErrorBoundary.tsx",
+      "line": 54,
+      "kind": "jsx",
+      "text": "Try Again"
+    },
+    {
+      "file": "src/components/GroupBalanceCard.tsx",
+      "line": 86,
+      "kind": "copy",
+      "text": "Open shared expenses"
+    },
+    {
+      "file": "src/components/GroupBalanceCard.tsx",
+      "line": 99,
+      "kind": "jsx",
+      "text": "Owed to you"
+    },
+    {
+      "file": "src/components/GroupBalanceCard.tsx",
+      "line": 107,
+      "kind": "jsx",
+      "text": "You owe"
+    },
+    {
+      "file": "src/components/GroupBalanceCard.tsx",
+      "line": 116,
+      "kind": "jsx",
+      "text": "Across"
+    },
+    {
+      "file": "src/components/GroupBalanceCard.tsx",
+      "line": 117,
+      "kind": "jsx",
+      "text": "• Tap to settle"
+    },
+    {
+      "file": "src/components/NudgeCard.tsx",
+      "line": 37,
+      "kind": "jsx",
+      "text": "Tomo noticed"
+    },
+    {
+      "file": "src/components/NudgeCard.tsx",
+      "line": 49,
+      "kind": "copy",
+      "text": "Hide this Tomo nudge for 24 hours"
+    },
+    {
+      "file": "src/components/NudgeCard.tsx",
+      "line": 51,
+      "kind": "jsx",
+      "text": "Not now"
+    },
+    {
+      "file": "src/components/QuickAddTemplates.tsx",
+      "line": 27,
+      "kind": "copy",
+      "text": "Swiggy"
+    },
+    {
+      "file": "src/components/QuickAddTemplates.tsx",
+      "line": 27,
+      "kind": "copy",
+      "text": "Swiggy order"
+    },
+    {
+      "file": "src/components/QuickAddTemplates.tsx",
+      "line": 28,
+      "kind": "copy",
+      "text": "Zomato"
+    },
+    {
+      "file": "src/components/QuickAddTemplates.tsx",
+      "line": 28,
+      "kind": "copy",
+      "text": "Zomato order"
+    },
+    {
+      "file": "src/components/QuickAddTemplates.tsx",
+      "line": 29,
+      "kind": "copy",
+      "text": "Uber"
+    },
+    {
+      "file": "src/components/QuickAddTemplates.tsx",
+      "line": 29,
+      "kind": "copy",
+      "text": "Uber ride"
+    },
+    {
+      "file": "src/components/QuickAddTemplates.tsx",
+      "line": 30,
+      "kind": "copy",
+      "text": "Ola"
+    },
+    {
+      "file": "src/components/QuickAddTemplates.tsx",
+      "line": 30,
+      "kind": "copy",
+      "text": "Ola ride"
+    },
+    {
+      "file": "src/components/QuickAddTemplates.tsx",
+      "line": 31,
+      "kind": "copy",
+      "text": "Petrol"
+    },
+    {
+      "file": "src/components/QuickAddTemplates.tsx",
+      "line": 31,
+      "kind": "copy",
+      "text": "Petrol"
+    },
+    {
+      "file": "src/components/QuickAddTemplates.tsx",
+      "line": 32,
+      "kind": "copy",
+      "text": "Groceries"
+    },
+    {
+      "file": "src/components/QuickAddTemplates.tsx",
+      "line": 32,
+      "kind": "copy",
+      "text": "Groceries"
+    },
+    {
+      "file": "src/components/QuickAddTemplates.tsx",
+      "line": 33,
+      "kind": "copy",
+      "text": "Rent"
+    },
+    {
+      "file": "src/components/QuickAddTemplates.tsx",
+      "line": 33,
+      "kind": "copy",
+      "text": "Monthly rent"
+    },
+    {
+      "file": "src/components/QuickAddTemplates.tsx",
+      "line": 34,
+      "kind": "copy",
+      "text": "Coffee"
+    },
+    {
+      "file": "src/components/QuickAddTemplates.tsx",
+      "line": 34,
+      "kind": "copy",
+      "text": "Coffee"
+    },
+    {
+      "file": "src/components/QuickAddTemplates.tsx",
+      "line": 35,
+      "kind": "copy",
+      "text": "Recharge"
+    },
+    {
+      "file": "src/components/QuickAddTemplates.tsx",
+      "line": 35,
+      "kind": "copy",
+      "text": "Mobile recharge"
+    },
+    {
+      "file": "src/components/QuickAddTemplates.tsx",
+      "line": 36,
+      "kind": "copy",
+      "text": "Salary"
+    },
+    {
+      "file": "src/components/QuickAddTemplates.tsx",
+      "line": 36,
+      "kind": "copy",
+      "text": "Monthly salary"
+    },
+    {
+      "file": "src/components/StreakChip.tsx",
+      "line": 81,
+      "kind": "jsx",
+      "text": "day"
+    },
+    {
+      "file": "src/components/TransactionItem.tsx",
+      "line": 80,
+      "kind": "copy",
+      "text": "Delete transaction"
+    },
+    {
+      "file": "src/components/trends/CategoryComparison.tsx",
+      "line": 30,
+      "kind": "jsx",
+      "text": "Top categories"
+    },
+    {
+      "file": "src/components/trends/CategoryComparison.tsx",
+      "line": 31,
+      "kind": "jsx",
+      "text": "No spending data yet."
+    },
+    {
+      "file": "src/components/trends/CategoryComparison.tsx",
+      "line": 38,
+      "kind": "jsx",
+      "text": "Top categories"
+    },
+    {
+      "file": "src/components/trends/TrendLineChart.tsx",
+      "line": 68,
+      "kind": "jsx",
+      "text": "Add transactions to see trends."
+    },
+    {
+      "file": "src/components/trends/UpcomingChargesSection.tsx",
+      "line": 49,
+      "kind": "jsx",
+      "text": "Upcoming charges"
+    },
+    {
+      "file": "src/components/trends/UpcomingChargesSection.tsx",
+      "line": 50,
+      "kind": "jsx",
+      "text": "· 30 days"
+    },
+    {
+      "file": "src/components/TypeToggle.tsx",
+      "line": 19,
+      "kind": "jsx",
+      "text": "💸 Expense"
+    },
+    {
+      "file": "src/components/TypeToggle.tsx",
+      "line": 28,
+      "kind": "jsx",
+      "text": "💰 Income"
+    },
+    {
+      "file": "src/components/ui/AnimatedFAB.tsx",
+      "line": 44,
+      "kind": "copy",
+      "text": "Add new transaction"
+    },
+    {
+      "file": "src/components/ui/Input.tsx",
+      "line": 47,
+      "kind": "copy",
+      "text": "Toggle password visibility"
+    },
+    {
+      "file": "src/components/UpiVpaEditor.tsx",
+      "line": 54,
+      "kind": "jsx",
+      "text": "UPI for settlements"
+    },
+    {
+      "file": "src/components/UpiVpaEditor.tsx",
+      "line": 60,
+      "kind": "jsx",
+      "text": "Your UPI VPA is used to compose deeplinks when other group members settle a balance owed to you. We never see your bank account number."
+    },
+    {
+      "file": "src/components/UpiVpaEditor.tsx",
+      "line": 67,
+      "kind": "jsx",
+      "text": "Your VPA"
+    },
+    {
+      "file": "src/components/UpiVpaEditor.tsx",
+      "line": 72,
+      "kind": "copy",
+      "text": "9876543210@ybl"
+    },
+    {
+      "file": "src/components/UpiVpaEditor.tsx",
+      "line": 80,
+      "kind": "jsx",
+      "text": "Examples:"
+    },
+    {
+      "file": "src/components/UpiVpaEditor.tsx",
+      "line": 80,
+      "kind": "jsx",
+      "text": "name@okhdfcbank"
+    },
+    {
+      "file": "src/components/UpiVpaEditor.tsx",
+      "line": 81,
+      "kind": "jsx",
+      "text": "9876543210@paytm"
+    },
+    {
+      "file": "src/components/UpiVpaEditor.tsx",
+      "line": 82,
+      "kind": "jsx",
+      "text": "name@ybl"
+    },
+    {
+      "file": "src/components/UpiVpaEditor.tsx",
+      "line": 93,
+      "kind": "jsx",
+      "text": "Clear my VPA"
+    },
+    {
+      "file": "src/constants/categories.ts",
+      "line": 11,
+      "kind": "copy",
+      "text": "Food"
+    },
+    {
+      "file": "src/constants/categories.ts",
+      "line": 12,
+      "kind": "copy",
+      "text": "Transport"
+    },
+    {
+      "file": "src/constants/categories.ts",
+      "line": 13,
+      "kind": "copy",
+      "text": "Shopping"
+    },
+    {
+      "file": "src/constants/categories.ts",
+      "line": 14,
+      "kind": "copy",
+      "text": "Fun"
+    },
+    {
+      "file": "src/constants/categories.ts",
+      "line": 15,
+      "kind": "copy",
+      "text": "Health"
+    },
+    {
+      "file": "src/constants/categories.ts",
+      "line": 16,
+      "kind": "copy",
+      "text": "Housing"
+    },
+    {
+      "file": "src/constants/categories.ts",
+      "line": 17,
+      "kind": "copy",
+      "text": "Education"
+    },
+    {
+      "file": "src/constants/categories.ts",
+      "line": 18,
+      "kind": "copy",
+      "text": "Savings"
+    },
+    {
+      "file": "src/constants/categories.ts",
+      "line": 19,
+      "kind": "copy",
+      "text": "Other"
+    },
+    {
+      "file": "src/constants/categories.ts",
+      "line": 23,
+      "kind": "copy",
+      "text": "Salary"
+    },
+    {
+      "file": "src/constants/categories.ts",
+      "line": 24,
+      "kind": "copy",
+      "text": "Freelance"
+    },
+    {
+      "file": "src/constants/categories.ts",
+      "line": 25,
+      "kind": "copy",
+      "text": "Returns"
+    },
+    {
+      "file": "src/constants/categories.ts",
+      "line": 26,
+      "kind": "copy",
+      "text": "Gift"
+    },
+    {
+      "file": "src/constants/categories.ts",
+      "line": 27,
+      "kind": "copy",
+      "text": "Other"
+    },
+    {
+      "file": "src/context/DataContext.tsx",
+      "line": 430,
+      "kind": "copy",
+      "text": "Couldn't save that entry. Please try again."
+    },
+    {
+      "file": "src/hooks/useNotifications.ts",
+      "line": 22,
+      "kind": "copy",
+      "text": "A quick money check-in? 🌿"
+    },
+    {
+      "file": "src/hooks/useNotifications.ts",
+      "line": 23,
+      "kind": "copy",
+      "text": "Want a two-minute review? 🧭"
+    },
+    {
+      "file": "src/hooks/useNotifications.ts",
+      "line": 24,
+      "kind": "copy",
+      "text": "Your plan is ready when you are"
+    },
+    {
+      "file": "src/hooks/useNotifications.ts",
+      "line": 25,
+      "kind": "copy",
+      "text": "A calm check-in from Tomo"
+    },
+    {
+      "file": "src/hooks/useNotifications.ts",
+      "line": 233,
+      "kind": "copy",
+      "text": "Tomo says hi! 🤖"
+    },
+    {
+      "file": "src/lib/otaUpdates.ts",
+      "line": 64,
+      "kind": "copy",
+      "text": "Checking for updates…"
+    },
+    {
+      "file": "src/lib/otaUpdates.ts",
+      "line": 70,
+      "kind": "copy",
+      "text": "Ari is up to date."
+    },
+    {
+      "file": "src/lib/otaUpdates.ts",
+      "line": 76,
+      "kind": "copy",
+      "text": "Downloading update…"
+    },
+    {
+      "file": "src/lib/otaUpdates.ts",
+      "line": 86,
+      "kind": "copy",
+      "text": "Update downloaded. It will apply the next time you close and reopen Ari."
+    },
+    {
+      "file": "src/lib/otaUpdates.ts",
+      "line": 91,
+      "kind": "copy",
+      "text": "Ari is up to date."
+    },
+    {
+      "file": "src/lib/otaUpdates.ts",
+      "line": 94,
+      "kind": "copy",
+      "text": "Could not check for updates right now."
+    },
+    {
+      "file": "src/lib/otaUpdates.ts",
+      "line": 108,
+      "kind": "copy",
+      "text": "Updates are not available in this build."
+    },
+    {
+      "file": "src/navigation/MainNavigator.tsx",
+      "line": 54,
+      "kind": "copy",
+      "text": "Add transaction"
+    },
+    {
+      "file": "src/navigation/MainNavigator.tsx",
+      "line": 80,
+      "kind": "copy",
+      "text": "Home"
+    },
+    {
+      "file": "src/navigation/MainNavigator.tsx",
+      "line": 81,
+      "kind": "copy",
+      "text": "Accountant"
+    },
+    {
+      "file": "src/navigation/MainNavigator.tsx",
+      "line": 82,
+      "kind": "copy",
+      "text": "Tomo"
+    },
+    {
+      "file": "src/navigation/MainNavigator.tsx",
+      "line": 83,
+      "kind": "copy",
+      "text": "More"
+    },
+    {
+      "file": "src/navigation/RootNavigator.tsx",
+      "line": 21,
+      "kind": "jsx",
+      "text": "Ari is Locked"
+    },
+    {
+      "file": "src/navigation/RootNavigator.tsx",
+      "line": 22,
+      "kind": "jsx",
+      "text": "Authenticate to continue"
+    },
+    {
+      "file": "src/navigation/RootNavigator.tsx",
+      "line": 24,
+      "kind": "jsx",
+      "text": "Unlock"
+    },
+    {
+      "file": "src/screens/AboutScreen.tsx",
+      "line": 61,
+      "kind": "jsx",
+      "text": "Ari"
+    },
+    {
+      "file": "src/screens/AboutScreen.tsx",
+      "line": 62,
+      "kind": "jsx",
+      "text": "Version"
+    },
+    {
+      "file": "src/screens/AboutScreen.tsx",
+      "line": 64,
+      "kind": "jsx",
+      "text": "Runtime:"
+    },
+    {
+      "file": "src/screens/AboutScreen.tsx",
+      "line": 66,
+      "kind": "jsx",
+      "text": "Channel:"
+    },
+    {
+      "file": "src/screens/AboutScreen.tsx",
+      "line": 67,
+      "kind": "jsx",
+      "text": "Bundle:"
+    },
+    {
+      "file": "src/screens/AboutScreen.tsx",
+      "line": 68,
+      "kind": "jsx",
+      "text": "Update:"
+    },
+    {
+      "file": "src/screens/AboutScreen.tsx",
+      "line": 69,
+      "kind": "jsx",
+      "text": "Your Money, Your Future"
+    },
+    {
+      "file": "src/screens/AboutScreen.tsx",
+      "line": 79,
+      "kind": "copy",
+      "text": "Check for updates"
+    },
+    {
+      "file": "src/screens/AboutScreen.tsx",
+      "line": 84,
+      "kind": "jsx",
+      "text": "Check for updates"
+    },
+    {
+      "file": "src/screens/AboutScreen.tsx",
+      "line": 94,
+      "kind": "jsx",
+      "text": "What is Ari?"
+    },
+    {
+      "file": "src/screens/AboutScreen.tsx",
+      "line": 96,
+      "kind": "jsx",
+      "text": "Ari is your personal finance companion built for India. Track expenses, set budgets, and get AI-powered insights from Tomo — your financial coach who understands the Indian context."
+    },
+    {
+      "file": "src/screens/AboutScreen.tsx",
+      "line": 105,
+      "kind": "jsx",
+      "text": "Meet Tomo"
+    },
+    {
+      "file": "src/screens/AboutScreen.tsx",
+      "line": 107,
+      "kind": "jsx",
+      "text": "Tomo is your AI finance coach. From SIP advice to spending analysis, Tomo helps you build better money habits with personalized tips and real-time insights."
+    },
+    {
+      "file": "src/screens/AboutScreen.tsx",
+      "line": 133,
+      "kind": "jsx",
+      "text": "Made with love in India"
+    },
+    {
+      "file": "src/screens/accountant/BudgetPlannerScreen.tsx",
+      "line": 259,
+      "kind": "copy",
+      "text": "Edit overall monthly budget"
+    },
+    {
+      "file": "src/screens/accountant/BudgetPlannerScreen.tsx",
+      "line": 263,
+      "kind": "jsx",
+      "text": "Overall monthly budget"
+    },
+    {
+      "file": "src/screens/accountant/BudgetPlannerScreen.tsx",
+      "line": 265,
+      "kind": "jsx",
+      "text": "of"
+    },
+    {
+      "file": "src/screens/accountant/BudgetPlannerScreen.tsx",
+      "line": 292,
+      "kind": "copy",
+      "text": "Set an overall monthly budget"
+    },
+    {
+      "file": "src/screens/accountant/BudgetPlannerScreen.tsx",
+      "line": 295,
+      "kind": "jsx",
+      "text": "Set an overall monthly budget"
+    },
+    {
+      "file": "src/screens/accountant/BudgetPlannerScreen.tsx",
+      "line": 306,
+      "kind": "jsx",
+      "text": "Budgeted"
+    },
+    {
+      "file": "src/screens/accountant/BudgetPlannerScreen.tsx",
+      "line": 311,
+      "kind": "jsx",
+      "text": "Spent"
+    },
+    {
+      "file": "src/screens/accountant/BudgetPlannerScreen.tsx",
+      "line": 318,
+      "kind": "jsx",
+      "text": "Remaining"
+    },
+    {
+      "file": "src/screens/accountant/BudgetPlannerScreen.tsx",
+      "line": 327,
+      "kind": "jsx",
+      "text": "Includes"
+    },
+    {
+      "file": "src/screens/accountant/BudgetPlannerScreen.tsx",
+      "line": 344,
+      "kind": "jsx",
+      "text": "over budget"
+    },
+    {
+      "file": "src/screens/accountant/BudgetPlannerScreen.tsx",
+      "line": 447,
+      "kind": "jsx",
+      "text": "Clear overall budget"
+    },
+    {
+      "file": "src/screens/accountant/BudgetPlannerScreen.tsx",
+      "line": 509,
+      "kind": "jsx",
+      "text": "spent"
+    },
+    {
+      "file": "src/screens/accountant/PnlReportScreen.tsx",
+      "line": 147,
+      "kind": "jsx",
+      "text": "Month-over-Month"
+    },
+    {
+      "file": "src/screens/accountant/PnlReportScreen.tsx",
+      "line": 151,
+      "kind": "copy",
+      "text": "Income"
+    },
+    {
+      "file": "src/screens/accountant/PnlReportScreen.tsx",
+      "line": 157,
+      "kind": "copy",
+      "text": "Expenses"
+    },
+    {
+      "file": "src/screens/accountant/PnlReportScreen.tsx",
+      "line": 238,
+      "kind": "jsx",
+      "text": "Expense Breakdown"
+    },
+    {
+      "file": "src/screens/accountant/PnlReportScreen.tsx",
+      "line": 267,
+      "kind": "jsx",
+      "text": "Income Sources"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 27,
+      "kind": "copy",
+      "text": "Home"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 28,
+      "kind": "copy",
+      "text": "Car"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 29,
+      "kind": "copy",
+      "text": "Business"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 30,
+      "kind": "copy",
+      "text": "Education"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 31,
+      "kind": "copy",
+      "text": "Wedding"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 32,
+      "kind": "copy",
+      "text": "Emergency"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 33,
+      "kind": "copy",
+      "text": "Vacation"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 34,
+      "kind": "copy",
+      "text": "Other"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 237,
+      "kind": "jsx",
+      "text": "Total Saved"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 244,
+      "kind": "jsx",
+      "text": "Total Target"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 249,
+      "kind": "jsx",
+      "text": "Progress"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 259,
+      "kind": "jsx",
+      "text": "goal"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 259,
+      "kind": "jsx",
+      "text": "achieved"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 270,
+      "kind": "copy",
+      "text": "No savings goals yet"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 291,
+      "kind": "jsx",
+      "text": "Achieved Goals"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 350,
+      "kind": "copy",
+      "text": "YYYY-MM-DD"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 383,
+      "kind": "jsx",
+      "text": "Add to &quot;"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 383,
+      "kind": "jsx",
+      "text": "&quot;"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 386,
+      "kind": "jsx",
+      "text": "of"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 386,
+      "kind": "jsx",
+      "text": "saved"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 510,
+      "kind": "jsx",
+      "text": "/mo needed"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 514,
+      "kind": "jsx",
+      "text": "to go"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 519,
+      "kind": "jsx",
+      "text": "Add"
+    },
+    {
+      "file": "src/screens/accountant/SmartLedgerScreen.tsx",
+      "line": 234,
+      "kind": "copy",
+      "text": "Search by name, category, tags..."
+    },
+    {
+      "file": "src/screens/accountant/SmartLedgerScreen.tsx",
+      "line": 266,
+      "kind": "jsx",
+      "text": "Recurring"
+    },
+    {
+      "file": "src/screens/accountant/SmartLedgerScreen.tsx",
+      "line": 276,
+      "kind": "copy",
+      "text": "Manage recurring payments"
+    },
+    {
+      "file": "src/screens/accountant/SmartLedgerScreen.tsx",
+      "line": 278,
+      "kind": "jsx",
+      "text": "Manage →"
+    },
+    {
+      "file": "src/screens/accountant/SmartLedgerScreen.tsx",
+      "line": 298,
+      "kind": "jsx",
+      "text": "All Categories"
+    },
+    {
+      "file": "src/screens/accountant/TaxEstimatorScreen.tsx",
+      "line": 151,
+      "kind": "jsx",
+      "text": "Tax Regime"
+    },
+    {
+      "file": "src/screens/accountant/TaxEstimatorScreen.tsx",
+      "line": 156,
+      "kind": "jsx",
+      "text": "Best"
+    },
+    {
+      "file": "src/screens/accountant/TaxEstimatorScreen.tsx",
+      "line": 168,
+      "kind": "jsx",
+      "text": "Total Tax"
+    },
+    {
+      "file": "src/screens/accountant/TaxEstimatorScreen.tsx",
+      "line": 170,
+      "kind": "jsx",
+      "text": "Monthly"
+    },
+    {
+      "file": "src/screens/accountant/TaxEstimatorScreen.tsx",
+      "line": 172,
+      "kind": "jsx",
+      "text": "Rate"
+    },
+    {
+      "file": "src/screens/accountant/TaxEstimatorScreen.tsx",
+      "line": 180,
+      "kind": "jsx",
+      "text": "Deductions"
+    },
+    {
+      "file": "src/screens/accountant/TaxEstimatorScreen.tsx",
+      "line": 181,
+      "kind": "jsx",
+      "text": "Tax"
+    },
+    {
+      "file": "src/screens/accountant/TaxEstimatorScreen.tsx",
+      "line": 182,
+      "kind": "jsx",
+      "text": "Take Home"
+    },
+    {
+      "file": "src/screens/accountant/TaxEstimatorScreen.tsx",
+      "line": 191,
+      "kind": "jsx",
+      "text": "Regime Comparison"
+    },
+    {
+      "file": "src/screens/accountant/TaxEstimatorScreen.tsx",
+      "line": 193,
+      "kind": "jsx",
+      "text": "Old Regime"
+    },
+    {
+      "file": "src/screens/accountant/TaxEstimatorScreen.tsx",
+      "line": 193,
+      "kind": "jsx",
+      "text": "% rate"
+    },
+    {
+      "file": "src/screens/accountant/TaxEstimatorScreen.tsx",
+      "line": 194,
+      "kind": "jsx",
+      "text": "VS"
+    },
+    {
+      "file": "src/screens/accountant/TaxEstimatorScreen.tsx",
+      "line": 195,
+      "kind": "jsx",
+      "text": "New Regime"
+    },
+    {
+      "file": "src/screens/accountant/TaxEstimatorScreen.tsx",
+      "line": 195,
+      "kind": "jsx",
+      "text": "% rate"
+    },
+    {
+      "file": "src/screens/accountant/TaxEstimatorScreen.tsx",
+      "line": 198,
+      "kind": "jsx",
+      "text": "You save"
+    },
+    {
+      "file": "src/screens/accountant/TaxEstimatorScreen.tsx",
+      "line": 198,
+      "kind": "jsx",
+      "text": "/year with"
+    },
+    {
+      "file": "src/screens/accountant/TaxEstimatorScreen.tsx",
+      "line": 198,
+      "kind": "jsx",
+      "text": "Regime"
+    },
+    {
+      "file": "src/screens/accountant/TaxEstimatorScreen.tsx",
+      "line": 215,
+      "kind": "copy",
+      "text": "HRA Received (Annual)"
+    },
+    {
+      "file": "src/screens/accountant/TaxEstimatorScreen.tsx",
+      "line": 215,
+      "kind": "copy",
+      "text": "Rent Paid (Annual)"
+    },
+    {
+      "file": "src/screens/AccountantScreen.tsx",
+      "line": 38,
+      "kind": "copy",
+      "text": "Trends & Insights"
+    },
+    {
+      "file": "src/screens/AccountantScreen.tsx",
+      "line": 39,
+      "kind": "copy",
+      "text": "Spending patterns, categories and recent activity"
+    },
+    {
+      "file": "src/screens/AccountantScreen.tsx",
+      "line": 45,
+      "kind": "copy",
+      "text": "Smart Ledger"
+    },
+    {
+      "file": "src/screens/AccountantScreen.tsx",
+      "line": 46,
+      "kind": "copy",
+      "text": "Recurring entries, tags & multi-source income"
+    },
+    {
+      "file": "src/screens/AccountantScreen.tsx",
+      "line": 52,
+      "kind": "copy",
+      "text": "Budget Planner"
+    },
+    {
+      "file": "src/screens/AccountantScreen.tsx",
+      "line": 53,
+      "kind": "copy",
+      "text": "Monthly targets with rollover tracking"
+    },
+    {
+      "file": "src/screens/AccountantScreen.tsx",
+      "line": 59,
+      "kind": "copy",
+      "text": "Bills & reminders"
+    },
+    {
+      "file": "src/screens/AccountantScreen.tsx",
+      "line": 60,
+      "kind": "copy",
+      "text": "Rent, EMI & bill due-date reminders"
+    },
+    {
+      "file": "src/screens/AccountantScreen.tsx",
+      "line": 66,
+      "kind": "copy",
+      "text": "Savings Goals"
+    },
+    {
+      "file": "src/screens/AccountantScreen.tsx",
+      "line": 67,
+      "kind": "copy",
+      "text": "Track goals & contributions"
+    },
+    {
+      "file": "src/screens/AccountantScreen.tsx",
+      "line": 73,
+      "kind": "copy",
+      "text": "Tax Estimator"
+    },
+    {
+      "file": "src/screens/AccountantScreen.tsx",
+      "line": 74,
+      "kind": "copy",
+      "text": "Old vs New regime, 80C/80D, HRA, GST"
+    },
+    {
+      "file": "src/screens/AccountantScreen.tsx",
+      "line": 83,
+      "kind": "copy",
+      "text": "Daily to yearly reviews"
+    },
+    {
+      "file": "src/screens/AccountantScreen.tsx",
+      "line": 84,
+      "kind": "copy",
+      "text": "Visual reports for every money rhythm"
+    },
+    {
+      "file": "src/screens/AccountantScreen.tsx",
+      "line": 90,
+      "kind": "copy",
+      "text": "P&L Reports"
+    },
+    {
+      "file": "src/screens/AccountantScreen.tsx",
+      "line": 91,
+      "kind": "copy",
+      "text": "Income vs expense trends & insights"
+    },
+    {
+      "file": "src/screens/AccountantScreen.tsx",
+      "line": 97,
+      "kind": "copy",
+      "text": "Daily Heatmap"
+    },
+    {
+      "file": "src/screens/AccountantScreen.tsx",
+      "line": 98,
+      "kind": "copy",
+      "text": "Which days of the month you spend the most"
+    },
+    {
+      "file": "src/screens/AccountantScreen.tsx",
+      "line": 104,
+      "kind": "copy",
+      "text": "Shared Expenses"
+    },
+    {
+      "file": "src/screens/AccountantScreen.tsx",
+      "line": 105,
+      "kind": "copy",
+      "text": "Split with friends, settle via UPI"
+    },
+    {
+      "file": "src/screens/AccountantScreen.tsx",
+      "line": 111,
+      "kind": "copy",
+      "text": "To-do Notes"
+    },
+    {
+      "file": "src/screens/AccountantScreen.tsx",
+      "line": 112,
+      "kind": "copy",
+      "text": "Track financial tasks and due dates"
+    },
+    {
+      "file": "src/screens/AddSharedExpenseScreen.tsx",
+      "line": 125,
+      "kind": "jsx",
+      "text": "Add to"
+    },
+    {
+      "file": "src/screens/AddSharedExpenseScreen.tsx",
+      "line": 145,
+      "kind": "jsx",
+      "text": "What was it for?"
+    },
+    {
+      "file": "src/screens/AddSharedExpenseScreen.tsx",
+      "line": 150,
+      "kind": "copy",
+      "text": "Hotel, dinner, cab…"
+    },
+    {
+      "file": "src/screens/AddSharedExpenseScreen.tsx",
+      "line": 154,
+      "kind": "jsx",
+      "text": "Split equally between"
+    },
+    {
+      "file": "src/screens/AddTransactionScreen.tsx",
+      "line": 440,
+      "kind": "copy",
+      "text": "Date"
+    },
+    {
+      "file": "src/screens/AddTransactionScreen.tsx",
+      "line": 458,
+      "kind": "copy",
+      "text": "Repeat this transaction"
+    },
+    {
+      "file": "src/screens/BillsScreen.tsx",
+      "line": 46,
+      "kind": "copy",
+      "text": "Rent/EMI"
+    },
+    {
+      "file": "src/screens/BillsScreen.tsx",
+      "line": 47,
+      "kind": "copy",
+      "text": "Insurance"
+    },
+    {
+      "file": "src/screens/BillsScreen.tsx",
+      "line": 48,
+      "kind": "copy",
+      "text": "Subscriptions"
+    },
+    {
+      "file": "src/screens/BillsScreen.tsx",
+      "line": 49,
+      "kind": "copy",
+      "text": "Fees"
+    },
+    {
+      "file": "src/screens/BillsScreen.tsx",
+      "line": 50,
+      "kind": "copy",
+      "text": "Transport"
+    },
+    {
+      "file": "src/screens/BillsScreen.tsx",
+      "line": 51,
+      "kind": "copy",
+      "text": "Other"
+    },
+    {
+      "file": "src/screens/BillsScreen.tsx",
+      "line": 236,
+      "kind": "jsx",
+      "text": "· due"
+    },
+    {
+      "file": "src/screens/DailyHeatmapScreen.tsx",
+      "line": 105,
+      "kind": "jsx",
+      "text": "Daily heatmap"
+    },
+    {
+      "file": "src/screens/DailyHeatmapScreen.tsx",
+      "line": 140,
+      "kind": "jsx",
+      "text": "Current streak"
+    },
+    {
+      "file": "src/screens/DailyHeatmapScreen.tsx",
+      "line": 144,
+      "kind": "jsx",
+      "text": "Longest streak"
+    },
+    {
+      "file": "src/screens/DailyHeatmapScreen.tsx",
+      "line": 162,
+      "kind": "jsx",
+      "text": "Month total"
+    },
+    {
+      "file": "src/screens/DailyHeatmapScreen.tsx",
+      "line": 166,
+      "kind": "jsx",
+      "text": "Heaviest day"
+    },
+    {
+      "file": "src/screens/DailyHeatmapScreen.tsx",
+      "line": 218,
+      "kind": "jsx",
+      "text": "Couldn&apos;t load heatmap."
+    },
+    {
+      "file": "src/screens/DashboardScreen.tsx",
+      "line": 216,
+      "kind": "copy",
+      "text": "Add an entry"
+    },
+    {
+      "file": "src/screens/DashboardScreen.tsx",
+      "line": 221,
+      "kind": "jsx",
+      "text": "Add an entry"
+    },
+    {
+      "file": "src/screens/DashboardScreen.tsx",
+      "line": 264,
+      "kind": "jsx",
+      "text": "Recent"
+    },
+    {
+      "file": "src/screens/DashboardScreen.tsx",
+      "line": 267,
+      "kind": "copy",
+      "text": "See all transactions"
+    },
+    {
+      "file": "src/screens/DashboardScreen.tsx",
+      "line": 270,
+      "kind": "jsx",
+      "text": "See all"
+    },
+    {
+      "file": "src/screens/DashboardScreen.tsx",
+      "line": 279,
+      "kind": "copy",
+      "text": "No entries yet"
+    },
+    {
+      "file": "src/screens/ExportScreen.tsx",
+      "line": 140,
+      "kind": "jsx",
+      "text": "Export as CSV"
+    },
+    {
+      "file": "src/screens/ExportScreen.tsx",
+      "line": 142,
+      "kind": "jsx",
+      "text": "Save spreadsheet-ready transaction data or a 12-month P&L report."
+    },
+    {
+      "file": "src/screens/ExportScreen.tsx",
+      "line": 145,
+      "kind": "jsx",
+      "text": "transaction"
+    },
+    {
+      "file": "src/screens/ExportScreen.tsx",
+      "line": 145,
+      "kind": "jsx",
+      "text": "available"
+    },
+    {
+      "file": "src/screens/ExportScreen.tsx",
+      "line": 151,
+      "kind": "copy",
+      "text": "Export transactions as CSV"
+    },
+    {
+      "file": "src/screens/ExportScreen.tsx",
+      "line": 152,
+      "kind": "jsx",
+      "text": "Export Transactions (CSV)"
+    },
+    {
+      "file": "src/screens/ExportScreen.tsx",
+      "line": 157,
+      "kind": "copy",
+      "text": "Export profit and loss report as CSV"
+    },
+    {
+      "file": "src/screens/ExportScreen.tsx",
+      "line": 158,
+      "kind": "jsx",
+      "text": "Export P&L Report (CSV)"
+    },
+    {
+      "file": "src/screens/ExportScreen.tsx",
+      "line": 165,
+      "kind": "jsx",
+      "text": "Full Account Export"
+    },
+    {
+      "file": "src/screens/ExportScreen.tsx",
+      "line": 167,
+      "kind": "jsx",
+      "text": "Everything we hold about you — profile, transactions, budgets, goals, tax profile, and notes — as one JSON file. This is the data-portability export from our privacy policy."
+    },
+    {
+      "file": "src/screens/ExportScreen.tsx",
+      "line": 175,
+      "kind": "copy",
+      "text": "Export full account data"
+    },
+    {
+      "file": "src/screens/ExportScreen.tsx",
+      "line": 176,
+      "kind": "jsx",
+      "text": "Export Everything (JSON)"
+    },
+    {
+      "file": "src/screens/ExportScreen.tsx",
+      "line": 183,
+      "kind": "jsx",
+      "text": "Your data stays on your device. We never sell or share your financial information."
+    },
+    {
+      "file": "src/screens/GroupDetailScreen.tsx",
+      "line": 68,
+      "kind": "copy",
+      "text": "Ari group invite"
+    },
+    {
+      "file": "src/screens/GroupDetailScreen.tsx",
+      "line": 244,
+      "kind": "jsx",
+      "text": "Your net balance"
+    },
+    {
+      "file": "src/screens/GroupDetailScreen.tsx",
+      "line": 256,
+      "kind": "jsx",
+      "text": "You owe"
+    },
+    {
+      "file": "src/screens/GroupDetailScreen.tsx",
+      "line": 281,
+      "kind": "jsx",
+      "text": "Owed to you"
+    },
+    {
+      "file": "src/screens/GroupDetailScreen.tsx",
+      "line": 298,
+      "kind": "jsx",
+      "text": "Add shared expense"
+    },
+    {
+      "file": "src/screens/GroupDetailScreen.tsx",
+      "line": 302,
+      "kind": "jsx",
+      "text": "Recent expenses"
+    },
+    {
+      "file": "src/screens/GroupDetailScreen.tsx",
+      "line": 304,
+      "kind": "jsx",
+      "text": "No shared expenses yet."
+    },
+    {
+      "file": "src/screens/GroupDetailScreen.tsx",
+      "line": 317,
+      "kind": "jsx",
+      "text": "paid •"
+    },
+    {
+      "file": "src/screens/GroupDetailScreen.tsx",
+      "line": 326,
+      "kind": "jsx",
+      "text": "You owe"
+    },
+    {
+      "file": "src/screens/GroupsListScreen.tsx",
+      "line": 93,
+      "kind": "jsx",
+      "text": "Create group"
+    },
+    {
+      "file": "src/screens/GroupsListScreen.tsx",
+      "line": 101,
+      "kind": "jsx",
+      "text": "Join by code"
+    },
+    {
+      "file": "src/screens/GroupsListScreen.tsx",
+      "line": 107,
+      "kind": "jsx",
+      "text": "Group name"
+    },
+    {
+      "file": "src/screens/GroupsListScreen.tsx",
+      "line": 110,
+      "kind": "copy",
+      "text": "Trip to Goa"
+    },
+    {
+      "file": "src/screens/GroupsListScreen.tsx",
+      "line": 116,
+      "kind": "jsx",
+      "text": "Create"
+    },
+    {
+      "file": "src/screens/GroupsListScreen.tsx",
+      "line": 122,
+      "kind": "jsx",
+      "text": "Invite code"
+    },
+    {
+      "file": "src/screens/GroupsListScreen.tsx",
+      "line": 125,
+      "kind": "copy",
+      "text": "XXXXXXXX"
+    },
+    {
+      "file": "src/screens/GroupsListScreen.tsx",
+      "line": 134,
+      "kind": "jsx",
+      "text": "Join"
+    },
+    {
+      "file": "src/screens/GroupsListScreen.tsx",
+      "line": 144,
+      "kind": "copy",
+      "text": "No groups yet"
+    },
+    {
+      "file": "src/screens/HelpSupportScreen.tsx",
+      "line": 119,
+      "kind": "jsx",
+      "text": "How can we help?"
+    },
+    {
+      "file": "src/screens/HelpSupportScreen.tsx",
+      "line": 121,
+      "kind": "jsx",
+      "text": "Browse the FAQs below or get in touch — we read every message."
+    },
+    {
+      "file": "src/screens/HelpSupportScreen.tsx",
+      "line": 133,
+      "kind": "copy",
+      "text": "Email support"
+    },
+    {
+      "file": "src/screens/HelpSupportScreen.tsx",
+      "line": 137,
+      "kind": "jsx",
+      "text": "Email Us"
+    },
+    {
+      "file": "src/screens/HelpSupportScreen.tsx",
+      "line": 144,
+      "kind": "copy",
+      "text": "Visit website"
+    },
+    {
+      "file": "src/screens/HelpSupportScreen.tsx",
+      "line": 148,
+      "kind": "jsx",
+      "text": "Website"
+    },
+    {
+      "file": "src/screens/HelpSupportScreen.tsx",
+      "line": 149,
+      "kind": "jsx",
+      "text": "aritomo.in"
+    },
+    {
+      "file": "src/screens/HelpSupportScreen.tsx",
+      "line": 156,
+      "kind": "jsx",
+      "text": "Frequently Asked"
+    },
+    {
+      "file": "src/screens/HelpSupportScreen.tsx",
+      "line": 190,
+      "kind": "jsx",
+      "text": "Still stuck? Email us — we usually reply within a day."
+    },
+    {
+      "file": "src/screens/InviteFriendsScreen.tsx",
+      "line": 36,
+      "kind": "copy",
+      "text": "Try Ari with me"
+    },
+    {
+      "file": "src/screens/InviteFriendsScreen.tsx",
+      "line": 70,
+      "kind": "jsx",
+      "text": "Grow your circle"
+    },
+    {
+      "file": "src/screens/InviteFriendsScreen.tsx",
+      "line": 70,
+      "kind": "jsx",
+      "text": "Invite people without pressure or spam"
+    },
+    {
+      "file": "src/screens/InviteFriendsScreen.tsx",
+      "line": 77,
+      "kind": "jsx",
+      "text": "Money habits are easier together"
+    },
+    {
+      "file": "src/screens/InviteFriendsScreen.tsx",
+      "line": 78,
+      "kind": "jsx",
+      "text": "Share Ari when it feels useful. Your friend chooses whether to join and apply your code."
+    },
+    {
+      "file": "src/screens/InviteFriendsScreen.tsx",
+      "line": 79,
+      "kind": "jsx",
+      "text": "Your invite code"
+    },
+    {
+      "file": "src/screens/InviteFriendsScreen.tsx",
+      "line": 81,
+      "kind": "jsx",
+      "text": "Invite a friend"
+    },
+    {
+      "file": "src/screens/InviteFriendsScreen.tsx",
+      "line": 86,
+      "kind": "jsx",
+      "text": "Circle progress"
+    },
+    {
+      "file": "src/screens/InviteFriendsScreen.tsx",
+      "line": 89,
+      "kind": "jsx",
+      "text": "joined"
+    },
+    {
+      "file": "src/screens/InviteFriendsScreen.tsx",
+      "line": 91,
+      "kind": "jsx",
+      "text": "shares"
+    },
+    {
+      "file": "src/screens/InviteFriendsScreen.tsx",
+      "line": 93,
+      "kind": "jsx",
+      "text": "circle badge"
+    },
+    {
+      "file": "src/screens/InviteFriendsScreen.tsx",
+      "line": 95,
+      "kind": "jsx",
+      "text": "more accepted"
+    },
+    {
+      "file": "src/screens/InviteFriendsScreen.tsx",
+      "line": 95,
+      "kind": "jsx",
+      "text": "to reach the next circle milestone."
+    },
+    {
+      "file": "src/screens/InviteFriendsScreen.tsx",
+      "line": 99,
+      "kind": "jsx",
+      "text": "Were you invited?"
+    },
+    {
+      "file": "src/screens/InviteFriendsScreen.tsx",
+      "line": 100,
+      "kind": "jsx",
+      "text": "Apply a friend’s code once. It credits the welcome; it never exposes your financial data."
+    },
+    {
+      "file": "src/screens/InviteFriendsScreen.tsx",
+      "line": 102,
+      "kind": "copy",
+      "text": "ARI123ABC"
+    },
+    {
+      "file": "src/screens/InviteFriendsScreen.tsx",
+      "line": 102,
+      "kind": "copy",
+      "text": "Invite code"
+    },
+    {
+      "file": "src/screens/InviteFriendsScreen.tsx",
+      "line": 104,
+      "kind": "jsx",
+      "text": "Apply"
+    },
+    {
+      "file": "src/screens/LinkBankConsentDetailScreen.tsx",
+      "line": 82,
+      "kind": "copy",
+      "text": "Couldn't load this bank link"
+    },
+    {
+      "file": "src/screens/LinkBankConsentDetailScreen.tsx",
+      "line": 109,
+      "kind": "jsx",
+      "text": "Linked accounts"
+    },
+    {
+      "file": "src/screens/LinkBankConsentDetailScreen.tsx",
+      "line": 120,
+      "kind": "jsx",
+      "text": "Status:"
+    },
+    {
+      "file": "src/screens/LinkBankConsentDetailScreen.tsx",
+      "line": 123,
+      "kind": "jsx",
+      "text": "Accounts:"
+    },
+    {
+      "file": "src/screens/LinkBankConsentDetailScreen.tsx",
+      "line": 133,
+      "kind": "copy",
+      "text": "Sync latest transactions"
+    },
+    {
+      "file": "src/screens/LinkBankConsentDetailScreen.tsx",
+      "line": 135,
+      "kind": "jsx",
+      "text": "Sync latest transactions"
+    },
+    {
+      "file": "src/screens/LinkBankConsentScreen.tsx",
+      "line": 35,
+      "kind": "copy",
+      "text": "Savings / current account"
+    },
+    {
+      "file": "src/screens/LinkBankConsentScreen.tsx",
+      "line": 36,
+      "kind": "copy",
+      "text": "Fixed deposit"
+    },
+    {
+      "file": "src/screens/LinkBankConsentScreen.tsx",
+      "line": 37,
+      "kind": "copy",
+      "text": "Recurring deposit"
+    },
+    {
+      "file": "src/screens/LinkBankConsentScreen.tsx",
+      "line": 38,
+      "kind": "copy",
+      "text": "Credit card"
+    },
+    {
+      "file": "src/screens/LinkBankConsentScreen.tsx",
+      "line": 142,
+      "kind": "jsx",
+      "text": "Approve the consent on your bank’s page, then come back here."
+    },
+    {
+      "file": "src/screens/LinkBankConsentScreen.tsx",
+      "line": 170,
+      "kind": "jsx",
+      "text": "Link bank"
+    },
+    {
+      "file": "src/screens/LinkBankConsentScreen.tsx",
+      "line": 173,
+      "kind": "jsx",
+      "text": "Approve bank access"
+    },
+    {
+      "file": "src/screens/LinkBankConsentScreen.tsx",
+      "line": 175,
+      "kind": "jsx",
+      "text": "Ari uses Setu (an RBI-licensed Account Aggregator) to read your statements read-only. You approve the exact accounts and can revoke access any time."
+    },
+    {
+      "file": "src/screens/LinkBankConsentScreen.tsx",
+      "line": 180,
+      "kind": "copy",
+      "text": "Bank ID (AA VUA)"
+    },
+    {
+      "file": "src/screens/LinkBankConsentScreen.tsx",
+      "line": 186,
+      "kind": "copy",
+      "text": "9876543210@onemoney"
+    },
+    {
+      "file": "src/screens/LinkBankConsentScreen.tsx",
+      "line": 190,
+      "kind": "jsx",
+      "text": "Accounts to include"
+    },
+    {
+      "file": "src/screens/LinkBankConsentScreen.tsx",
+      "line": 219,
+      "kind": "copy",
+      "text": "Continue to bank approval"
+    },
+    {
+      "file": "src/screens/LinkBankConsentScreen.tsx",
+      "line": 222,
+      "kind": "jsx",
+      "text": "Continue to bank approval"
+    },
+    {
+      "file": "src/screens/LinkBankConsentScreen.tsx",
+      "line": 226,
+      "kind": "jsx",
+      "text": "Consent is valid for one year and can be revoked from Settings at any time. Ari never sees your bank login or password."
+    },
+    {
+      "file": "src/screens/LinkBankScreen.tsx",
+      "line": 79,
+      "kind": "copy",
+      "text": "Couldn't reach Ari"
+    },
+    {
+      "file": "src/screens/LinkBankScreen.tsx",
+      "line": 96,
+      "kind": "copy",
+      "text": "Bank linking isn't available yet"
+    },
+    {
+      "file": "src/screens/LinkBankScreen.tsx",
+      "line": 124,
+      "kind": "jsx",
+      "text": "Securely import your bank transactions so Ari can track spending you didn’t type yourself."
+    },
+    {
+      "file": "src/screens/LinkBankScreen.tsx",
+      "line": 144,
+      "kind": "copy",
+      "text": "Link bank account"
+    },
+    {
+      "file": "src/screens/LinkBankScreen.tsx",
+      "line": 147,
+      "kind": "jsx",
+      "text": "Link bank account"
+    },
+    {
+      "file": "src/screens/LinkBankScreen.tsx",
+      "line": 155,
+      "kind": "jsx",
+      "text": "Linked accounts"
+    },
+    {
+      "file": "src/screens/LoginScreen.tsx",
+      "line": 218,
+      "kind": "copy",
+      "text": "you@example.com"
+    },
+    {
+      "file": "src/screens/ManageCategoriesScreen.tsx",
+      "line": 214,
+      "kind": "jsx",
+      "text": "DEFAULT"
+    },
+    {
+      "file": "src/screens/ManageCategoriesScreen.tsx",
+      "line": 233,
+      "kind": "jsx",
+      "text": "CUSTOM"
+    },
+    {
+      "file": "src/screens/ManageCategoriesScreen.tsx",
+      "line": 243,
+      "kind": "jsx",
+      "text": "Custom"
+    },
+    {
+      "file": "src/screens/ManageCategoriesScreen.tsx",
+      "line": 258,
+      "kind": "jsx",
+      "text": "Add Custom Category"
+    },
+    {
+      "file": "src/screens/ManageCategoriesScreen.tsx",
+      "line": 282,
+      "kind": "copy",
+      "text": "e.g. Groceries, Pet, Gym..."
+    },
+    {
+      "file": "src/screens/ManageCategoriesScreen.tsx",
+      "line": 291,
+      "kind": "jsx",
+      "text": "Default category names cannot be changed"
+    },
+    {
+      "file": "src/screens/ManageCategoriesScreen.tsx",
+      "line": 295,
+      "kind": "jsx",
+      "text": "Emoji"
+    },
+    {
+      "file": "src/screens/OnboardingScreen.tsx",
+      "line": 43,
+      "kind": "copy",
+      "text": "Bill reminders"
+    },
+    {
+      "file": "src/screens/OnboardingScreen.tsx",
+      "line": 44,
+      "kind": "copy",
+      "text": "Tomo, your AI coach"
+    },
+    {
+      "file": "src/screens/OnboardingScreen.tsx",
+      "line": 45,
+      "kind": "copy",
+      "text": "Know your money"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 27,
+      "kind": "jsx",
+      "text": "Last updated:"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 29,
+      "kind": "jsx",
+      "text": "1. Introduction"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 31,
+      "kind": "jsx",
+      "text": "Pinegrass Technologies Private Limited (\"Pinegrass\", \"we\", \"our\", \"us\") operates the Ari mobile application (\"Ari\" or the \"Service\"). This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use Ari."
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 34,
+      "kind": "jsx",
+      "text": "We are committed to protecting your privacy and complying with the Digital Personal Data Protection Act, 2023 (DPDPA) of India and other applicable data protection laws."
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 37,
+      "kind": "jsx",
+      "text": "2. Information We Collect"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 39,
+      "kind": "jsx",
+      "text": "Account Information:"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 39,
+      "kind": "jsx",
+      "text": "When you sign up, we collect your name, email address, and authentication credentials via Apple, Google Sign-In, or email/password. Your authentication is managed through Supabase. Apple may provide a private relay email address if you choose Hide My Email."
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 42,
+      "kind": "jsx",
+      "text": "Financial Data:"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 42,
+      "kind": "jsx",
+      "text": "You provide transaction details including amounts, categories, merchants, dates, and payment methods. This data is essential for Ari to provide budgeting, tracking, and insights."
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 45,
+      "kind": "jsx",
+      "text": "Voice Data:"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 45,
+      "kind": "jsx",
+      "text": "If you use voice input, your speech is transcribed on-device or through a secure service. Voice recordings are not stored."
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 48,
+      "kind": "jsx",
+      "text": "Usage Data:"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 48,
+      "kind": "jsx",
+      "text": "We collect anonymised app usage statistics (screens visited, features used) via PostHog to improve Ari. No financial data is sent to analytics."
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 51,
+      "kind": "jsx",
+      "text": "Engagement and Invites:"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 51,
+      "kind": "jsx",
+      "text": "We store the last time your account used Ari, notification cadence state, your invite code, invite share count, and accepted invite attribution. We do not reveal your financial data to invited users or inviters."
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 54,
+      "kind": "jsx",
+      "text": "Device Information:"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 54,
+      "kind": "jsx",
+      "text": "Push notification tokens, device model, and OS version are collected for crash reporting (Sentry) and notification delivery."
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 57,
+      "kind": "jsx",
+      "text": "3. How We Use Your Data"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 58,
+      "kind": "jsx",
+      "text": "• To provide and maintain the Ari service"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 59,
+      "kind": "jsx",
+      "text": "• To categorise transactions, generate budgets, and deliver financial insights"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 60,
+      "kind": "jsx",
+      "text": "• To send opted-in reminders, budget alerts, reports, and limited re-engagement messages"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 61,
+      "kind": "jsx",
+      "text": "• To attribute invite codes and show circle milestones"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 62,
+      "kind": "jsx",
+      "text": "• To improve Ari through anonymised usage analytics"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 63,
+      "kind": "jsx",
+      "text": "• To detect and prevent fraud, abuse, or security incidents"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 64,
+      "kind": "jsx",
+      "text": "• To comply with legal obligations"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 66,
+      "kind": "jsx",
+      "text": "4. AI and Third-Party Processing"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 68,
+      "kind": "jsx",
+      "text": "Ari's AI coach (\"Tomo\") may process your transaction data to provide personalised financial guidance. Before any data is sent to an AI provider, personally identifiable information (PII) such as account numbers, card details, and full names are stripped. AI requests are ephemeral and not used to train models."
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 71,
+      "kind": "jsx",
+      "text": "We use the following third-party services:"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 72,
+      "kind": "jsx",
+      "text": "• Supabase — authentication and database hosting"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 73,
+      "kind": "jsx",
+      "text": "• Sentry — crash and error reporting"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 74,
+      "kind": "jsx",
+      "text": "• PostHog — product analytics"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 75,
+      "kind": "jsx",
+      "text": "• Apple and Google — authentication (Sign-In)"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 78,
+      "kind": "jsx",
+      "text": "5. Data Storage and Security"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 80,
+      "kind": "jsx",
+      "text": "Your data is encrypted in transit (TLS 1.3) and at rest (AES-256). We use Supabase's managed infrastructure with regular security updates. You may enable biometric lock (Face ID / fingerprint) in Settings for an additional layer of device-level security."
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 83,
+      "kind": "jsx",
+      "text": "6. Data Retention and Deletion"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 85,
+      "kind": "jsx",
+      "text": "We retain your data for as long as your account is active. You may delete your account at any time from Settings → Delete Account. Account deletion permanently removes your personal data, transaction history, budgets, and associated records within 30 days. Some anonymised aggregate data may be retained for legal compliance."
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 88,
+      "kind": "jsx",
+      "text": "To request data export or deletion, contact us at privacy@pinegrass.in."
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 91,
+      "kind": "jsx",
+      "text": "7. Your Rights (DPDPA)"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 93,
+      "kind": "jsx",
+      "text": "Under India's DPDP Act, you have the right to:"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 94,
+      "kind": "jsx",
+      "text": "• Access a summary of your personal data"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 95,
+      "kind": "jsx",
+      "text": "• Correct inaccurate or incomplete data"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 96,
+      "kind": "jsx",
+      "text": "• Request erasure of your data"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 97,
+      "kind": "jsx",
+      "text": "• Nominate a representative for your data rights"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 98,
+      "kind": "jsx",
+      "text": "• Grievance redressal through our Grievance Officer"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 101,
+      "kind": "jsx",
+      "text": "8. Children's Privacy"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 103,
+      "kind": "jsx",
+      "text": "Ari is not intended for users under 18. We do not knowingly collect data from children. If you believe a child has provided us with personal data, contact us immediately."
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 106,
+      "kind": "jsx",
+      "text": "9. Contact Us"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 108,
+      "kind": "jsx",
+      "text": "Pinegrass Technologies Pvt. Ltd."
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 109,
+      "kind": "jsx",
+      "text": "Email: privacy@pinegrass.in"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 110,
+      "kind": "jsx",
+      "text": "Grievance Officer: privacy@pinegrass.in"
+    },
+    {
+      "file": "src/screens/PrivacyPolicyScreen.tsx",
+      "line": 111,
+      "kind": "jsx",
+      "text": "Response time: within 30 days"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 32,
+      "kind": "copy",
+      "text": "Under 18"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 39,
+      "kind": "copy",
+      "text": "Save More"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 40,
+      "kind": "copy",
+      "text": "Pay Off Debt"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 41,
+      "kind": "copy",
+      "text": "Start Investing"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 42,
+      "kind": "copy",
+      "text": "Emergency Fund"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 43,
+      "kind": "copy",
+      "text": "Buy a Home"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 44,
+      "kind": "copy",
+      "text": "Just Track"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 164,
+      "kind": "jsx",
+      "text": "Step 1 of 3"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 165,
+      "kind": "jsx",
+      "text": "Create your account"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 166,
+      "kind": "jsx",
+      "text": "Your financial journey starts here"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 168,
+      "kind": "copy",
+      "text": "Full Name"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 169,
+      "kind": "copy",
+      "text": "Rahul Sharma"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 177,
+      "kind": "copy",
+      "text": "rahul@example.com"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 194,
+      "kind": "copy",
+      "text": "Invite Code (optional)"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 195,
+      "kind": "copy",
+      "text": "ARI123ABC"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 202,
+      "kind": "copy",
+      "text": "Continue to next step"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 203,
+      "kind": "jsx",
+      "text": "Continue →"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 211,
+      "kind": "jsx",
+      "text": "Step 2 of 3"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 212,
+      "kind": "jsx",
+      "text": "Tell us about yourself"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 213,
+      "kind": "jsx",
+      "text": "So Tomo can give you relevant advice"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 280,
+      "kind": "copy",
+      "text": "Continue to next step"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 281,
+      "kind": "jsx",
+      "text": "Continue →"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 289,
+      "kind": "jsx",
+      "text": "Step 3 of 3"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 290,
+      "kind": "jsx",
+      "text": "Your main goal?"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 291,
+      "kind": "jsx",
+      "text": "We&apos;ll personalise Tomo&apos;s coaching for you"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 319,
+      "kind": "copy",
+      "text": "Start my journey"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 320,
+      "kind": "jsx",
+      "text": "Start My Journey"
+    },
+    {
+      "file": "src/screens/SettingsScreen.tsx",
+      "line": 367,
+      "kind": "copy",
+      "text": "Invite Friends"
+    },
+    {
+      "file": "src/screens/SettingsScreen.tsx",
+      "line": 368,
+      "kind": "copy",
+      "text": "Grow your circle and track accepted invites"
+    },
+    {
+      "file": "src/screens/SettingsScreen.tsx",
+      "line": 373,
+      "kind": "copy",
+      "text": "Recurring Payments"
+    },
+    {
+      "file": "src/screens/SettingsScreen.tsx",
+      "line": 374,
+      "kind": "copy",
+      "text": "Pause, edit or stop repeating entries"
+    },
+    {
+      "file": "src/screens/SettingsScreen.tsx",
+      "line": 388,
+      "kind": "copy",
+      "text": "Receive shared-expense settlements via UPI"
+    },
+    {
+      "file": "src/screens/SettingsScreen.tsx",
+      "line": 393,
+      "kind": "copy",
+      "text": "Link bank account"
+    },
+    {
+      "file": "src/screens/SettingsScreen.tsx",
+      "line": 394,
+      "kind": "copy",
+      "text": "Auto-import bank transactions via Setu"
+    },
+    {
+      "file": "src/screens/SettingsScreen.tsx",
+      "line": 406,
+      "kind": "copy",
+      "text": "Shared expenses"
+    },
+    {
+      "file": "src/screens/SettingsScreen.tsx",
+      "line": 407,
+      "kind": "copy",
+      "text": "Split with friends, settle via UPI"
+    },
+    {
+      "file": "src/screens/SettingsScreen.tsx",
+      "line": 410,
+      "kind": "copy",
+      "text": "Manage Categories"
+    },
+    {
+      "file": "src/screens/SettingsScreen.tsx",
+      "line": 410,
+      "kind": "copy",
+      "text": "Add custom expense & income types"
+    },
+    {
+      "file": "src/screens/SettingsScreen.tsx",
+      "line": 411,
+      "kind": "copy",
+      "text": "Export Data"
+    },
+    {
+      "file": "src/screens/SettingsScreen.tsx",
+      "line": 411,
+      "kind": "copy",
+      "text": "Download your transactions"
+    },
+    {
+      "file": "src/screens/SettingsScreen.tsx",
+      "line": 412,
+      "kind": "copy",
+      "text": "Send Feedback"
+    },
+    {
+      "file": "src/screens/SettingsScreen.tsx",
+      "line": 412,
+      "kind": "copy",
+      "text": "Goes straight to the Ari team"
+    },
+    {
+      "file": "src/screens/SettingsScreen.tsx",
+      "line": 413,
+      "kind": "copy",
+      "text": "Privacy Policy"
+    },
+    {
+      "file": "src/screens/SettingsScreen.tsx",
+      "line": 413,
+      "kind": "copy",
+      "text": "How we protect your data"
+    },
+    {
+      "file": "src/screens/SettingsScreen.tsx",
+      "line": 414,
+      "kind": "copy",
+      "text": "Terms of Service"
+    },
+    {
+      "file": "src/screens/SettingsScreen.tsx",
+      "line": 414,
+      "kind": "copy",
+      "text": "Rules for using Ari"
+    },
+    {
+      "file": "src/screens/SettingsScreen.tsx",
+      "line": 415,
+      "kind": "copy",
+      "text": "Help & Support"
+    },
+    {
+      "file": "src/screens/SettingsScreen.tsx",
+      "line": 415,
+      "kind": "copy",
+      "text": "FAQs and contact us"
+    },
+    {
+      "file": "src/screens/SettingsScreen.tsx",
+      "line": 416,
+      "kind": "copy",
+      "text": "Rate Ari"
+    },
+    {
+      "file": "src/screens/SettingsScreen.tsx",
+      "line": 416,
+      "kind": "copy",
+      "text": "Love Ari? Let us know!"
+    },
+    {
+      "file": "src/screens/SettingsScreen.tsx",
+      "line": 417,
+      "kind": "copy",
+      "text": "About"
+    },
+    {
+      "file": "src/screens/ShareCaptureScreen.tsx",
+      "line": 96,
+      "kind": "jsx",
+      "text": "SMS Capture"
+    },
+    {
+      "file": "src/screens/ShareCaptureScreen.tsx",
+      "line": 108,
+      "kind": "jsx",
+      "text": "Parsing with AI…"
+    },
+    {
+      "file": "src/screens/ShareCaptureScreen.tsx",
+      "line": 116,
+      "kind": "jsx",
+      "text": "Add manually"
+    },
+    {
+      "file": "src/screens/ShareCaptureScreen.tsx",
+      "line": 149,
+      "kind": "jsx",
+      "text": "Add entry"
+    },
+    {
+      "file": "src/screens/ShareCaptureScreen.tsx",
+      "line": 153,
+      "kind": "jsx",
+      "text": "Edit first"
+    },
+    {
+      "file": "src/screens/ShareCaptureScreen.tsx",
+      "line": 159,
+      "kind": "jsx",
+      "text": "Dismiss"
+    },
+    {
+      "file": "src/screens/SplashScreen.tsx",
+      "line": 12,
+      "kind": "copy",
+      "text": "Smart Tracking"
+    },
+    {
+      "file": "src/screens/SplashScreen.tsx",
+      "line": 13,
+      "kind": "copy",
+      "text": "Tomo AI Coach"
+    },
+    {
+      "file": "src/screens/SplashScreen.tsx",
+      "line": 14,
+      "kind": "copy",
+      "text": "Budget Goals"
+    },
+    {
+      "file": "src/screens/SplashScreen.tsx",
+      "line": 72,
+      "kind": "jsx",
+      "text": "Ari"
+    },
+    {
+      "file": "src/screens/SplashScreen.tsx",
+      "line": 73,
+      "kind": "jsx",
+      "text": "Your Money, Your Future"
+    },
+    {
+      "file": "src/screens/SplashScreen.tsx",
+      "line": 108,
+      "kind": "copy",
+      "text": "Let's Get Started"
+    },
+    {
+      "file": "src/screens/SplashScreen.tsx",
+      "line": 111,
+      "kind": "jsx",
+      "text": "Let&apos;s Get Started"
+    },
+    {
+      "file": "src/screens/SplashScreen.tsx",
+      "line": 117,
+      "kind": "copy",
+      "text": "I already have an account"
+    },
+    {
+      "file": "src/screens/SplashScreen.tsx",
+      "line": 120,
+      "kind": "jsx",
+      "text": "I already have an account"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 27,
+      "kind": "jsx",
+      "text": "Last updated:"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 29,
+      "kind": "jsx",
+      "text": "1. Acceptance of Terms"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 31,
+      "kind": "jsx",
+      "text": "By downloading, installing, or using the Ari mobile application (\"Ari\" or the \"Service\"), you agree to be bound by these Terms of Service (\"Terms\"). If you do not agree, do not use Ari."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 34,
+      "kind": "jsx",
+      "text": "These Terms form a binding agreement between you and Pinegrass Technologies Private Limited (\"Pinegrass\", \"we\", \"our\", \"us\"), a company incorporated in India (CIN U62011MN2026PTC015607)."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 37,
+      "kind": "jsx",
+      "text": "2. Eligibility"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 39,
+      "kind": "jsx",
+      "text": "You must be at least 18 years of age to use Ari. By using Ari, you represent that you meet this age requirement. Ari is designed for users in India and complies with Indian laws including the DPDP Act, 2023."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 42,
+      "kind": "jsx",
+      "text": "3. Description of Service"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 44,
+      "kind": "jsx",
+      "text": "Ari is a personal finance management application that helps you track expenses, manage budgets, set savings goals, receive AI-powered financial coaching (\"Tomo\"), and generate tax estimates. Ari does not provide financial, legal, or tax advice. All insights are informational only."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 47,
+      "kind": "jsx",
+      "text": "4. User Accounts"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 49,
+      "kind": "jsx",
+      "text": "You are responsible for maintaining the confidentiality of your account credentials. You agree to provide accurate information and to update it as necessary. We reserve the right to suspend or terminate accounts that violate these Terms."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 52,
+      "kind": "jsx",
+      "text": "You may delete your account at any time through Settings. Account deletion is governed by our Privacy Policy."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 55,
+      "kind": "jsx",
+      "text": "5. Subscriptions and Payments"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 57,
+      "kind": "jsx",
+      "text": "Ari offers both free and paid subscription tiers (\"Ari Pro\"). Paid subscriptions are processed through the Google Play Store or Apple App Store billing systems. Ari Pro starts with a 14-day free trial; after the trial, the subscription continues at the price shown at the point of purchase unless you cancel. You may manage or cancel your subscription through your device's app store settings at any time."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 60,
+      "kind": "jsx",
+      "text": "6. Acceptable Use"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 62,
+      "kind": "jsx",
+      "text": "You agree not to:"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 63,
+      "kind": "jsx",
+      "text": "• Use Ari for any unlawful purpose"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 64,
+      "kind": "jsx",
+      "text": "• Attempt to gain unauthorized access to Ari's systems"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 65,
+      "kind": "jsx",
+      "text": "• Upload malicious code or attempt to disrupt the Service"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 66,
+      "kind": "jsx",
+      "text": "• Violate any applicable laws or regulations"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 69,
+      "kind": "jsx",
+      "text": "7. Intellectual Property"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 71,
+      "kind": "jsx",
+      "text": "Ari, its name, logo, design, and code are the intellectual property of Pinegrass Technologies Pvt. Ltd. You may not copy, modify, distribute, or create derivative works without our written permission."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 74,
+      "kind": "jsx",
+      "text": "8. Limitation of Liability"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 76,
+      "kind": "jsx",
+      "text": "To the maximum extent permitted by law, Pinegrass shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of Ari. Our total liability shall not exceed the amount you paid us in the 12 months preceding the claim, or ₹5,000, whichever is greater."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 79,
+      "kind": "jsx",
+      "text": "Ari provides informational tools, not professional financial advice. You are solely responsible for your financial decisions."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 82,
+      "kind": "jsx",
+      "text": "9. Disclaimer of Warranties"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 84,
+      "kind": "jsx",
+      "text": "Ari is provided \"as is\" without warranties of any kind, express or implied. We do not warrant that Ari will be uninterrupted, error-free, or completely secure."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 87,
+      "kind": "jsx",
+      "text": "10. Governing Law and Dispute Resolution"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 89,
+      "kind": "jsx",
+      "text": "These Terms are governed by the laws of India. Any dispute arising from these Terms shall be subject to the exclusive jurisdiction of courts in Manipur, India. Before initiating formal proceedings, you agree to attempt resolution through our Grievance Officer at privacy@pinegrass.in."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 92,
+      "kind": "jsx",
+      "text": "11. Changes to Terms"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 94,
+      "kind": "jsx",
+      "text": "We may update these Terms from time to time. Material changes will be notified through the app. Continued use after changes constitutes acceptance."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 97,
+      "kind": "jsx",
+      "text": "12. Contact"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 99,
+      "kind": "jsx",
+      "text": "Pinegrass Technologies Pvt. Ltd."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 100,
+      "kind": "jsx",
+      "text": "Email: privacy@pinegrass.in"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 101,
+      "kind": "jsx",
+      "text": "CIN: U62011MN2026PTC015607"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 102,
+      "kind": "jsx",
+      "text": "Manipur, India"
+    },
+    {
+      "file": "src/screens/TodoNotesScreen.tsx",
+      "line": 23,
+      "kind": "copy",
+      "text": "High"
+    },
+    {
+      "file": "src/screens/TodoNotesScreen.tsx",
+      "line": 24,
+      "kind": "copy",
+      "text": "Medium"
+    },
+    {
+      "file": "src/screens/TodoNotesScreen.tsx",
+      "line": 25,
+      "kind": "copy",
+      "text": "Low"
+    },
+    {
+      "file": "src/screens/TodoNotesScreen.tsx",
+      "line": 240,
+      "kind": "jsx",
+      "text": "Notes & To-Do"
+    },
+    {
+      "file": "src/screens/TodoNotesScreen.tsx",
+      "line": 242,
+      "kind": "jsx",
+      "text": "active ·"
+    },
+    {
+      "file": "src/screens/TodoNotesScreen.tsx",
+      "line": 242,
+      "kind": "jsx",
+      "text": "done"
+    },
+    {
+      "file": "src/screens/TodoNotesScreen.tsx",
+      "line": 253,
+      "kind": "copy",
+      "text": "All"
+    },
+    {
+      "file": "src/screens/TodoNotesScreen.tsx",
+      "line": 254,
+      "kind": "copy",
+      "text": "Active"
+    },
+    {
+      "file": "src/screens/TodoNotesScreen.tsx",
+      "line": 255,
+      "kind": "copy",
+      "text": "Done"
+    },
+    {
+      "file": "src/screens/TodoNotesScreen.tsx",
+      "line": 256,
+      "kind": "copy",
+      "text": "Pinned"
+    },
+    {
+      "file": "src/screens/TodoNotesScreen.tsx",
+      "line": 395,
+      "kind": "jsx",
+      "text": "Title"
+    },
+    {
+      "file": "src/screens/TodoNotesScreen.tsx",
+      "line": 400,
+      "kind": "copy",
+      "text": "What needs to be done?"
+    },
+    {
+      "file": "src/screens/TodoNotesScreen.tsx",
+      "line": 407,
+      "kind": "jsx",
+      "text": "Notes (optional)"
+    },
+    {
+      "file": "src/screens/TodoNotesScreen.tsx",
+      "line": 412,
+      "kind": "copy",
+      "text": "Add details..."
+    },
+    {
+      "file": "src/screens/TodoNotesScreen.tsx",
+      "line": 419,
+      "kind": "jsx",
+      "text": "Priority"
+    },
+    {
+      "file": "src/screens/TodoNotesScreen.tsx",
+      "line": 438,
+      "kind": "jsx",
+      "text": "Due Date (optional)"
+    },
+    {
+      "file": "src/screens/TodoNotesScreen.tsx",
+      "line": 443,
+      "kind": "copy",
+      "text": "YYYY-MM-DD"
+    },
+    {
+      "file": "src/screens/TodoNotesScreen.tsx",
+      "line": 450,
+      "kind": "jsx",
+      "text": "Time (optional)"
+    },
+    {
+      "file": "src/screens/TodoNotesScreen.tsx",
+      "line": 455,
+      "kind": "copy",
+      "text": "HH:MM (e.g. 14:30)"
+    },
+    {
+      "file": "src/screens/TodoNotesScreen.tsx",
+      "line": 477,
+      "kind": "jsx",
+      "text": "Pin to top"
+    },
+    {
+      "file": "src/screens/TransactionsScreen.tsx",
+      "line": 49,
+      "kind": "copy",
+      "text": "This month"
+    },
+    {
+      "file": "src/screens/TransactionsScreen.tsx",
+      "line": 50,
+      "kind": "copy",
+      "text": "6 months"
+    },
+    {
+      "file": "src/screens/TransactionsScreen.tsx",
+      "line": 51,
+      "kind": "copy",
+      "text": "1 year"
+    },
+    {
+      "file": "src/theme/tokens.ts",
+      "line": 46,
+      "kind": "copy",
+      "text": "#8FB0A8"
+    },
+    {
+      "file": "src/utils/locale.ts",
+      "line": 41,
+      "kind": "copy",
+      "text": "Under ₹15K"
+    },
+    {
+      "file": "src/utils/locale.ts",
+      "line": 56,
+      "kind": "copy",
+      "text": "Under $2K"
+    },
+    {
+      "file": "src/utils/locale.ts",
+      "line": 71,
+      "kind": "copy",
+      "text": "Under £1.5K"
+    },
+    {
+      "file": "src/utils/locale.ts",
+      "line": 86,
+      "kind": "copy",
+      "text": "Under $2K"
+    },
+    {
+      "file": "src/utils/locale.ts",
+      "line": 104,
+      "kind": "copy",
+      "text": "Under $1K"
+    },
+    {
+      "file": "src/utils/taxCalculator.ts",
+      "line": 157,
+      "kind": "copy",
+      "text": "India — FY 2026-27"
+    },
+    {
+      "file": "src/utils/taxCalculator.ts",
+      "line": 212,
+      "kind": "copy",
+      "text": "US — 2025 Tax Year"
+    },
+    {
+      "file": "src/utils/taxCalculator.ts",
+      "line": 265,
+      "kind": "copy",
+      "text": "UK — 2026-27"
+    },
+    {
+      "file": "src/utils/taxCalculator.ts",
+      "line": 305,
+      "kind": "copy",
+      "text": "Australia — 2025-26"
+    },
+    {
+      "file": "src/utils/taxCalculator.ts",
+      "line": 338,
+      "kind": "copy",
+      "text": "Generic — Progressive"
+    },
+    {
+      "file": "aritomo-web/app/account-deletion/page.tsx",
+      "line": 5,
+      "kind": "copy",
+      "text": "Delete Your Ari Account"
+    },
+    {
+      "file": "aritomo-web/app/account-deletion/page.tsx",
+      "line": 6,
+      "kind": "jsx",
+      "text": "You can delete your Ari account and associated data at any time."
+    },
+    {
+      "file": "aritomo-web/app/account-deletion/page.tsx",
+      "line": 9,
+      "kind": "jsx",
+      "text": "HOW TO DELETE FROM THE APP"
+    },
+    {
+      "file": "aritomo-web/app/account-deletion/page.tsx",
+      "line": 11,
+      "kind": "jsx",
+      "text": "Open Ari on your phone."
+    },
+    {
+      "file": "aritomo-web/app/account-deletion/page.tsx",
+      "line": 12,
+      "kind": "jsx",
+      "text": "Go to Settings → Account."
+    },
+    {
+      "file": "aritomo-web/app/account-deletion/page.tsx",
+      "line": 13,
+      "kind": "jsx",
+      "text": "Tap &quot;Delete Account&quot;."
+    },
+    {
+      "file": "aritomo-web/app/account-deletion/page.tsx",
+      "line": 15,
+      "kind": "jsx",
+      "text": "Confirm by entering your password or completing the Google re-authentication prompt."
+    },
+    {
+      "file": "aritomo-web/app/account-deletion/page.tsx",
+      "line": 19,
+      "kind": "jsx",
+      "text": "Your account and all associated transactions, budgets, and categories are deleted within 30 days."
+    },
+    {
+      "file": "aritomo-web/app/account-deletion/page.tsx",
+      "line": 26,
+      "kind": "jsx",
+      "text": "IF YOU CANNOT ACCESS THE APP"
+    },
+    {
+      "file": "aritomo-web/app/account-deletion/page.tsx",
+      "line": 28,
+      "kind": "jsx",
+      "text": "Email us at privacy@pinegrass.in from the email address associated with your account. We will verify your identity and process your deletion request within 30 days."
+    },
+    {
+      "file": "aritomo-web/app/account-deletion/page.tsx",
+      "line": 35,
+      "kind": "jsx",
+      "text": "WHAT GETS DELETED"
+    },
+    {
+      "file": "aritomo-web/app/account-deletion/page.tsx",
+      "line": 37,
+      "kind": "jsx",
+      "text": "Account credentials (email, password hash, Google identifier)"
+    },
+    {
+      "file": "aritomo-web/app/account-deletion/page.tsx",
+      "line": 38,
+      "kind": "jsx",
+      "text": "All transactions, budgets, categories, and notes you created"
+    },
+    {
+      "file": "aritomo-web/app/account-deletion/page.tsx",
+      "line": 39,
+      "kind": "jsx",
+      "text": "App usage analytics tied to your account"
+    },
+    {
+      "file": "aritomo-web/app/account-deletion/page.tsx",
+      "line": 44,
+      "kind": "jsx",
+      "text": "WHAT IS RETAINED"
+    },
+    {
+      "file": "aritomo-web/app/account-deletion/page.tsx",
+      "line": 47,
+      "kind": "jsx",
+      "text": "Anonymised aggregated analytics that cannot be traced back to you (for product improvement)"
+    },
+    {
+      "file": "aritomo-web/app/account-deletion/page.tsx",
+      "line": 50,
+      "kind": "jsx",
+      "text": "Backups for up to 90 days, after which they are overwritten"
+    },
+    {
+      "file": "aritomo-web/app/account-deletion/page.tsx",
+      "line": 52,
+      "kind": "jsx",
+      "text": "Records required for legal or tax compliance (financial transaction logs we are required to retain by Indian law, if any apply to your usage)"
+    },
+    {
+      "file": "aritomo-web/app/account-deletion/page.tsx",
+      "line": 60,
+      "kind": "jsx",
+      "text": "CONTACT"
+    },
+    {
+      "file": "aritomo-web/app/account-deletion/page.tsx",
+      "line": 61,
+      "kind": "jsx",
+      "text": "privacy@pinegrass.in"
+    },
+    {
+      "file": "aritomo-web/app/app/page.tsx",
+      "line": 4,
+      "kind": "copy",
+      "text": "Ari web dashboard"
+    },
+    {
+      "file": "aritomo-web/app/auth/callback/page.tsx",
+      "line": 4,
+      "kind": "copy",
+      "text": "Signing in - Ari"
+    },
+    {
+      "file": "aritomo-web/app/invite/InviteShell.tsx",
+      "line": 8,
+      "kind": "copy",
+      "text": "Ari home"
+    },
+    {
+      "file": "aritomo-web/app/invite/InviteShell.tsx",
+      "line": 10,
+      "kind": "jsx",
+      "text": "Ari"
+    },
+    {
+      "file": "aritomo-web/app/invite/InviteShell.tsx",
+      "line": 13,
+      "kind": "jsx",
+      "text": "A friend invited you"
+    },
+    {
+      "file": "aritomo-web/app/invite/InviteShell.tsx",
+      "line": 14,
+      "kind": "jsx",
+      "text": "Money habits feel lighter together."
+    },
+    {
+      "file": "aritomo-web/app/invite/InviteShell.tsx",
+      "line": 15,
+      "kind": "jsx",
+      "text": "Use Ari for calm expense tracking, useful reports, and optional coaching. Your financial information always stays private."
+    },
+    {
+      "file": "aritomo-web/app/invite/InviteShell.tsx",
+      "line": 18,
+      "kind": "jsx",
+      "text": "Invite code"
+    },
+    {
+      "file": "aritomo-web/app/invite/InviteShell.tsx",
+      "line": 24,
+      "kind": "jsx",
+      "text": "Open in Ari"
+    },
+    {
+      "file": "aritomo-web/app/invite/InviteShell.tsx",
+      "line": 25,
+      "kind": "jsx",
+      "text": "Get Ari on Google Play"
+    },
+    {
+      "file": "aritomo-web/app/invite/InviteShell.tsx",
+      "line": 28,
+      "kind": "jsx",
+      "text": "This invite link is incomplete. Ask your friend to share it again."
+    },
+    {
+      "file": "aritomo-web/app/invite/InviteShell.tsx",
+      "line": 31,
+      "kind": "jsx",
+      "text": "Already have Ari? Open the app and enter this code under Settings → Invite Friends."
+    },
+    {
+      "file": "aritomo-web/app/invite/page.tsx",
+      "line": 7,
+      "kind": "copy",
+      "text": "You have an Ari invite"
+    },
+    {
+      "file": "aritomo-web/app/invite/page.tsx",
+      "line": 8,
+      "kind": "copy",
+      "text": "Join a friend on Ari for calm money tracking and visual reports."
+    },
+    {
+      "file": "aritomo-web/app/layout.tsx",
+      "line": 18,
+      "kind": "copy",
+      "text": "Capture expenses, review your recorded cash flow, and choose a useful next step with Tomo. Ari brings everyday money into focus."
+    },
+    {
+      "file": "aritomo-web/app/layout.tsx",
+      "line": 23,
+      "kind": "copy",
+      "text": "Ari — Make sense of your everyday money"
+    },
+    {
+      "file": "aritomo-web/app/layout.tsx",
+      "line": 25,
+      "kind": "copy",
+      "text": "Capture expenses, review your recorded cash flow, and choose a useful next step with Tomo."
+    },
+    {
+      "file": "aritomo-web/app/layout.tsx",
+      "line": 30,
+      "kind": "copy",
+      "text": "Ari — Make sense of your everyday money"
+    },
+    {
+      "file": "aritomo-web/app/layout.tsx",
+      "line": 32,
+      "kind": "copy",
+      "text": "Capture expenses, review your recorded cash flow, and choose a useful next step with Tomo."
+    },
+    {
+      "file": "aritomo-web/app/login/page.tsx",
+      "line": 4,
+      "kind": "copy",
+      "text": "Sign in - Ari"
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 5,
+      "kind": "copy",
+      "text": "Privacy Policy"
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 6,
+      "kind": "jsx",
+      "text": "Last updated: 31 May 2026"
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 9,
+      "kind": "jsx",
+      "text": "This Privacy Policy explains how Pinegrass Technologies Pvt Ltd (&quot;Pinegrass&quot;, &quot;we&quot;, &quot;us&quot;) collects, uses, and protects information when you use Ari, our AI money coach mobile application (&quot;the App&quot;), and the aritomo.in website (&quot;the Site&quot;)."
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 16,
+      "kind": "jsx",
+      "text": "1. INFORMATION WE COLLECT"
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 17,
+      "kind": "jsx",
+      "text": "a) Information you provide"
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 20,
+      "kind": "jsx",
+      "text": "Account information: name, email address, and a user identifier when you sign up via email/password or Google Sign-In."
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 24,
+      "kind": "jsx",
+      "text": "Financial information: the transactions, budgets, categories, and notes you enter into the App. This is the core data the App is designed to help you manage."
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 28,
+      "kind": "jsx",
+      "text": "Communications: any feedback or support requests you send us."
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 30,
+      "kind": "jsx",
+      "text": "b) Information collected automatically"
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 33,
+      "kind": "jsx",
+      "text": "App activity: interactions with App features, including which screens you visit and which actions you take. Collected via PostHog for product analytics."
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 38,
+      "kind": "jsx",
+      "text": "App performance: crash logs, diagnostic information, and performance metrics. Collected via Sentry to help us identify and fix issues."
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 42,
+      "kind": "jsx",
+      "text": "Device identifiers: a unique device or installation ID used by analytics and crash reporting."
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 46,
+      "kind": "jsx",
+      "text": "Approximate location: city or region-level location may be inferred from your IP address for regional defaults (currency, language). We do not collect precise GPS location."
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 51,
+      "kind": "jsx",
+      "text": "c) Information we do NOT collect"
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 54,
+      "kind": "jsx",
+      "text": "Voice recordings: voice input in the App is transcribed entirely on your device. Audio is not transmitted to our servers."
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 58,
+      "kind": "jsx",
+      "text": "Contacts, photos, messages, calendar, browsing history, health data, or any other data category not listed above."
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 65,
+      "kind": "jsx",
+      "text": "2. HOW WE USE INFORMATION"
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 68,
+      "kind": "jsx",
+      "text": "To provide and operate the App&apos;s core functionality (transaction tracking, budgets, AI coaching)."
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 72,
+      "kind": "jsx",
+      "text": "To improve the App: diagnose crashes, understand which features are useful, fix bugs."
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 76,
+      "kind": "jsx",
+      "text": "To communicate with you: respond to support requests, send service-related notifications."
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 79,
+      "kind": "jsx",
+      "text": "To comply with legal obligations."
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 82,
+      "kind": "jsx",
+      "text": "We do not sell your data. We do not share your financial data with advertisers."
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 88,
+      "kind": "jsx",
+      "text": "3. THIRD-PARTY SERVICES"
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 89,
+      "kind": "jsx",
+      "text": "We use the following processors. Each has its own privacy policy."
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 91,
+      "kind": "jsx",
+      "text": "Supabase (data storage and authentication)"
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 92,
+      "kind": "jsx",
+      "text": "Railway (backend hosting)"
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 93,
+      "kind": "jsx",
+      "text": "PostHog (product analytics)"
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 94,
+      "kind": "jsx",
+      "text": "Sentry (error monitoring)"
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 95,
+      "kind": "jsx",
+      "text": "Google (Sign-In)"
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 98,
+      "kind": "jsx",
+      "text": "These processors handle data on our behalf and are contractually required to protect it."
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 104,
+      "kind": "jsx",
+      "text": "4. DATA RETENTION"
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 106,
+      "kind": "jsx",
+      "text": "We retain your account and financial data for as long as your account is active. When you delete your account (see Account Deletion), all associated data is removed from our active databases within 30 days. Backups may retain data for up to 90 days before being overwritten."
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 114,
+      "kind": "jsx",
+      "text": "5. YOUR RIGHTS"
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 115,
+      "kind": "jsx",
+      "text": "You can:"
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 117,
+      "kind": "jsx",
+      "text": "Access your data via the App."
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 118,
+      "kind": "jsx",
+      "text": "Edit or delete individual transactions, budgets, and categories."
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 119,
+      "kind": "jsx",
+      "text": "Delete your account (see /account-deletion)."
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 120,
+      "kind": "jsx",
+      "text": "Contact us at the email below with any privacy questions."
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 125,
+      "kind": "jsx",
+      "text": "6. SECURITY"
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 127,
+      "kind": "jsx",
+      "text": "All data is encrypted in transit (HTTPS/TLS). Data at rest is encrypted by our infrastructure providers. We follow industry practices for access control and credential management."
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 134,
+      "kind": "jsx",
+      "text": "7. CHILDREN"
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 136,
+      "kind": "jsx",
+      "text": "Ari is not intended for users under 18. We do not knowingly collect data from children."
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 142,
+      "kind": "jsx",
+      "text": "8. CHANGES"
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 144,
+      "kind": "jsx",
+      "text": "We may update this policy. Material changes will be communicated via the App or email."
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 150,
+      "kind": "jsx",
+      "text": "9. CONTACT"
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 152,
+      "kind": "jsx",
+      "text": "Pinegrass Technologies Pvt Ltd"
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 154,
+      "kind": "jsx",
+      "text": "Email: privacy@pinegrass.in"
+    },
+    {
+      "file": "aritomo-web/app/privacy/page.tsx",
+      "line": 156,
+      "kind": "jsx",
+      "text": "Address: [TO BE FILLED — Pinegrass registered office, Imphal East, Manipur, India]"
+    },
+    {
+      "file": "aritomo-web/app/signup/page.tsx",
+      "line": 4,
+      "kind": "copy",
+      "text": "Create account - Ari"
+    },
+    {
+      "file": "aritomo-web/app/support/page.tsx",
+      "line": 6,
+      "kind": "copy",
+      "text": "Support"
+    },
+    {
+      "file": "aritomo-web/app/support/page.tsx",
+      "line": 8,
+      "kind": "copy",
+      "text": "Get help with Ari accounts, transactions, notifications, subscriptions, privacy, and data access."
+    },
+    {
+      "file": "aritomo-web/app/support/page.tsx",
+      "line": 15,
+      "kind": "copy",
+      "text": "Ari Support"
+    },
+    {
+      "file": "aritomo-web/app/support/page.tsx",
+      "line": 17,
+      "kind": "jsx",
+      "text": "Need a hand with Ari? Email"
+    },
+    {
+      "file": "aritomo-web/app/support/page.tsx",
+      "line": 21,
+      "kind": "jsx",
+      "text": ". Include the device platform and a short description of what happened. Please never send passwords, verification codes, API keys, or full financial account details."
+    },
+    {
+      "file": "aritomo-web/app/support/page.tsx",
+      "line": 27,
+      "kind": "jsx",
+      "text": "COMMON QUESTIONS"
+    },
+    {
+      "file": "aritomo-web/app/support/page.tsx",
+      "line": 28,
+      "kind": "jsx",
+      "text": "I cannot sign in"
+    },
+    {
+      "file": "aritomo-web/app/support/page.tsx",
+      "line": 30,
+      "kind": "jsx",
+      "text": "Confirm you are using the same sign-in method you originally chose. If Google sign-in was used, select Continue with Google again. For email sign-in, check the address carefully and retry on a stable connection."
+    },
+    {
+      "file": "aritomo-web/app/support/page.tsx",
+      "line": 35,
+      "kind": "jsx",
+      "text": "My latest entries are missing"
+    },
+    {
+      "file": "aritomo-web/app/support/page.tsx",
+      "line": 37,
+      "kind": "jsx",
+      "text": "Pull down to refresh the relevant screen. Entries created offline remain on the device and should sync after connectivity returns. If they still do not appear, contact support before reinstalling the app."
+    },
+    {
+      "file": "aritomo-web/app/support/page.tsx",
+      "line": 42,
+      "kind": "jsx",
+      "text": "Notifications are not arriving"
+    },
+    {
+      "file": "aritomo-web/app/support/page.tsx",
+      "line": 44,
+      "kind": "jsx",
+      "text": "Check Ari&apos;s notification setting and the operating system&apos;s app permissions. Battery-saving modes can also delay notifications."
+    },
+    {
+      "file": "aritomo-web/app/support/page.tsx",
+      "line": 48,
+      "kind": "jsx",
+      "text": "How do I manage a subscription?"
+    },
+    {
+      "file": "aritomo-web/app/support/page.tsx",
+      "line": 50,
+      "kind": "jsx",
+      "text": "Purchases are managed by the store account used on your device. Use Ari&apos;s Restore Purchases action after reinstalling or changing devices, and use your App Store or Google Play subscription settings to cancel."
+    },
+    {
+      "file": "aritomo-web/app/support/page.tsx",
+      "line": 57,
+      "kind": "jsx",
+      "text": "PRIVACY AND ACCOUNT DATA"
+    },
+    {
+      "file": "aritomo-web/app/support/page.tsx",
+      "line": 59,
+      "kind": "jsx",
+      "text": "Ari provides account-data export and deletion controls in the app. You can also review the"
+    },
+    {
+      "file": "aritomo-web/app/support/page.tsx",
+      "line": 60,
+      "kind": "jsx",
+      "text": "Privacy Policy"
+    },
+    {
+      "file": "aritomo-web/app/support/page.tsx",
+      "line": 61,
+      "kind": "jsx",
+      "text": "or follow the"
+    },
+    {
+      "file": "aritomo-web/app/support/page.tsx",
+      "line": 63,
+      "kind": "jsx",
+      "text": "Account Deletion instructions"
+    },
+    {
+      "file": "aritomo-web/app/support/page.tsx",
+      "line": 70,
+      "kind": "jsx",
+      "text": "CONTACT"
+    },
+    {
+      "file": "aritomo-web/app/support/page.tsx",
+      "line": 72,
+      "kind": "jsx",
+      "text": "Pinegrass Technologies Pvt Ltd"
+    },
+    {
+      "file": "aritomo-web/app/support/page.tsx",
+      "line": 74,
+      "kind": "jsx",
+      "text": "Email:"
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 5,
+      "kind": "copy",
+      "text": "Terms of Service"
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 6,
+      "kind": "jsx",
+      "text": "Last updated: 31 May 2026"
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 9,
+      "kind": "jsx",
+      "text": "These Terms govern your use of Ari (&quot;the App&quot;) and the aritomo.in website (&quot;the Site&quot;), provided by Pinegrass Technologies Pvt Ltd."
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 14,
+      "kind": "jsx",
+      "text": "1. ACCEPTANCE"
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 16,
+      "kind": "jsx",
+      "text": "By using the App or Site, you agree to these Terms. If you do not agree, do not use them."
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 22,
+      "kind": "jsx",
+      "text": "2. ELIGIBILITY"
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 23,
+      "kind": "jsx",
+      "text": "You must be at least 18 years old to use the App."
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 27,
+      "kind": "jsx",
+      "text": "3. ACCOUNTS"
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 29,
+      "kind": "jsx",
+      "text": "You are responsible for maintaining the security of your account credentials and for all activity on your account."
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 35,
+      "kind": "jsx",
+      "text": "4. ACCEPTABLE USE"
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 36,
+      "kind": "jsx",
+      "text": "You agree not to:"
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 38,
+      "kind": "jsx",
+      "text": "Use the App for unlawful purposes."
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 39,
+      "kind": "jsx",
+      "text": "Attempt to reverse-engineer or compromise the App."
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 41,
+      "kind": "jsx",
+      "text": "Use the App to transmit malware, spam, or content that infringes on others&apos; rights."
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 48,
+      "kind": "jsx",
+      "text": "5. NOT FINANCIAL ADVICE"
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 50,
+      "kind": "jsx",
+      "text": "Ari is a personal finance tracking tool with AI-generated coaching insights. It is not a financial advisor, tax professional, or regulated financial product. Coaching content is generated by AI and should not be relied upon for investment, tax, legal, or financial planning decisions. Always consult a qualified professional for material financial decisions."
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 60,
+      "kind": "jsx",
+      "text": "6. SUBSCRIPTIONS"
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 62,
+      "kind": "jsx",
+      "text": "Certain features may require a paid subscription. Subscription terms, pricing, and cancellation are described in the App at the point of purchase."
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 69,
+      "kind": "jsx",
+      "text": "7. TERMINATION"
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 71,
+      "kind": "jsx",
+      "text": "We may suspend or terminate your account if you violate these Terms. You may delete your account at any time."
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 77,
+      "kind": "jsx",
+      "text": "8. DISCLAIMERS"
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 79,
+      "kind": "jsx",
+      "text": "The App is provided &quot;as is&quot; without warranty of any kind. We do not guarantee uninterrupted availability or freedom from errors."
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 85,
+      "kind": "jsx",
+      "text": "9. LIMITATION OF LIABILITY"
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 87,
+      "kind": "jsx",
+      "text": "To the maximum extent permitted by law, Pinegrass is not liable for indirect, incidental, or consequential damages arising from your use of the App."
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 94,
+      "kind": "jsx",
+      "text": "10. GOVERNING LAW"
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 96,
+      "kind": "jsx",
+      "text": "These Terms are governed by the laws of India. Disputes will be resolved in the courts of Imphal, Manipur."
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 102,
+      "kind": "jsx",
+      "text": "11. CHANGES"
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 104,
+      "kind": "jsx",
+      "text": "We may update these Terms. Continued use after changes constitutes acceptance."
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 110,
+      "kind": "jsx",
+      "text": "12. CONTACT"
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 112,
+      "kind": "jsx",
+      "text": "Pinegrass Technologies Pvt Ltd"
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 114,
+      "kind": "jsx",
+      "text": "Email: legal@pinegrass.in"
+    },
+    {
+      "file": "aritomo-web/app/terms/page.tsx",
+      "line": 116,
+      "kind": "jsx",
+      "text": "Address: [TO BE FILLED]"
+    },
+    {
+      "file": "aritomo-web/components/app/PnlReport.tsx",
+      "line": 53,
+      "kind": "jsx",
+      "text": "3 months"
+    },
+    {
+      "file": "aritomo-web/components/app/PnlReport.tsx",
+      "line": 54,
+      "kind": "jsx",
+      "text": "6 months"
+    },
+    {
+      "file": "aritomo-web/components/app/PnlReport.tsx",
+      "line": 55,
+      "kind": "jsx",
+      "text": "12 months"
+    },
+    {
+      "file": "aritomo-web/components/app/PnlReport.tsx",
+      "line": 69,
+      "kind": "jsx",
+      "text": "Building your report…"
+    },
+    {
+      "file": "aritomo-web/components/app/PnlReport.tsx",
+      "line": 83,
+      "kind": "copy",
+      "text": "Total income"
+    },
+    {
+      "file": "aritomo-web/components/app/PnlReport.tsx",
+      "line": 84,
+      "kind": "copy",
+      "text": "Total expenses"
+    },
+    {
+      "file": "aritomo-web/components/app/PnlReport.tsx",
+      "line": 85,
+      "kind": "copy",
+      "text": "Net"
+    },
+    {
+      "file": "aritomo-web/components/app/PnlReport.tsx",
+      "line": 86,
+      "kind": "copy",
+      "text": "Average net cash flow rate"
+    },
+    {
+      "file": "aritomo-web/components/app/PnlReport.tsx",
+      "line": 91,
+      "kind": "copy",
+      "text": "Income trend"
+    },
+    {
+      "file": "aritomo-web/components/app/PnlReport.tsx",
+      "line": 97,
+      "kind": "copy",
+      "text": "Spending trend"
+    },
+    {
+      "file": "aritomo-web/components/app/PnlReport.tsx",
+      "line": 107,
+      "kind": "copy",
+      "text": "Month by month"
+    },
+    {
+      "file": "aritomo-web/components/app/PnlReport.tsx",
+      "line": 136,
+      "kind": "jsx",
+      "text": "Net"
+    },
+    {
+      "file": "aritomo-web/components/app/PnlReport.tsx",
+      "line": 142,
+      "kind": "jsx",
+      "text": "Net cash flow rate"
+    },
+    {
+      "file": "aritomo-web/components/app/PnlReport.tsx",
+      "line": 152,
+      "kind": "copy",
+      "text": "Where it goes"
+    },
+    {
+      "file": "aritomo-web/components/app/PnlReport.tsx",
+      "line": 175,
+      "kind": "jsx",
+      "text": "No expense data in this window."
+    },
+    {
+      "file": "aritomo-web/components/app/PnlReport.tsx",
+      "line": 180,
+      "kind": "copy",
+      "text": "Income mix"
+    },
+    {
+      "file": "aritomo-web/components/app/PnlReport.tsx",
+      "line": 195,
+      "kind": "jsx",
+      "text": "No income recorded in this window."
+    },
+    {
+      "file": "aritomo-web/components/app/ProUpsell.tsx",
+      "line": 201,
+      "kind": "jsx",
+      "text": "Upgrade on Android"
+    },
+    {
+      "file": "aritomo-web/components/app/ProUpsell.tsx",
+      "line": 254,
+      "kind": "jsx",
+      "text": "Pro is active on this account"
+    },
+    {
+      "file": "aritomo-web/components/app/ProUpsell.tsx",
+      "line": 259,
+      "kind": "jsx",
+      "text": "Choose a plan — cancel anytime"
+    },
+    {
+      "file": "aritomo-web/components/app/ProUpsell.tsx",
+      "line": 274,
+      "kind": "jsx",
+      "text": "per month"
+    },
+    {
+      "file": "aritomo-web/components/app/ProUpsell.tsx",
+      "line": 289,
+      "kind": "jsx",
+      "text": "Secure Razorpay checkout · cancel anytime · works instantly on mobile too"
+    },
+    {
+      "file": "aritomo-web/components/app/ProUpsell.tsx",
+      "line": 301,
+      "kind": "jsx",
+      "text": "Upgrade on Android"
+    },
+    {
+      "file": "aritomo-web/components/app/ProUpsell.tsx",
+      "line": 317,
+      "kind": "jsx",
+      "text": "Web payments are processed by Razorpay (UPI, cards, netbanking). Android users can also subscribe through Google Play — both unlock the same account everywhere."
+    },
+    {
+      "file": "aritomo-web/components/app/SavingsGoals.tsx",
+      "line": 138,
+      "kind": "copy",
+      "text": "Create a goal"
+    },
+    {
+      "file": "aritomo-web/components/app/SavingsGoals.tsx",
+      "line": 142,
+      "kind": "copy",
+      "text": "Goal name — e.g. Goa trip"
+    },
+    {
+      "file": "aritomo-web/components/app/SavingsGoals.tsx",
+      "line": 152,
+      "kind": "copy",
+      "text": "Target amount"
+    },
+    {
+      "file": "aritomo-web/components/app/SavingsGoals.tsx",
+      "line": 161,
+      "kind": "copy",
+      "text": "Already saved"
+    },
+    {
+      "file": "aritomo-web/components/app/SavingsGoals.tsx",
+      "line": 173,
+      "kind": "jsx",
+      "text": "Icon"
+    },
+    {
+      "file": "aritomo-web/components/app/SavingsGoals.tsx",
+      "line": 204,
+      "kind": "jsx",
+      "text": "Loading goals…"
+    },
+    {
+      "file": "aritomo-web/components/app/SavingsGoals.tsx",
+      "line": 265,
+      "kind": "jsx",
+      "text": "Goal completed — nice work."
+    },
+    {
+      "file": "aritomo-web/components/app/SettingsPanel.tsx",
+      "line": 260,
+      "kind": "jsx",
+      "text": "Default"
+    },
+    {
+      "file": "aritomo-web/components/app/TaxEstimator.tsx",
+      "line": 148,
+      "kind": "jsx",
+      "text": "This country uses the generic progressive estimator. India, US, UK and Australia get dedicated tax engines."
+    },
+    {
+      "file": "aritomo-web/components/app/TaxEstimator.tsx",
+      "line": 172,
+      "kind": "copy",
+      "text": "Section 80C (PPF/ELSS/EPF…)"
+    },
+    {
+      "file": "aritomo-web/components/app/TaxEstimator.tsx",
+      "line": 173,
+      "kind": "copy",
+      "text": "Section 80D (health cover)"
+    },
+    {
+      "file": "aritomo-web/components/app/TaxEstimator.tsx",
+      "line": 174,
+      "kind": "copy",
+      "text": "Home loan interest"
+    },
+    {
+      "file": "aritomo-web/components/app/TaxEstimator.tsx",
+      "line": 175,
+      "kind": "copy",
+      "text": "Other deductions"
+    },
+    {
+      "file": "aritomo-web/components/app/TaxEstimator.tsx",
+      "line": 176,
+      "kind": "copy",
+      "text": "HRA received"
+    },
+    {
+      "file": "aritomo-web/components/app/TaxEstimator.tsx",
+      "line": 180,
+      "kind": "copy",
+      "text": "Retirement / pension"
+    },
+    {
+      "file": "aritomo-web/components/app/TaxEstimator.tsx",
+      "line": 181,
+      "kind": "copy",
+      "text": "Other deductions"
+    },
+    {
+      "file": "aritomo-web/components/app/TaxEstimator.tsx",
+      "line": 186,
+      "kind": "jsx",
+      "text": "Metro city (HRA 50%)"
+    },
+    {
+      "file": "aritomo-web/components/app/TaxEstimator.tsx",
+      "line": 192,
+      "kind": "jsx",
+      "text": "GST registered (freelance)"
+    },
+    {
+      "file": "aritomo-web/components/app/TaxEstimator.tsx",
+      "line": 227,
+      "kind": "copy",
+      "text": "Old vs new regime"
+    },
+    {
+      "file": "aritomo-web/components/app/TaxEstimator.tsx",
+      "line": 229,
+      "kind": "copy",
+      "text": "Old regime"
+    },
+    {
+      "file": "aritomo-web/components/app/TaxEstimator.tsx",
+      "line": 230,
+      "kind": "copy",
+      "text": "New regime"
+    },
+    {
+      "file": "aritomo-web/components/app/TaxEstimator.tsx",
+      "line": 241,
+      "kind": "copy",
+      "text": "Breakdown"
+    },
+    {
+      "file": "aritomo-web/components/app/TaxEstimator.tsx",
+      "line": 243,
+      "kind": "copy",
+      "text": "Gross income"
+    },
+    {
+      "file": "aritomo-web/components/app/TaxEstimator.tsx",
+      "line": 244,
+      "kind": "copy",
+      "text": "Deductions"
+    },
+    {
+      "file": "aritomo-web/components/app/TaxEstimator.tsx",
+      "line": 245,
+      "kind": "copy",
+      "text": "Taxable income"
+    },
+    {
+      "file": "aritomo-web/components/app/TaxEstimator.tsx",
+      "line": 246,
+      "kind": "copy",
+      "text": "Income tax"
+    },
+    {
+      "file": "aritomo-web/components/app/TaxEstimator.tsx",
+      "line": 247,
+      "kind": "copy",
+      "text": "Cess / payroll"
+    },
+    {
+      "file": "aritomo-web/components/app/TaxEstimator.tsx",
+      "line": 254,
+      "kind": "copy",
+      "text": "Freelance GST"
+    },
+    {
+      "file": "aritomo-web/components/app/TaxEstimator.tsx",
+      "line": 342,
+      "kind": "jsx",
+      "text": "HRA exempted:"
+    },
+    {
+      "file": "aritomo-web/components/app/TodoNotes.tsx",
+      "line": 127,
+      "kind": "copy",
+      "text": "New note"
+    },
+    {
+      "file": "aritomo-web/components/app/TodoNotes.tsx",
+      "line": 131,
+      "kind": "copy",
+      "text": "Title — e.g. Cancel unused OTT subscription"
+    },
+    {
+      "file": "aritomo-web/components/app/TodoNotes.tsx",
+      "line": 137,
+      "kind": "copy",
+      "text": "Details (optional)"
+    },
+    {
+      "file": "aritomo-web/components/app/TodoNotes.tsx",
+      "line": 146,
+      "kind": "jsx",
+      "text": "priority"
+    },
+    {
+      "file": "aritomo-web/components/app/TodoNotes.tsx",
+      "line": 152,
+      "kind": "jsx",
+      "text": "Color"
+    },
+    {
+      "file": "aritomo-web/components/app/TodoNotes.tsx",
+      "line": 185,
+      "kind": "jsx",
+      "text": "Loading notes…"
+    },
+    {
+      "file": "aritomo-web/components/app/TodoNotes.tsx",
+      "line": 247,
+      "kind": "jsx",
+      "text": "Due"
+    },
+    {
+      "file": "aritomo-web/components/app/TodoNotes.tsx",
+      "line": 251,
+      "kind": "jsx",
+      "text": "Pinned"
+    },
+    {
+      "file": "aritomo-web/components/app/TomoChat.tsx",
+      "line": 83,
+      "kind": "jsx",
+      "text": "Hey, I&apos;m Tomo."
+    },
+    {
+      "file": "aritomo-web/components/app/TomoChat.tsx",
+      "line": 85,
+      "kind": "jsx",
+      "text": "Your money, minus the mystery. Start with one of these, or ask me anything about your finances."
+    },
+    {
+      "file": "aritomo-web/components/app/TomoChat.tsx",
+      "line": 139,
+      "kind": "jsx",
+      "text": "Today&apos;s free Tomo messages are used up"
+    },
+    {
+      "file": "aritomo-web/components/app/TomoChat.tsx",
+      "line": 143,
+      "kind": "jsx",
+      "text": "Ari Pro unlocks unlimited coaching, weekly briefs, subscription-leak detection and tax tools — and it works on web and mobile with the same account."
+    },
+    {
+      "file": "aritomo-web/components/app/TomoChat.tsx",
+      "line": 204,
+      "kind": "jsx",
+      "text": "Free accounts get a handful of Tomo messages per day. When they run out, the inbox, budgets and reports keep working — and Pro removes the cap everywhere."
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 55,
+      "kind": "copy",
+      "text": "Inbox"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 56,
+      "kind": "copy",
+      "text": "Tomo"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 57,
+      "kind": "copy",
+      "text": "Tomo updates"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 58,
+      "kind": "copy",
+      "text": "Plan to payday"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 59,
+      "kind": "copy",
+      "text": "Goals"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 60,
+      "kind": "copy",
+      "text": "Reports"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 61,
+      "kind": "copy",
+      "text": "Taxes"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 62,
+      "kind": "copy",
+      "text": "Notes"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 63,
+      "kind": "copy",
+      "text": "Settings"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 333,
+      "kind": "jsx",
+      "text": "Preparing your Ari Inbox…"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 346,
+      "kind": "jsx",
+      "text": "Sign in to Ari web."
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 348,
+      "kind": "jsx",
+      "text": "Ari web uses your Google or email account to keep your money review in sync with the mobile app."
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 375,
+      "kind": "jsx",
+      "text": "Inbox unavailable"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 381,
+      "kind": "jsx",
+      "text": "Sign out and retry"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 393,
+      "kind": "copy",
+      "text": "Ari home"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 398,
+      "kind": "jsx",
+      "text": "Ari"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 399,
+      "kind": "jsx",
+      "text": "Web"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 407,
+      "kind": "jsx",
+      "text": "Pro"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 430,
+      "kind": "copy",
+      "text": "Ari sections"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 463,
+      "kind": "jsx",
+      "text": "Hi"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 463,
+      "kind": "jsx",
+      "text": ", here&apos;s your money."
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 544,
+      "kind": "jsx",
+      "text": "P&amp;L"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 614,
+      "kind": "jsx",
+      "text": "Balance this month"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 711,
+      "kind": "copy",
+      "text": "Quick add"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 742,
+      "kind": "copy",
+      "text": "Amount"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 772,
+      "kind": "copy",
+      "text": "Description — e.g. Lunch with Riya"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 840,
+      "kind": "jsx",
+      "text": "Live"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 875,
+      "kind": "copy",
+      "text": "Tomo insight"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 885,
+      "kind": "copy",
+      "text": "Possible subscription leak"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 897,
+      "kind": "jsx",
+      "text": "Your inbox is quiet. Add a transaction above or capture one on the mobile app — it will land here automatically."
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 949,
+      "kind": "jsx",
+      "text": "Tomo · AI coach"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 956,
+      "kind": "jsx",
+      "text": "Try asking:"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 1069,
+      "kind": "copy",
+      "text": "Budget planner"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 1087,
+      "kind": "copy",
+      "text": "Monthly limit"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 1115,
+      "kind": "copy",
+      "text": "Category pulse"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 1144,
+      "kind": "jsx",
+      "text": "Category insights will appear after this month has expense data."
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 1165,
+      "kind": "copy",
+      "text": "Sync"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 1171,
+      "kind": "jsx",
+      "text": "One account, everywhere"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 1173,
+      "kind": "jsx",
+      "text": "Web and mobile talk to the same Ari API as"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 1174,
+      "kind": "jsx",
+      "text": ". Anything you add here appears on your phone, and vice versa."
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 1181,
+      "kind": "jsx",
+      "text": "API"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 1185,
+      "kind": "jsx",
+      "text": "Identity"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 1189,
+      "kind": "jsx",
+      "text": "Last synced"
+    },
+    {
+      "file": "aritomo-web/components/AppDashboard.tsx",
+      "line": 1200,
+      "kind": "jsx",
+      "text": "Sync now"
+    },
+    {
+      "file": "aritomo-web/components/AuthCallback.tsx",
+      "line": 88,
+      "kind": "jsx",
+      "text": "Back to sign in"
+    },
+    {
+      "file": "aritomo-web/components/AuthForm.tsx",
+      "line": 25,
+      "kind": "copy",
+      "text": "One inbox for your money"
+    },
+    {
+      "file": "aritomo-web/components/AuthForm.tsx",
+      "line": 26,
+      "kind": "copy",
+      "text": "Tomo, your AI coach"
+    },
+    {
+      "file": "aritomo-web/components/AuthForm.tsx",
+      "line": 27,
+      "kind": "copy",
+      "text": "Private by design"
+    },
+    {
+      "file": "aritomo-web/components/AuthForm.tsx",
+      "line": 86,
+      "kind": "jsx",
+      "text": "Ari"
+    },
+    {
+      "file": "aritomo-web/components/AuthForm.tsx",
+      "line": 93,
+      "kind": "jsx",
+      "text": "Sign in with Google or email to review your money on a larger screen, spot patterns, and keep Tomo close when you need a sharper financial next step."
+    },
+    {
+      "file": "aritomo-web/components/AuthForm.tsx",
+      "line": 122,
+      "kind": "jsx",
+      "text": "Ari"
+    },
+    {
+      "file": "aritomo-web/components/AuthForm.tsx",
+      "line": 172,
+      "kind": "copy",
+      "text": "you@example.com"
+    },
+    {
+      "file": "aritomo-web/components/HomePage.tsx",
+      "line": 9,
+      "kind": "copy",
+      "text": "Make sense of your everyday money."
+    },
+    {
+      "file": "aritomo-web/components/HomePage.tsx",
+      "line": 74,
+      "kind": "copy",
+      "text": "Ari home"
+    },
+    {
+      "file": "aritomo-web/components/HomePage.tsx",
+      "line": 74,
+      "kind": "jsx",
+      "text": "ari."
+    },
+    {
+      "file": "aritomo-web/components/HomePage.tsx",
+      "line": 79,
+      "kind": "jsx",
+      "text": "ARI / TOMO"
+    },
+    {
+      "file": "aritomo-web/components/HomePage.tsx",
+      "line": 83,
+      "kind": "jsx",
+      "text": "ari."
+    },
+    {
+      "file": "aritomo-web/components/HomePage.tsx",
+      "line": 83,
+      "kind": "jsx",
+      "text": "© 2026 Pinegrass Technologies Pvt Ltd"
+    },
+    {
+      "file": "aritomo-web/components/HomePage.tsx",
+      "line": 83,
+      "kind": "jsx",
+      "text": "support@pinegrass.in"
+    },
+    {
+      "file": "aritomo-web/components/LegalPage.tsx",
+      "line": 16,
+      "kind": "jsx",
+      "text": "Back to Ari"
+    },
+    {
+      "file": "aritomo-web/components/WaitlistForm.tsx",
+      "line": 108,
+      "kind": "copy",
+      "text": "you@example.com"
+    }
+  ]
+}
