@@ -4,7 +4,7 @@ import TrialCard from '../TrialCard';
 import {apiRequest} from '../../api/client';
 let mockFocus:()=>void|(()=>void);
 const mockRefresh=jest.fn().mockResolvedValue(undefined);
-jest.mock('@react-navigation/native',()=>({useFocusEffect:(callback:()=>void|(()=>void))=>{mockFocus=callback;require('react').useEffect(callback,[callback]);}}));
+jest.mock('@react-navigation/native',()=>({useFocusEffect:(callback:()=>void|(()=>void))=>{mockFocus=callback;jest.requireActual('react').useEffect(callback,[callback]);}}));
 jest.mock('../../api/client',()=>({apiRequest:jest.fn()}));
 jest.mock('../../context/AuthContext',()=>({useAuth:()=>({user:{id:1},refreshFromSession:mockRefresh})}));
 jest.mock('../../i18n/LanguageContext',()=>({useLanguage:()=>({t:(key:string)=>key})}));
