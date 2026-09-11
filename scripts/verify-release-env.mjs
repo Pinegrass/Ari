@@ -16,8 +16,7 @@ const required = [
 ];
 
 if (platform === 'ios') {
-  // RevenueCat is optional until the App Store public SDK key is provisioned.
-  // The app intentionally runs with purchases disabled when it is absent.
+  required.push('EXPO_PUBLIC_REVENUECAT_IOS_API_KEY');
 } else {
   required.push('EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY', 'GOOGLE_SERVICES_JSON');
 }
