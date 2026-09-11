@@ -1,9 +1,13 @@
-const releaseProfiles = new Set(['preview', 'production']);
+const releaseProfiles = new Set(['preview', 'production', 'internal-release']);
 const profile = process.env.EAS_BUILD_PROFILE;
 
 if (!releaseProfiles.has(profile)) {
   console.log(`[release-env] Skipping release checks for profile ${profile ?? 'local'}.`);
   process.exit(0);
+}
+
+if (process.env.EXPO_PUBLIC_MAESTRO_E2E === '1') {
+  throw new Error('[release-env] Test entitlement overrides must not be included in release builds.');
 }
 
 const platform = process.env.EAS_BUILD_PLATFORM ?? process.env.PINEGRASS_BUILD_PLATFORM;
