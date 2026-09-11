@@ -9,6 +9,15 @@ module.exports = ({ config }) => {
 
   return {
     ...config,
+    ...(process.env.EXPO_UPDATES_CHANNEL ? {
+      updates: {
+        ...config.updates,
+        requestHeaders: {
+          ...config.updates?.requestHeaders,
+          'expo-channel-name': process.env.EXPO_UPDATES_CHANNEL,
+        },
+      },
+    } : {}),
     android: {
       ...config.android,
       ...(googleServicesFile ? { googleServicesFile } : {}),

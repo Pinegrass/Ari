@@ -257,13 +257,11 @@ definitions:
     app_store_connect:
       auth: integration
       submit_to_testflight: true
-      submit_to_app_store: true
-      release_type: MANUAL
-      phased_release: true
+      submit_to_app_store: false
 
 workflows:
   ari-ios-workflow:
-    name: Ari - iOS App Store release
+    name: Ari - iOS TestFlight verification
     max_build_duration: 90
     triggering:
       events:
@@ -281,6 +279,8 @@ workflows:
         XCODE_SCHEME: "Ari"
         APP_ID: "6789322260"
         SENTRY_DISABLE_AUTO_UPLOAD: "true"
+        APP_VARIANT: "production"
+        EXPO_UPDATES_CHANNEL: "internal-release"
       node: 20
       xcode: 26.4
       cocoapods: default
