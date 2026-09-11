@@ -1,5 +1,6 @@
 /** Language is independent of country/currency. New languages extend this registry. */
 export const en = {
+  more: 'More',
   planning: 'Plan to payday', planningHelp: 'Estimate from cash and obligations you confirm. Expected income is excluded. This is not a bank balance or a guarantee.',
   cashNow: 'Available cash now', protectedReserve: 'Money to keep aside', nextPayday: 'Next payday (YYYY-MM-DD)', obligationAmount: 'Amount due', obligationDate: 'Due date (YYYY-MM-DD)',
   addObligation: 'Add an obligation', removeObligation: 'Remove obligation', confirmPlanning: 'I checked my cash and included every obligation through payday.',
@@ -44,6 +45,7 @@ export const en = {
 
 export type MessageKey = keyof typeof en;
 export const hi: Record<MessageKey, string> = {
+  more: 'और',
   planning: 'अगली आमदनी तक की योजना', planningHelp: 'आपके बताए नकद और देनदारियों से बना अनुमान। आने वाली आमदनी इसमें नहीं जुड़ती। यह बैंक बैलेंस या गारंटी नहीं है।',
   cashNow: 'अभी उपलब्ध नकद', protectedReserve: 'अलग रखी जाने वाली रकम', nextPayday: 'अगली आमदनी की तारीख (YYYY-MM-DD)', obligationAmount: 'देय रकम', obligationDate: 'भुगतान की तारीख (YYYY-MM-DD)',
   addObligation: 'देनदारी जोड़ें', removeObligation: 'देनदारी हटाएँ', confirmPlanning: 'मैंने नकद जाँचा है और अगली आमदनी तक की सभी देनदारियाँ शामिल की हैं।',
@@ -89,7 +91,7 @@ export const hi: Record<MessageKey, string> = {
 export const catalogs = { en, hi };
 export type Language = keyof typeof catalogs;
 export function translate(language: Language, key: MessageKey, values: Record<string, string | number> = {}): string {
-  const message = catalogs[language]?.[key] ?? en[key];
+  const message = catalogs[language]?.[key] ?? en[key] ?? String(key);
   return message.replace(/\{(\w+)\}/g, (token, name) => values[name] === undefined ? token : String(values[name]));
 }
 export function entryCount(language: Language, count: number): string {

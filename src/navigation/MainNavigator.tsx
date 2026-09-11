@@ -74,13 +74,13 @@ const fab = StyleSheet.create({
   plus: { color: color.card, fontSize: 28, lineHeight: 32, fontFamily: font.body },
 });
 
-type RealTab = { name: Exclude<keyof TabParamList, 'Add' | 'Transactions'>; icon: IconName; label: string; component: React.ComponentType<any> };
+type RealTab = { name: Exclude<keyof TabParamList, 'Add' | 'Transactions'>; icon: IconName; label: MessageKey; component: React.ComponentType<any> };
 const AccountantTabScreen = () => <AccountantScreen embedded />;
 const TABS: RealTab[] = [
-  { name: 'Dashboard',    icon: 'home',    label: 'Home',   component: DashboardScreen },
-  { name: 'Accountant',   icon: 'briefcase', label: 'Accountant', component: AccountantTabScreen },
-  { name: 'Tomo',         icon: 'bot',     label: 'Tomo',   component: TomoScreen },
-  { name: 'Settings',     icon: 'settings', label: 'More', component: SettingsScreen },
+  { name: 'Dashboard',    icon: 'home',    label: 'home',   component: DashboardScreen },
+  { name: 'Accountant',   icon: 'briefcase', label: 'accountant', component: AccountantTabScreen },
+  { name: 'Tomo',         icon: 'bot',     label: 'tomo',   component: TomoScreen },
+  { name: 'Settings',     icon: 'settings', label: 'more', component: SettingsScreen },
 ];
 
 function TabNavigator() {
@@ -116,8 +116,8 @@ function TabNavigator() {
           name={tab.name}
           component={tab.component}
           options={{
-            tabBarLabel: t(tab.label.toLowerCase() as MessageKey),
-            tabBarAccessibilityLabel: t(tab.label.toLowerCase() as MessageKey),
+            tabBarLabel: t(tab.label),
+            tabBarAccessibilityLabel: t(tab.label),
             tabBarIcon: ({ focused }) => (
               <Icon
                 name={tab.icon}
@@ -147,8 +147,8 @@ function TabNavigator() {
           name={tab.name}
           component={tab.component}
           options={{
-            tabBarLabel: t(tab.label.toLowerCase() as MessageKey),
-            tabBarAccessibilityLabel: t(tab.label.toLowerCase() as MessageKey),
+            tabBarLabel: t(tab.label),
+            tabBarAccessibilityLabel: t(tab.label),
             tabBarIcon: ({ focused }) => (
               <Icon
                 name={tab.icon}
