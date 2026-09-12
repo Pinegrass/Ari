@@ -49,3 +49,17 @@ known_blockers: [Google Play submission permission, BillDesk verification, store
 evidence: docs/product-programme-2026-09/android-completion.md
 important_paths: [src, supabase, backend, aritomo-web, docs]
 continuity_schema_version: 1
+
+integration_review:
+  date: 2026-09-12
+  findings: {p1: 2, p2: 1, fixed: 3}
+  focused_tests: {backend: 66_pass, mobile: 27_pass, web: 9_pass}
+  report: docs/product-programme-2026-09/integration-review-2026-09-12.md
+
+integration_fixes:
+  mobile_commit: 1c6077d6c6fea304218d7d92505295cee96672f8
+  backend_commit: 84f4df41bbac721184b21daf214904647c3493bb
+  web_commit: 2b9647a1c814284214f555875dfa30c63a8105db
+  tests: {mobile: 522_pass, backend: 300_pass, web: 11_pass}
+  on_device_testing: prohibited_by_owner_not_run
+  distribution: none

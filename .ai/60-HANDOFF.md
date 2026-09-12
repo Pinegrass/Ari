@@ -1,18 +1,12 @@
-# Latest handoff — Android v61 verified
-Updated: 2026-09-12 IST
+# Latest handoff — Integration fixes complete locally
+Updated:2026-09-12
 
-Owner prioritised Android; approved ₹149/month, ₹1,499/year and a 14-day no-card trial after the first recorded entry. BillDesk incomplete; iPhone deferred to Codemagic/later. Latest ready reply allowed final Samsung checks.
+User requested all three review fixes and explicitly NO on-device testing afterward. No phone/emulator/simulator testing, push, deployment, OTA or native build was performed. Preserve that restriction.
 
-Release source e9d1cb4e6263b0760a2ca9d07646774f65658498, pushed codex/ari-android-product-20260911; canonical source matches. Subsequent continuity commits are not artifact source. Backend a4014a860d8f6efd17df26f5d1d27e3efb53f717 live via Railway ef35a25b-a2d1-4a05-a972-3741b6f44f7f. Web7d11e4f remains live; local product changes not deployed. Preserve unrelated release reports and nested web edits.
+Local implementation commits: mobile 1c6077d6c6fea304218d7d92505295cee96672f8; backend 84f4df41bbac721184b21daf214904647c3493bb; canonical web 2b9647a1c814284214f555875dfa30c63a8105db. Web commit includes previously dirty programme source required for an integrated checkpoint. Generated web AGENTS.md/CLAUDE.md and unrelated release/archive files remain untracked; preserve them.
 
-Final Android1.3.0/code61 EAS51376781-e083-42f3-9724-8bd16cc006fd FINISHED. Runtime f82b9c561785202f8057920d7a8a052d15c1ed33, internal-release. AAB SHA256 a0c0b5b5419bd3539f1277e52a7da2e6a1499164f391db6f7bbf6072ac4e26b3. AAB and signed device splits validated. v58-v60 superseded. Links/hashes in docs/product-programme-2026-09/android-completion.md.
+Fixed: account-local-midnight snapshot expiry with optional expiresAt response; client deadline checks and stale-response generations; web blur/visibility invalidation and focus/ledger revision reload; report-action/planning-save/trial-start event wiring through existing consent/privacy gates.
 
-Samsung R9ZY6046FML SM_M166P API36 now v61, installed preserving data. Final Home, More, existing session, About embedded eaddd186-3a7d-4d79-8181-0dcdffd4e92d, runtime/channel, up-to-date status and planning bottom safe area verified. Left Ari on Home. No owner ledger or trial changed. Captured log has RevenueCat catalog ConfigurationError (no offerings), no AndroidRuntime crash.
+Tests:522mobile/47suites,300backend,11web/4suites pass. Types and changed-file lint pass; web production build passes. Evidence: docs/product-programme-2026-09/integration-fixes-2026-09-12.md. No schema change. New source is not live: installedv61/sourcee9d1cb4, backend a4014a8 and web7d11e4f are still the prior release evidence. Backend deployment must precede client distribution for expiresAt. No distribution authorised merely by fixes.
 
-Isolated AOSP API36 emulator verified five report periods/history, private planning,150%font, offline entry recovery exactly once, offline cold start,14-day UI trial, entry edit/delete. Fresh native v61 offline launch, online sign-in and embedded About verified. Initial sign-in snapshot was still loading; subsequent Home succeeded without changes.45suites/516tests/types/lint pass. Backend299tests/66PGchecks/29liveAPIchecks; four migrations applied with RLS; outbox gated off.
-
-Play internal submission348b172e-aef5-49c1-bc11-0e59926a0cc9 FAILED: service account lacks submission permission. Edit/read access works but does not imply upload access. Post-failure API verified production57completed and internal57draft/5completed unchanged; temporary edit discarded204. No v61 Play distribution or production OTA/rollout. Correct Play app release permissions or upload exact AAB with an authorised Console account, then retry internal. Catalog403/RevenueCat offerings and real purchase/restore remain separate blockers.
-
-Cleanup complete: password-confirmed deletion of emulator account; scoped DB confirms app/auth users0, test entries already0. Emulator app data cleared and emulator-5580 stopped. Copied worktree service-account key removed; root original preserved. Private local DB copy removed. Local PostgreSQL test container stopped. Private evidence: D:/Codex/Artifacts/Ari/2026-09-11; never commit credentials or financial screenshots.
-
-Remaining: Play submission permission, merchant/catalog and paid purchase/restore, actual push display/receipt verification (outbox off), full Hindi/native legal review, separate web delivery and deferred iOS. Do not repeat completed implementation or claim these external checks complete.
+Remaining external blockers: Play release service-account permission, merchant/catalog and real purchase/restore, real push display/receipts (outbox gated off), full Hindi/native review and deferred iPhone. Review findings themselves resolved locally.

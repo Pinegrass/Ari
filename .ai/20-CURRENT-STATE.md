@@ -11,3 +11,7 @@ Android v61 is installed preserving the Samsung session and data. Final Home/Mor
 Google Play internal submission348b172e-aef5-49c1-bc11-0e59926a0cc9 failed: service account lacks submission permission. Post-failure track inspection confirms production57completed/internal57draft and5completed unchanged. Edit/read access alone is insufficient. No new Play distribution or production OTA. Catalog403 and RevenueCat missing offerings remain; real purchase/restore blocked. Copied worktree credential removed.
 
 Evidence: `docs/product-programme-2026-09/android-completion.md`. Historical release checkpoints are archived; earlier phone-free and unapproved-pricing restrictions are superseded. Other programme gaps include full Hindi/native review, real push receipt evidence and web delivery.
+
+Latest targeted integration review found two P1planning defects and missing measurement wiring; findings remain unfixed. Current focused102tests pass, but do not cover these gaps. See `docs/product-programme-2026-09/integration-review-2026-09-12.md`. Prior device verification does not resolve these newly identified cases.
+
+The latest review findings are now fixed locally: midnight expiry, web planning refresh and event wiring. Source/test details in `integration-fixes-2026-09-12.md`;522mobile/300backend/11web tests pass. No device testing, deployment or distribution; earlier live identities above remain unchanged. Web product source is now committed locally at2b9647a.
