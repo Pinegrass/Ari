@@ -1,21 +1,13 @@
 # Current state — 12 September 2026
 
-Android product completion is active. Owner approves ₹149/month, ₹1,499/year and a 14-day no-card trial after the first recorded entry. BillDesk verification remains incomplete; iPhone testing is deferred to Codemagic/later.
+The five Android user-journey findings are fixed locally. Mobile `5ba6d31`, backend `c05a77f`, web `c10caca`. Source and evidence: `docs/product-programme-2026-09/usability-fixes-2026-09-12.md`.
 
-- Mobile source: `e9d1cb4e6263b0760a2ca9d07646774f65658498`, master locally and pushed candidate branch `codex/ari-android-product-20260911`. 45 suites/516 tests, TypeScript and lint pass. v61 EAS `51376781-e083-42f3-9724-8bd16cc006fd` finished, installed and verified on Samsung and emulator on internal-release; runtime `f82b9c561785202f8057920d7a8a052d15c1ed33`.
-- Backend: `a4014a860d8f6efd17df26f5d1d27e3efb53f717` live, Railway `ef35a25b-a2d1-4a05-a972-3741b6f44f7f`. 299 tests, 66 PostgreSQL feature checks, 29 authenticated live API checks pass. Four additive migrations applied; RLS verified; synthetic accounts deleted. Local test container stopped. Automated outbox sends gated off pending real delivery checks.
-- Web: `7d11e4f5d28a6defed8613a15123044a5c6e1663` remains live; local product changes pass nine tests, types, lint and production build, but are not deployed.
+Planning retries preserve drafts; date picking and inline validation prevent invalid submissions. INR paise work through entry, server validation and display. Report drilldown retains dates. Home/history and confirmed deletion are easier to reach.
 
-Android v61 is installed preserving the Samsung session and data. Final Home/More, embedded bundle identity and planning safe-area fix verified. Emulator checks passed all report periods/history, private planning, enlarged text, offline cold start and recovery exactly once, UI trial activation, edit/delete. Disposable account deleted (app/auth counts0), emulator data cleared and emulator stopped. v58-v60 superseded.
+Verification: 534 mobile tests (50 suites), 301 backend tests, 12 web tests. Types, changed-source lint, web build pass. No device testing or release in this implementation turn. Backend must deploy before the client paise change.
 
-Google Play internal submission348b172e-aef5-49c1-bc11-0e59926a0cc9 failed: service account lacks submission permission. Post-failure track inspection confirms production57completed/internal57draft and5completed unchanged. Edit/read access alone is insufficient. No new Play distribution or production OTA. Catalog403 and RevenueCat missing offerings remain; real purchase/restore blocked. Copied worktree credential removed.
+Last exercised phone: Samsung SM_M166P API36, v61, internal update `01a0948a-72b6-7334-ae99-f209255c567e` from mobile `1c6077d`. Physical walkthrough completed, temporary entry deleted, original baseline restored. These new fixes are not on that phone.
 
-Evidence: `docs/product-programme-2026-09/android-completion.md`. Historical release checkpoints are archived; earlier phone-free and unapproved-pricing restrictions are superseded. Other programme gaps include full Hindi/native review, real push receipt evidence and web delivery.
+Live backend remains `a4014a860d8f6efd17df26f5d1d27e3efb53f717`; live web remains `7d11e4f5d28a6defed8613a15123044a5c6e1663`. Local backend also contains the earlier midnight planning-expiry fix, still undeployed.
 
-Latest targeted integration review found two P1planning defects and missing measurement wiring; findings remain unfixed. Current focused102tests pass, but do not cover these gaps. See `docs/product-programme-2026-09/integration-review-2026-09-12.md`. Prior device verification does not resolve these newly identified cases.
-
-The latest review findings are now fixed locally: midnight expiry, web planning refresh and event wiring. Source/test details in `integration-fixes-2026-09-12.md`;522mobile/300backend/11web tests pass. No device testing, deployment or distribution; earlier live identities above remain unchanged. Web product source is now committed locally at2b9647a.
-
-Owner now requests physical user-journey testing, superseding no-device-testing restriction. Latest client update01a0948a published internally; phone application/identity verification pending. Testing paused after another app took foreground; awaiting exclusive-access ready reply. No new pain-point conclusions yet.
-
-Physical user-journey walkthrough completed after owner ready. Latest client update01a0948a identity verified on Samsung; five observed usability findings documented in device-user-journey-2026-09-12.md. QA entry deleted, baseline restored, Ari left Home. Latest backend fix remains undeployed.
+Owner approved ₹149/month or ₹1,499/year, 14-day no-card trial after first entry. BillDesk incomplete; iPhone deferred to Codemagic/later. Google Play internal submission permission/catalog and real purchase/restore remain blocked. Actual push delivery/receipts and full native Hindi review unverified; automated outbox sends gated off. No new production OTA, Play submission or build.

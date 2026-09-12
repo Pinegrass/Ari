@@ -59,3 +59,8 @@ Status: APPROVED / BACKEND LIVE / ANDROID VERIFIED / PLAY UPLOAD BLOCKED
 Date:2026-09-11
 
 Owner approved ₹149/month, ₹1,499/year and14-day no-card trial after experiencing value; eligibility is the first recorded entry, one trial per account, no automatic charge. This supersedes DEC-004 commercial hold. Owner authorised phone use, then explicitly deferred iPhone testing to Codemagic/later and prioritised Android. BillDesk remains incomplete. Android verification uses the final product candidate on internal-release; v58-v60 are superseded after physical QA defects. New automatic outbox sends stay behind NUDGE_OUTBOX_ENABLED until real delivery verification.
+
+
+## 2026-09-12 — INR minor units and draft preservation
+
+The approved device pain-point fixes supersede the earlier whole-rupee entry restriction: INR accepts and displays up to two decimals across mobile/server/web. Deploy backend acceptance before releasing the keypad change. Draft edits survive load/save failures; operation retries must not replace a draft with saved inputs. Report drilldowns carry inclusive dates. Native date selection reuses the installed datetimepicker dependency to preserve the current native runtime.
