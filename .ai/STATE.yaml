@@ -6,7 +6,7 @@ source_commit: 5ba6d31614ee6ee93fa03cd3461ad210af181e2f
 backend_head: c05a77ffa07b3ccd6a1edde49b0678ec0f52000d
 web_head: c10caca1b381d3d2cd351554f165b404c53f9242
 development_stage: usability_fixes_locally_verified
-release_status: not_published_backend_first_required
+release_status: backend_deployed_clients_pending
 verification: {mobile_tests: 534_pass, mobile_suites: 50_pass, backend_tests: 301_pass, web_tests: 12_pass, lint: pass, typecheck: pass, web_build: pass}
 latest_turn_device_testing: not_run
 android:
@@ -21,7 +21,7 @@ android:
   submission_status: failed_missing_service_account_permission
   production_track: v57_completed_last_verified
   internal_track: v57_draft_v5_completed_last_verified
-live_backend: a4014a860d8f6efd17df26f5d1d27e3efb53f717
+live_backend: c05a77ffa07b3ccd6a1edde49b0678ec0f52000d
 live_web: 7d11e4f5d28a6defed8613a15123044a5c6e1663
 commercial: {monthly_inr: 149, yearly_inr: 1499, trial_days: 14, card_required: false, owner_approved: true}
 ios: deferred_by_owner
@@ -29,3 +29,6 @@ outbox_scheduler: gated_off
 known_blockers: [Google Play submission permission, BillDesk verification, store catalog, real purchase and restore, actual push delivery and receipts, full Hindi native review]
 evidence: docs/product-programme-2026-09/usability-fixes-2026-09-12.md
 continuity_schema_version: 1
+
+backend_deployment: 14764053-885e-4299-a78b-8f17faf32068
+backend_live_verification: {api_checks: 28_pass, supabase_persistence: verified, fixture_cleanup: verified, health: exact_revision_healthy}
