@@ -76,6 +76,8 @@ export type AnalyticsEvent =
   | 'nudge_checkins_disabled'
   | 'engagement_card_opened'
   | 'report_action_started'
+  | 'planning_saved'
+  | 'trial_started'
   | 'language_changed'
   | 'notification_preferences_updated'
   | 'periodic_report_viewed'
@@ -98,7 +100,7 @@ export type AnalyticsEvent =
 
 export function track(event:AnalyticsEvent,_props:Record<string,unknown>={}):void{
   if(privateMode||!allowed)return;
-  const names:Record<string,string>={periodic_report_viewed:'report_opened',nudge_opened:'insight_opened',nudge_dismissed:'insight_dismissed',transaction_logged:'transaction_logged',notification_preferences_updated:'notification_preferences_updated'};
+  const names:Record<string,string>={report_action_started:'report_action_started',planning_saved:'planning_saved',trial_started:'trial_started',periodic_report_viewed:'report_opened',nudge_opened:'insight_opened',nudge_dismissed:'insight_dismissed',transaction_logged:'transaction_logged',notification_preferences_updated:'notification_preferences_updated'};
   if(names[event])void apiRequest('/measurement/events',{method:'POST',body:JSON.stringify({event:names[event]})}).catch(()=>{});
 }
 // ─── Helpers ──────────────────────────────────────────────────────────────────

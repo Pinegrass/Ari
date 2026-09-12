@@ -1,7 +1,9 @@
 import React from 'react';
 import {act,fireEvent,render,waitFor} from '@testing-library/react-native';
 import TrialCard from '../TrialCard';
+import {track} from '../../lib/analytics';
 import {apiRequest} from '../../api/client';
+jest.mock('../../lib/analytics',()=>({track:jest.fn()}));
 let mockFocus:()=>void|(()=>void);
 const mockRefresh=jest.fn().mockResolvedValue(undefined);
 jest.mock('@react-navigation/native',()=>({useFocusEffect:(callback:()=>void|(()=>void))=>{mockFocus=callback;jest.requireActual('react').useEffect(callback,[callback]);}}));
@@ -22,4 +24,5 @@ it('rechecks eligibility on return and activates the available trial',async()=>{
  await waitFor(()=>expect(screen.getByText(/trialActive/)).toBeTruthy());
  expect(apiRequest).toHaveBeenLastCalledWith('/billing/trial',{method:'POST'});
  expect(mockRefresh).toHaveBeenCalledWith(user);
+ expect(track).toHaveBeenCalledWith('trial_started');
 });
