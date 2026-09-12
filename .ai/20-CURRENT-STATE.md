@@ -15,3 +15,7 @@ Evidence: `docs/product-programme-2026-09/android-completion.md`. Historical rel
 Latest targeted integration review found two P1planning defects and missing measurement wiring; findings remain unfixed. Current focused102tests pass, but do not cover these gaps. See `docs/product-programme-2026-09/integration-review-2026-09-12.md`. Prior device verification does not resolve these newly identified cases.
 
 The latest review findings are now fixed locally: midnight expiry, web planning refresh and event wiring. Source/test details in `integration-fixes-2026-09-12.md`;522mobile/300backend/11web tests pass. No device testing, deployment or distribution; earlier live identities above remain unchanged. Web product source is now committed locally at2b9647a.
+
+Owner now requests physical user-journey testing, superseding no-device-testing restriction. Latest client update01a0948a published internally; phone application/identity verification pending. Testing paused after another app took foreground; awaiting exclusive-access ready reply. No new pain-point conclusions yet.
+
+Physical user-journey walkthrough completed after owner ready. Latest client update01a0948a identity verified on Samsung; five observed usability findings documented in device-user-journey-2026-09-12.md. QA entry deleted, baseline restored, Ari left Home. Latest backend fix remains undeployed.

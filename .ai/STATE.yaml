@@ -63,3 +63,10 @@ integration_fixes:
   tests: {mobile: 522_pass, backend: 300_pass, web: 11_pass}
   on_device_testing: prohibited_by_owner_not_run
   distribution: none
+
+user_journey_test:
+  device_testing: authorised_by_latest_owner_request
+  status: completed_five_usability_findings
+  update_id: 01a0948a-72b6-7334-ae99-f209255c567e
+  update_group: ca3bdd7f-22ea-4c1c-b2c9-addc618ff577
+  phone_update_verified: true

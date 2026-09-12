@@ -7,3 +7,7 @@ Distribution blocked: EAS internal submission348b172e-aef5-49c1-bc11-0e59926a0cc
 Review completed2026-09-12: two P1planning integration defects and one P2measurement finding documented in integration-review-2026-09-12.md; no application fixes made. Address these before further rollout.
 
 Implementation complete locally: all three review findings fixed and automated checks pass. NO subsequent on-device testing per owner. Source not deployed/distributed; see integration-fixes-2026-09-12.md.
+
+Owner now requests physical user-journey testing, superseding no-device-testing restriction. Latest client update01a0948a published internally; phone application/identity verification pending. Testing paused after another app took foreground; awaiting exclusive-access ready reply. No new pain-point conclusions yet.
+
+Physical user-journey walkthrough completed after owner ready. Latest client update01a0948a identity verified on Samsung; five observed usability findings documented in device-user-journey-2026-09-12.md. QA entry deleted, baseline restored, Ari left Home. Latest backend fix remains undeployed.
