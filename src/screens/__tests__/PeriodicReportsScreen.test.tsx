@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-require-imports -- Jest hoisted mock factories resolve dependencies locally. */
 import React from 'react';
-import { render, waitFor } from '@testing-library/react-native';
+import { render, waitFor, fireEvent } from '@testing-library/react-native';
 import PeriodicReportsScreen from '../PeriodicReportsScreen';
 import { getPeriodicReport } from '../../api/reports';
 jest.setTimeout(20000);
 let mockPrivate = false;
+const mockNavigate=jest.fn();
 jest.mock('../../api/reports', () => ({ getPeriodicReport: jest.fn() }));
 jest.mock('../../lib/analytics', () => ({ track: jest.fn() }));
 jest.mock('../../context/PrivacyContext', () => ({ usePrivacy: () => ({ isPrivate: mockPrivate }) }));
@@ -14,7 +15,7 @@ jest.mock('../../components/ScreenShell', () => {
 });
 jest.mock('@react-navigation/native', () => ({
   useRoute: () => ({params:undefined}),
-  useNavigation: () => ({ navigate: jest.fn(), goBack: jest.fn() }),
+  useNavigation: () => ({ navigate: mockNavigate, goBack: jest.fn() }),
   useFocusEffect: (effect: () => (() => void)) => { require('react').useEffect(effect, [effect]); },
 }));
 const report = { period:'weekly',start:'2026-01-01',end:'2026-01-07', totals:{income:0,expenses:500,net:-500,transactionCount:1}, comparison:{expensesChange:null}, evidence:[{code:'private',kind:'calculated',text:'Sensitive interpretation 500'}],categories:[{name:'food',amount:500,share:100}],timeline:[],goals:[] };
@@ -32,4 +33,11 @@ it('masks totals and removes sensitive interpretation in private mode', async ()
   expect(screen.queryByText('-₹500')).toBeNull();
   expect(screen.queryByText(/Sensitive interpretation/)).toBeNull();
   expect(screen.queryByText('food')).toBeNull();
+});
+
+it('passes the exact displayed report period into review entries',async()=>{
+ const screen=render(<PeriodicReportsScreen/>);
+ await waitFor(()=>expect(screen.getByText('Review entries →')).toBeTruthy());
+ fireEvent.press(screen.getByText('Review entries →'));
+ expect(mockNavigate).toHaveBeenCalledWith('SmartLedger',{start:report.start,end:report.end});
 });

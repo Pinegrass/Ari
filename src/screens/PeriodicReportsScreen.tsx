@@ -99,7 +99,7 @@ export default function PeriodicReportsScreen() {
             <Text style={styles.sectionTitle}>{t('goals')}</Text><Text style={styles.muted}>{t('currentGoals')}</Text>
             {report.goals.map(goal => <View key={goal.id} style={styles.categoryRow}><Text style={{ flex: 1 }}>{goal.name}</Text><Text>{money(goal.current)} / {money(goal.target)}</Text></View>)}
           </View>}
-          <TouchableOpacity accessibilityRole="button" onPress={() => { track('report_action_started', { period, action: 'review_entries' }); navigation.navigate('SmartLedger'); }} style={styles.card}><Text style={styles.sectionTitle}>{t('reviewEntries')} →</Text></TouchableOpacity>
+          <TouchableOpacity accessibilityRole="button" onPress={() => { track('report_action_started', { period, action: 'review_entries' }); navigation.navigate('SmartLedger', {start:report.start,end:report.end}); }} style={styles.card}><Text style={styles.sectionTitle}>{t('reviewEntries')} →</Text></TouchableOpacity>
         </>}
       </ScrollView>
     </ScreenShell>

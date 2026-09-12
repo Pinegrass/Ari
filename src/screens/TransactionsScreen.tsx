@@ -72,6 +72,7 @@ export default function TransactionsScreen() {
   const insets = useSafeAreaInsets();
   const { formatAmount } = usePrivacy();
 
+  const [showTrends,setShowTrends]=useState(false);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<FilterType>('all');
   const [toDelete, setToDelete] = useState<Transaction | null>(null);
@@ -190,9 +191,11 @@ export default function TransactionsScreen() {
           <View>
             {/* Header */}
             <AnimatedEntry delay={0}>
-              <Text style={styles.screenTitle}>{phrase("Trends")}</Text>
+              <Text style={styles.screenTitle}>{phrase("Transactions")}</Text>
             </AnimatedEntry>
 
+            <TouchableOpacity accessibilityRole="button" accessibilityState={{expanded:showTrends}} onPress={()=>setShowTrends(v=>!v)} style={{paddingVertical:16}}><Text style={{color:c.forest}}>{phrase(showTrends?'Hide trends':'Show trends')}</Text></TouchableOpacity>
+            {showTrends && <>
             {/* Period selector */}
             <AnimatedEntry delay={40}>
               <View style={styles.periodRow}>
@@ -265,6 +268,7 @@ export default function TransactionsScreen() {
               ))}
             </AnimatedEntry>
 
+            </>}
             {/* Search */}
             <AnimatedEntry delay={240}>
               <View style={styles.searchRow}>

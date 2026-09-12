@@ -21,6 +21,7 @@ import type { StackScreenProps } from '@react-navigation/stack';
 import type { MainStackParamList } from '../navigation/navigationTypes';
 import { useData } from '../context/DataContext';
 import { ApiError } from '../api/client';
+import DeleteConfirmSheet from '../components/DeleteConfirmSheet';
 import CategoryPicker from '../components/CategoryPicker';
 import Icon from '../components/ui/Icon';
 import { font, type as ftype } from '../theme/tokens';
@@ -41,7 +42,7 @@ type Props = StackScreenProps<MainStackParamList, 'AddTransaction'>;
 
 const MAX_AMOUNT = 10_000_000; // 1 crore / $10M in major currency units (D5)
 const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'del'] as const;
-// Cents-based locales (USD/GBP/AUD) swap the dead key for a decimal point.
+// Supported minor-unit currencies (including INR paise) expose a decimal key.
 const KEYS_DECIMAL = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', 'del'] as const;
 
 /**
@@ -66,7 +67,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
   const isEdit = !!editTxn;
   const initialType: TransactionType = editTxn?.type ?? (params as { type?: 'expense' | 'income' } | undefined)?.type ?? 'expense';
 
-  const { addTransaction, updateTransaction, userCategories, fetchUserCategories } = useData();
+  const { addTransaction, updateTransaction, deleteTransaction, userCategories, fetchUserCategories } = useData();
   const { locale } = useLocale();
   const haptics = useHaptics();
   const insets = useSafeAreaInsets();
@@ -96,6 +97,14 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
     editTxn?.recurrenceRule ?? 'monthly'
   );
   const [saving, setSaving] = useState(false);
+  const [confirmDelete,setConfirmDelete]=useState(false);
+  const handleDelete=async()=>{
+    if(!editTxn || saving)return;
+    setSaving(true);
+    try{await deleteTransaction(editTxn.id);setConfirmDelete(false);navigation.goBack();}
+    catch{setConfirmDelete(false);setError(phrase('Could not delete transaction.'));}
+    finally{setSaving(false);}
+  };
   const [error, setError] = useState('');
 
   // Sheets
@@ -165,12 +174,12 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
       setCategory(r.category);
       if (r.type !== type) setType(r.type);
       if (r.merchant) setMerchantName(r.merchant);
-      if (!amount && r.amount > 0) setAmount(String(Math.round(r.amount)));
+      if (!amount && r.amount > 0) setAmount(String(Math.round(r.amount * 100) / 100));
       setParseSource('ai');
       setConfidence(r.confidence);
       setRawInput(r.rawInput);
     },
-    [amount, type]
+    [amount, type, setParseSource]
   );
 
   // Description -> category via MerchantDB (sync), then keyword detector, then
@@ -221,7 +230,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
         }
       }, 600);
     },
-    [type, applyAiResult]
+    [type, applyAiResult, setParseSource]
   );
 
   // Voice input streams into the description (D1 differentiator).
@@ -251,9 +260,9 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
     }
     if (k === '') return;
     if (k === '.') {
-      // Decimal point: cents locales only, one per amount, never leading.
+      // One decimal separator; start sub-unit amounts at 0.
       if (!locale.usesDecimalAmounts) return;
-      setAmount((a) => (a === '' || a.includes('.')) ? a : a + '.');
+      setAmount((a) => a.includes('.') ? a : (a || '0') + '.');
       return;
     }
     setAmount((a) => {
@@ -339,11 +348,13 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
   // Chip display uses the built-in defs; a custom category falls back to a
   // generic emoji + its capitalized name, which reads fine on the chip.
   const cat = getCategoryDef(category);
-  const displayAmount = numericAmount.toLocaleString(locale.localeTag);
+  const [wholeAmount,fractionAmount]=amount.split('.');
+  const displayAmount = Number(wholeAmount||0).toLocaleString(locale.localeTag)+(fractionAmount!==undefined?'.'+fractionAmount:'');
   const dateLabel = date === todayISO() ? 'Today' : formatSectionDate(date);
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+      <DeleteConfirmSheet visible={confirmDelete} title={phrase('Delete entry?')} message={phrase('This action cannot be undone.')} loading={saving} onConfirm={()=>void handleDelete()} onCancel={()=>{if(!saving)setConfirmDelete(false);}} />
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior="padding"
@@ -365,7 +376,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
           <Text style={styles.closeText}>✕</Text>
         </TouchableOpacity>
         <Text style={styles.title}>{isEdit ? 'Edit entry' : 'New entry'}</Text>
-        <View style={{ width: 38 }} />
+        {isEdit && !editingTemplate ? <TouchableOpacity accessibilityRole="button" accessibilityLabel={phrase('Delete entry')} disabled={saving} onPress={()=>setConfirmDelete(true)} style={{padding:12}}><Text style={{color:c.clay}}>{phrase('Delete')}</Text></TouchableOpacity> : <View style={{ width: 38 }} />}
       </View>
 
       {/* Spent / Received toggle */}

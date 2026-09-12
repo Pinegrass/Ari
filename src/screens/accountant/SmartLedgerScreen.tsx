@@ -1,11 +1,14 @@
 import {useLanguage as useCopyLanguage} from '../../i18n/LanguageContext';
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, TextInput,
   StyleSheet, ActivityIndicator, FlatList, Alert, RefreshControl,
 } from 'react-native';
 import ScreenShell from '../../components/ScreenShell';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useNavigation, useFocusEffect, useRoute, type RouteProp } from '@react-navigation/native';
+import type {StackNavigationProp} from '@react-navigation/stack';
+import type {MainStackParamList} from '../../navigation/navigationTypes';
+import {loadReportTransactions} from '../../utils/reportTransactions';
 import Icon, { CATEGORY_ICONS } from '../../components/ui/Icon';
 import type { IconName } from '../../components/ui/Icon';
 import AnimatedEntry from '../../components/ui/AnimatedEntry';
@@ -58,7 +61,11 @@ type SortBy = 'date' | 'amount';
 export default function SmartLedgerScreen() {
  const {phrase:localizeCopy}=useCopyLanguage();
   const { locale } = useLocale();
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
+  const route=useRoute<RouteProp<MainStackParamList,'SmartLedger'>>();
+  const range=route.params?.start&&route.params?.end?route.params:undefined;
+  const request=useRef(0);
+  const [loadError,setLoadError]=useState(false);
   const haptics = useHaptics();
   const { formatAmount } = usePrivacy();
 
@@ -78,21 +85,23 @@ export default function SmartLedgerScreen() {
   // ── Fetch ──────────────────────────────────────────────────────────
 
   const fetchTxns = useCallback(async () => {
+    const id=++request.current;setLoadError(false);setTransactions([]);
     try {
-      const data = await txnApi.getTransactions(month);
+      const data = range?await loadReportTransactions(range.start,range.end,txnApi.getTransactions):await txnApi.getTransactions(month);
+      if(id!==request.current)return;
       setTransactions(data);
     } catch {
-      // silently fail
+      if(id===request.current)setLoadError(true);
     } finally {
-      setLoading(false);
-      setRefreshing(false);
+      if(id===request.current){setLoading(false);setRefreshing(false);}
     }
-  }, [month]);
+  }, [month,range]);
 
   useFocusEffect(
     useCallback(() => {
       setLoading(true);
-      fetchTxns();
+      void fetchTxns();
+      return()=>{request.current++;};
     }, [fetchTxns])
   );
 
@@ -213,7 +222,7 @@ export default function SmartLedgerScreen() {
       </View>
 
       {/* Month Navigator */}
-      <View style={styles.monthNav}>
+      {range?<View style={styles.monthNav}><Text style={styles.monthText}>{range.start} – {range.end}</Text><TouchableOpacity accessibilityRole="button" onPress={()=>{navigation.replace('SmartLedger');}}><Text>{localizeCopy('Clear date filter')}</Text></TouchableOpacity></View>:<View style={styles.monthNav}>
         <TouchableOpacity onPress={() => goMonth(-1)} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
           <Icon name="chevron-left" size={22} color={color.ink} />
         </TouchableOpacity>
@@ -223,6 +232,7 @@ export default function SmartLedgerScreen() {
         </TouchableOpacity>
       </View>
 
+      }
       {/* Filters panel */}
       {showFilters && (
         <View style={styles.filterPanel}>
@@ -339,7 +349,7 @@ export default function SmartLedgerScreen() {
         <View style={styles.loadingWrap}>
           <ActivityIndicator size="large" color={color.forest} />
         </View>
-      ) : filteredTxns.length === 0 ? (
+      ) : loadError ? <View style={{padding:20}}><Text>{localizeCopy('Could not load transactions.')}</Text><TouchableOpacity accessibilityRole="button" onPress={()=>{setLoading(true);void fetchTxns();}} style={{padding:16}}><Text>{localizeCopy('Try again')}</Text></TouchableOpacity></View> : filteredTxns.length === 0 ? (
         <EmptyState
           emoji={searchQuery || categoryFilter || typeFilter !== 'all' ? '🔍' : '📝'}
           title={searchQuery || categoryFilter || typeFilter !== 'all' ? 'No matches' : 'No transactions'}

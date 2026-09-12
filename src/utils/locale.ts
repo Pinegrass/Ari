@@ -15,7 +15,7 @@ export interface LocaleInfo {
   symbol: string;         // e.g. "₹", "$", "£"
   localeTag: string;      // BCP-47 locale, e.g. "en-IN"
   numberingSystem: 'indian' | 'western';
-  /** False for whole-unit currencies (INR: no paise); true where cents/pence are first-class. Mirrors backend locale_config.py. */
+  /** Whether entry and display support minor currency units, including paise. */
   usesDecimalAmounts: boolean;
   incomeBrackets: IncomeBracket[];
 }
@@ -36,7 +36,7 @@ const LOCALE_DATA: Record<string, Omit<LocaleInfo, 'code' | 'incomeBrackets'> & 
     symbol: '₹',
     localeTag: 'en-IN',
     numberingSystem: 'indian',
-    usesDecimalAmounts: false,
+    usesDecimalAmounts: true,
     incomeBrackets: [
       { label: 'Under ₹15K', min: 0, max: 14999 },
       { label: '₹15K – ₹30K', min: 15000, max: 30000 },
@@ -203,8 +203,7 @@ export function formatCurrencyFull(amount: number, locale?: LocaleInfo | string 
 
 /**
  * Validate a raw amount-input string for the locale.
- * Whole-unit locales (INR) reject a decimal point; cents-based locales allow
- * up to 2 decimal places. Returns the numeric amount, or null when invalid.
+ * All supported currencies allow up to 2 decimal places, including INR paise. Returns the numeric amount, or null when invalid.
  */
 export function parseAmountInput(text: string, locale?: LocaleInfo | string | null): number | null {
   const loc = typeof locale === 'string' || !locale

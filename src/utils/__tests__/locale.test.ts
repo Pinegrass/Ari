@@ -5,8 +5,8 @@ describe('locale engine — decimals', () => {
     expect(formatCurrency(125000, 'IN')).toBe('₹1,25,000');
   });
 
-  it('INR never renders paise', () => {
-    expect(formatCurrency(1250.5, 'IN')).toBe('₹1,250');
+  it('INR preserves paise', () => {
+    expect(formatCurrency(1250.5, 'IN')).toBe('₹1,250.50');
   });
 
   it('USD renders cents with 2 decimals', () => {
@@ -38,8 +38,8 @@ describe('locale engine — decimals', () => {
 });
 
 describe('locale engine — decimal flags', () => {
-  it('INR is whole-unit, cents locales are decimal', () => {
-    expect(getLocale('IN').usesDecimalAmounts).toBe(false);
+  it('All supported currencies support minor units', () => {
+    expect(getLocale('IN').usesDecimalAmounts).toBe(true);
     for (const code of ['US', 'GB', 'AU']) {
       expect(getLocale(code).usesDecimalAmounts).toBe(true);
     }
@@ -53,8 +53,8 @@ describe('parseAmountInput', () => {
     expect(parseAmountInput('500', 'US')).toBe(500);
   });
 
-  it('rejects decimals for INR', () => {
-    expect(parseAmountInput('10.50', 'IN')).toBeNull();
+  it('accepts paise for INR', () => {
+    expect(parseAmountInput('10.50', 'IN')).toBe(10.5);
   });
 
   it('accepts up to 2 decimals for cents locales', () => {

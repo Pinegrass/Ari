@@ -42,3 +42,26 @@ it('revalidates when the dashboard ledger revision changes',async()=>{
   expect(result.current.result?.estimate).toBeNull();
   expect(getPlanning).toHaveBeenCalledTimes(2);
 });
+
+it('retries a failed save with the current draft without reloading saved inputs',async()=>{
+ (savePlanning as jest.Mock).mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce(ready);
+ const {result}=renderHook(()=>usePlanning('INR'));
+ await waitFor(()=>expect(result.current.loading).toBe(false));
+ act(()=>result.current.change({cash:'1000',reserve:'0',complete:true}));
+ await act(async()=>{await result.current.save();});
+ act(()=>result.current.change({cash:'1250.50',complete:true}));
+ await act(async()=>result.current.retry());
+ expect(getPlanning).toHaveBeenCalledTimes(1);
+ expect(savePlanning).toHaveBeenLastCalledWith(expect.objectContaining({cash:'1250.50',complete:true}));
+ expect(result.current.form.cash).toBe('1250.50');
+});
+it('preserves edits across a reload and does not show an estimate for the old inputs',async()=>{
+ const {result,rerender}=renderHook<ReturnType<typeof usePlanning>,{revision:string}>(({revision})=>usePlanning('INR',revision),{initialProps:{revision:'a'}});
+ await waitFor(()=>expect(result.current.loading).toBe(false));
+ act(()=>result.current.change({cash:'1200'}));
+ (getPlanning as jest.Mock).mockResolvedValue(ready);
+ rerender({revision:'b'});
+ await waitFor(()=>expect(getPlanning).toHaveBeenCalledTimes(2));
+ expect(result.current.form.cash).toBe('1200');
+ expect(result.current.result?.estimate).toBeFalsy();
+});

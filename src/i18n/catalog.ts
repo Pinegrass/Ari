@@ -1,8 +1,9 @@
 /** Language is independent of country/currency. New languages extend this registry. */
 export const en = {
+  planningAmountInvalid: 'Enter an amount from 0 to 999,999,999.99, with up to two decimal places.', planningPaydayInvalid: 'Choose a payday after today and within 90 days.', planningDueInvalid: 'Choose a due date from today through payday.', planningConfirmRequired: 'Confirm that your cash and obligations are complete.', selectDate: 'Choose date', planningRequestError: 'Could not complete the request. Your draft is kept. Try again when connected.',
   more: 'More',
   planning: 'Plan to payday', planningHelp: 'Estimate from cash and obligations you confirm. Expected income is excluded. This is not a bank balance or a guarantee.',
-  cashNow: 'Available cash now', protectedReserve: 'Money to keep aside', nextPayday: 'Next payday (YYYY-MM-DD)', obligationAmount: 'Amount due', obligationDate: 'Due date (YYYY-MM-DD)',
+  cashNow: 'Available cash now', protectedReserve: 'Money to keep aside', nextPayday: 'Next payday', obligationAmount: 'Amount due', obligationDate: 'Due date',
   addObligation: 'Add an obligation', removeObligation: 'Remove obligation', confirmPlanning: 'I checked my cash and included every obligation through payday.',
   savePlanning: 'Confirm and calculate', clearPlanning: 'Delete planning inputs', planningRemaining: 'Estimated remainder', planningDaily: 'Average per day until payday',
   planningMissing: 'Confirm your inputs to see an estimate.', planningStale: 'Confirm again: inputs expired, entries changed, or currency changed.', planningError: 'Could not save. Check amounts and dates, then try again.',
@@ -45,6 +46,7 @@ export const en = {
 
 export type MessageKey = keyof typeof en;
 export const hi: Record<MessageKey, string> = {
+  planningAmountInvalid: '0 से 999,999,999.99 तक रकम भरें, अधिकतम दो दशमलव अंकों के साथ।', planningPaydayInvalid: 'आज के बाद और 90 दिनों के भीतर वेतन की तारीख चुनें।', planningDueInvalid: 'आज से वेतन की तारीख तक की देय तारीख चुनें।', planningConfirmRequired: 'पुष्टि करें कि नकद और सभी देनदारियाँ शामिल हैं।', selectDate: 'तारीख चुनें', planningRequestError: 'अनुरोध पूरा नहीं हुआ। आपकी जानकारी सुरक्षित है। कनेक्शन मिलने पर फिर कोशिश करें।',
   more: 'और',
   planning: 'अगली आमदनी तक की योजना', planningHelp: 'आपके बताए नकद और देनदारियों से बना अनुमान। आने वाली आमदनी इसमें नहीं जुड़ती। यह बैंक बैलेंस या गारंटी नहीं है।',
   cashNow: 'अभी उपलब्ध नकद', protectedReserve: 'अलग रखी जाने वाली रकम', nextPayday: 'अगली आमदनी की तारीख (YYYY-MM-DD)', obligationAmount: 'देय रकम', obligationDate: 'भुगतान की तारीख (YYYY-MM-DD)',

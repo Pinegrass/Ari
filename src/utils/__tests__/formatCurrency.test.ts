@@ -29,9 +29,9 @@ describe('formatCurrency', () => {
     expect(formatCurrency(-500)).toBe(formatCurrency(500));
   });
 
-  it('strips decimals', () => {
+  it('preserves paise', () => {
     const result = formatCurrency(99.99);
-    expect(result).not.toContain('.');
+    expect(result).toBe('₹99.99');
   });
 });
 

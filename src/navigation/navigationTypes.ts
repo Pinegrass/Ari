@@ -43,7 +43,7 @@ export type MainStackParamList = {
   ShareCapture: { text: string };
   // Accountant feature
   Accountant: undefined;
-  SmartLedger: undefined;
+  SmartLedger: { start: string; end: string } | undefined;
   BudgetPlanner: undefined;
   SavingsGoals: undefined;
   TaxEstimator: undefined;

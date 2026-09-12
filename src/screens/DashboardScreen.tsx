@@ -58,7 +58,7 @@ function getGreeting(): string {
  * existing bottom tabs until the nav/FAB restructure (Commit 6).
  */
 export default function DashboardScreen() {
-  const {t} = useLanguage();
+  const {t,phrase} = useLanguage();
   const { isPrivate } = usePrivacy();
   const navigation = useNavigation<Nav>();
   const { user } = useAuth();
@@ -193,7 +193,7 @@ export default function DashboardScreen() {
         <Text style={styles.greet}>
           {getGreeting()}, {user?.name?.split(' ')[0] || 'there'}
         </Text>
-        <StreakChip />
+        <StreakChip /><TouchableOpacity accessibilityRole="button" onPress={()=>navigation.navigate('Tabs',{screen:'Transactions'})} style={{paddingVertical:14}}><Text style={{color:c.forest}}>{phrase("Transactions")} →</Text></TouchableOpacity>
         <TouchableOpacity accessibilityRole="button" onPress={()=>navigation.navigate('NudgeInbox')} style={{paddingVertical:14}}><Text style={{color:c.forest}}>{t('updates')} →</Text></TouchableOpacity>
         <TouchableOpacity accessibilityRole="button" onPress={()=>navigation.navigate('Planning')} style={{paddingVertical:14}}><Text style={{color:c.forest}}>{t('planning')} →</Text></TouchableOpacity>
       </AnimatedEntry>
