@@ -20,3 +20,5 @@ export const chatWithTomo = async (message: string, history: ChatMessage[]) => {
 export const getNudge = () => apiRequest<Nudge | null>('/tomo/nudge');
 
 export const getInsights = () => apiRequest<{ insights: Insight[] }>('/insights');
+
+export const dismissNudge = (id: string) => apiRequest('/tomo/nudge/dismiss', { method: 'POST', body: JSON.stringify({ id }) });

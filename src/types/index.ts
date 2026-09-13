@@ -96,7 +96,9 @@ export interface Nudge {
   title: string;
   message: string;
   trigger: string;
-  action: 'open_tomo';
+  action: 'open_tomo' | 'open_planning' | 'open_report' | 'open_budget' | 'add_entry';
+  period?: 'weekly' | 'monthly';
+  anchor?: string;
   actionPrompt: string;
   experimentVariant: string;
 }

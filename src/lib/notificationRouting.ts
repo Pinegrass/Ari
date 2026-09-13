@@ -14,7 +14,7 @@
  */
 
 export type NotificationRouteTarget =
-  | { kind: 'stack'; screen: 'BudgetPlanner' | 'SmartLedger' | 'PeriodicReports' }
+  | { kind: 'stack'; screen: 'BudgetPlanner' | 'SmartLedger' | 'PeriodicReports' | 'Planning'; params?: { period: 'weekly' | 'monthly'; anchor: string } }
   | { kind: 'tab'; tab: 'Dashboard' | 'Tomo' };
 
 /** Extract the discriminator from an arbitrary push data payload. */
@@ -50,6 +50,18 @@ export function nudgeContextOf(data: unknown): NudgeNotificationContext | null {
  */
 export function routeForNotificationData(data: unknown): NotificationRouteTarget | null {
   switch (notificationTypeOf(data)) {
+    case 'daily_bill':
+    case 'daily_plan':
+      return { kind: 'stack', screen: 'Planning' };
+    case 'daily_report': {
+      const value = data as Record<string, unknown>;
+      const params: { period: 'weekly' | 'monthly'; anchor: string } | undefined = (value.period === 'weekly' || value.period === 'monthly') && typeof value.anchor === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value.anchor)
+        ? { period: value.period, anchor: value.anchor } : undefined;
+      return { kind: 'stack', screen: 'PeriodicReports', ...(params ? { params } : {}) };
+    }
+    case 'daily_checkin':
+      return { kind: 'tab', tab: 'Dashboard' };
+    case 'daily_spending':
     case 'budget_alert':
       return { kind: 'stack', screen: 'BudgetPlanner' };
     case 'weekly_brief':

@@ -115,7 +115,7 @@ function navigateForPushPayload(data: unknown) {
         },
       });
     } else {
-      (navigationRef as any).navigate('Main', { screen: target.screen });
+      (navigationRef as any).navigate('Main', { screen: target.screen, ...(target.params ? { params: target.params } : {}) });
     }
     track('push_opened', {
       type: notificationTypeOf(data) ?? 'unknown',

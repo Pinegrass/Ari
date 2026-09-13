@@ -301,14 +301,13 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   }, [handleError, fetchWithCache, user]);
 
   const dismissNudge = useCallback(async (item: Nudge) => {
-    setNudge((current) => current?.id === item.id ? null : current);
     if (!user) return;
-    try {
-      await dismissNudgeForUser(user.id, item.id);
-    } catch {
-      /* best effort — the card still stays hidden for this session */
-    }
-  }, [user]);
+    // Server acknowledgement is required so scheduled pushes share dismissal.
+    await tomoApi.dismissNudge(item.id);
+    await dismissNudgeForUser(user.id, item.id).catch(() => {});
+    setNudge((current) => current?.id === item.id ? null : current);
+    await fetchNudge();
+  }, [user, fetchNudge]);
 
   const fetchInsights = useCallback(async () => {
     try {

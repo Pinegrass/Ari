@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useEffect, useRef } from 'react';
+import React, { useMemo, useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -63,6 +63,8 @@ export default function DashboardScreen() {
   const haptics = useHaptics();
   const c = useColors();
   const styles = useMemo(() => makeStyles(c), [c]);
+  const [dismissError, setDismissError] = useState(false);
+  const dismissBusy = useRef(false);
   const presentedNudges = useRef(new Set<string>());
 
   useEffect(() => {
@@ -112,6 +114,10 @@ export default function DashboardScreen() {
       experiment_variant: nudge.experimentVariant,
       surface: 'dashboard',
     });
+    if (nudge.action === 'open_planning') { navigation.navigate('Planning'); return; }
+    if (nudge.action === 'open_report') { navigation.navigate('PeriodicReports', nudge.period && nudge.anchor ? { period: nudge.period, anchor: nudge.anchor } : undefined); return; }
+    if (nudge.action === 'open_budget') { navigation.navigate('BudgetPlanner'); return; }
+    if (nudge.action === 'add_entry') { navigation.navigate('AddTransaction', { type: 'expense' }); return; }
     navigation.navigate('Tabs', {
       screen: 'Tomo',
       params: {
@@ -123,17 +129,17 @@ export default function DashboardScreen() {
     });
   }, [haptics, navigation, nudge]);
 
-  const handleNudgeDismiss = useCallback(() => {
-    if (!nudge) return;
+  const handleNudgeDismiss = useCallback(async () => {
+    if (!nudge || dismissBusy.current) return;
+    dismissBusy.current = true;
+    setDismissError(false);
     haptics.light();
-    track('nudge_dismissed', {
-      nudge_id: nudge.id,
-      trigger: nudge.trigger,
-      experiment_variant: nudge.experimentVariant,
-      surface: 'dashboard',
-    });
-    void dismissNudge(nudge);
-  }, [dismissNudge, haptics, nudge]);
+    try {
+      await dismissNudge(nudge);
+      track('nudge_dismissed', { trigger: nudge.trigger, surface: 'dashboard' });
+    } catch { setDismissError(true); }
+    finally { dismissBusy.current = false; }
+  }, [haptics, nudge, dismissNudge]);
 
   const bottom = shellPad.tab(insets);
 
@@ -182,6 +188,7 @@ export default function DashboardScreen() {
         <NudgeCard compact nudge={nudge} onPress={handleNudgePress} onDismiss={handleNudgeDismiss} />
       )}
 
+      {dismissError && <Text accessibilityRole="alert" style={{ color: c.inkSoft }}>{t('dismissFailed')}</Text>}
       <View style={styles.secHead}>
         <Text style={styles.secTitle}>{t('homeRecent')}</Text>
         <TouchableOpacity onPress={handleSeeAll} style={styles.textLink}

@@ -1,5 +1,6 @@
 /** Language is independent of country/currency. New languages extend this registry. */
 export const en = {
+  dailyNudgeSchedule: 'Up to three useful nudges at 9 AM, 2 PM and 7 PM in your timezone. Quiet hours and your weekly limit apply.',
   homeTomoNoticed: 'Tomo noticed', homeDismissNudge: 'Hide this Tomo nudge for 24 hours', homeNotNow: 'Not now',
   homeMorning: 'Good morning, {name}',
   homeAfternoon: 'Good afternoon, {name}',
@@ -64,6 +65,7 @@ export const en = {
 
 export type MessageKey = keyof typeof en;
 export const hi: Record<MessageKey, string> = {
+  dailyNudgeSchedule: 'आपके समय क्षेत्र में सुबह 9, दोपहर 2 और शाम 7 बजे तक तीन उपयोगी सुझाव। शांत समय और आपकी साप्ताहिक सीमा लागू होगी।',
   homeTomoNoticed: 'टोमो ने गौर किया', homeDismissNudge: 'टोमो का यह सुझाव 24 घंटे के लिए छिपाएँ', homeNotNow: 'अभी नहीं',
   homeMorning: 'सुप्रभात, {name}',
   homeAfternoon: 'नमस्ते, {name}',

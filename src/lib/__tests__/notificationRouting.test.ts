@@ -94,3 +94,13 @@ describe('notificationTypeOf', () => {
     expect(notificationTypeOf(null)).toBeNull();
   });
 });
+
+it.each([
+  ['daily_bill', 'Planning'], ['daily_plan', 'Planning'], ['daily_report', 'PeriodicReports'], ['daily_spending', 'BudgetPlanner'],
+])('routes the daily %s notification', (type, screen) => {
+  expect(routeForNotificationData({ type })).toEqual({ kind: 'stack', screen });
+});
+
+it('preserves the review period and anchor from a daily push', () => {
+  expect(routeForNotificationData({ type: 'daily_report', period: 'monthly', anchor: '2026-08-31' })).toEqual({ kind: 'stack', screen: 'PeriodicReports', params: { period: 'monthly', anchor: '2026-08-31' } });
+});

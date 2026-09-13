@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-require-imports -- Jest mock factories resolve dependencies locally. */
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
+import { render, fireEvent, act } from '@testing-library/react-native';
 import DashboardScreen from '../DashboardScreen';
 import { todayISO } from '../../utils/dateHelpers';
 import { track } from '../../lib/analytics';
@@ -80,4 +80,22 @@ it('uses Hindi for the new hierarchy and controls', () => {
   expect(screen.getByText('आज का खर्च')).toBeTruthy();
   expect(screen.getByText('हाल की एंट्री')).toBeTruthy();
   expect(screen.getByLabelText('रकम छिपाएँ')).toBeTruthy();
+});
+
+it.each([
+  ['open_planning', 'Planning'], ['open_budget', 'BudgetPlanner'], ['add_entry', 'AddTransaction'], ['open_report', 'PeriodicReports'],
+])('routes %s directly from Home', (action, destination) => {
+  mockData.nudge = { id: 'direct', title: 'Take action', message: 'Detail', action, actionPrompt: 'Review', trigger: 'review', period: 'weekly', anchor: '2026-09-13' };
+  const screen = render(<DashboardScreen />);
+  fireEvent.press(screen.getByText('Take action'));
+  expect(mockNavigate.mock.calls.at(-1)?.[0]).toBe(destination);
+  if (action === 'open_report') expect(mockNavigate).toHaveBeenLastCalledWith('PeriodicReports', { period: 'weekly', anchor: '2026-09-13' });
+});
+
+it('keeps dismissal failure visible so the user can retry', async () => {
+  mockData.nudge = { id: 'n1', title: 'Review', message: 'Detail', actionPrompt: 'Review', trigger: 'review' };
+  mockData.dismissNudge.mockRejectedValue(new Error('offline'));
+  const screen = render(<DashboardScreen />);
+  await act(async () => { fireEvent.press(screen.getByText('Not now')); });
+  expect(await screen.findByText('Could not dismiss this update. Try again.')).toBeTruthy();
 });
