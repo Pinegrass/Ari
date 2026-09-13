@@ -11,3 +11,6 @@ Last exercised phone: Samsung SM_M166P API36, v61, internal update `01a0948a-72b
 Live backend is `c05a77ffa07b3ccd6a1edde49b0678ec0f52000d`, Railway `14764053-885e-4299-a78b-8f17faf32068`. 28 live checks pass, Supabase persistence and synthetic cleanup verified. Both paise support and midnight planning expiry are live. Live web remains `7d11e4f5d28a6defed8613a15123044a5c6e1663`.
 
 Owner approved ₹149/month or ₹1,499/year, 14-day no-card trial after first entry. BillDesk incomplete; iPhone deferred to Codemagic/later. Google Play internal submission permission/catalog and real purchase/restore remain blocked. Actual push delivery/receipts and full native Hindi review unverified; automated outbox sends gated off. No new production OTA, Play submission or build.
+
+
+13September: Android usability fixes published to internal-release, update 01a09995-993e-741b-9fff-f2e8c017a182, group c6c1a184-e6fe-4873-942c-8ebb7f7f958a. Runtime matches Samsungv61. Phone application and physical verification pending owner ready; Darelight was foreground. Web remains unpublished. See android-internal-update-2026-09-13.md.

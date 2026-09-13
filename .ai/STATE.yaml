@@ -1,12 +1,12 @@
 project: Ari
-updated_at: 2026-09-12
+updated_at: 2026-09-13
 active_branch: master
 active_task: ARI-ANDROID-USABILITY-FIXES
 source_commit: 5ba6d31614ee6ee93fa03cd3461ad210af181e2f
 backend_head: c05a77ffa07b3ccd6a1edde49b0678ec0f52000d
 web_head: c10caca1b381d3d2cd351554f165b404c53f9242
 development_stage: usability_fixes_locally_verified
-release_status: backend_deployed_clients_pending
+release_status: backend_live_android_internal_published_phone_ready_pending
 verification: {mobile_tests: 534_pass, mobile_suites: 50_pass, backend_tests: 301_pass, web_tests: 12_pass, lint: pass, typecheck: pass, web_build: pass}
 latest_turn_device_testing: not_run
 android:
@@ -32,3 +32,12 @@ continuity_schema_version: 1
 
 backend_deployment: 14764053-885e-4299-a78b-8f17faf32068
 backend_live_verification: {api_checks: 28_pass, supabase_persistence: verified, fixture_cleanup: verified, health: exact_revision_healthy}
+
+android_usability_update:
+  update_id: 01a09995-993e-741b-9fff-f2e8c017a182
+  group: c6c1a184-e6fe-4873-942c-8ebb7f7f958a
+  source: 5ba6d31614ee6ee93fa03cd3461ad210af181e2f
+  channel: internal-release
+  published: true
+  phone_verified: false
+  awaiting: owner_ready_ari_foreground
