@@ -17,6 +17,7 @@ import { color, font } from '../../theme/tokens';
 import { usePrivacy } from '../../context/PrivacyContext';
 import { useHaptics } from '../../hooks/useHaptics';
 import { useLocale } from '../../hooks/useLocale';
+import { formatCurrencyFull } from '../../utils/locale';
 import * as txnApi from '../../api/transactions';
 import type { Transaction } from '../../types';
 
@@ -67,7 +68,7 @@ export default function SmartLedgerScreen() {
   const request=useRef(0);
   const [loadError,setLoadError]=useState(false);
   const haptics = useHaptics();
-  const { formatAmount } = usePrivacy();
+  const { formatAmount, isPrivate } = usePrivacy();
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -338,8 +339,8 @@ export default function SmartLedgerScreen() {
           <Text style={[styles.statVal, { color: color.clay }]}>↓ {formatAmount(stats.expense)}</Text>
         </View>
         <View style={styles.statItem}>
-          <Text style={[styles.statVal, { color: stats.net >= 0 ? color.forest : color.clay, fontFamily: font.bodyBold }]}>
-            = {formatAmount(stats.net)}
+          <Text style={[styles.statVal, { color: isPrivate ? color.ink : stats.net >= 0 ? color.forest : color.clay, fontFamily: font.bodyBold }]}>
+            = {isPrivate ? formatAmount(stats.net) : formatCurrencyFull(stats.net, locale)}
           </Text>
         </View>
       </View>
