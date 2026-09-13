@@ -6,3 +6,6 @@ Local checks pass. Backend rollout completed with owner approval;28livechecks an
 
 
 Android internal publication complete13September. Awaiting phone-ready reply to confirm update01a09995 and test five corrected journeys. No device changes yet.
+
+
+13September physical verification completed after ready: exact internal update01a09995 confirmed, five regression journeys pass, test fixtures removed,39existingentries/0spenttoday restored, networks restored, Ari Home. New open P2: Smart Ledger negative net lacks minus sign. See android-regression-2026-09-13.md.

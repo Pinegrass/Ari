@@ -6,7 +6,7 @@ source_commit: 5ba6d31614ee6ee93fa03cd3461ad210af181e2f
 backend_head: c05a77ffa07b3ccd6a1edde49b0678ec0f52000d
 web_head: c10caca1b381d3d2cd351554f165b404c53f9242
 development_stage: usability_fixes_locally_verified
-release_status: backend_live_android_internal_published_phone_ready_pending
+release_status: backend_live_android_internal_device_verified
 verification: {mobile_tests: 534_pass, mobile_suites: 50_pass, backend_tests: 301_pass, web_tests: 12_pass, lint: pass, typecheck: pass, web_build: pass}
 latest_turn_device_testing: not_run
 android:
@@ -17,7 +17,7 @@ android:
   update_group: ca3bdd7f-22ea-4c1c-b2c9-addc618ff577
   verified_source: 1c6077d6c6fea304218d7d92505295cee96672f8
   phone: SM_M166P_API36
-  new_fixes_installed: false
+  new_fixes_installed: true
   submission_status: failed_missing_service_account_permission
   production_track: v57_completed_last_verified
   internal_track: v57_draft_v5_completed_last_verified
@@ -39,5 +39,7 @@ android_usability_update:
   source: 5ba6d31614ee6ee93fa03cd3461ad210af181e2f
   channel: internal-release
   published: true
-  phone_verified: false
-  awaiting: owner_ready_ari_foreground
+  phone_verified: true
+  regression: five_targeted_journeys_pass
+  cleanup: qa_entry_and_planning_deleted_networks_restored
+  remaining_finding: smart_ledger_net_missing_negative_sign

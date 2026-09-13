@@ -14,3 +14,6 @@ Owner approved ₹149/month or ₹1,499/year, 14-day no-card trial after first e
 
 
 13September: Android usability fixes published to internal-release, update 01a09995-993e-741b-9fff-f2e8c017a182, group c6c1a184-e6fe-4873-942c-8ebb7f7f958a. Runtime matches Samsungv61. Phone application and physical verification pending owner ready; Darelight was foreground. Web remains unpublished. See android-internal-update-2026-09-13.md.
+
+
+13September physical verification completed after ready: exact internal update01a09995 confirmed, five regression journeys pass, test fixtures removed,39existingentries/0spenttoday restored, networks restored, Ari Home. New open P2: Smart Ledger negative net lacks minus sign. See android-regression-2026-09-13.md.
