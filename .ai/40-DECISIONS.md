@@ -76,3 +76,6 @@ Owner approved calm daily Home rather than making unconfirmed affordability its 
 ## 13 September 2026 — three daily nudge opportunities
 
 Owner requested3daily nudges. Use9AM/2PM/7PM notification-timezone windows, eligible actions only, no missed-slot catch-up. Cap all server push attempts at3perlocalday and default21perrollingweek; retain saved lower caps and opt-outs. Slot/candidate dedupe and acknowledged24-hour dismissals apply. Local device reminders retain separate controls. No live activation inferred from implementation request; verify real delivery and concurrency before enabling new gates.
+
+## 2026-09-13 — coordinated rollout
+Owner request to complete next item authorizes the previously proposed coordinated release. Backend and web production plus Android internal OTA published; automatic daily delivery remains disabled until real delivery/receipts and daily PostgreSQL concurrency acceptance.

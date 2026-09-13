@@ -1,3 +1,3 @@
-# Active task: ARI-DAILY-NUDGES
+# Active task: ARI-COORDINATED-RELEASE
 
-Shared priority and3daily local-time opportunities implemented locally (mobile d0093c5/backend b855630/web7a1533f). Full tests and checks pass; no release/real push/device testing. Gates remain off. See latest handoff and daily-nudges-2026-09-13.md for rollout acceptance requirements.
+Release completed; exact artifacts and live verification in latest handoff. Next pending item is isolated push/receipt and concurrent daily-worker acceptance before scheduler activation. Physical Android acceptance remains unverified.

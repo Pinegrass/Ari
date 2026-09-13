@@ -1,12 +1,12 @@
 project: Ari
 updated_at: 2026-09-13
 active_branch: master
-active_task: ARI-DAILY-NUDGES
+active_task: ARI-COORDINATED-RELEASE
 source_commit: d0093c50f08f96543fb89d8c0e5d09737420af34
 backend_head: b8556303627323581193967e6cd97b7676aef066
 web_head: 7a1533f2e82ad69b61960d753f1d2832e8f8800a
 development_stage: usability_fixes_locally_verified
-release_status: backend_live_android_net_fix_internal_published_device_unverified
+release_status: backend_and_web_live_android_home_nudges_internal_published_device_unverified
 verification: {mobile_tests: 556_pass, mobile_suites: 52_pass, backend_tests: 309_pass, web_tests: 12_pass, lint: pass, typecheck: pass, web_build: pass}
 latest_turn_device_testing: not_run
 android:
@@ -21,8 +21,8 @@ android:
   submission_status: failed_missing_service_account_permission
   production_track: v57_completed_last_verified
   internal_track: v57_draft_v5_completed_last_verified
-live_backend: c05a77ffa07b3ccd6a1edde49b0678ec0f52000d
-live_web: 7d11e4f5d28a6defed8613a15123044a5c6e1663
+live_backend: b8556303627323581193967e6cd97b7676aef066
+live_web: 7a1533f2e82ad69b61960d753f1d2832e8f8800a
 commercial: {monthly_inr: 149, yearly_inr: 1499, trial_days: 14, card_required: false, owner_approved: true}
 ios: deferred_by_owner
 outbox_scheduler: gated_off
@@ -30,8 +30,8 @@ known_blockers: [Google Play submission permission, BillDesk verification, store
 evidence: docs/product-programme-2026-09/usability-fixes-2026-09-12.md
 continuity_schema_version: 1
 
-backend_deployment: 14764053-885e-4299-a78b-8f17faf32068
-backend_live_verification: {api_checks: 28_pass, supabase_persistence: verified, fixture_cleanup: verified, health: exact_revision_healthy}
+backend_deployment: ba6152e3-8e20-4495-bad9-6ba1260b8455
+backend_live_verification: {api_checks: 40_pass, supabase_persistence: verified, fixture_cleanup: verified, health: exact_revision_healthy}
 
 android_usability_update:
   update_id: 01a09995-993e-741b-9fff-f2e8c017a182
@@ -55,13 +55,13 @@ net_sign_fix:
 implementation_audit: docs/product-programme-2026-09/implementation-audit-2026-09-13.md
 calm_home:
   source: c02374a227d45b9cf82c5aed352721965a9e0b1a
-  published: false
+  published: true
   device_tested: false
   verification: full_mobile_suite_types_lint_pass_synthetic_browser_preview
   evidence: docs/product-programme-2026-09/calm-home-2026-09-13.md
 daily_nudges:
   implemented: true
-  published: false
+  published: true
   live_enabled: false
   local_hours: [9, 14, 19]
   max_per_local_day: 3
@@ -69,3 +69,12 @@ daily_nudges:
   preserve_saved_lower_limits: true
   actual_delivery_verified: false
   evidence: docs/product-programme-2026-09/daily-nudges-2026-09-13.md
+
+coordinated_release:
+  android_source: dfdaec15bccd87e5287e9a9cac3927adbc53c2f9
+  android_update: 01a09ba2-b520-7bc6-a812-ca4382a245f2
+  android_group: 860cb92d-cb0c-4ab1-8dee-15e7dd150c97
+  android_device_verified: false
+  web_deployment: dpl_12kGaGyRybh341rWWq9HH5r2YwpA
+  daily_gate_verified_disabled: true
+  evidence: docs/product-programme-2026-09/coordinated-release-2026-09-13.md
