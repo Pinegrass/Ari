@@ -1,21 +1,21 @@
 project: Ari
 updated_at: 2026-09-13
 active_branch: master
-active_task: ARI-ANDROID-USABILITY-FIXES
-source_commit: 5ba6d31614ee6ee93fa03cd3461ad210af181e2f
+active_task: ARI-NET-SIGN-AND-IMPLEMENTATION-AUDIT
+source_commit: 0f70898880f93e25075b9ed7f3b0203593e21eaa
 backend_head: c05a77ffa07b3ccd6a1edde49b0678ec0f52000d
 web_head: c10caca1b381d3d2cd351554f165b404c53f9242
 development_stage: usability_fixes_locally_verified
-release_status: backend_live_android_internal_device_verified
+release_status: backend_live_android_net_fix_internal_published_device_unverified
 verification: {mobile_tests: 534_pass, mobile_suites: 50_pass, backend_tests: 301_pass, web_tests: 12_pass, lint: pass, typecheck: pass, web_build: pass}
 latest_turn_device_testing: not_run
 android:
   version_code: 61
   runtime: f82b9c561785202f8057920d7a8a052d15c1ed33
   channel: internal-release
-  update_id: 01a0948a-72b6-7334-ae99-f209255c567e
-  update_group: ca3bdd7f-22ea-4c1c-b2c9-addc618ff577
-  verified_source: 1c6077d6c6fea304218d7d92505295cee96672f8
+  update_id: 01a09995-993e-741b-9fff-f2e8c017a182
+  update_group: c6c1a184-e6fe-4873-942c-8ebb7f7f958a
+  verified_source: 5ba6d31614ee6ee93fa03cd3461ad210af181e2f
   phone: SM_M166P_API36
   new_fixes_installed: true
   submission_status: failed_missing_service_account_permission
@@ -42,4 +42,14 @@ android_usability_update:
   phone_verified: true
   regression: five_targeted_journeys_pass
   cleanup: qa_entry_and_planning_deleted_networks_restored
-  remaining_finding: smart_ledger_net_missing_negative_sign
+  remaining_finding: net_sign_fixed_in_new_internal_update_device_unverified
+
+net_sign_fix:
+  source: 0f70898880f93e25075b9ed7f3b0203593e21eaa
+  update: 01a09a28-cb33-785d-8ab3-61e14353ee89
+  group: ea93b358-a687-4c4d-9ab6-a60d32c67317
+  channel: internal-release
+  published: true
+  phone_verified: false
+  focused_verification: {suites: 4, tests: 32, new_tests: 6, typecheck: pass, changed_source_lint: pass}
+implementation_audit: docs/product-programme-2026-09/implementation-audit-2026-09-13.md

@@ -1,7 +1,9 @@
-# Latest handoff — Samsung update verified
+# Latest handoff — net display fixed and implementation audit delivered
 
-Owner ready resolved phone access. About confirms internal update01a09995-993e-741b-9fff-f2e8c017a182/source5ba6d31 on Samsungv61. All five targeted regression journeys passed: paisecreate/edit, Home/history/Delete confirmation, native planning date/errors, failed-save draft retention and successful retry after reconnect, daily report exact-date drilldown and clear filter.
+Owner requested the remaining Smart Ledger net-sign fix and an audited implementation report. Source `0f70898880f93e25075b9ed7f3b0203593e21eaa` uses signed locale formatting for net, preserving masking and neutralizing net color in Private Mode. Six new screen cases; four focused suites /32 tests, TypeScript and changed-source lint pass. No full suite or device rerun today.
 
-Cleanup: refreshed pre-test baseline39entries restored,0spenttoday, daily report0entries. AriQA13Sep and test planning snapshot deleted through UI; planning blank on reopen. Wi-Fi/mobile data restored to1, phone Home. Existing user records/preferences/trial untouched.
+Android internal publication succeeded: update `01a09a28-cb33-785d-8ab3-61e14353ee89`, group `ea93b358-a687-4c4d-9ab6-a60d32c67317`, source0f70898, runtime `f82b9c561785202f8057920d7a8a052d15c1ed33`, channel/branch internal-release, environment production. Clean existing release worktree fast-forwarded to source0f70898. No native/store/production-channel release, source Git push or backend/web changes. New update installation NOT VERIFIED; previous update01a09995/source5ba6d31 remains latest physically verified Samsung version.
 
-New P2: Smart Ledger net summary omits minus sign when expenses exceed income; source line342 calls magnitude formatAmount(stats.net). Not fixed; see docs/product-programme-2026-09/android-regression-2026-09-13.md. Backendc05a77f remains live, webc10caca unpublished. Play/payment/push/iOS gates unchanged. No new source/publication this turn.
+Report: `docs/product-programme-2026-09/implementation-audit-2026-09-13.md`; includes source/evidence/status matrix, latest defect, verification scope, remaining work and acceptance criteria. Internal engineering audit, not independent security certification. Backendc05a77f live; webc10caca unpublished. Play permissions, BillDesk/catalog/purchase, real push, iPhone, full Hindi and operational/product validation remain.
+
+Private publication and fingerprint JSONs: `D:/Codex/Artifacts/Ari/android-net-update-2026-09-13.json` and `android-net-fingerprint-2026-09-13.json`. Existing unrelated untracked files preserved.

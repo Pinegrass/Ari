@@ -64,3 +64,7 @@ Owner approved ₹149/month, ₹1,499/year and14-day no-card trial after experie
 ## 2026-09-12 — INR minor units and draft preservation
 
 The approved device pain-point fixes supersede the earlier whole-rupee entry restriction: INR accepts and displays up to two decimals across mobile/server/web. Deploy backend acceptance before releasing the keypad change. Draft edits survive load/save failures; operation retries must not replace a draft with saved inputs. Report drilldowns carry inclusive dates. Native date selection reuses the installed datetimepicker dependency to preserve the current native runtime.
+
+## 13 September 2026 — signed ledger display
+
+Smart Ledger net uses the existing sign-aware currency formatter with account locale; magnitude formatting elsewhere is unchanged. Private Mode masks the net and uses neutral coloring. Audits distinguish source, publication and physical acceptance; historical full-suite results are not presented as freshly rerun checks.
