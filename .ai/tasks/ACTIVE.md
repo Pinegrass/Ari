@@ -1,3 +1,3 @@
-# Active task: ARI-CALM-HOME
+# Active task: ARI-DAILY-NUDGES
 
-Owner-approved Home simplification complete locally in c02374a. Full mobile52suites/546tests, types/lint and bounded synthetic browser preview pass. No deployment/device testing. See latest handoff and `docs/product-programme-2026-09/calm-home-2026-09-13.md`.
+Shared priority and3daily local-time opportunities implemented locally (mobile d0093c5/backend b855630/web7a1533f). Full tests and checks pass; no release/real push/device testing. Gates remain off. See latest handoff and daily-nudges-2026-09-13.md for rollout acceptance requirements.

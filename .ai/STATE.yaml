@@ -1,13 +1,13 @@
 project: Ari
 updated_at: 2026-09-13
 active_branch: master
-active_task: ARI-CALM-HOME
-source_commit: c02374a227d45b9cf82c5aed352721965a9e0b1a
-backend_head: c05a77ffa07b3ccd6a1edde49b0678ec0f52000d
-web_head: c10caca1b381d3d2cd351554f165b404c53f9242
+active_task: ARI-DAILY-NUDGES
+source_commit: d0093c50f08f96543fb89d8c0e5d09737420af34
+backend_head: b8556303627323581193967e6cd97b7676aef066
+web_head: 7a1533f2e82ad69b61960d753f1d2832e8f8800a
 development_stage: usability_fixes_locally_verified
 release_status: backend_live_android_net_fix_internal_published_device_unverified
-verification: {mobile_tests: 546_pass, mobile_suites: 52_pass, backend_tests: 301_pass, web_tests: 12_pass, lint: pass, typecheck: pass, web_build: pass}
+verification: {mobile_tests: 556_pass, mobile_suites: 52_pass, backend_tests: 309_pass, web_tests: 12_pass, lint: pass, typecheck: pass, web_build: pass}
 latest_turn_device_testing: not_run
 android:
   version_code: 61
@@ -59,3 +59,13 @@ calm_home:
   device_tested: false
   verification: full_mobile_suite_types_lint_pass_synthetic_browser_preview
   evidence: docs/product-programme-2026-09/calm-home-2026-09-13.md
+daily_nudges:
+  implemented: true
+  published: false
+  live_enabled: false
+  local_hours: [9, 14, 19]
+  max_per_local_day: 3
+  default_per_rolling_week: 21
+  preserve_saved_lower_limits: true
+  actual_delivery_verified: false
+  evidence: docs/product-programme-2026-09/daily-nudges-2026-09-13.md

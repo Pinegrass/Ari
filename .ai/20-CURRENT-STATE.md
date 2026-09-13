@@ -15,3 +15,7 @@ Net fix subsequently published internally: update `01a09a28-cb33-785d-8ab3-61e14
 ## Calm daily Home — latest implementation
 
 Owner-approved simplification committed in `c02374a227d45b9cf82c5aed352721965a9e0b1a`. One spending hero, compact header, optional compact nudge, three recent entries and review/planning links. Removed duplicate Home summaries/chart/habit stack. Paise preserved; retained monthly component uses recorded net and hides percentage. English/Hindi copy. Full mobile52suites/546tests, types and changed-source lint pass; synthetic RN Web phone-width checks pass with documented limits. LOCAL/UNPUBLISHED; no native test or deployment. Latest report `docs/product-programme-2026-09/calm-home-2026-09-13.md`.
+
+## Daily nudges — latest local implementation
+
+Mobile d0093c5/backend b855630/web7a1533f implement shared priority, direct routes, acknowledged24-hour dismissal and9/14/19 local-time opportunities. One attempt/window,3per localday/default21perrollingweek; existing lower limits preserved. Mobile556/backend309/web12tests, types/scopedlint and webbuild pass. Daily scheduler/endpoint gates off; no release or actual delivery. See daily-nudges-2026-09-13.md. Earlier live/source distinctions above remain historical.

@@ -72,3 +72,7 @@ Smart Ledger net uses the existing sign-aware currency formatter with account lo
 ## 13 September 2026 — daily Home hierarchy
 
 Owner approved calm daily Home rather than making unconfirmed affordability its headline. Use a single daily-spending hero with monthly context, compact planning access, one existing nudge, recent entries and a reports link. Keep bottom + primary and first-entry CTA for empty history. Hide routine habit/chart/coaching stacks from Home. Do not label recorded net as actual savings. Implementation approval does not alone trigger another publication.
+
+## 13 September 2026 — three daily nudge opportunities
+
+Owner requested3daily nudges. Use9AM/2PM/7PM notification-timezone windows, eligible actions only, no missed-slot catch-up. Cap all server push attempts at3perlocalday and default21perrollingweek; retain saved lower caps and opt-outs. Slot/candidate dedupe and acknowledged24-hour dismissals apply. Local device reminders retain separate controls. No live activation inferred from implementation request; verify real delivery and concurrency before enabling new gates.
