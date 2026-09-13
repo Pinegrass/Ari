@@ -45,13 +45,14 @@ const Stack = createStackNavigator<MainStackParamList>();
 
 // FAB button rendered in the center tab slot.
 function TabFAB() {
+  const { t } = useLanguage();
   const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
   return (
     <TouchableOpacity
       onPress={() => navigation.navigate('AddTransaction', { type: 'expense' })}
       style={fab.wrap}
       activeOpacity={0.85}
-      accessibilityLabel="Add transaction"
+      accessibilityLabel={t('homeAddEntry')}
       accessibilityRole="button"
     >
       <View style={fab.circle}>

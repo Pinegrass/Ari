@@ -3,6 +3,8 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { color, font, type as ftype } from '../../theme/tokens';
 import { usePrivacy } from '../../context/PrivacyContext';
+import { useLocale } from '../../hooks/useLocale';
+import { formatCurrencyFull } from '../../utils/locale';
 
 interface Props {
   income: number;
@@ -10,10 +12,11 @@ interface Props {
 }
 
 export default function ThisMonthSummary({ income, expenses }: Props) {
- const {phrase:localizeCopy}=useCopyLanguage();
-  const { formatAmount } = usePrivacy();
+ const {phrase:localizeCopy, t}=useCopyLanguage();
+  const { isPrivate } = usePrivacy();
+  const { locale, formatCurrency } = useLocale();
+  const formatAmount = (value: number) => isPrivate ? '••••' : formatCurrency(value);
   const savings = income - expenses;
-  const savingsRate = income > 0 ? Math.round((savings / income) * 100) : 0;
 
   return (
     <View style={styles.card}>
@@ -30,11 +33,10 @@ export default function ThisMonthSummary({ income, expenses }: Props) {
         </View>
         <View style={styles.divider} />
         <View style={styles.cell}>
-          <Text style={styles.label}>{savings >= 0 ? 'Saved' : 'Deficit'}</Text>
-          <Text style={[styles.amount, savings >= 0 ? styles.saved : styles.expense]}>
-            {formatAmount(Math.abs(savings))}
+          <Text style={styles.label}>{t('homeRecordedNet')}</Text>
+          <Text style={[styles.amount, isPrivate ? undefined : savings >= 0 ? styles.saved : styles.expense]}>
+            {isPrivate ? '••••' : formatCurrencyFull(savings, locale)}
           </Text>
-          <Text style={styles.rate}>{savingsRate}% saved</Text>
         </View>
       </View>
     </View>

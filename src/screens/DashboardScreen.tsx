@@ -15,18 +15,11 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import { useAuth } from '../context/AuthContext';
 import { useData } from '../context/DataContext';
 import BalanceCard from '../components/BalanceCard';
-import CoachingBriefCard from '../components/CoachingBriefCard';
+import Icon from '../components/ui/Icon';
 import NudgeCard from '../components/NudgeCard';
 import TransactionItem from '../components/TransactionItem';
-import ThisMonthSummary from '../components/dashboard/ThisMonthSummary';
-import MonthSpendChart from '../components/dashboard/MonthSpendChart';
-import CategoryBreakdown from '../components/dashboard/CategoryBreakdown';
-import UpcomingBillsCard from '../components/dashboard/UpcomingBillsCard';
-import StreakChip from '../components/StreakChip';
-import EngagementCard from '../components/EngagementCard';
 import { SkeletonList } from '../components/ui/Skeleton';
 import EmptyState from '../components/ui/EmptyState';
-import AnimatedEntry from '../components/ui/AnimatedEntry';
 import { font, type } from '../theme/tokens';
 import { useColors } from '../context/ThemeContext';
 import type { Palette } from '../theme/palettes';
@@ -43,31 +36,22 @@ type Nav = CompositeNavigationProp<
   StackNavigationProp<MainStackParamList>
 >;
 
-function getGreeting(): string {
-  const h = new Date().getHours();
-  if (h < 12) return 'Good morning';
-  if (h < 17) return 'Good afternoon';
-  return 'Good evening';
+function getGreetingKey() {
+  const hour = new Date().getHours();
+  return hour < 12 ? 'homeMorning' : hour < 17 ? 'homeAfternoon' : 'homeEvening';
 }
 
-/**
- * Home — forest-on-cream, stripped to the prototype (docs/ari-v2-forest.html):
- * date eyebrow, greeting, "Spent today" hero, one Add-entry CTA, Tomo brief,
- * Tomo nudge, Recent list. Quick Actions grid, banners, group balance and
- * insights were removed from Home this sprint; they remain reachable via the
- * existing bottom tabs until the nav/FAB restructure (Commit 6).
- */
+/** Daily Home: one summary, one optional nudge, recent entries and deeper review links. */
 export default function DashboardScreen() {
-  const {t,phrase} = useLanguage();
-  const { isPrivate } = usePrivacy();
+  const {t, language} = useLanguage();
+  const { isPrivate, togglePrivate } = usePrivacy();
   const navigation = useNavigation<Nav>();
   const { user } = useAuth();
-  const { formatDate } = useLocale();
+  const { locale } = useLocale();
   const insets = useSafeAreaInsets();
   const {
     transactions,
     summary,
-    dailyData,
     nudge,
     loadingData,
     refreshing,
@@ -82,7 +66,7 @@ export default function DashboardScreen() {
   const presentedNudges = useRef(new Set<string>());
 
   useEffect(() => {
-    if (!nudge || presentedNudges.current.has(nudge.id)) return;
+    if (isPrivate || !nudge || presentedNudges.current.has(nudge.id)) return;
     presentedNudges.current.add(nudge.id);
     track('nudge_presented', {
       nudge_id: nudge.id,
@@ -90,7 +74,7 @@ export default function DashboardScreen() {
       experiment_variant: nudge.experimentVariant,
       surface: 'dashboard',
     });
-  }, [nudge]);
+  }, [nudge, isPrivate]);
 
   useFocusEffect(
     useCallback(() => {
@@ -102,29 +86,13 @@ export default function DashboardScreen() {
   );
 
   const today = todayISO();
-  const { moneyIn, moneyOut } = useMemo(() => {
-    let mi = 0;
-    let mo = 0;
-    for (const t of transactions) {
-      if (t.date !== today) continue;
-      if (t.type === 'income') mi += t.amount;
-      else mo += t.amount;
-    }
-    return { moneyIn: mi, moneyOut: mo };
-  }, [transactions, today]);
-  const netToday = moneyIn - moneyOut;
-
-  const recentTxns = useMemo(() => transactions.slice(0, 5), [transactions]);
-
-  const dateLabel = useMemo(
-    () =>
-      formatDate(new Date(), {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-      }),
-    [formatDate]
-  );
+  const moneyOut = useMemo(() => transactions.reduce(
+    (total, transaction) => total + (transaction.date === today && transaction.type === 'expense' ? transaction.amount : 0), 0,
+  ), [transactions, today]);
+  const recentTxns = useMemo(() => transactions.slice(0, 3), [transactions]);
+  const dateLabel = new Date().toLocaleDateString(language === 'hi' ? 'hi-IN' : locale.localeTag, {
+    weekday: 'short', day: 'numeric', month: 'short',
+  });
 
   const handleAddEntry = useCallback(() => {
     haptics.medium();
@@ -188,124 +156,61 @@ export default function DashboardScreen() {
         ),
       }}
     >
-      <AnimatedEntry delay={0}>
-        <Text style={styles.eyebrow}>{dateLabel}</Text>
-        <Text style={styles.greet}>
-          {getGreeting()}, {user?.name?.split(' ')[0] || 'there'}
-        </Text>
-        <StreakChip /><TouchableOpacity accessibilityRole="button" onPress={()=>navigation.navigate('Tabs',{screen:'Transactions'})} style={{paddingVertical:14}}><Text style={{color:c.forest}}>{phrase("Transactions")} →</Text></TouchableOpacity>
-        <TouchableOpacity accessibilityRole="button" onPress={()=>navigation.navigate('NudgeInbox')} style={{paddingVertical:14}}><Text style={{color:c.forest}}>{t('updates')} →</Text></TouchableOpacity>
-        <TouchableOpacity accessibilityRole="button" onPress={()=>navigation.navigate('Planning')} style={{paddingVertical:14}}><Text style={{color:c.forest}}>{t('planning')} →</Text></TouchableOpacity>
-      </AnimatedEntry>
-
-        <AnimatedEntry delay={80}>
-          <BalanceCard
-            spentToday={moneyOut}
-            moneyIn={moneyIn}
-            moneyOut={moneyOut}
-            netToday={netToday}
-          />
-        </AnimatedEntry>
-
-        <AnimatedEntry delay={140}>
-          <TouchableOpacity
-            style={styles.addCta}
-            activeOpacity={0.9}
-            onPress={handleAddEntry}
-            accessibilityRole="button"
-            accessibilityLabel="Add an entry"
-          >
-            <View style={styles.plus}>
-              <Text style={styles.plusText}>+</Text>
-            </View>
-            <Text style={styles.addCtaText}>Add an entry</Text>
+      <View style={styles.header}>
+        <View style={styles.greetingBlock}>
+          <Text style={styles.eyebrow}>{dateLabel}</Text>
+          <Text style={styles.greet}>{t(getGreetingKey(), { name: user?.name?.split(' ')[0] || t('homeFriend') })}</Text>
+        </View>
+        <View style={styles.headerActions}>
+          <TouchableOpacity style={styles.iconButton} accessibilityRole="button"
+            accessibilityLabel={t(isPrivate ? 'homeShowAmounts' : 'homeHideAmounts')}
+            onPress={togglePrivate}>
+            <Icon name={isPrivate ? 'eye-off' : 'eye'} size={21} color={c.forest} />
           </TouchableOpacity>
-        </AnimatedEntry>
+          <TouchableOpacity style={styles.iconButton} accessibilityRole="button"
+            accessibilityLabel={t('updates')} onPress={() => navigation.navigate('NudgeInbox')}>
+            <Icon name="bell" size={21} color={c.forest} />
+          </TouchableOpacity>
+        </View>
+      </View>
 
-        <AnimatedEntry delay={200}>
-          <EngagementCard />
-        </AnimatedEntry>
+      <BalanceCard spentToday={moneyOut} spentThisMonth={summary?.expenses ?? null}
+        loading={loadingData && transactions.length === 0}
+        onPlan={() => navigation.navigate('Planning')} />
 
-        <AnimatedEntry delay={220}>
-          {!isPrivate && <CoachingBriefCard />}
-        </AnimatedEntry>
+      {nudge && !isPrivate && (
+        <NudgeCard compact nudge={nudge} onPress={handleNudgePress} onDismiss={handleNudgeDismiss} />
+      )}
 
-        {nudge && !isPrivate && (
-          <AnimatedEntry delay={230}>
-            <NudgeCard
-              nudge={nudge}
-              onPress={handleNudgePress}
-              onDismiss={handleNudgeDismiss}
-            />
-          </AnimatedEntry>
-        )}
+      <View style={styles.secHead}>
+        <Text style={styles.secTitle}>{t('homeRecent')}</Text>
+        <TouchableOpacity onPress={handleSeeAll} style={styles.textLink}
+          accessibilityLabel={t('homeAllTransactions')} accessibilityRole="link">
+          <Text style={styles.seeAll}>{t('homeViewAll')} →</Text>
+        </TouchableOpacity>
+      </View>
+      {loadingData && recentTxns.length === 0 ? (
+        <SkeletonList count={3} />
+      ) : recentTxns.length === 0 ? (
+        <EmptyState emoji="💳" title={t('homeNoEntries')} subtitle={t('homeFirstEntryHelp')}
+          actionLabel={t('homeAddEntry')} onAction={handleAddEntry} />
+      ) : recentTxns.map((txn, i) => (
+        <TransactionItem key={txn.id} transaction={txn} showDelete={false} testID={`txn-row-${i}`}
+          onEdit={(transaction) => navigation.navigate('AddTransaction', {
+            editTransaction: { id: transaction.id, type: transaction.type, amount: transaction.amount,
+              category: transaction.category, description: transaction.description,
+              note: transaction.note, date: transaction.date },
+          })} />
+      ))}
 
-        <AnimatedEntry delay={260}>
-          <ThisMonthSummary
-            income={summary?.income ?? 0}
-            expenses={summary?.expenses ?? 0}
-          />
-        </AnimatedEntry>
-
-        <AnimatedEntry delay={320}>
-          <MonthSpendChart data={dailyData} loading={loadingData} />
-        </AnimatedEntry>
-
-        <AnimatedEntry delay={380}>
-          <CategoryBreakdown categories={summary?.categories ?? {}} />
-        </AnimatedEntry>
-
-        <AnimatedEntry delay={410}>
-          <UpcomingBillsCard />
-        </AnimatedEntry>
-
-        <AnimatedEntry delay={440}>
-          <View style={styles.secHead}>
-            <Text style={styles.secTitle}>Recent</Text>
-            <TouchableOpacity
-              onPress={handleSeeAll}
-              accessibilityLabel="See all transactions"
-              accessibilityRole="link"
-            >
-              <Text style={styles.seeAll}>See all</Text>
-            </TouchableOpacity>
-          </View>
-
-          {loadingData ? (
-            <SkeletonList count={4} />
-          ) : recentTxns.length === 0 ? (
-            <EmptyState
-              emoji="💳"
-              title="No entries yet"
-              subtitle="Add your first spend or income"
-              actionLabel="Add an entry"
-              onAction={handleAddEntry}
-            />
-          ) : (
-            recentTxns.map((txn, i) => (
-              <AnimatedEntry key={txn.id} delay={300 + i * 60}>
-                <TransactionItem
-                  transaction={txn}
-                  showDelete={false}
-                  testID={`txn-row-${i}`}
-                  onEdit={(t) =>
-                    navigation.navigate('AddTransaction', {
-                      editTransaction: {
-                        id: t.id,
-                        type: t.type,
-                        amount: t.amount,
-                        category: t.category,
-                        description: t.description,
-                        note: t.note,
-                        date: t.date,
-                      },
-                    })
-                  }
-                />
-              </AnimatedEntry>
-            ))
-          )}
-        </AnimatedEntry>
+      <TouchableOpacity style={styles.reviewLink} accessibilityRole="button"
+        onPress={() => navigation.navigate('PeriodicReports')}>
+        <View style={styles.greetingBlock}>
+          <Text style={styles.reviewTitle}>{t('reports')}</Text>
+          <Text style={styles.reviewHelp}>{t('homeReviewHelp')}</Text>
+        </View>
+        <Icon name="chevron-right" size={20} color={c.forest} />
+      </TouchableOpacity>
     </ScreenShell>
   );
 }
@@ -315,51 +220,31 @@ const makeStyles = (c: Palette) => StyleSheet.create({
   eyebrow: {
     fontFamily: font.bodyBold,
     fontSize: type.eyebrow,
-    letterSpacing: 1.8,
+    letterSpacing: 0.7,
     textTransform: 'uppercase',
     color: c.moss,
   },
   greet: {
     fontFamily: font.display,
-    fontSize: type.greeting,
+    fontSize: 25,
     letterSpacing: -0.3,
     marginTop: 5,
     color: c.forestDeep,
   },
-  addCta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-    backgroundColor: c.forest2,
-    borderRadius: 20,
-    paddingVertical: 19,
-  },
-  plus: {
-    width: 25,
-    height: 25,
-    borderRadius: 12.5,
-    borderWidth: 1.5,
-    borderColor: 'rgba(244,239,227,0.5)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  plusText: {
-    fontFamily: font.body,
-    fontSize: 16,
-    lineHeight: 19,
-    color: c.cream,
-  },
-  addCtaText: {
-    fontFamily: font.bodySemi,
-    fontSize: type.screenTitle,
-    color: c.cream,
-  },
+  header: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  greetingBlock: { flex: 1, minWidth: 0 },
+  headerActions: { flexDirection: 'row' },
+  iconButton: { width: 44, minHeight: 48, alignItems: 'center', justifyContent: 'center' },
+  textLink: { minHeight: 44, justifyContent: 'center' },
+  reviewLink: { flexDirection: 'row', alignItems: 'center', gap: 12, borderTopWidth: 1,
+    borderTopColor: c.line, marginTop: 24, paddingVertical: 20 },
+  reviewTitle: { fontFamily: font.bodySemi, fontSize: 16, color: c.forest },
+  reviewHelp: { fontFamily: font.body, fontSize: 13, color: c.inkSoft, marginTop: 4 },
   secHead: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'baseline',
-    marginTop: 26,
+    marginTop: 10,
     marginBottom: 10,
     marginHorizontal: 2,
   },
@@ -370,7 +255,7 @@ const makeStyles = (c: Palette) => StyleSheet.create({
   },
   seeAll: {
     fontFamily: font.bodySemi,
-    fontSize: 12.5,
+    fontSize: 14,
     color: c.moss,
   },
 });

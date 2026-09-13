@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { color, font, type } from '../theme/tokens';
 import Icon from './ui/Icon';
 import type { Nudge } from '../types';
+import { useLanguage } from '../i18n/LanguageContext';
 
 interface Props {
   nudge: Nudge;
@@ -10,6 +11,7 @@ interface Props {
   onPress?: () => void;
   /** Autonomy-preserving 24-hour dismissal. */
   onDismiss?: () => void;
+  compact?: boolean;
 }
 
 /**
@@ -17,7 +19,8 @@ interface Props {
  * cards (flat `card` surface, hairline border, 22 radius — see
  * CoachingBriefCard); a chevron hints that tapping opens the Tomo tab.
  */
-export default function NudgeCard({ nudge, onPress, onDismiss }: Props) {
+export default function NudgeCard({ nudge, onPress, onDismiss, compact = false }: Props) {
+  const { t } = useLanguage();
   return (
     <View style={styles.card}>
       <TouchableOpacity
@@ -26,7 +29,7 @@ export default function NudgeCard({ nudge, onPress, onDismiss }: Props) {
         activeOpacity={onPress ? 0.8 : 1}
         disabled={!onPress}
         accessibilityRole={onPress ? 'button' : undefined}
-        accessibilityLabel={`Tomo nudge: ${nudge.title}`}
+        accessibilityLabel={`${t('homeTomoNoticed')}: ${nudge.title}`}
       >
         <View style={styles.header}>
           {nudge.emoji ? (
@@ -34,21 +37,21 @@ export default function NudgeCard({ nudge, onPress, onDismiss }: Props) {
           ) : (
             <Icon name="zap" size={20} color={color.forest} />
           )}
-          <Text style={styles.badgeText}>Tomo noticed</Text>
+          <Text style={styles.badgeText}>{t('homeTomoNoticed')}</Text>
           <View style={styles.spacer} />
           {onPress ? <Icon name="chevron-right" size={16} color={color.inkFaint} /> : null}
         </View>
-        <Text style={styles.title}>{nudge.title}</Text>
-        <Text style={styles.message}>{nudge.message}</Text>
+        <Text style={styles.title} numberOfLines={compact ? 2 : undefined}>{nudge.title}</Text>
+        {!compact && <Text style={styles.message}>{nudge.message}</Text>}
       </TouchableOpacity>
       {onDismiss ? (
         <TouchableOpacity
           style={styles.dismiss}
           onPress={onDismiss}
           accessibilityRole="button"
-          accessibilityLabel="Hide this Tomo nudge for 24 hours"
+          accessibilityLabel={t('homeDismissNudge')}
         >
-          <Text style={styles.dismissText}>Not now</Text>
+          <Text style={styles.dismissText}>{t('homeNotNow')}</Text>
         </TouchableOpacity>
       ) : null}
     </View>

@@ -1,142 +1,49 @@
-import {useLanguage as useCopyLanguage} from '../i18n/LanguageContext';
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { color, onForest, font, type } from '../theme/tokens';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { color, onForest, font } from '../theme/tokens';
 import { usePrivacy } from '../context/PrivacyContext';
 import { useLocale } from '../hooks/useLocale';
+import { useLanguage } from '../i18n/LanguageContext';
 
 interface Props {
-  /** Total spent today (money out). The hero number. */
   spentToday: number;
-  /** Income received today. */
-  moneyIn: number;
-  /** Expenses today (same as spentToday; named for the pill). */
-  moneyOut: number;
-  /** moneyIn - moneyOut. Signed. */
-  netToday: number;
+  spentThisMonth: number | null;
+  loading?: boolean;
+  onPlan: () => void;
 }
 
-/**
- * "Spent today" hero — flat forest block, no gradient (design rule #1).
- * Reframed from the old monthly balance card to a daily-spend focus, which
- * matches how the target user (daily house-budget logging) reads the app.
- * Mirrors `.hero` in docs/ari-v2-forest.html.
- */
-export default function BalanceCard({ spentToday, moneyIn, moneyOut, netToday }: Props) {
- const {phrase:localizeCopy}=useCopyLanguage();
+/** One daily figure, monthly context and a route to user-confirmed planning. */
+export default function BalanceCard({ spentToday, spentThisMonth, loading, onPlan }: Props) {
   const { isPrivate } = usePrivacy();
-  const { locale, formatCurrency } = useLocale();
-
-  const amt = (n: number) => (isPrivate ? '••••' : formatCurrency(n).replace(/[^0-9,]/g, ''));
-  const signed = (n: number) =>
-    isPrivate ? '••••' : `${n >= 0 ? '+' : '−'}${formatCurrency(Math.abs(n))}`;
-
+  const { formatCurrency } = useLocale();
+  const { t } = useLanguage();
+  const amount = (value: number) => isPrivate ? '••••' : formatCurrency(value);
+  const today = loading ? t('homeLoading') : amount(spentToday);
   return (
     <View style={styles.hero}>
-      {/* Faint concentric-circle ornaments, clipped by overflow:hidden. */}
-      <View style={[styles.ring, styles.ringOuter]} pointerEvents="none" />
-      <View style={[styles.ring, styles.ringInner]} pointerEvents="none" />
-
-      {/* Read the label + amount as one unit under TalkBack. */}
-      <View accessible accessibilityRole="summary" accessibilityLabel={`Spent today, ${isPrivate ? 'hidden' : locale.symbol + amt(spentToday)}`}>
-        <Text style={styles.label}>{localizeCopy("Spent today")}</Text>
-        {/* adjustsFontSizeToFit keeps the hero number on one line at OS font
-            scales up to 1.3× instead of wrapping/clipping. */}
-        <Text style={styles.amount} numberOfLines={1} adjustsFontSizeToFit>
-          <Text style={styles.rupee}>{locale.symbol}</Text>
-          {amt(spentToday)}
-        </Text>
+      <View accessible accessibilityRole="summary" accessibilityLabel={`${t('homeSpentToday')}, ${today}`}>
+        <Text style={styles.label}>{t('homeSpentToday')}</Text>
+        <Text style={[styles.amount, loading && styles.loading]} numberOfLines={1} adjustsFontSizeToFit>{today}</Text>
       </View>
-
-      <View style={styles.pills}>
-        <View style={styles.pill} accessible accessibilityLabel={`Money out ${locale.symbol}${amt(moneyOut)}`}>
-          <Text style={styles.pillKey}>Money out</Text>
-          <Text style={[styles.pillVal, styles.pillValClay]} numberOfLines={1} adjustsFontSizeToFit>{locale.symbol}{amt(moneyOut)}</Text>
-        </View>
-        <View style={styles.pill} accessible accessibilityLabel={`Money in ${locale.symbol}${amt(moneyIn)}`}>
-          <Text style={styles.pillKey}>Money in</Text>
-          <Text style={styles.pillVal} numberOfLines={1} adjustsFontSizeToFit>{locale.symbol}{amt(moneyIn)}</Text>
-        </View>
-        <View style={styles.pill} accessible accessibilityLabel={`Net today ${signed(netToday)}`}>
-          <Text style={styles.pillKey}>Net today</Text>
-          <Text style={styles.pillVal} numberOfLines={1} adjustsFontSizeToFit>{signed(netToday)}</Text>
-        </View>
+      <View style={styles.month}>
+        <Text style={styles.monthLabel}>{t('homeSpentMonth')}</Text>
+        <Text style={styles.monthAmount}>{spentThisMonth === null ? '—' : amount(spentThisMonth)}</Text>
       </View>
+      <TouchableOpacity onPress={onPlan} style={styles.plan} accessibilityRole="button">
+        <Text style={styles.planText}>{t('planning')} →</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  hero: {
-    marginTop: 20,
-    marginBottom: 16,
-    backgroundColor: color.forest,
-    borderRadius: 26,
-    paddingVertical: 26,
-    paddingHorizontal: 24,
-    overflow: 'hidden',
-  },
-  ring: {
-    position: 'absolute',
-    borderWidth: 1.5,
-    borderRadius: 999,
-  },
-  ringOuter: {
-    right: -30,
-    bottom: -50,
-    width: 160,
-    height: 160,
-    borderColor: 'rgba(239,234,217,0.10)',
-  },
-  ringInner: {
-    right: 6,
-    bottom: -20,
-    width: 100,
-    height: 100,
-    borderColor: 'rgba(239,234,217,0.08)',
-  },
-  label: {
-    fontFamily: font.bodySemi,
-    fontSize: type.caption,
-    letterSpacing: 0.5,
-    textTransform: 'uppercase',
-    color: onForest.muted,
-  },
-  amount: {
-    fontFamily: font.display,
-    fontSize: type.heroAmount,
-    lineHeight: type.heroAmount,
-    letterSpacing: -1,
-    marginTop: 12,
-    color: onForest.textBright,
-  },
-  rupee: {
-    fontFamily: font.display,
-    fontSize: 30,
-    color: onForest.label,
-  },
-  pills: {
-    flexDirection: 'row',
-    gap: 22,
-    marginTop: 20,
-  },
-  pill: {
-    flex: 1,
-    gap: 2,
-  },
-  pillKey: {
-    fontFamily: font.bodySemi,
-    fontSize: 10.5,
-    letterSpacing: 0.7,
-    textTransform: 'uppercase',
-    color: onForest.label,
-  },
-  pillVal: {
-    fontFamily: font.display,
-    fontSize: 17,
-    color: onForest.text,
-  },
-  pillValClay: {
-    color: onForest.clay,
-  },
+  hero: { marginTop: 20, marginBottom: 10, backgroundColor: color.forest, borderRadius: 24, padding: 22 },
+  label: { fontFamily: font.bodySemi, fontSize: 14, color: onForest.label },
+  amount: { fontFamily: font.display, fontSize: 48, marginTop: 8, color: onForest.textBright },
+  loading: { fontFamily: font.body, fontSize: 18 },
+  month: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignItems: 'baseline', marginTop: 12 },
+  monthLabel: { fontFamily: font.body, fontSize: 13, color: onForest.label },
+  monthAmount: { fontFamily: font.bodySemi, fontSize: 15, color: onForest.text },
+  plan: { borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.18)', marginTop: 16, paddingTop: 12, minHeight: 44, justifyContent: 'center' },
+  planText: { fontFamily: font.bodySemi, fontSize: 14, color: onForest.textBright },
 });
