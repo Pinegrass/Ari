@@ -68,3 +68,7 @@ The approved device pain-point fixes supersede the earlier whole-rupee entry res
 ## 13 September 2026 — signed ledger display
 
 Smart Ledger net uses the existing sign-aware currency formatter with account locale; magnitude formatting elsewhere is unchanged. Private Mode masks the net and uses neutral coloring. Audits distinguish source, publication and physical acceptance; historical full-suite results are not presented as freshly rerun checks.
+
+## 13 September 2026 — daily Home hierarchy
+
+Owner approved calm daily Home rather than making unconfirmed affordability its headline. Use a single daily-spending hero with monthly context, compact planning access, one existing nudge, recent entries and a reports link. Keep bottom + primary and first-entry CTA for empty history. Hide routine habit/chart/coaching stacks from Home. Do not label recorded net as actual savings. Implementation approval does not alone trigger another publication.

@@ -11,3 +11,7 @@ Latest physically verified Android: Samsung SM_M166P API36, v61, internal update
 Owner-approved pricing ₹149/month / ₹1,499/year, 14-day no-card trial after first entry. BillDesk incomplete; Play submission permissions/catalog/RevenueCat offerings and actual purchase/restore unresolved. Outbox automatic sends gated off pending real delivery/receipts. iPhone deferred; full Hindi/accessibility review remains. No web/production-channel/native/store release today.
 
 Net fix subsequently published internally: update `01a09a28-cb33-785d-8ab3-61e14353ee89`, group `ea93b358-a687-4c4d-9ab6-a60d32c67317`, compatible runtime verified. Installation/physical acceptance of this update remains unverified.
+
+## Calm daily Home — latest implementation
+
+Owner-approved simplification committed in `c02374a227d45b9cf82c5aed352721965a9e0b1a`. One spending hero, compact header, optional compact nudge, three recent entries and review/planning links. Removed duplicate Home summaries/chart/habit stack. Paise preserved; retained monthly component uses recorded net and hides percentage. English/Hindi copy. Full mobile52suites/546tests, types and changed-source lint pass; synthetic RN Web phone-width checks pass with documented limits. LOCAL/UNPUBLISHED; no native test or deployment. Latest report `docs/product-programme-2026-09/calm-home-2026-09-13.md`.

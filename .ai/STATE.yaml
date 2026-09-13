@@ -1,13 +1,13 @@
 project: Ari
 updated_at: 2026-09-13
 active_branch: master
-active_task: ARI-NET-SIGN-AND-IMPLEMENTATION-AUDIT
-source_commit: 0f70898880f93e25075b9ed7f3b0203593e21eaa
+active_task: ARI-CALM-HOME
+source_commit: c02374a227d45b9cf82c5aed352721965a9e0b1a
 backend_head: c05a77ffa07b3ccd6a1edde49b0678ec0f52000d
 web_head: c10caca1b381d3d2cd351554f165b404c53f9242
 development_stage: usability_fixes_locally_verified
 release_status: backend_live_android_net_fix_internal_published_device_unverified
-verification: {mobile_tests: 534_pass, mobile_suites: 50_pass, backend_tests: 301_pass, web_tests: 12_pass, lint: pass, typecheck: pass, web_build: pass}
+verification: {mobile_tests: 546_pass, mobile_suites: 52_pass, backend_tests: 301_pass, web_tests: 12_pass, lint: pass, typecheck: pass, web_build: pass}
 latest_turn_device_testing: not_run
 android:
   version_code: 61
@@ -53,3 +53,9 @@ net_sign_fix:
   phone_verified: false
   focused_verification: {suites: 4, tests: 32, new_tests: 6, typecheck: pass, changed_source_lint: pass}
 implementation_audit: docs/product-programme-2026-09/implementation-audit-2026-09-13.md
+calm_home:
+  source: c02374a227d45b9cf82c5aed352721965a9e0b1a
+  published: false
+  device_tested: false
+  verification: full_mobile_suite_types_lint_pass_synthetic_browser_preview
+  evidence: docs/product-programme-2026-09/calm-home-2026-09-13.md
