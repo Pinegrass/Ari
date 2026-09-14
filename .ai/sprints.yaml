@@ -95,6 +95,7 @@ sprints:
   - Actionable alerts and recovery runbook for API/provider/job failures
   evidence:
   - docs/product-programme-2026-09/operations-runbook.md
+  - docs/product-programme-2026-09/heartbeat-2026-09-14-1735.md
   blockers: []
   completed_checks:
   - Observed maintenance34820989626 and receipts34816725158 actual successful HTTP200
@@ -102,6 +103,10 @@ sprints:
   - Exact live health revision b855630 healthy; no endpoints manually triggered
   - Read-only diagnostic and recovery runbook prepared; proposed thresholds not active
     alerts
+  - Scheduler partial batch failures and sanitized aggregate logs verified:326 backend
+    tests; localf79ec76
+  source: f79ec7681f988292386035a463f357bcd45ea7d8
+  release_status: runner fix local unpublished; alert routing not activated
 - id: S4
   title: Hindi and accessibility
   status: in_progress
@@ -144,7 +149,7 @@ sprints:
   - real payment lifecycle evidence
 - id: S6
   title: Measurement and pilot reporting
-  status: pending
+  status: in_progress
   depends_on:
   - S0
   acceptance:
@@ -154,10 +159,16 @@ sprints:
   - D1/D7/D30 WAU/MAU report/action notification-open trial/paid renewal/churn with
     honest denominators
   - Validate transport and reports using synthetic fixtures
-  evidence: []
+  evidence:
+  - docs/product-programme-2026-09/measurement-v2-contract.md
   blockers:
   - paid metrics depend on S5
   - real outcomes require elapsed cohort time
+  completed_checks:
+  - Source audit and proposed cohort/consent/dedupe/timezone contract prepared
+  remaining_notes:
+  - V2 schema, transport, retention/export and cohort reports not implemented
+  - Do not reinterpret legacy UTC counts as local-day retention
 - id: S7
   title: Remaining product intelligence
   status: pending

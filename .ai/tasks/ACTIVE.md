@@ -1,3 +1,3 @@
 # Active task: ARI-SPRINT-ORCHESTRATION
 
-S1 source/concurrency checks complete; real acceptance remains pending. S3 scheduled-step evidence/runbook recorded. S4 Hindi auth copy local dc4dcb8 verified; unpublished. Continue eligible operations/localization/measurement/intelligence criteria from .ai/sprints.yaml. No device testing or notification activation.
+S3 scheduler failure/log privacy fix local f79ec76 with326tests. S6 contract prepared, implementation pending. S4 localdc4dcb8 remains unpublished. Continue dependency-ledger eligible work; device testing and notification activation remain on hold.

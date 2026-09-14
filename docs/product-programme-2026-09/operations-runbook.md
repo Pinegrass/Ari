@@ -59,3 +59,6 @@ Thresholds are initial engineering proposals. An empty queue is not an incident.
 ## Open operational gates
 
 Alert delivery/channel ownership is not configured or verified here. Backup restore, existing database security-advisor findings, session revocation and full export/deletion isolation require separate acceptance. S3 remains in progress. All device testing remains pending by owner; do not resume through this runbook.
+
+## Prepared runner improvement — not live
+Backend local f79ec76 detects reported batch errors despite HTTP200 and emits aggregate-only summaries. Policy skips remain non-failures; receipt failed/unknown counters fail without retries. Historical live logs still use the old runner until release.326 backend tests passed; no external alert route configured.

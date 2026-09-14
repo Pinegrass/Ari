@@ -85,3 +85,6 @@ Owner authorized agent orchestration across all sprints. Root remains accountabl
 
 ## 2026-09-14 — operational acceptance evidence
 A successful scheduled workflow is insufficient: verify actual job step and HTTP outcome. Zero-count maintenance/receipt runs prove connectivity only. Local check-ins/bills are outside the server nudge cap; document this before activation and preserve user-created reminders.
+
+## 2026-09-14 — scheduler failures and measurement versioning
+HTTP200 does not establish per-user batch success. Runner logs must avoid raw identifiers/provider errors; policy skips are not failures and uncertain work is not retried. Legacy UTC measurement counts must not be relabeled as local-day cohorts; versioned ingestion/consent design precedes reporting.
