@@ -1,0 +1,188 @@
+version: 1
+updated_at: '2026-09-14'
+owner: root orchestrator
+automation_id: ari-sprint-orchestrator
+cadence_hours: 4
+primary_sequence:
+- S0
+- S1
+- S2
+- S3
+- S4
+- S5
+- S6
+- S7
+- S8
+- S9
+eligible_parallel_lanes:
+- S3
+- S4
+- S6
+- S7
+rules:
+- Advance only after prerequisite acceptance; pending device/provider gates do not
+  block independent code work
+- A sprint is accepted only when every criterion has evidence or owner explicitly
+  accepts scope deferral
+- No device work until owner resumes it; no automatic scheduler activation before
+  acceptance
+- Source changes do not authorize deployment or store publication
+sprints:
+- id: S0
+  title: Coordinated release
+  status: accepted
+  depends_on: []
+  acceptance:
+  - Exact three-repository source and release artifacts recorded
+  - Backend40 live checks and Supabase fixture cleanup
+  - Web cloud build and Android runtime compatibility
+  evidence:
+  - docs/product-programme-2026-09/coordinated-release-2026-09-13.md
+  blockers: []
+- id: S1
+  title: Notification acceptance
+  status: in_progress
+  depends_on:
+  - S0
+  acceptance:
+  - Isolated PostgreSQL simultaneous workers, shared quota and uncertain-send non-retry
+  - Bounded pagination with aggregate counts and cursor protection
+  - Real Expo acceptance, receipt and device display
+  - Exact tap route and report anchor; opt-out, quiet hours, dismissal and lower limits
+  - Audit combined local reminders and server pushes; no unsupported total-three guarantee
+  - Deliberate gate activation and successful scheduled runs after acceptance
+  evidence:
+  - backend/tests/verify_daily_nudges_postgres.py
+  - backend/tests/test_scheduled_jobs_script.py
+  blockers:
+  - device testing pending by owner
+  - real provider and receipt evidence missing
+  - scheduler activation pending acceptance
+  completed_checks:
+  - PostgreSQL16 reservation/slot/candidate/shared-quota and unknown-send concurrency
+    acceptance
+  - Scheduler 1100-page aggregation, repeated cursor failure and uncertain request
+    non-retry
+  - Backend312 tests and changed-source Ruff F/E9 passed
+  source: 79bf2c3c8b0bf1d1efa366e49dcd09e7b1d2010e
+  release_status: pagination fix local; live backend remains b855630
+- id: S2
+  title: Released client acceptance
+  status: pending
+  depends_on:
+  - S0
+  acceptance:
+  - Verify latest Android OTA identity and Home/net privacy/actions/dismissal
+  - Authenticated live web reviews/planning retry/consent/trial/preferences
+  - English/Hindi and empty/mature narrow viewport states
+  - Disposable fixture cleanup
+  evidence: []
+  blockers:
+  - physical Android testing pending by owner
+- id: S3
+  title: Trust and operational readiness
+  status: pending
+  depends_on:
+  - S0
+  acceptance:
+  - Review existing Supabase exposure/search-path and password protection findings
+  - Verify session revocation, ownership, export and deletion
+  - Restore backup into isolated target and verify integrity
+  - Verify maintenance and receipt job operation and delivery retention
+  - Actionable alerts and recovery runbook for API/provider/job failures
+  evidence: []
+  blockers: []
+- id: S4
+  title: Hindi and accessibility
+  status: pending
+  depends_on:
+  - S0
+  acceptance:
+  - Inventory and translate remaining static/dynamic/legal/provider text
+  - Fix known English promotional copy on Hindi sign-in
+  - Core screen-reader/focus/contrast/font-scale/error/touch-target checks
+  - Human Hindi review recorded separately
+  - Deployed mobile-web performance measured
+  evidence: []
+  blockers:
+  - native tests pending by owner
+  - human linguistic review required
+- id: S5
+  title: Android distribution and commerce
+  status: blocked_external
+  depends_on:
+  - S0
+  acceptance:
+  - Play upload/release permission and exact tester artifact installation
+  - Approved INR149 monthly/1499 yearly catalogue and RevenueCat offerings
+  - Purchase restore renewal cancellation failure/grace/refund reconciliation
+  - Server entitlement parity and usable free/trial-expiry flows
+  evidence: []
+  blockers:
+  - Play submission permission
+  - BillDesk verification incomplete
+  - catalogue and provider setup
+  - real payment lifecycle evidence
+- id: S6
+  title: Measurement and pilot reporting
+  status: pending
+  depends_on:
+  - S0
+  acceptance:
+  - Define meaningful activation and local-day cohorts before calculation
+  - Resolve current UTC count dates vs local-day retention semantics
+  - Consent, retry dedupe, staff/test exclusions, withdrawal/export/retention
+  - D1/D7/D30 WAU/MAU report/action notification-open trial/paid renewal/churn with
+    honest denominators
+  - Validate transport and reports using synthetic fixtures
+  evidence: []
+  blockers:
+  - paid metrics depend on S5
+  - real outcomes require elapsed cohort time
+- id: S7
+  title: Remaining product intelligence
+  status: pending
+  depends_on:
+  - S0
+  acceptance:
+  - Evidence IDs and correction routes for Tomo insights
+  - Recurring/payday candidates with provenance and explicit confirmation
+  - Confirmed upcoming obligations/payday in period reviews with freshness
+  - History-dependent baseline, category and income consistency
+  - Observed/calculated/predicted/AI distinctions and unknown balances preserved
+  - Test edits/transfers/currencies/history and horizon limits
+  evidence: []
+  blockers:
+  - major repositioning or new paid restrictions requires owner decision
+- id: S8
+  title: iOS acceptance
+  status: deferred_owner
+  depends_on:
+  - S0
+  acceptance:
+  - Codemagic/TestFlight exact build
+  - Core flows notifications privacy Hindi/accessibility
+  - iPhone purchase and restore
+  evidence: []
+  blockers:
+  - owner deferred iPhone testing
+- id: S9
+  title: Pilot and final programme audit
+  status: pending
+  depends_on:
+  - S1
+  - S2
+  - S3
+  - S4
+  - S6
+  - S7
+  acceptance:
+  - Consented pilot and real repeated useful actions
+  - Retention/correction burden/paid willingness evidence with elapsed time
+  - Triage findings and map original A-T brief to evidence
+  - Final implemented/released/verified verdict; owner-accepted scope deferrals
+  evidence: []
+  blockers:
+  - paid assessment depends on S5
+  - iOS completion depends on S8 or explicit scope deferral
+  - D30 and renewal require real elapsed time
