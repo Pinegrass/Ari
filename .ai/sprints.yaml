@@ -54,6 +54,7 @@ sprints:
   evidence:
   - backend/tests/verify_daily_nudges_postgres.py
   - backend/tests/test_scheduled_jobs_script.py
+  - docs/product-programme-2026-09/notification-channel-audit-2026-09-14.md
   blockers:
   - device testing pending by owner
   - real provider and receipt evidence missing
@@ -64,6 +65,8 @@ sprints:
   - Scheduler 1100-page aggregation, repeated cursor failure and uncertain request
     non-retry
   - Backend312 tests and changed-source Ruff F/E9 passed
+  - 'Combined local/server source audit: local twice-weekly check-ins and bills outside
+    server quota; runtime combined experience pending'
   source: 79bf2c3c8b0bf1d1efa366e49dcd09e7b1d2010e
   release_status: pagination fix local; live backend remains b855630
 - id: S2
@@ -81,7 +84,7 @@ sprints:
   - physical Android testing pending by owner
 - id: S3
   title: Trust and operational readiness
-  status: pending
+  status: in_progress
   depends_on:
   - S0
   acceptance:
@@ -90,11 +93,18 @@ sprints:
   - Restore backup into isolated target and verify integrity
   - Verify maintenance and receipt job operation and delivery retention
   - Actionable alerts and recovery runbook for API/provider/job failures
-  evidence: []
+  evidence:
+  - docs/product-programme-2026-09/operations-runbook.md
   blockers: []
+  completed_checks:
+  - Observed maintenance34820989626 and receipts34816725158 actual successful HTTP200
+    job steps with zero records
+  - Exact live health revision b855630 healthy; no endpoints manually triggered
+  - Read-only diagnostic and recovery runbook prepared; proposed thresholds not active
+    alerts
 - id: S4
   title: Hindi and accessibility
-  status: pending
+  status: in_progress
   depends_on:
   - S0
   acceptance:
@@ -103,10 +113,19 @@ sprints:
   - Core screen-reader/focus/contrast/font-scale/error/touch-target checks
   - Human Hindi review recorded separately
   - Deployed mobile-web performance measured
-  evidence: []
+  evidence:
+  - docs/product-programme-2026-09/heartbeat-2026-09-14-1334.md
   blockers:
   - native tests pending by owner
   - human linguistic review required
+  completed_checks:
+  - Shared login/signup promotional copy localized via existing phrase catalog
+  - Web12 tests, typecheck, scoped lint and14-page production build pass
+  source: dc4dcb81134fa2474b030610a5d8ab6bcc205db6
+  release_status: local unpublished
+  remaining_notes:
+  - Static English browser titles and raw API errors
+  - Broader Hindi/accessibility and human review pending
 - id: S5
   title: Android distribution and commerce
   status: blocked_external

@@ -82,3 +82,6 @@ Owner request to complete next item authorizes the previously proposed coordinat
 
 ## 2026-09-14 — sprint orchestration and device hold
 Owner authorized agent orchestration across all sprints. Root remains accountable, with bounded agents and a four-hour task heartbeat. Implemented/released/verified/accepted states remain separate. Owner explicitly left device testing pending; future runs must not use devices until resumed. External billing/Play gates do not block independent engineering.
+
+## 2026-09-14 — operational acceptance evidence
+A successful scheduled workflow is insufficient: verify actual job step and HTTP outcome. Zero-count maintenance/receipt runs prove connectivity only. Local check-ins/bills are outside the server nudge cap; document this before activation and preserve user-created reminders.

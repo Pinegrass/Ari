@@ -1,11 +1,13 @@
-# Latest handoff — sprint orchestration and server acceptance
+# Latest handoff — operations evidence and Hindi auth copy
 
-Ari sprint orchestrator ACTIVE every4hours in this task (ari-sprint-orchestrator). Root reviews bounded agents; dependency/evidence ledger .ai/sprints.yaml and protocol .ai/SPRINT-ORCHESTRATION.md. S0 release complete; S1 partially verified; S2 device acceptance pending; independent S3/S4/S6/S7 work eligible. S5 external commerce/distribution gates; S8 iOS deferred; S9 real pilot pending.
+14 September 2026, 13:34UTC heartbeat. Cold start showed no source changes since the prior checkpoint. Root audited S1 combined notification channels and S3 live job evidence while a bounded web agent completed the known Hindi auth promotional-copy fix. Exact diff reviewed before commit.
 
-Live backend b855630 on Railway ba6152e3-8e20-4495-bad9-6ba1260b8455,40 live checks and Supabase cleanup verified13September. Live web7a1533f / Vercel dpl_12kGaGyRybh341rWWq9HH5r2YwpA. Android latest published dfdaec1/update01a09ba2-b520-7bc6-a812-ca4382a245f2 internally; physically verified older5ba6d31/update01a09995. Latest Home/nudge/net acceptance remains unverified.
+Web local dc4dcb81134fa2474b030610a5d8ab6bcc205db6: login/signup introduction and promise cards use existing language lookup; six Hindi entries added. Standalone typecheck/scoped lint exit0,12 tests across4 files pass, production build14/14 pages exit0. LOCAL/UNPUBLISHED; no browser or device checks. Static browser titles/raw API error localization and broader S4 acceptance remain open.
 
-Backend local79bf2c3 adds iterative aggregate scheduler pagination and disposable PostgreSQL daily-worker acceptance. Full312tests and scoped Ruff pass. Concurrency acceptance against PostgreSQL16 passed; synthetic candidates/provider, fixture/container removed. No release/push today; live backend unchanged. Mobile556/web12 historical checks unchanged.
+S3 actual scheduled steps verified: maintenance34820989626 HTTP200 all counts0, receipts34816725158 HTTP200 checked0. Two other green runs skipped all product steps. Live health still b855630 healthy. operations-runbook.md records diagnostic/recovery procedure and proposed thresholds, not active alerts. Backup/security/session/retention-policy gates remain open.
 
-Owner14September: leave device testing pending. Do not use connected devices or repeatedly ask until owner resumes. No actual delivery/receipts tested; daily/outbox gates remain off. Billing approval149INR/month1499/year and14day no-card trial persists; BillDesk/Play/catalogue/real lifecycle blocked. Full Hindi/accessibility, operations, cohorts, intelligence and pilot evidence remain incomplete.
+S1 source audit confirms local Tuesday/Friday check-ins and bill reminders bypass the server three/day cap and quiet-hour preferences. No total-frequency guarantee. Runtime acceptance remains pending by owner. Evidence in notification-channel-audit-2026-09-14.md.
 
-Evidence: docs/product-programme-2026-09/sprint-orchestration-2026-09-14.md. Earlier state archived; do not confuse published and physically verified artifacts.
+No device access, manual job trigger, send, provider charge, configuration change, deployment or push this turn. Live backend b855630/web7a1533f/Android dfdaec1 unchanged. Backend local79bf2c3 with312tests remains unpublished; mobile556 tests historical. Daily/outbox gates stay off, device testing pending and iPhone deferred. Continue eligible S3/S4/S6/S7 work without repeating settled evidence or unchanged permission questions.
+
+Primary records: .ai/sprints.yaml and docs/product-programme-2026-09/heartbeat-2026-09-14-1334.md. Automation ari-sprint-orchestrator remains active every4hours.

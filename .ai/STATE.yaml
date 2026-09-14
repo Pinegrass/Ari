@@ -4,7 +4,7 @@ active_branch: master
 active_task: ARI-SPRINT-ORCHESTRATION
 source_commit: d0093c50f08f96543fb89d8c0e5d09737420af34
 backend_head: 79bf2c3c8b0bf1d1efa366e49dcd09e7b1d2010e
-web_head: 7a1533f2e82ad69b61960d753f1d2832e8f8800a
+web_head: dc4dcb81134fa2474b030610a5d8ab6bcc205db6
 development_stage: notification_acceptance_and_parallel_sprint_work
 release_status: backend_and_web_live_android_home_nudges_internal_published_device_unverified
 verification:
@@ -49,7 +49,7 @@ known_blockers:
 - real purchase and restore
 - actual push delivery and receipts
 - full Hindi native review
-evidence: docs/product-programme-2026-09/sprint-orchestration-2026-09-14.md
+evidence: docs/product-programme-2026-09/heartbeat-2026-09-14-1334.md
 continuity_schema_version: 2
 backend_deployment: ba6152e3-8e20-4495-bad9-6ba1260b8455
 backend_live_verification:
@@ -116,3 +116,5 @@ orchestration:
   daily_postgres_concurrency: pass_synthetic_provider
   pagination_fix: local_unpublished
   device_testing: pending_by_owner
+  latest_progress: S1 channel audit, S3 scheduled-step evidence/runbook, S4 Hindi
+    auth fix local

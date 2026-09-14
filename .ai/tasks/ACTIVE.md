@@ -1,3 +1,3 @@
 # Active task: ARI-SPRINT-ORCHESTRATION
 
-Heartbeat every4hours; .ai/sprints.yaml owns sequencing. S1 server concurrency passed, pagination fix local79bf2c3 with312tests. Device testing pending by owner; gates off. Continue eligible operations/Hindi/measurement/intelligence work. Read latest handoff and exact evidence before repeating checks.
+S1 source/concurrency checks complete; real acceptance remains pending. S3 scheduled-step evidence/runbook recorded. S4 Hindi auth copy local dc4dcb8 verified; unpublished. Continue eligible operations/localization/measurement/intelligence criteria from .ai/sprints.yaml. No device testing or notification activation.
