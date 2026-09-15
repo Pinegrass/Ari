@@ -94,3 +94,6 @@ Validate S6 local-day/maturity/exclusion calculations independently before addit
 
 ## 2026-09-15 — retention boundary and auth error privacy
 Legacy date-only counts expire conservatively including UTCtoday−90 at maintenance execution; do not claim exact continuous enforcement. Auth UI renders allowlisted localized messages, never arbitrary provider/API/URL descriptions. Password recovery guidance must not assume one provider minimum policy.
+
+## 15 September — shared legacy expiry
+Maintenance and ingestion use one conservative UTC90-day boundary; this does not guarantee continuous physical purge. S6 review records that deleted UUID receipts cannot support indefinite retry recognition. No new longer-lived identifier retention policy or production v2 schema was introduced.

@@ -97,6 +97,7 @@ sprints:
   - docs/product-programme-2026-09/operations-runbook.md
   - docs/product-programme-2026-09/heartbeat-2026-09-14-1735.md
   - docs/product-programme-2026-09/retention-boundary-2026-09-15.md
+  - docs/product-programme-2026-09/heartbeat-2026-09-15-1004.md
   blockers: []
   completed_checks:
   - Observed maintenance34820989626 and receipts34816725158 actual successful HTTP200
@@ -108,7 +109,9 @@ sprints:
     tests; localf79ec76
   - Conservative UTC90-day boundary cleanup verified with340 full backend tests; actual
     purge timing still depends on scheduler
-  source: 4d39f87551064310e978eb8f88c93be3e6f8d5ce
+  - Shared UTC boundary applied to ingestion and maintenance;342 tests including owner
+    isolation pass locally
+  source: d9575bd20bfed5db98d98a5c8bb2b046235ebf98
   release_status: scheduler and retention fixes local unpublished; alert routing not
     activated
 - id: S4
@@ -169,6 +172,7 @@ sprints:
   evidence:
   - docs/product-programme-2026-09/measurement-v2-contract.md
   - docs/product-programme-2026-09/cohort-reference-2026-09-15.md
+  - docs/product-programme-2026-09/heartbeat-2026-09-15-1004.md
   blockers:
   - paid metrics depend on S5
   - real outcomes require elapsed cohort time
@@ -179,6 +183,8 @@ sprints:
   remaining_notes:
   - V2 schema, transport, retention/export and cohort reports not implemented
   - Do not reinterpret legacy UTC counts as local-day retention
+  - Resolve finite retry dedupe vs90-day receipt deletion and expired activation state
+    before schema; reference WAU/MAU is cohort-scoped
   source: e57ab26003ba9a4170b91ec78e552216ad2c318f
   release_status: isolated reference only, local unpublished, no production wiring
 - id: S7
