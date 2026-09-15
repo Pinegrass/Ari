@@ -1,16 +1,16 @@
 project: Ari
-updated_at: '2026-09-14'
+updated_at: '2026-09-15'
 active_branch: master
 active_task: ARI-SPRINT-ORCHESTRATION
 source_commit: d0093c50f08f96543fb89d8c0e5d09737420af34
-backend_head: f79ec7681f988292386035a463f357bcd45ea7d8
+backend_head: e57ab26003ba9a4170b91ec78e552216ad2c318f
 web_head: dc4dcb81134fa2474b030610a5d8ab6bcc205db6
 development_stage: notification_acceptance_and_parallel_sprint_work
 release_status: backend_and_web_live_android_home_nudges_internal_published_device_unverified
 verification:
   mobile_tests: 556_pass
   mobile_suites: 52_pass
-  backend_tests: 326_pass
+  backend_tests: 336_pass
   web_tests: 12_pass
   lint: pass
   typecheck: pass
@@ -49,7 +49,7 @@ known_blockers:
 - real purchase and restore
 - actual push delivery and receipts
 - full Hindi native review
-evidence: docs/product-programme-2026-09/heartbeat-2026-09-14-1735.md
+evidence: docs/product-programme-2026-09/cohort-reference-2026-09-15.md
 continuity_schema_version: 2
 backend_deployment: ba6152e3-8e20-4495-bad9-6ba1260b8455
 backend_live_verification:
@@ -116,5 +116,5 @@ orchestration:
   daily_postgres_concurrency: pass_synthetic_provider
   pagination_fix: local_unpublished
   device_testing: pending_by_owner
-  latest_progress: S3 scheduler partial-failure and safe logging fix local; S6 design
-    audited
+  latest_progress: S6 pure reference calculator and10 fixtures passed; production
+    ingestion pending

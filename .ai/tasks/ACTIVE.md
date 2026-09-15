@@ -1,3 +1,3 @@
 # Active task: ARI-SPRINT-ORCHESTRATION
 
-S3 scheduler failure/log privacy fix local f79ec76 with326tests. S6 contract prepared, implementation pending. S4 localdc4dcb8 remains unpublished. Continue dependency-ledger eligible work; device testing and notification activation remain on hold.
+S6 reference calculator local e57ab26 verified with336 full backend tests. Next: versioned storage/consent/ingestion/retention and reporting; reference module is not production wired. S3/S4 local fixes remain unpublished. Device testing and automatic notification activation stay on hold.

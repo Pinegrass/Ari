@@ -1,4 +1,4 @@
-# Latest handoff — isolated S6 cohort reference
+# S6 reference cohort calculation — 15 September 2026
 
 Heartbeat started14September23:11UTC (15September IST). Cold start matched mobile44d71f5/backendf79ec76/webdc4dcb8; no new source deltas. S1 actual delivery remains dependent on owner-held device testing; no repeated concurrency test or device access.
 

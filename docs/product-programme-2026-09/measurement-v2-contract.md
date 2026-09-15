@@ -36,3 +36,6 @@ Maintenance uses a UTC date cutoff that can retain almost91days despite up-to90-
 7. Observe actual elapsed cohorts. Fixtures and code cannot establish real D30 retention, renewal or willingness to pay.
 
 S6 definitions audited and proposed; implementation and reporting remain pending. This contract is independent of device/payment blockers, except actual notification and paid attribution.
+
+## Reference milestone15September
+measurement_cohorts.py implements pure calculation over current episode snapshots; ten fixtures and independent review passed. Backend e57ab26,336 full tests. It is not a production adapter or consent/epoch implementation; remaining migration/ingestion work above still applies.

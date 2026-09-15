@@ -17,3 +17,7 @@ Web local dc4dcb8 fixes shared Hindi auth promotional copy:12 tests/types/lint/b
 ## 17:35UTC heartbeat
 
 Backend local f79ec76 surfaces scheduled HTTP200 batch failures and redacts workflow response logs to aggregate counts;326 tests/Ruff pass, unpublished. S6 source audit and measurement-v2-contract.md prepared; no analytics schema changes. Existing live releases/gates/device hold unchanged. See heartbeat-2026-09-14-1735.md.
+
+## 15 September — S6 calculation milestone
+
+Backend local e57ab26 adds pure reference cohort calculator plus10 synthetic fixtures;336 full tests/Ruff pass and independent review completed. Not production-wired, no schema or data changes. S6 storage/ingestion/reporting still pending. Live releases and device/notification holds unchanged. Evidence cohort-reference-2026-09-15.md.

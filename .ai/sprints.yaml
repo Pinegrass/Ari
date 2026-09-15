@@ -1,5 +1,5 @@
 version: 1
-updated_at: '2026-09-14'
+updated_at: '2026-09-15'
 owner: root orchestrator
 automation_id: ari-sprint-orchestrator
 cadence_hours: 4
@@ -161,14 +161,19 @@ sprints:
   - Validate transport and reports using synthetic fixtures
   evidence:
   - docs/product-programme-2026-09/measurement-v2-contract.md
+  - docs/product-programme-2026-09/cohort-reference-2026-09-15.md
   blockers:
   - paid metrics depend on S5
   - real outcomes require elapsed cohort time
   completed_checks:
   - Source audit and proposed cohort/consent/dedupe/timezone contract prepared
+  - Pure cohort reference and10 local-day/DST/maturity/exclusion fixtures; full336
+    backend tests, scoped lint and independent review
   remaining_notes:
   - V2 schema, transport, retention/export and cohort reports not implemented
   - Do not reinterpret legacy UTC counts as local-day retention
+  source: e57ab26003ba9a4170b91ec78e552216ad2c318f
+  release_status: isolated reference only, local unpublished, no production wiring
 - id: S7
   title: Remaining product intelligence
   status: pending

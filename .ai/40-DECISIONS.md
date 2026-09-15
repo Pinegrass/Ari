@@ -88,3 +88,6 @@ A successful scheduled workflow is insufficient: verify actual job step and HTTP
 
 ## 2026-09-14 — scheduler failures and measurement versioning
 HTTP200 does not establish per-user batch success. Runner logs must avoid raw identifiers/provider errors; policy skips are not failures and uncertain work is not retried. Legacy UTC measurement counts must not be relabeled as local-day cohorts; versioned ingestion/consent design precedes reporting.
+
+## 2026-09-15 — reference before ingestion
+Validate S6 local-day/maturity/exclusion calculations independently before additive schema work. Treat already consent-scoped current episode snapshots as a strict reference input; do not adapt legacy UTC counts or claim epoch/transport acceptance from pure fixtures.
