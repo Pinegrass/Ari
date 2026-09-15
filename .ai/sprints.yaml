@@ -96,6 +96,7 @@ sprints:
   evidence:
   - docs/product-programme-2026-09/operations-runbook.md
   - docs/product-programme-2026-09/heartbeat-2026-09-14-1735.md
+  - docs/product-programme-2026-09/retention-boundary-2026-09-15.md
   blockers: []
   completed_checks:
   - Observed maintenance34820989626 and receipts34816725158 actual successful HTTP200
@@ -105,8 +106,11 @@ sprints:
     alerts
   - Scheduler partial batch failures and sanitized aggregate logs verified:326 backend
     tests; localf79ec76
-  source: f79ec7681f988292386035a463f357bcd45ea7d8
-  release_status: runner fix local unpublished; alert routing not activated
+  - Conservative UTC90-day boundary cleanup verified with340 full backend tests; actual
+    purge timing still depends on scheduler
+  source: 4d39f87551064310e978eb8f88c93be3e6f8d5ce
+  release_status: scheduler and retention fixes local unpublished; alert routing not
+    activated
 - id: S4
   title: Hindi and accessibility
   status: in_progress
@@ -120,17 +124,20 @@ sprints:
   - Deployed mobile-web performance measured
   evidence:
   - docs/product-programme-2026-09/heartbeat-2026-09-14-1334.md
+  - docs/product-programme-2026-09/heartbeat-2026-09-15-0530.md
   blockers:
   - native tests pending by owner
   - human linguistic review required
   completed_checks:
   - Shared login/signup promotional copy localized via existing phrase catalog
   - Web12 tests, typecheck, scoped lint and14-page production build pass
-  source: dc4dcb81134fa2474b030610a5d8ab6bcc205db6
+  - Safe localized email/Google/callback errors and async recovery;29 tests/types/lint/build
+    pass
+  source: 9eeb3563a1190befa8af57aa095a6268abbc37c5
   release_status: local unpublished
   remaining_notes:
-  - Static English browser titles and raw API errors
-  - Broader Hindi/accessibility and human review pending
+  - Static English browser metadata; broader API error localization outside auth
+  - Browser/OAuth round-trip, broader Hindi/accessibility and human review pending
 - id: S5
   title: Android distribution and commerce
   status: blocked_external

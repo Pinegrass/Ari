@@ -62,3 +62,6 @@ Alert delivery/channel ownership is not configured or verified here. Backup rest
 
 ## Prepared runner improvement — not live
 Backend local f79ec76 detects reported batch errors despite HTTP200 and emits aggregate-only summaries. Policy skips remain non-failures; receipt failed/unknown counters fail without retries. Historical live logs still use the old runner until release.326 backend tests passed; no external alert route configured.
+
+## Prepared legacy retention boundary fix
+Local backend4d39f87 now deletes UTC dates on or before today−90, conservatively removing the boundary day.340tests pass; no live purge. Exact deletion timing still depends on job execution. See retention-boundary-2026-09-15.md.

@@ -91,3 +91,6 @@ HTTP200 does not establish per-user batch success. Runner logs must avoid raw id
 
 ## 2026-09-15 — reference before ingestion
 Validate S6 local-day/maturity/exclusion calculations independently before additive schema work. Treat already consent-scoped current episode snapshots as a strict reference input; do not adapt legacy UTC counts or claim epoch/transport acceptance from pure fixtures.
+
+## 2026-09-15 — retention boundary and auth error privacy
+Legacy date-only counts expire conservatively including UTCtoday−90 at maintenance execution; do not claim exact continuous enforcement. Auth UI renders allowlisted localized messages, never arbitrary provider/API/URL descriptions. Password recovery guidance must not assume one provider minimum policy.
