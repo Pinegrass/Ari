@@ -1,4 +1,4 @@
-# Original programme deliverables and remaining gaps — 19 September 2026
+# Original programme deliverables and remaining gaps — updated 20 September 2026
 
 Evidence inventory against the owner's original attachment `pasted-text.txt`
 (attachment fe9b2d6d-3a25-45a2-af02-f7063b14e146). This document distinguishes an
@@ -52,28 +52,17 @@ not thereby approved. Section12 security has concrete improvements and remaining
 operational gates. Sections13–16 require continued prioritised implementation and actual
 validation, not a claim that every test type was run on every surface.
 
-## Still-unimplemented or incomplete engineering
+## 20 September coding closure and scope boundaries
 
-These are not blocked merely because the phone, BillDesk or Play is unavailable:
+The historical A–T rows above describe the earlier checkpoint. For current source and validation, use `completion-audit-2026-09-20.md` and its linked lane reports. This continuation implemented notification-owned attribution and mature post-open action association, consented ordered funnels and paid lifecycle windows, generic notification ownership, secondary Hindi/error states, bounded multi-phase maintenance/streaming reports, five-cadence recurrence and confirmed horizons, parser validation, account-isolated bills, immutable group currency and settlement retry safety.
 
-- Delivery-owned notification-open attribution and defensible open/conversion rates;
-  raw interaction counts must not masquerade as rates with an unknown denominator.
-- Verified paid lifecycle measurement: conversion, churn, renewal opportunity/outcome,
-  recovery and reactivation semantics. Existing entitlement infrastructure and a trial
-  start event do not complete the requested measurement catalogue.
-- Complete onboarding/activation funnel semantics across the intended eligible population;
-  current consented cohorts are not all signups. Return-frequency distributions are now
-  implemented for the explicitly scoped current consented population, including zero-day
-  accounts; they are not population-wide sign-up or session-frequency metrics.
-- Combined local check-in/bill/server notification budgeting and broader reviewed trigger
-  coverage. Preserve bill reminders rather than silently replacing them with server caps.
-- Remaining Hindi strings and dynamic/provider-copy work; full accessibility and large-
-  history performance checks. Human/native validation is a separate final gate.
-- Broader forecasting, predicted-vs-confirmed horizon handling and automated AI claim
-  evaluation. Build only where inputs support the promise; unavailable balances should
-  remain unavailable rather than filled by guesses.
-- Operational scale work: v2 account locks are now bounded to100-account pages (see
-  `maintenance-pages-2026-09-19.md`); global legacy/delivery cleanup and report scaling remain; notification tombstone growth policy; full backup-restore execution and evidence.
+Remaining limitations must not be hidden behind an implementation label:
+
+- Full signup/onboarding population metrics are unavailable without pre-consent collection; current consented observation funnels are explicit. Net paid churn, revenue/refunds and annual-history gaps are not guessed from incomplete webhooks.
+- Bill reminders remain separate from the server quota. Older/offline clients require refresh after a compatible update; real combined device experience remains unverified.
+- Tombstones are retained pending evidence of a safe replay horizon. Production query plans, restored backups and alert delivery require operational verification.
+- Human/native language/accessibility and released performance remain acceptance work. App-owned source copy is not a translation of provider-hosted screens or arbitrary AI/user text; English/Hindi legal bodies are implemented as drafts pending publication review.
+- Conservative bounded predictions and deterministic/parser regression tests do not verify every generated AI sentence or establish unknown bank balances. Broad unconstrained forecasting is deliberately unavailable when evidence cannot support it.
 
 ## External, owner-deferred, release or elapsed-time gates
 

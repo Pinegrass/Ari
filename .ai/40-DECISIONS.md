@@ -116,3 +116,16 @@ Planning confirmation/deletion use business operation UUIDs and expected snapsho
 ## 19 September — bounded v2 cleanup transactions
 
 Measurement expiry selects100 accounts per keyset page and commits between internal HTTP pages. Preserve the shared user-lock order; tolerate accounts deleted after selection and advance using selected IDs. Do not skip locked accounts silently. Scheduler summaries contain counts, not cursors, and ambiguous requests are not retried. New runner must precede/accompany backend rollout because old runners stop at one page. This bounds account locks only; global legacy/delivery cleanup and report scale remain open.
+
+
+## 20 September — coding closure, provenance and release boundaries
+
+Verified billing state is maintained separately for each provider; unknown historical provenance preserves existing valid paid access until real reconciliation establishes ownership. Billing issues do not create a guessed grace period. Current-consent lifecycle observations use opaque epoch-scoped subscription references and expire within 90 days; annual baselines may disappear. Missing webhooks are unknown, cancellation is not refund/churn, and observed-window fractions are not subscriber census or causal lift.
+
+Three daily opportunities remain the server generic channel policy when deliberately enabled. Updated clients query authenticated ownership before scheduling local generic check-ins; bill reminders remain separate. Legacy/offline clients and real OS/provider behavior require acceptance. All automatic sending gates remain off.
+
+Local bills require verified account binding and account-specific storage. Historical unowned data is preserved separately; do not guess its owner. Financial screen state resets across accounts. Confirmed account deletion may clean the captured deleted account's local bills even after session transition, but must not expose its response or log out a new account. Ambiguous deletion is not automatically replayed.
+
+Groups use an immutable recorded currency. Historical NULL needs explicit creator confirmation without converting amounts. Group writes require captured currency, so older clients receive a conflict until upgraded. New expense UUID retry safety requires backend-first release. UPI launch is not payment evidence; settlement records only explicitly confirmed exact splits.
+
+Structured/parser and recorded-data calculations have synthetic regression evidence; freeform AI prose remains labelled interpretation with unverified claims. Do not turn manual net cash flow into actual savings/bank balance. Legal/data-handling copy changes are unpublished factual drafts, not legal compliance certification. Device hold, no new release authority and independent repository records persist.

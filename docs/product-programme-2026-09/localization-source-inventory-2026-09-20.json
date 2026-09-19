@@ -1,0 +1,545 @@
+{
+  "generatedAt": "2026-09-19T19:08:11.221Z",
+  "scope": "Mobile source JSX text, literal visible attributes and direct error/alert source identifiers. Classifications reviewed against rendering paths. English legal branches have Hindi counterparts. Brand/domain/VPA/date examples retain technical spelling. Stored error identifiers are translated at display. Dynamic provider/user-authored text excluded. This is not exhaustive human language/accessibility acceptance.",
+  "findings": [
+    {
+      "file": "src/screens/AboutScreen.tsx",
+      "line": 61,
+      "kind": "jsx-text",
+      "classification": "brand-or-technical-example",
+      "text": "Ari"
+    },
+    {
+      "file": "src/screens/accountant/BudgetPlannerScreen.tsx",
+      "line": 182,
+      "kind": "error-or-alert-literal",
+      "classification": "localized-at-render-source-id",
+      "text": "Enter a valid budget amount"
+    },
+    {
+      "file": "src/screens/accountant/BudgetPlannerScreen.tsx",
+      "line": 192,
+      "kind": "error-or-alert-literal",
+      "classification": "localized-at-render-source-id",
+      "text": "Failed to save budget"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 75,
+      "kind": "error-or-alert-literal",
+      "classification": "localized-at-render-source-id",
+      "text": "Failed to load goals"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 124,
+      "kind": "error-or-alert-literal",
+      "classification": "localized-at-render-source-id",
+      "text": "Give your goal a name"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 126,
+      "kind": "error-or-alert-literal",
+      "classification": "localized-at-render-source-id",
+      "text": "Enter a valid target amount"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 130,
+      "kind": "error-or-alert-literal",
+      "classification": "localized-at-render-source-id",
+      "text": "Date must be YYYY-MM-DD format"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 153,
+      "kind": "error-or-alert-literal",
+      "classification": "localized-at-render-source-id",
+      "text": "Failed to save goal"
+    },
+    {
+      "file": "src/screens/accountant/SavingsGoalsScreen.tsx",
+      "line": 356,
+      "kind": "literal-attribute",
+      "classification": "technical-format-example",
+      "text": "YYYY-MM-DD"
+    },
+    {
+      "file": "src/screens/AddTransactionScreen.tsx",
+      "line": 292,
+      "kind": "error-or-alert-literal",
+      "classification": "localized-at-render-source-id",
+      "text": "Enter an amount"
+    },
+    {
+      "file": "src/screens/AddTransactionScreen.tsx",
+      "line": 456,
+      "kind": "literal-attribute",
+      "classification": "technical-format-example",
+      "text": "Date"
+    },
+    {
+      "file": "src/screens/BudgetScreen.tsx",
+      "line": 105,
+      "kind": "error-or-alert-literal",
+      "classification": "localized-at-render-source-id",
+      "text": "Enter a valid budget amount"
+    },
+    {
+      "file": "src/screens/BudgetScreen.tsx",
+      "line": 114,
+      "kind": "error-or-alert-literal",
+      "classification": "localized-at-render-source-id",
+      "text": "Failed to save budget"
+    },
+    {
+      "file": "src/screens/GroupsListScreen.tsx",
+      "line": 132,
+      "kind": "literal-attribute",
+      "classification": "technical-format-example",
+      "text": "XXXXXXXX"
+    },
+    {
+      "file": "src/screens/HelpSupportScreen.tsx",
+      "line": 97,
+      "kind": "error-or-alert-literal",
+      "classification": "localized-at-render-source-id",
+      "text": "https://aritomo.in"
+    },
+    {
+      "file": "src/screens/HelpSupportScreen.tsx",
+      "line": 149,
+      "kind": "jsx-text",
+      "classification": "brand-or-technical-example",
+      "text": "aritomo.in"
+    },
+    {
+      "file": "src/screens/InviteFriendsScreen.tsx",
+      "line": 104,
+      "kind": "literal-attribute",
+      "classification": "technical-format-example",
+      "text": "ARI123ABC"
+    },
+    {
+      "file": "src/screens/LinkBankConsentScreen.tsx",
+      "line": 184,
+      "kind": "literal-attribute",
+      "classification": "technical-format-example",
+      "text": "9876543210@onemoney"
+    },
+    {
+      "file": "src/screens/LoginScreen.tsx",
+      "line": 119,
+      "kind": "error-or-alert-literal",
+      "classification": "localized-at-render-source-id",
+      "text": "Sign-in failed. Please try again or use your email."
+    },
+    {
+      "file": "src/screens/LoginScreen.tsx",
+      "line": 161,
+      "kind": "error-or-alert-literal",
+      "classification": "localized-at-render-source-id",
+      "text": "Sign-in failed. Please try again or use your email."
+    },
+    {
+      "file": "src/screens/LoginScreen.tsx",
+      "line": 169,
+      "kind": "error-or-alert-literal",
+      "classification": "localized-at-render-source-id",
+      "text": "Email is required"
+    },
+    {
+      "file": "src/screens/LoginScreen.tsx",
+      "line": 170,
+      "kind": "error-or-alert-literal",
+      "classification": "localized-at-render-source-id",
+      "text": "Password is required"
+    },
+    {
+      "file": "src/screens/LoginScreen.tsx",
+      "line": 217,
+      "kind": "literal-attribute",
+      "classification": "technical-format-example",
+      "text": "you@example.com"
+    },
+    {
+      "file": "src/screens/PaywallScreen.tsx",
+      "line": 33,
+      "kind": "error-or-alert-literal",
+      "classification": "localized-at-render-source-id",
+      "text": "Sign in before upgrading so your purchase can be restored on every device."
+    },
+    {
+      "file": "src/screens/PaywallScreen.tsx",
+      "line": 39,
+      "kind": "error-or-alert-literal",
+      "classification": "localized-at-render-source-id",
+      "text": "Subscriptions are not configured in this build."
+    },
+    {
+      "file": "src/screens/PaywallScreen.tsx",
+      "line": 43,
+      "kind": "error-or-alert-literal",
+      "classification": "localized-at-render-source-id",
+      "text": "Paid plans are currently unavailable. Please try again later."
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 95,
+      "kind": "error-or-alert-literal",
+      "classification": "localized-at-render-source-id",
+      "text": "Name is required"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 96,
+      "kind": "error-or-alert-literal",
+      "classification": "localized-at-render-source-id",
+      "text": "Email is required"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 97,
+      "kind": "error-or-alert-literal",
+      "classification": "localized-at-render-source-id",
+      "text": "Enter a valid email"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 98,
+      "kind": "error-or-alert-literal",
+      "classification": "localized-at-render-source-id",
+      "text": "Password must be at least 6 characters"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 168,
+      "kind": "literal-attribute",
+      "classification": "technical-format-example",
+      "text": "Rahul Sharma"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 176,
+      "kind": "literal-attribute",
+      "classification": "technical-format-example",
+      "text": "rahul@example.com"
+    },
+    {
+      "file": "src/screens/RegisterScreen.tsx",
+      "line": 194,
+      "kind": "literal-attribute",
+      "classification": "technical-format-example",
+      "text": "ARI123ABC"
+    },
+    {
+      "file": "src/screens/ShareCaptureScreen.tsx",
+      "line": 45,
+      "kind": "error-or-alert-literal",
+      "classification": "localized-at-render-source-id",
+      "text": "Could not parse — add manually"
+    },
+    {
+      "file": "src/screens/ShareCaptureScreen.tsx",
+      "line": 72,
+      "kind": "error-or-alert-literal",
+      "classification": "localized-at-render-source-id",
+      "text": "Could not save this entry. Review it before trying again."
+    },
+    {
+      "file": "src/screens/ShareCaptureScreen.tsx",
+      "line": 78,
+      "kind": "error-or-alert-literal",
+      "classification": "localized-at-render-source-id",
+      "text": "Couldn't save that entry. Please try again."
+    },
+    {
+      "file": "src/screens/SplashScreen.tsx",
+      "line": 74,
+      "kind": "jsx-text",
+      "classification": "brand-or-technical-example",
+      "text": "Ari"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 32,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "1. Acceptance of Terms"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 34,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "By downloading, installing, or using the Ari mobile application (\"Ari\" or the \"Service\"), you agree to be bound by these Terms of Service (\"Terms\"). If you do not agree, do not use Ari."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 37,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "These Terms form a binding agreement between you and Pinegrass Technologies Private Limited (\"Pinegrass\", \"we\", \"our\", \"us\"), a company incorporated in India (CIN U62011MN2026PTC015607)."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 40,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "2. Eligibility"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 42,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "You must be at least 18 years of age to use Ari. By using Ari, you represent that you meet this age requirement. Ari is designed for users in India and complies with Indian laws including the DPDP Act, 2023."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 45,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "3. Description of Service"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 47,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "Ari is a personal finance management application that helps you track expenses, manage budgets, set savings goals, receive AI-powered financial coaching (\"Tomo\"), and generate tax estimates. Ari does not provide financial, legal, or tax advice. All insights are informational only."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 50,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "4. User Accounts"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 52,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "You are responsible for maintaining the confidentiality of your account credentials. You agree to provide accurate information and to update it as necessary. We reserve the right to suspend or terminate accounts that violate these Terms."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 55,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "You may delete your account at any time through Settings. Account deletion is governed by our Privacy Policy."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 58,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "5. Subscriptions and Payments"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 60,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "Ari offers free features and optional paid access (\"Ari Pro\"), subject to availability. The eligible 14-day Ari trial requires no card and does not automatically become a paid subscription. A purchase requires a separate checkout. Before purchasing, review the price, billing period, renewal, cancellation and refund terms shown by the applicable store or checkout provider. Manage an existing subscription through the provider used to purchase it."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 63,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "6. Acceptable Use"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 65,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "You agree not to:"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 66,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "• Use Ari for any unlawful purpose"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 67,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "• Attempt to gain unauthorized access to Ari's systems"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 68,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "• Upload malicious code or attempt to disrupt the Service"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 69,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "• Violate any applicable laws or regulations"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 72,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "7. Intellectual Property"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 74,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "Ari, its name, logo, design, and code are the intellectual property of Pinegrass Technologies Pvt. Ltd. You may not copy, modify, distribute, or create derivative works without our written permission."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 77,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "8. Limitation of Liability"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 79,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "To the maximum extent permitted by law, Pinegrass shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of Ari. Our total liability shall not exceed the amount you paid us in the 12 months preceding the claim, or ₹5,000, whichever is greater."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 82,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "Ari provides informational tools, not professional financial advice. You are solely responsible for your financial decisions."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 85,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "9. Disclaimer of Warranties"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 87,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "Ari is provided \"as is\" without warranties of any kind, express or implied. We do not warrant that Ari will be uninterrupted, error-free, or completely secure."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 90,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "10. Governing Law and Dispute Resolution"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 92,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "These Terms are governed by the laws of India. Any dispute arising from these Terms shall be subject to the exclusive jurisdiction of courts in Manipur, India. Before initiating formal proceedings, you agree to attempt resolution through our Grievance Officer at privacy@pinegrass.in."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 95,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "11. Changes to Terms"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 97,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "We may update these Terms from time to time. Material changes will be notified through the app. Continued use after changes constitutes acceptance."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 100,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "12. Contact"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 102,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "Pinegrass Technologies Pvt. Ltd."
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 103,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "Email: privacy@pinegrass.in"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 104,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "CIN: U62011MN2026PTC015607"
+    },
+    {
+      "file": "src/screens/TermsScreen.tsx",
+      "line": 105,
+      "kind": "jsx-text",
+      "classification": "bilingual-legal-english-branch",
+      "text": "Manipur, India"
+    },
+    {
+      "file": "src/screens/TodoNotesScreen.tsx",
+      "line": 448,
+      "kind": "literal-attribute",
+      "classification": "technical-format-example",
+      "text": "YYYY-MM-DD"
+    },
+    {
+      "file": "src/components/UpiVpaEditor.tsx",
+      "line": 30,
+      "kind": "error-or-alert-literal",
+      "classification": "localized-at-render-source-id",
+      "text": "VPA should look like name@bank (e.g. 9876543210@ybl)"
+    },
+    {
+      "file": "src/components/UpiVpaEditor.tsx",
+      "line": 70,
+      "kind": "literal-attribute",
+      "classification": "technical-format-example",
+      "text": "9876543210@ybl"
+    },
+    {
+      "file": "src/components/UpiVpaEditor.tsx",
+      "line": 78,
+      "kind": "jsx-text",
+      "classification": "brand-or-technical-example",
+      "text": "name@okhdfcbank"
+    },
+    {
+      "file": "src/components/UpiVpaEditor.tsx",
+      "line": 79,
+      "kind": "jsx-text",
+      "classification": "brand-or-technical-example",
+      "text": "9876543210@paytm"
+    },
+    {
+      "file": "src/components/UpiVpaEditor.tsx",
+      "line": 80,
+      "kind": "jsx-text",
+      "classification": "brand-or-technical-example",
+      "text": "name@ybl"
+    }
+  ]
+}
