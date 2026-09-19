@@ -1,5 +1,8 @@
+import { useData } from '../context/DataContext';
+import { localStore } from '../lib/localStore';
+import { ReviewIntelligence } from '../components/ReviewIntelligence';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useFocusEffect, useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import type { MainStackParamList } from '../navigation/navigationTypes';
@@ -17,6 +20,7 @@ export default function PeriodicReportsScreen() {
   const route = useRoute<RouteProp<MainStackParamList, 'PeriodicReports'>>();
   const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
   const { locale } = useLocale();
+  const { fetchTransactions } = useData();
   const { isPrivate } = usePrivacy();
   const { language, t } = useLanguage();
   const [period, setPeriod] = useState<ReportPeriod>(route.params?.period ?? 'weekly');
@@ -26,6 +30,7 @@ export default function PeriodicReportsScreen() {
   const [anchor, setAnchor] = useState<string | undefined>(route.params?.anchor);
   useEffect(() => { if (route.params) { setPeriod(route.params.period); setAnchor(route.params.anchor); } }, [route.params]);
   const requestId = useRef(0);
+  const measuredView = useRef<string|null>(null);
   const money = (value: number) => isPrivate ? '••••' : new Intl.NumberFormat(language === 'hi' ? 'hi-IN' : locale.localeTag, { style: 'currency', currency: locale.currency, maximumFractionDigits: locale.usesDecimalAmounts ? 2 : 0 }).format(value);
   const day = (value: string) => new Date(`${value}T12:00:00`).toLocaleDateString(language === 'hi' ? 'hi-IN' : locale.localeTag, { day: 'numeric', month: 'short', year: 'numeric' });
   const load = useCallback(async (refresh = false) => {
@@ -35,11 +40,12 @@ export default function PeriodicReportsScreen() {
       const value = await getPeriodicReport(period, language, anchor);
       if (id !== requestId.current) return;
       setReport(value);
-      track('periodic_report_viewed', { period, has_data: value.totals.transactionCount > 0, language });
+      const viewKey = `${period}:${value.start}:${value.end}`;
+      if(measuredView.current!==viewKey){measuredView.current=viewKey;track('periodic_report_viewed');}
     } catch { if (id === requestId.current) setReport(null); }
     finally { if (id === requestId.current) { setLoading(false); setRefreshing(false); } }
   }, [period, language, anchor]);
-  useFocusEffect(useCallback(() => { void load(); return () => { requestId.current += 1; }; }, [load]));
+  useFocusEffect(useCallback(() => { void load(); return () => { requestId.current += 1; measuredView.current=null; }; }, [load]));
   return (
     <ScreenShell>
       <View style={styles.header}>
@@ -95,6 +101,7 @@ export default function PeriodicReportsScreen() {
             {!!report.categoryChanges?.length && <Text style={[styles.sectionTitle, { marginTop: 20 }]}>{t('changes')}</Text>}
             {report.categoryChanges?.slice(0, 4).map(item => <View key={item.name} style={styles.categoryRow}><Text style={{ flex: 1 }}>{item.name}</Text><Text>{money(item.delta)}</Text></View>)}
           </View>}
+          {!isPrivate && <ReviewIntelligence key={report.provenance?.revision} provenance={report.provenance} outlook={report.planningOutlook} baseline={report.historyBaseline} language={language} money={money} day={day} onEdit={entry => { void (async () => { await fetchTransactions(); const fresh = (await localStore.getAll()).find(row => row.id === entry.id); if (!fresh) { Alert.alert(t('unavailable')); return; } navigation.navigate('AddTransaction', { editTransaction: { id: fresh.id, type: fresh.type, amount: fresh.amount, category: fresh.category || 'uncategorized', description: fresh.description || '', note: fresh.note || '', date: fresh.date, isRecurring: fresh.isRecurring, recurrenceRule: fresh.recurrenceRule || undefined } }); })().catch(() => Alert.alert(t('unavailable'))); }} onPlanning={() => navigation.navigate('Planning')} onChanged={async () => { await fetchTransactions(); await load(true); }} />}
           {!isPrivate && report.goals.length > 0 && <View style={styles.card}>
             <Text style={styles.sectionTitle}>{t('goals')}</Text><Text style={styles.muted}>{t('currentGoals')}</Text>
             {report.goals.map(goal => <View key={goal.id} style={styles.categoryRow}><Text style={{ flex: 1 }}>{goal.name}</Text><Text>{money(goal.current)} / {money(goal.target)}</Text></View>)}

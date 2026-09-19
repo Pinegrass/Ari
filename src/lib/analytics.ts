@@ -1,5 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {apiRequest} from '../api/client';
+import * as Crypto from 'expo-crypto';
+import {measurementEpoch,setMeasurementEpoch,setMeasurementPrivate} from './measurementSession';
 
 // First-party, explicit opt-in counts only. No third-party SDK, properties or replay.
 let privateMode=true;
@@ -7,16 +9,21 @@ let privacyChoiceSet=false;
 let allowed=false;
 let generation=0;
 let accountId:string|null=null;
-export function setMeasurementAllowed(enabled:boolean):void{generation++;allowed=enabled;}
+export function setMeasurementAllowed(enabled:boolean,epoch:string|null=null):void{generation++;allowed=enabled&&!!epoch;setMeasurementEpoch(allowed?epoch:null);}
+export function measurementRevision():number{return generation;}
+export function applyMeasurementConsent(value:{enabled:boolean;consentEpoch:string|null},revision:number):boolean{
+  if(revision!==generation)return false;
+  setMeasurementAllowed(value.enabled,value.consentEpoch);return true;
+}
 export async function syncMeasurementConsent():Promise<void>{
   const current=++generation;
-  try{const value=await apiRequest<{enabled:boolean}>('/measurement/consent');if(current===generation)setMeasurementAllowed(value.enabled);}catch{if(current===generation)setMeasurementAllowed(false);}
+  try{const value=await apiRequest<{enabled:boolean;consentEpoch:string|null}>('/measurement/v2/consent');if(current===generation)setMeasurementAllowed(value.enabled,value.consentEpoch);}catch{if(current===generation)setMeasurementAllowed(false);}
 }
 export async function initAnalytics():Promise<void>{
-  try{const saved=await AsyncStorage.getItem('ari_private_mode');if(!privacyChoiceSet)privateMode=saved==='1';}catch{return;}
+  try{const saved=await AsyncStorage.getItem('ari_private_mode');if(!privacyChoiceSet){privateMode=saved==='1';setMeasurementPrivate(privateMode);}}catch{return;}
   await syncMeasurementConsent();
 }
-export function setPrivacyEnabled(enabled:boolean):void{privacyChoiceSet=true;privateMode=enabled;}
+export function setPrivacyEnabled(enabled:boolean):void{privacyChoiceSet=true;privateMode=enabled;setMeasurementPrivate(enabled);}
 export function isPrivacyEnabled():boolean{return privateMode;}
 export function identifyUser(userId:string,_traits:Record<string,unknown>={}):void{
   if(accountId!==userId){setMeasurementAllowed(false);accountId=userId;}
@@ -100,21 +107,20 @@ export type AnalyticsEvent =
 
 export function track(event:AnalyticsEvent,_props:Record<string,unknown>={}):void{
   if(privateMode||!allowed)return;
-  const names:Record<string,string>={report_action_started:'report_action_started',planning_saved:'planning_saved',trial_started:'trial_started',periodic_report_viewed:'report_opened',nudge_opened:'insight_opened',nudge_dismissed:'insight_dismissed',transaction_logged:'transaction_logged',notification_preferences_updated:'notification_preferences_updated'};
-  if(names[event])void apiRequest('/measurement/events',{method:'POST',body:JSON.stringify({event:names[event]})}).catch(()=>{});
+  const names:Record<string,string>={report_action_started:'report_action_started',periodic_report_viewed:'report_displayed',nudge_opened:'insight_opened',nudge_dismissed:'insight_dismissed',notification_preferences_updated:'notification_preferences_updated'};
+  const epoch=measurementEpoch(),name=names[event],current=generation;
+  if(!epoch||!name)return;
+  const body=JSON.stringify({event:name,eventId:Crypto.randomUUID(),consentEpoch:epoch});
+  // One immediate retry uses the same identity; no durable offline event queue.
+  const send=()=>apiRequest('/measurement/v2/events',{method:'POST',body});
+  void send().catch(error=>{
+    const status=(error as {status?:number})?.status;
+    if(current===generation&&measurementEpoch()===epoch&&(status===0||status===undefined||status>=500))return send().catch(()=>{});
+  });
 }
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-/**
- * Bucket an amount into a coarse band. Buckets are calibrated to cover
- * typical personal-finance ranges so the histogram across users is balanced and
- * actionable — most expenses fall in 100–2k, salaries land in 50k+.
- *
- * Reasons we bucket instead of sending raw amounts:
- *   1. PII minimisation (DPDPA-friendly)
- *   2. Cohort-friendly aggregation in PostHog
- *   3. Compresses the long tail of vehicle / rent / EMI amounts
- */
+/** Legacy call-site helper. Measurement v2 discards all amount properties. */
 export function bucketAmount(amount: number): string {
   if (amount < 100) return '0-100';
   if (amount < 500) return '100-500';

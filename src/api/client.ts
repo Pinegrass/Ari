@@ -1,3 +1,5 @@
+import { requestSessionRevision } from '../lib/requestSession';
+import { measurementEpoch } from '../lib/measurementSession';
 import { secureStorage } from '../lib/secureStorage';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { addBreadcrumb } from '../config/sentry';
@@ -26,6 +28,7 @@ const getToken = (): Promise<string | null> =>
 // Single in-flight refresh, shared by every concurrent 401. Without this,
 // 12 parallel screen-mount fetches all 401 at once trigger 12 refreshes,
 // rate-limit the auth endpoint, and likely race with the token write.
+let refreshRevision = -1;
 let _refreshInFlight: Promise<string | null> | null = null;
 
 function shouldRefreshAfter401(path: string): boolean {
@@ -36,15 +39,17 @@ function shouldRefreshAfter401(path: string): boolean {
   return path !== '/auth/login' && path !== '/auth/register';
 }
 
-async function _refreshAccessToken(): Promise<string | null> {
+async function _refreshAccessToken(revision: number): Promise<string | null> {
   if (!isSupabaseConfigured()) return null;
-  if (_refreshInFlight) return _refreshInFlight;
+  if (revision !== requestSessionRevision()) return null;
+  if (_refreshInFlight && refreshRevision === revision) return _refreshInFlight;
+  refreshRevision = revision;
 
   _refreshInFlight = (async () => {
     try {
       addBreadcrumb('auth', 'apiRequest: refreshing session after 401');
       const { data, error } = await supabase.auth.refreshSession();
-      if (error || !data.session) return null;
+      if (error || !data.session || revision !== requestSessionRevision()) return null;
       // AuthContext's onAuthStateChange hook also mirrors this, but we also
       // write it here so the immediate retry below sees the new token even
       // if the listener hasn't fired yet.
@@ -53,7 +58,7 @@ async function _refreshAccessToken(): Promise<string | null> {
     } catch {
       return null;
     } finally {
-      _refreshInFlight = null;
+      if (refreshRevision === revision) _refreshInFlight = null;
     }
   })();
   return _refreshInFlight;
@@ -62,9 +67,9 @@ async function _refreshAccessToken(): Promise<string | null> {
 async function _doRequest<T>(
   path: string,
   options: RequestInit,
-  tokenOverride?: string,
+  tokenOverride: string | null,
 ): Promise<{ ok: true; data: T } | { ok: false; status: number; message: string; body?: unknown }> {
-  const token = tokenOverride ?? (await getToken());
+  const token = tokenOverride;
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string>),
@@ -104,7 +109,18 @@ export async function apiRequest<T>(
   path: string,
   options: RequestInit = {}
 ): Promise<T> {
-  let first = await _doRequest<T>(path, options);
+  const revision = requestSessionRevision();
+  const token = await getToken();
+  const assertSession = () => {
+    if (revision !== requestSessionRevision()) throw new ApiError(409, 'Session changed; retry from the current account.');
+  };
+  assertSession();
+  const epoch = measurementEpoch();
+  if (epoch && ((['/transactions','/billing/trial'].includes(path) && options.method === 'POST') || (path === '/planning' && options.method === 'PUT'))) {
+    options = {...options, headers: {...(options.headers as Record<string,string>), 'X-Measurement-Consent-Epoch': epoch}};
+  }
+  let first = await _doRequest<T>(path, options, token);
+  assertSession();
   if (first.ok) return first.data;
 
   // A brief radio/DNS transition should not make safe reads or idempotent
@@ -112,7 +128,9 @@ export async function apiRequest<T>(
   // without duplicating financial records. POST is deliberately excluded.
   const method = (options.method ?? 'GET').toUpperCase();
   if (first.status === 0 && ['GET', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
-    first = await _doRequest<T>(path, options);
+    assertSession();
+    first = await _doRequest<T>(path, options, token);
+    assertSession();
     if (first.ok) return first.data;
   }
 
@@ -121,9 +139,12 @@ export async function apiRequest<T>(
   // explicitly skip refresh for credential exchange routes so a failed login
   // doesn't trigger a refresh storm against expired credentials.
   if (first.status === 401 && shouldRefreshAfter401(path)) {
-    const newToken = await _refreshAccessToken();
+    assertSession();
+    const newToken = await _refreshAccessToken(revision);
+    assertSession();
     if (newToken) {
       const second = await _doRequest<T>(path, options, newToken);
+      assertSession();
       if (second.ok) return second.data;
       throw new ApiError(second.status, second.message, second.body);
     }

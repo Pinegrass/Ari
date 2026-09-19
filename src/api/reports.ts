@@ -1,3 +1,4 @@
+import type { HistoryBaseline, PlanningOutlook, ReviewProvenance } from './reviewIntelligence';
 import { apiRequest } from './client';
 import type { PnlReport } from '../types';
 
@@ -26,6 +27,9 @@ export type ReportPeriod = 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearl
 
 export interface PeriodicReport {
   schemaVersion?: number;
+  provenance?: ReviewProvenance;
+  planningOutlook?: PlanningOutlook;
+  historyBaseline?: HistoryBaseline;
   currency?: string;
   evidence?: { code: string; kind: 'observed' | 'calculated' | 'predicted' | 'interpretation'; text: string }[];
   categoryChanges?: { name: string; current: number; previous: number; delta: number }[];

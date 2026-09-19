@@ -1,3 +1,4 @@
+import { observeRequestAccount, resetRequestSession } from '../lib/requestSession';
 import React, {
   createContext,
   useContext,
@@ -150,6 +151,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Wrap the React setter so anywhere we update `user`, the AsyncStorage
   // cache stays in lockstep. Avoids subtle drift between cache + state.
   const setUserAndCache = useCallback((u: User | null) => {
+    observeRequestAccount(u?.id ?? null);
     setUser(u);
     void cacheUser(u);
   }, []);
@@ -209,6 +211,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         const cached = await readCachedUser();
         if (cached && !cancelled) {
+          observeRequestAccount(cached.id);
           setUser(cached);
           // Cached data is usable offline; server validation must not block navigation.
           setLoading(false);
@@ -222,6 +225,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (err instanceof ApiError && err.status === 401) {
             // Real auth failure — token is invalid or expired beyond refresh.
             addBreadcrumb('auth', 'startup: 401 from /me, clearing session', 'warning');
+            resetRequestSession();
+            resetAnalytics();
             await secureStorage.removeItem('ari_token');
             await cacheUser(null);
             if (!cancelled) setUser(null);
@@ -251,6 +256,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let sub: { unsubscribe: () => void } | null = null;
     try {
       const { data } = supabase.auth.onAuthStateChange((event, session) => {
+        if(event === 'SIGNED_OUT') { resetRequestSession(); resetAnalytics(); }
+        if(session?.user?.id) observeRequestAccount(session.user.id);
         if (event === 'TOKEN_REFRESHED' && session?.access_token) {
           addBreadcrumb('auth', 'TOKEN_REFRESHED — mirroring to ari_token');
           void secureStorage.setItem('ari_token', session.access_token);
@@ -289,6 +296,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         stage: 'credential_exchange',
         outcome: 'success',
       });
+      observeRequestAccount(u.id);
       await secureStorage.setItem('ari_token', token);
       await adoptSessionIntoSupabase(token, refresh_token);
       setUserAndCache(u);
@@ -313,6 +321,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     addBreadcrumb('auth', 'register: attempt');
     const payload = buildRegisterPayload(formData);
     const { token, refresh_token, user: u } = await authApi.register(payload);
+    observeRequestAccount(u.id);
     await secureStorage.setItem('ari_token', token);
     await adoptSessionIntoSupabase(token, refresh_token);
     setUserAndCache(u);
@@ -324,6 +333,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [setUserAndCache]);
 
   const logout = useCallback(async () => {
+    resetRequestSession();
+    resetAnalytics();
     addBreadcrumb('auth', 'logout: starting');
     // Best-effort detach the token so the backend stops pushing to this
     // device. If the network is offline we just wipe local state.

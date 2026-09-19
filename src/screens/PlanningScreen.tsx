@@ -1,3 +1,4 @@
+import {useAuth} from '../context/AuthContext';
 import React,{useEffect,useRef,useState} from 'react';
 import {ActivityIndicator,AppState,ScrollView,Platform,Text,TextInput,TouchableOpacity,View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
@@ -12,7 +13,8 @@ import {usePlanning} from '../hooks/usePlanning';
 import {useLanguage} from '../i18n/LanguageContext';
 export default function PlanningScreen(){
   const {t,language}=useLanguage(),c=useColors(),{locale}=useLocale(),{isPrivate}=usePrivacy(),nav=useNavigation();
-  const p=usePlanning(locale.currency);
+  const {user}=useAuth();
+  const p=usePlanning(locale.currency,'',user?.id??'');
   const [submitted,setSubmitted]=useState(false);
   const [dateField,setDateField]=useState<'payday'|number|null>(null);
   const scroll=useRef<ScrollView>(null),positions=useRef<Record<string,number>>({});

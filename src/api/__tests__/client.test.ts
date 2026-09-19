@@ -1,3 +1,5 @@
+import {resetRequestSession,observeRequestAccount} from '../../lib/requestSession';
+import {setMeasurementEpoch,setMeasurementPrivate} from '../../lib/measurementSession';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiRequest, ApiError } from '../client';
 import { isSupabaseConfigured, supabase } from '../../lib/supabase';
@@ -18,6 +20,8 @@ const mockFetch = jest.fn();
 describe('apiRequest', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    resetRequestSession();
+    setMeasurementEpoch(null);setMeasurementPrivate(false);
     (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
     (isSupabaseConfigured as jest.Mock).mockReturnValue(false);
   });
@@ -156,5 +160,55 @@ describe('apiRequest', () => {
         }),
       })
     );
+  });
+});
+
+describe('confirmed-action measurement consent',()=>{
+  it('adds consent only to confirmed-action requests and suppresses it in private mode',async()=>{
+    setMeasurementPrivate(false);setMeasurementEpoch('synthetic-epoch');
+    mockFetch.mockResolvedValue({ok:true,json:()=>Promise.resolve({})});
+    await apiRequest('/transactions',{method:'POST',body:'{}'});
+    expect(mockFetch.mock.calls.at(-1)[1].headers['X-Measurement-Consent-Epoch']).toBe('synthetic-epoch');
+    await apiRequest('/billing/trial',{method:'POST'});
+    expect(mockFetch.mock.calls.at(-1)[1].headers['X-Measurement-Consent-Epoch']).toBe('synthetic-epoch');
+    setMeasurementPrivate(true);
+    await apiRequest('/planning',{method:'PUT',body:'{}'});
+    expect(mockFetch.mock.calls.at(-1)[1].headers['X-Measurement-Consent-Epoch']).toBeUndefined();
+    setMeasurementPrivate(false);
+    await apiRequest('/auth/me');
+    expect(mockFetch.mock.calls.at(-1)[1].headers['X-Measurement-Consent-Epoch']).toBeUndefined();
+    setMeasurementEpoch(null);
+  });
+});
+
+describe('account-bound request replay', () => {
+  beforeEach(()=>{jest.clearAllMocks();resetRequestSession();observeRequestAccount('a');(isSupabaseConfigured as jest.Mock).mockReturnValue(true);(AsyncStorage.getItem as jest.Mock).mockResolvedValue('token-a');});
+  it.each(['PUT','DELETE'])('does not replay %s after account switch during a lost response',async(method)=>{
+    let reject!: (error:unknown)=>void;
+    mockFetch.mockReturnValueOnce(new Promise((_,r)=>{reject=r;}));
+    const request=apiRequest('/planning',{method,body:'{"cash":"private draft"}'});
+    while(!mockFetch.mock.calls.length) await Promise.resolve();
+    observeRequestAccount('b');(AsyncStorage.getItem as jest.Mock).mockResolvedValue('token-b');
+    reject(new Error('lost response'));
+    await expect(request).rejects.toMatchObject({status:409});
+    expect(mockFetch).toHaveBeenCalledTimes(1);expect(supabase.auth.refreshSession).not.toHaveBeenCalled();
+  });
+  it('does not refresh after logout while a 401 response is pending',async()=>{
+    let finish!: (value:unknown)=>void;
+    mockFetch.mockReturnValueOnce(new Promise(r=>{finish=r;}));
+    const request=apiRequest('/planning',{method:'PUT'});
+    while(!mockFetch.mock.calls.length) await Promise.resolve();
+    resetRequestSession();finish({ok:false,status:401,json:()=>Promise.resolve({error:'Expired'})});
+    await expect(request).rejects.toMatchObject({status:409});expect(supabase.auth.refreshSession).not.toHaveBeenCalled();
+  });
+  it('does not replay or mirror a refresh completed after logout',async()=>{
+    let finish!: (value:unknown)=>void;
+    mockFetch.mockResolvedValueOnce({ok:false,status:401,json:()=>Promise.resolve({error:'Expired'})});
+    (supabase.auth.refreshSession as jest.Mock).mockReturnValueOnce(new Promise(r=>{finish=r;}));
+    const request=apiRequest('/planning',{method:'PUT'});
+    while(!(supabase.auth.refreshSession as jest.Mock).mock.calls.length) await Promise.resolve();
+    resetRequestSession();finish({data:{session:{access_token:'old-refreshed'}},error:null});
+    await expect(request).rejects.toMatchObject({status:409});expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(AsyncStorage.setItem).not.toHaveBeenCalledWith('ari_token','old-refreshed');
   });
 });

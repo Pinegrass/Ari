@@ -1,3 +1,4 @@
+import { reviewIntelligenceCopy } from '../i18n/reviewIntelligenceCopy';
 
 import { useLanguage } from '../i18n/LanguageContext';
 import React, { useRef, useEffect, useState, useMemo } from 'react';
@@ -92,7 +93,7 @@ const makeTyping = (c: Palette) => StyleSheet.create({
 });
 
 export default function TomoScreen() {
-  const { phrase } = useLanguage();
+  const { phrase, language } = useLanguage();
   const { chatHistory, tomoLoading, askTomo, clearChat } = useData();
   const haptics = useHaptics();
   const c = useColors();
@@ -192,6 +193,12 @@ export default function TomoScreen() {
           </TouchableOpacity>
         </View>
 
+        <View style={{ paddingHorizontal: 16, paddingVertical: 8 }}>
+          <Text style={{ color: c.inkSoft, fontSize: 12 }}>{reviewIntelligenceCopy[language].aiLimit}</Text>
+          <TouchableOpacity accessibilityRole="button" style={{ minHeight: 44, justifyContent: 'center' }} onPress={() => navigation.navigate('SmartLedger')}>
+            <Text style={{ color: c.forest }}>{reviewIntelligenceCopy[language].reviewCurrent}</Text>
+          </TouchableOpacity>
+        </View>
         {/* Chat List */}
         <FlatList
           ref={listRef}

@@ -3,6 +3,8 @@ import React from 'react';
 import {render,fireEvent,fireEventAsync,waitFor} from '@testing-library/react-native';
 import PlanningScreen from '../PlanningScreen';
 import {getPlanning,savePlanning} from '../../api/product';
+jest.mock('../../context/AuthContext',()=>({useAuth:()=>({user:{id:'user'}})}));
+jest.mock('expo-crypto',()=>({randomUUID:()=> '00000000-0000-4000-8000-000000000001'}));
 jest.setTimeout(20000);
 jest.mock('@react-native-community/datetimepicker',()=>{const {View}=require('react-native');return function Picker(props:object){return <View testID="date-picker" {...props}/>;};});
 let mockPrivate=false;
