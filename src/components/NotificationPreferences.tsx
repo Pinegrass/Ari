@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { getNotificationPreferences, saveNotificationPreferences, type NotificationPreferences as Preferences } from '../api/notificationPreferences';
+import { getNotificationPreferences, getNotificationCapabilities, saveNotificationPreferences, type NotificationPreferences as Preferences } from '../api/notificationPreferences';
+import { notificationAvailability } from '../i18n/notificationAvailability';
 import { useLanguage } from '../i18n/LanguageContext';
 import { track } from '../lib/analytics';
 
@@ -10,13 +11,16 @@ export default function NotificationPreferences() {
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  const [dailyEnabled, setDailyEnabled] = useState<boolean|null>(null);
   useEffect(() => {
     let active = true;
     getNotificationPreferences().then(v => { if (active) setValue(v); }).catch(() => { if (active) setMessage('notificationUnavailable'); });
+    getNotificationCapabilities().then(v => { if (active) setDailyEnabled(v.dailyServiceEnabled === true); }).catch(() => { if (active) setDailyEnabled(null); });
     return () => { active = false; };
   }, [attempt]);
   return <View style={{ padding: 16, backgroundColor: '#fff', borderRadius: 16, marginVertical: 16, gap: 12 }}>
-    <Text style={{ fontSize: 18 }}>{t('notifications')}</Text><Text>{t('notificationHelp')} {t('dailyNudgeSchedule')}</Text>
+    <Text style={{ fontSize: 18 }}>{t('notifications')}</Text><Text>{t('notificationHelp')} {dailyEnabled === true && t('dailyNudgeSchedule')}</Text>
+    <Text accessibilityRole="text">{notificationAvailability(language, dailyEnabled)}</Text>
     {!value && !message && <ActivityIndicator />}
     {value && <>
       {(['push', 'inApp'] as const).map(key => <TouchableOpacity key={key} disabled={busy} accessibilityRole="checkbox" accessibilityState={{ checked: value[key] }} onPress={() => setValue({ ...value, [key]: !value[key] })} style={{ paddingVertical: 10 }}><Text>{value[key] ? '☑' : '☐'} {t(key)}</Text></TouchableOpacity>)}

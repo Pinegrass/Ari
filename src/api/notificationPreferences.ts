@@ -5,4 +5,6 @@ export interface NotificationPreferences {
   maxPerWeek: number; quietStart: number; quietEnd: number; timezone: string; language: 'en' | 'hi';
 }
 export const getNotificationPreferences = () => apiRequest<NotificationPreferences>('/engagement/notification-preferences');
+export interface NotificationCapabilities { dailyServiceEnabled: boolean; genericCheckinOwner: 'server'|'device' }
+export const getNotificationCapabilities = () => apiRequest<NotificationCapabilities>('/engagement/notification-capabilities');
 export const saveNotificationPreferences = (settings: NotificationPreferences) => apiRequest<NotificationPreferences>('/engagement/notification-preferences', { method: 'PATCH', body: JSON.stringify(settings) });

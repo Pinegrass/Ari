@@ -15,7 +15,7 @@ jest.mock('../../context/AuthContext', () => ({ useAuth: () => ({ user: { name: 
 jest.mock('../../context/DataContext', () => ({ useData: () => mockData }));
 jest.mock('../../context/PrivacyContext', () => ({ usePrivacy: () => ({ isPrivate: mockPrivate, togglePrivate: mockToggle, formatAmount: (n: number) => mockPrivate ? '••••' : `₹${n}` }) }));
 jest.mock('../../context/ThemeContext', () => ({ useColors: () => require('../../theme/tokens').color }));
-jest.mock('../../i18n/LanguageContext', () => ({ useLanguage: () => ({ language: mockLanguage, t: (key: string, values: any) => require('../../i18n/catalog').translate(mockLanguage, key, values) }) }));
+jest.mock('../../i18n/LanguageContext', () => ({ useLanguage: () => ({ language: mockLanguage, phrase: (text: string) => require('../../i18n/phrases').phrase(mockLanguage, text), t: (key: string, values: any) => require('../../i18n/catalog').translate(mockLanguage, key, values) }) }));
 jest.mock('../../hooks/useHaptics', () => ({ useHaptics: () => ({ light: jest.fn(), medium: jest.fn() }) }));
 jest.mock('../../components/ui/Icon', () => ({ __esModule: true, default: () => null }));
 jest.mock('../../lib/analytics', () => ({ track: jest.fn() }));

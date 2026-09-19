@@ -1,4 +1,6 @@
 import React from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { phrase } from '../i18n/phrases';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { captureError } from '../config/sentry';
 import { color, font } from '../theme/tokens';
@@ -9,6 +11,7 @@ interface Props {
 }
 
 interface State {
+  language?: string;
   hasError: boolean;
   error: Error | null;
 }
@@ -24,6 +27,7 @@ export default class ErrorBoundary extends React.Component<Props, State> {
     // Tag root-boundary catches so Sentry can split them from per-screen
     // boundaries when we add those. The component-stack fragment gives us
     // a quick triage hint without bloating the event payload.
+    void AsyncStorage.getItem('ari_language').then(value => this.setState({ language: value === 'hi' ? 'hi' : 'en' })).catch(() => {});
     captureError(error, {
       boundary: 'root',
       component: errorInfo.componentStack?.substring(0, 200) ?? 'unknown',
@@ -35,13 +39,14 @@ export default class ErrorBoundary extends React.Component<Props, State> {
   };
 
   render() {
+    const copy = (text: string) => phrase(this.state.language ?? 'en', text);
     if (this.state.hasError) {
       return (
         <View style={styles.container}>
           <Icon name="alert-triangle" size={64} color={color.clay} />
-          <Text style={styles.title}>Something went wrong</Text>
+          <Text style={styles.title}>{copy('Something went wrong')}</Text>
           <Text style={styles.message}>
-            Don&apos;t worry, your data is safe. The error has been reported and we&apos;ll fix it soon.
+            {copy('Ari could not display this screen. Try again, and check recent changes before repeating a save.')}
           </Text>
           {__DEV__ && this.state.error && (
             <View style={styles.debugBox}>
@@ -50,8 +55,8 @@ export default class ErrorBoundary extends React.Component<Props, State> {
               </Text>
             </View>
           )}
-          <TouchableOpacity style={styles.btn} onPress={this.handleRestart} activeOpacity={0.85}>
-            <Text style={styles.btnText}>Try Again</Text>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel={copy("Try Again")} style={styles.btn} onPress={this.handleRestart} activeOpacity={0.85}>
+            <Text style={styles.btnText}>{copy('Try Again')}</Text>
           </TouchableOpacity>
         </View>
       );

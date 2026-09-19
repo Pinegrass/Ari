@@ -1,3 +1,4 @@
+import { useLanguage } from '../i18n/LanguageContext';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator,
@@ -19,6 +20,7 @@ import { computeStreaks, writeStreakCache, type StreakInfo } from '../lib/streak
  */
 
 const DOW = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+const DOW_HI = ['सोम', 'मंगल', 'बुध', 'गुरु', 'शुक्र', 'शनि', 'रवि'];
 
 function offsetMonth(m: string, delta: number): string {
   const [y, mo] = m.split('-').map(Number);
@@ -38,7 +40,8 @@ function todayIso(): string {
 
 export default function DailyHeatmapScreen() {
   const navigation = useNavigation();
-  const { formatAmount } = usePrivacy();
+  const { formatAmount, isPrivate } = usePrivacy();
+  const { language, phrase: localizeCopy } = useLanguage();
   const { locale } = useLocale();
 
   const [month, setMonth] = useState(() => todayIso().slice(0, 7));
@@ -99,19 +102,20 @@ export default function DailyHeatmapScreen() {
   return (
     <ScreenShell edges={['top']}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={8}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel={localizeCopy("Go back")} onPress={() => navigation.goBack()} hitSlop={8}>
           <Icon name="chevron-left" size={22} color={color.ink} />
         </TouchableOpacity>
-        <Text style={styles.title}>Daily heatmap</Text>
+        <Text style={styles.title}>{localizeCopy("Daily heatmap")}</Text>
         <View style={{ width: 22 }} />
       </View>
 
       <View style={styles.monthRow}>
-        <TouchableOpacity onPress={() => setMonth(offsetMonth(month, -1))} hitSlop={8}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel={localizeCopy("Previous month")} onPress={() => setMonth(offsetMonth(month, -1))} hitSlop={8}>
           <Icon name="chevron-left" size={18} color={color.inkSoft} />
         </TouchableOpacity>
-        <Text style={styles.monthLabel}>{monthLabel(month, locale.localeTag)}</Text>
+        <Text style={styles.monthLabel}>{monthLabel(month, language === 'hi' ? 'hi-IN' : locale.localeTag)}</Text>
         <TouchableOpacity
+          accessibilityRole="button" accessibilityLabel={localizeCopy("Next month")}
           onPress={() => setMonth(offsetMonth(month, 1))}
           hitSlop={8}
           disabled={month >= todayIso().slice(0, 7)}
@@ -137,18 +141,16 @@ export default function DailyHeatmapScreen() {
                   />
                   <Text style={styles.streakValue}>{streak.current}</Text>
                 </View>
-                <Text style={styles.summaryLabel}>Current streak</Text>
+                <Text style={styles.summaryLabel}>{localizeCopy("Current streak")}</Text>
               </View>
               <View style={styles.streakCell}>
                 <Text style={styles.streakValue}>{streak.longest}</Text>
-                <Text style={styles.summaryLabel}>Longest streak</Text>
+                <Text style={styles.summaryLabel}>{localizeCopy("Longest streak")}</Text>
               </View>
             </View>
             {!streak.loggedToday && (
               <Text style={styles.streakHint}>
-                {streak.current > 0
-                  ? `Log something today to keep your ${streak.current}-day streak alive.`
-                  : 'Log something today to start a streak.'}
+                {localizeCopy("Add an entry when something changed. Skipping today is fine.")}
               </Text>
             )}
           </View>
@@ -159,17 +161,17 @@ export default function DailyHeatmapScreen() {
           <>
             <View style={styles.summary}>
               <View style={styles.summaryCell}>
-                <Text style={styles.summaryLabel}>Month total</Text>
+                <Text style={styles.summaryLabel}>{localizeCopy("Month total")}</Text>
                 <Text style={styles.summaryAmount}>{formatAmount(data.total)}</Text>
               </View>
               <View style={styles.summaryCell}>
-                <Text style={styles.summaryLabel}>Heaviest day</Text>
+                <Text style={styles.summaryLabel}>{localizeCopy("Heaviest day")}</Text>
                 <Text style={styles.summaryAmount}>
                   {heaviest ? formatAmount(heaviest[1]) : '—'}
                 </Text>
                 {heaviest && (
                   <Text style={styles.summarySub}>
-                    {new Date(heaviest[0] + 'T00:00:00').toLocaleDateString(locale.localeTag, {
+                    {new Date(heaviest[0] + 'T00:00:00').toLocaleDateString(language === 'hi' ? 'hi-IN' : locale.localeTag, {
                       day: 'numeric', month: 'short',
                     })}
                   </Text>
@@ -178,7 +180,7 @@ export default function DailyHeatmapScreen() {
             </View>
 
             <View style={styles.dowRow}>
-              {DOW.map((d, i) => (
+              {(language === 'hi' ? DOW_HI : DOW).map((d, i) => (
                 <Text key={`${d}-${i}`} style={styles.dow}>{d}</Text>
               ))}
             </View>
@@ -206,7 +208,7 @@ export default function DailyHeatmapScreen() {
                     </Text>
                     {amount > 0 && (
                       <Text style={[styles.cellAmount, intensity > 0.5 && { color: color.cream }]}>
-                        {amount >= 1000 ? `${Math.round(amount / 1000)}k` : amount}
+                        {isPrivate ? formatAmount(amount) : new Intl.NumberFormat(language === 'hi' ? 'hi-IN' : locale.localeTag, { notation: 'compact', maximumFractionDigits: 0 }).format(amount)}
                       </Text>
                     )}
                   </View>
@@ -215,7 +217,7 @@ export default function DailyHeatmapScreen() {
             </View>
           </>
         ) : (
-          <Text style={styles.error}>Couldn&apos;t load heatmap.</Text>
+          <View><Text accessibilityRole="alert" style={styles.error}>{localizeCopy("Couldn't load heatmap.")}</Text><TouchableOpacity accessibilityRole="button" onPress={() => void load(month)} style={{ padding: 16 }}><Text>{localizeCopy("Retry")}</Text></TouchableOpacity></View>
         )}
       </ScrollView>
     </ScreenShell>

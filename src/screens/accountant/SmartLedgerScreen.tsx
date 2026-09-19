@@ -34,15 +34,9 @@ function offsetMonth(m: string, delta: number): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 }
 
-const MONTH_NAMES: Record<string, string> = {
-  '01': 'January', '02': 'February', '03': 'March', '04': 'April',
-  '05': 'May', '06': 'June', '07': 'July', '08': 'August',
-  '09': 'September', '10': 'October', '11': 'November', '12': 'December',
-};
-
-function formatMonth(m: string): string {
-  const [y, mo] = m.split('-');
-  return `${MONTH_NAMES[mo] || mo} ${y}`;
+function formatMonth(month: string, language: string): string {
+  const [year, number] = month.split('-').map(Number);
+  return new Date(year, number - 1, 1).toLocaleDateString(language === 'hi' ? 'hi-IN' : 'en-US', {month:'long', year:'numeric'});
 }
 
 function fmtTxnDate(d: string, localeTag: string): string {
@@ -60,7 +54,7 @@ type FilterType = 'all' | 'income' | 'expense';
 type SortBy = 'date' | 'amount';
 
 export default function SmartLedgerScreen() {
- const {phrase:localizeCopy}=useCopyLanguage();
+ const {phrase:localizeCopy, language}=useCopyLanguage();
   const { locale } = useLocale();
   const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
   const route=useRoute<RouteProp<MainStackParamList,'SmartLedger'>>();
@@ -173,12 +167,12 @@ export default function SmartLedgerScreen() {
   const handleDelete = (txn: Transaction) => {
     haptics.medium();
     Alert.alert(
-      'Delete Transaction',
-      `Delete "${txn.description}" (${formatAmount(txn.amount)})?`,
+      localizeCopy('Delete Transaction'),
+      `${localizeCopy("Delete this entry?")} ${txn.description} (${formatAmount(txn.amount)})`,
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: localizeCopy('Cancel'), style: 'cancel' },
         {
-          text: 'Delete',
+          text: localizeCopy('Delete'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -186,7 +180,7 @@ export default function SmartLedgerScreen() {
               setTransactions((prev) => prev.filter((t) => t.id !== txn.id));
               haptics.success();
             } catch {
-              Alert.alert('Error', 'Could not delete transaction.');
+              Alert.alert(localizeCopy('Error'), localizeCopy('Could not delete transaction.'));
             }
           },
         },
@@ -207,7 +201,7 @@ export default function SmartLedgerScreen() {
     <ScreenShell edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel={localizeCopy("Go back")} onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Icon name="arrow-left" size={22} color={color.ink} />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
@@ -216,6 +210,7 @@ export default function SmartLedgerScreen() {
         </View>
         <TouchableOpacity
           onPress={() => { haptics.light(); setShowFilters(!showFilters); }}
+          accessibilityRole="button" accessibilityLabel={localizeCopy(showFilters ? "Hide filters" : "Show filters")} accessibilityState={{ expanded: showFilters }}
           style={[styles.filterToggle, showFilters && styles.filterToggleActive]}
         >
           <Icon name="search" size={18} color={showFilters ? color.forest : color.inkFaint} />
@@ -224,11 +219,11 @@ export default function SmartLedgerScreen() {
 
       {/* Month Navigator */}
       {range?<View style={styles.monthNav}><Text style={styles.monthText}>{range.start} – {range.end}</Text><TouchableOpacity accessibilityRole="button" onPress={()=>{navigation.replace('SmartLedger');}}><Text>{localizeCopy('Clear date filter')}</Text></TouchableOpacity></View>:<View style={styles.monthNav}>
-        <TouchableOpacity onPress={() => goMonth(-1)} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel={localizeCopy("Previous month")} onPress={() => goMonth(-1)} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
           <Icon name="chevron-left" size={22} color={color.ink} />
         </TouchableOpacity>
-        <Text style={styles.monthText}>{formatMonth(month)}</Text>
-        <TouchableOpacity onPress={() => goMonth(1)} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+        <Text style={styles.monthText}>{formatMonth(month, language)}</Text>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel={localizeCopy("Next month")} onPress={() => goMonth(1)} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
           <Icon name="chevron-right" size={22} color={color.ink} />
         </TouchableOpacity>
       </View>
@@ -244,12 +239,13 @@ export default function SmartLedgerScreen() {
               style={styles.searchInput}
               placeholder={localizeCopy("Search by name, category, tags...")}
               placeholderTextColor={color.inkFaint}
+              accessibilityLabel={localizeCopy("Search by name, category, tags...")}
               value={searchQuery}
               onChangeText={setSearchQuery}
               autoCapitalize="none"
             />
             {searchQuery.length > 0 && (
-              <TouchableOpacity onPress={() => setSearchQuery('')}>
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel={localizeCopy("Clear search")} onPress={() => setSearchQuery('')}>
                 <Icon name="x" size={16} color={color.inkFaint} />
               </TouchableOpacity>
             )}
@@ -259,17 +255,19 @@ export default function SmartLedgerScreen() {
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
             {(['all', 'income', 'expense'] as const).map((f) => (
               <TouchableOpacity
+                accessibilityRole="radio" accessibilityState={{ selected: typeFilter === f }}
                 key={f}
                 style={[styles.chip, typeFilter === f && styles.chipActive]}
                 onPress={() => { haptics.light(); setTypeFilter(f); }}
               >
                 <Text style={[styles.chipText, typeFilter === f && styles.chipTextActive]}>
-                  {f === 'all' ? 'All' : f === 'income' ? '↑ Income' : '↓ Expense'}
+                  {f === 'all' ? localizeCopy('All') : f === 'income' ? `↑ ${localizeCopy('Income')}` : `↓ ${localizeCopy('Expense')}`}
                 </Text>
               </TouchableOpacity>
             ))}
             <View style={styles.chipDivider} />
             <TouchableOpacity
+              accessibilityRole="checkbox" accessibilityState={{ checked: showRecurringOnly }}
               style={[styles.chip, showRecurringOnly && styles.chipActive]}
               onPress={() => { haptics.light(); setShowRecurringOnly(!showRecurringOnly); }}
             >
@@ -290,11 +288,12 @@ export default function SmartLedgerScreen() {
             </TouchableOpacity>
             <View style={styles.chipDivider} />
             <TouchableOpacity
+              accessibilityRole="button" accessibilityLabel={localizeCopy(sortBy === 'amount' ? 'Sort by date' : 'Sort by amount')}
               style={[styles.chip, sortBy === 'amount' && styles.chipActive]}
               onPress={() => { haptics.light(); setSortBy(sortBy === 'date' ? 'amount' : 'date'); }}
             >
               <Text style={[styles.chipText, sortBy === 'amount' && styles.chipTextActive]}>
-                {sortBy === 'amount' ? `${locale.symbol} Amount` : '📅 Date'}
+                {sortBy === 'amount' ? `${locale.symbol} ${localizeCopy('Amount')}` : `📅 ${localizeCopy('Date')}`}
               </Text>
             </TouchableOpacity>
           </ScrollView>
@@ -353,8 +352,8 @@ export default function SmartLedgerScreen() {
       ) : loadError ? <View style={{padding:20}}><Text>{localizeCopy('Could not load transactions.')}</Text><TouchableOpacity accessibilityRole="button" onPress={()=>{setLoading(true);void fetchTxns();}} style={{padding:16}}><Text>{localizeCopy('Try again')}</Text></TouchableOpacity></View> : filteredTxns.length === 0 ? (
         <EmptyState
           emoji={searchQuery || categoryFilter || typeFilter !== 'all' ? '🔍' : '📝'}
-          title={searchQuery || categoryFilter || typeFilter !== 'all' ? 'No matches' : 'No transactions'}
-          subtitle={searchQuery || categoryFilter || typeFilter !== 'all' ? 'Try adjusting your filters' : 'Add transactions to see them here'}
+          title={localizeCopy(searchQuery || categoryFilter || typeFilter !== 'all' ? 'No matches' : 'No transactions')}
+          subtitle={localizeCopy(searchQuery || categoryFilter || typeFilter !== 'all' ? 'Try adjusting your filters' : 'Add transactions to see them here')}
         />
       ) : (
         <FlatList
@@ -394,7 +393,7 @@ export default function SmartLedgerScreen() {
                         {txn.category.charAt(0).toUpperCase() + txn.category.slice(1)}
                       </Text>
                       <Text style={styles.txnDot}>·</Text>
-                      <Text style={styles.txnDate}>{fmtTxnDate(txn.date, locale.localeTag)}</Text>
+                      <Text style={styles.txnDate}>{fmtTxnDate(txn.date, language === 'hi' ? 'hi-IN' : locale.localeTag)}</Text>
                       {txn.incomeSource && (
                         <>
                           <Text style={styles.txnDot}>·</Text>

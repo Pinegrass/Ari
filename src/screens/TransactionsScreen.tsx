@@ -52,7 +52,7 @@ const PERIODS: { value: PeriodType; label: string }[] = [
 ];
 
 export default function TransactionsScreen() {
-  const { phrase } = useLanguage();
+  const { phrase, language } = useLanguage();
   const navigation = useNavigation<Nav>();
   const c = useColors();
   const styles = useMemo(() => makeStyles(c), [c]);
@@ -114,7 +114,7 @@ export default function TransactionsScreen() {
     });
   }, [transactions, filter, search]);
 
-  const sections = useMemo(() => groupTransactionsByDate(filtered), [filtered]);
+  const sections = useMemo(() => groupTransactionsByDate(filtered, language), [filtered, language]);
 
   const income = summary?.income ?? 0;
   const expenses = summary?.expenses ?? 0;

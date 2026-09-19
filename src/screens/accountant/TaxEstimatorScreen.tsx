@@ -108,8 +108,8 @@ export default function TaxEstimatorScreen() {
         rentPaid: numVal(rentPaid), homeLoanInterest: 0, metroCity: true, gstRegistered: false,
       });
       haptics.success();
-      Alert.alert('Saved!', 'Your tax profile has been saved. Tomo AI will use this for personalized tax advice.');
-    } catch { Alert.alert('Error', 'Could not save your tax profile.'); }
+      Alert.alert(localizeCopy('Saved!'), localizeCopy('Your tax profile has been saved.'));
+    } catch { Alert.alert(localizeCopy('Error'), localizeCopy('Could not save your tax profile.')); }
     finally { setSaving(false); }
   };
 
@@ -117,8 +117,8 @@ export default function TaxEstimatorScreen() {
 
   const deductionFields = isIndia
     ? [
-        { l: 'Section 80C (PPF, ELSS, EPF)', v: retirementContrib, s: setRetirementContrib, p: `Max ${fmt(150000)}` },
-        { l: 'Section 80D (Health Insurance)', v: otherDeductions, s: setOtherDeductions, p: `Max ${fmt(25000)}` },
+        { l: 'Section 80C (PPF, ELSS, EPF)', v: retirementContrib, s: setRetirementContrib, p: `${localizeCopy("Max")} ${fmt(150000)}` },
+        { l: 'Section 80D (Health Insurance)', v: otherDeductions, s: setOtherDeductions, p: `${localizeCopy("Max")} ${fmt(25000)}` },
       ]
     : [
         { l: country === 'US' ? '401(k) / IRA Contributions' : country === 'GB' ? 'Pension / SIPP' : country === 'AU' ? 'Superannuation (Concessional)' : 'Retirement / Pension', v: retirementContrib, s: setRetirementContrib, p: '' },
@@ -136,9 +136,9 @@ export default function TaxEstimatorScreen() {
   return (
     <ScreenShell edges={['top']}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}><Icon name="arrow-left" size={22} color={color.ink} /></TouchableOpacity>
-        <View style={{ flex: 1 }}><Text style={styles.headerTitle}>{localizeCopy("Tax Estimator")}</Text><Text style={styles.headerSub}>{engine.label}</Text></View>
-        <TouchableOpacity onPress={handleSave} disabled={saving} style={styles.saveHeaderBtn}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel={localizeCopy("Go back")} onPress={() => navigation.goBack()} style={styles.backBtn}><Icon name="arrow-left" size={22} color={color.ink} /></TouchableOpacity>
+        <View style={{ flex: 1 }}><Text style={styles.headerTitle}>{localizeCopy("Tax Estimator")}</Text><Text style={styles.headerSub}>{localizeCopy(engine.label)}</Text></View>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel={localizeCopy("Save Tax Profile")} accessibilityState={{ disabled: saving, busy: saving }} onPress={handleSave} disabled={saving} style={styles.saveHeaderBtn}>
           {saving ? <ActivityIndicator size="small" color={color.forest} /> : <Text style={styles.saveHeaderText}>{localizeCopy("Save")}</Text>}
         </TouchableOpacity>
       </View>
@@ -151,8 +151,8 @@ export default function TaxEstimatorScreen() {
                 <Text style={styles.regimeLabel}>{localizeCopy("Tax Regime")}</Text>
                 <View style={styles.regimeTabs}>
                   {(['new', 'old'] as const).map((r) => (
-                    <TouchableOpacity key={r} style={[styles.regimeTab, regime === r && styles.regimeTabActive]} onPress={() => { haptics.light(); setRegime(r); }}>
-                      <Text style={[styles.regimeTabText, regime === r && styles.regimeTabTextActive]}>{r === 'new' ? 'New' : 'Old'}</Text>
+                    <TouchableOpacity accessibilityRole="radio" accessibilityState={{ selected: regime === r }} key={r} style={[styles.regimeTab, regime === r && styles.regimeTabActive]} onPress={() => { haptics.light(); setRegime(r); }}>
+                      <Text style={[styles.regimeTabText, regime === r && styles.regimeTabTextActive]}>{localizeCopy(r === 'new' ? 'New' : 'Old')}</Text>
                       {comparison.recommendedRegime === r && <View style={styles.recommendBadge}><Text style={styles.recommendText}>{localizeCopy("Best")}</Text></View>}
                     </TouchableOpacity>
                   ))}
@@ -195,7 +195,7 @@ export default function TaxEstimatorScreen() {
                   <View style={styles.compareCol}><Text style={styles.compareLabel}>{localizeCopy("New Regime")}</Text><Text style={[styles.compareAmount, comparison.recommendedRegime === 'new' && styles.compareWinner]}>{fmt(comparison.new.totalTax)}</Text><Text style={styles.compareRate}>{comparison.new.effectiveTaxRate}{localizeCopy("% rate")}</Text></View>
                 </View>
                 {comparison.savings > 0 && (
-                  <View style={styles.savingsBanner}><Icon name="trending-down" size={16} color={color.forest} /><Text style={styles.savingsText}>{localizeCopy("You save")}{fmt(comparison.savings)}{localizeCopy("/year with")}{comparison.recommendedRegime === 'old' ? 'Old' : 'New'} {localizeCopy("Regime")}</Text></View>
+                  <View style={styles.savingsBanner}><Icon name="trending-down" size={16} color={color.forest} /><Text style={styles.savingsText}>{localizeCopy("You save")}{fmt(comparison.savings)}{localizeCopy("/year with")}{localizeCopy(comparison.recommendedRegime === 'old' ? 'Old' : 'New')} {localizeCopy("Regime")}</Text></View>
                 )}
               </View>
             </AnimatedEntry>
@@ -203,24 +203,24 @@ export default function TaxEstimatorScreen() {
 
           <AnimatedEntry delay={140}>
             <SectionAccordion title={localizeCopy("Income Details")} icon="💰" expanded={expandedSection === 'income'} onToggle={() => toggleSection('income')}>
-              <F label={localizeCopy("Annual Salary")} value={annualSalary} onChange={setAnnualSalary} placeholder={`e.g. ${fmt(1200000)}`} symbol={loc.symbol} />
-              <F label={country === 'US' ? 'Freelance / 1099 Income' : 'Freelance / Self-Employed'} value={freelanceIncome} onChange={setFreelanceIncome} placeholder={`e.g. ${fmt(300000)}`} symbol={loc.symbol} />
-              <F label={localizeCopy("Other Income (Interest, Rental, etc.)")} value={otherIncome} onChange={setOtherIncome} placeholder={`e.g. ${fmt(50000)}`} symbol={loc.symbol} />
+              <F label={localizeCopy("Annual Salary")} value={annualSalary} onChange={setAnnualSalary} placeholder={`${localizeCopy("e.g.")} ${fmt(1200000)}`} symbol={loc.symbol} />
+              <F label={localizeCopy(country === 'US' ? 'Freelance / 1099 Income' : 'Freelance / Self-Employed')} value={freelanceIncome} onChange={setFreelanceIncome} placeholder={`${localizeCopy("e.g.")} ${fmt(300000)}`} symbol={loc.symbol} />
+              <F label={localizeCopy("Other Income (Interest, Rental, etc.)")} value={otherIncome} onChange={setOtherIncome} placeholder={`${localizeCopy("e.g.")} ${fmt(50000)}`} symbol={loc.symbol} />
             </SectionAccordion>
           </AnimatedEntry>
 
           <AnimatedEntry delay={180}>
             <SectionAccordion title={localizeCopy("Deductions")} icon="📋" expanded={expandedSection === 'deductions'} onToggle={() => toggleSection('deductions')}>
-              {deductionFields.map((f) => <F key={f.l} label={f.l} value={f.v} onChange={f.s} placeholder={f.p} symbol={loc.symbol} />)}
-              {isIndia && (<><F label={localizeCopy("HRA Received (Annual)")} value={hraReceived} onChange={setHraReceived} placeholder={`e.g. ${fmt(240000)}`} symbol={loc.symbol} /><F label={localizeCopy("Rent Paid (Annual)")} value={rentPaid} onChange={setRentPaid} placeholder={`e.g. ${fmt(360000)}`} symbol={loc.symbol} /></>)}
+              {deductionFields.map((f) => <F key={f.l} label={localizeCopy(f.l)} value={f.v} onChange={f.s} placeholder={f.p} symbol={loc.symbol} />)}
+              {isIndia && (<><F label={localizeCopy("HRA Received (Annual)")} value={hraReceived} onChange={setHraReceived} placeholder={`${localizeCopy("e.g.")} ${fmt(240000)}`} symbol={loc.symbol} /><F label={localizeCopy("Rent Paid (Annual)")} value={rentPaid} onChange={setRentPaid} placeholder={`${localizeCopy("e.g.")} ${fmt(360000)}`} symbol={loc.symbol} /></>)}
             </SectionAccordion>
           </AnimatedEntry>
 
           <AnimatedEntry delay={300}>
-            <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={saving} activeOpacity={0.8}>
+            <TouchableOpacity accessibilityRole="button" accessibilityState={{ disabled: saving, busy: saving }} style={styles.saveBtn} onPress={handleSave} disabled={saving} activeOpacity={0.8}>
               {saving ? <ActivityIndicator color={color.cream} size="small" /> : <Text style={styles.saveBtnText}>{localizeCopy("Save Tax Profile")}</Text>}
             </TouchableOpacity>
-            <Text style={styles.disclaimer}>{localizeCopy("Estimates only. Consult a tax professional for exact calculations.")}{isIndia && `Based on FY ${engine.financialYear} slabs.`}</Text>
+            <Text style={styles.disclaimer}>{localizeCopy("Estimates only. Consult a tax professional for exact calculations.")}{isIndia && ` ${localizeCopy("Financial year")}: ${engine.financialYear}`}</Text>
           </AnimatedEntry>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -231,7 +231,7 @@ export default function TaxEstimatorScreen() {
 function SectionAccordion({ title, icon, expanded, onToggle, children }: { title: string; icon: string; expanded: boolean; onToggle: () => void; children: React.ReactNode }) {
   return (
     <View style={styles.accordionCard}>
-      <TouchableOpacity style={styles.accordionHeader} onPress={onToggle} activeOpacity={0.7}>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel={title} accessibilityState={{ expanded }} style={styles.accordionHeader} onPress={onToggle} activeOpacity={0.7}>
         <Text style={styles.accordionIcon}>{icon}</Text><View style={{ flex: 1 }}><Text style={styles.accordionTitle}>{title}</Text></View>
         <Icon name={expanded ? 'chevron-left' : 'chevron-right'} size={18} color={color.inkFaint} />
       </TouchableOpacity>
@@ -246,7 +246,7 @@ function F({ label, value, onChange, placeholder, symbol }: { label: string; val
       <Text style={styles.fieldLabel}>{label}</Text>
       <View style={styles.inputRow}>
         {symbol ? <Text style={styles.currencyPrefix}>{symbol}</Text> : null}
-        <TextInput style={styles.fieldInput} value={value} onChangeText={(t) => onChange(t.replace(/[^0-9]/g, ''))} placeholder={placeholder} placeholderTextColor={color.inkFaint} keyboardType="number-pad" returnKeyType="done" />
+        <TextInput accessibilityLabel={label} style={styles.fieldInput} value={value} onChangeText={(t) => onChange(t.replace(/[^0-9]/g, ''))} placeholder={placeholder} placeholderTextColor={color.inkFaint} keyboardType="number-pad" returnKeyType="done" />
       </View>
     </View>
   );

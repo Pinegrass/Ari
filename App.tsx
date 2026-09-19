@@ -1,4 +1,4 @@
-import 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import React, { useEffect, useRef, useState } from 'react';
 import { AppState, type AppStateStatus } from 'react-native';
 import * as Linking from 'expo-linking';
@@ -18,20 +18,20 @@ import {
 } from '@expo-google-fonts/inter';
 import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Sentry from '@sentry/react-native';
 import { initSentry } from './src/config/sentry';
 import { initSslPinning } from './src/lib/sslPinning';
 import * as Notifications from 'expo-notifications';
-import { initAnalytics, track } from './src/lib/analytics';
+import { initAnalytics, track, trackNotificationOpen } from './src/lib/analytics';
 import { checkAndApplyUpdate, registerOtaReloadHandler } from './src/lib/otaUpdates';
-import { reconcileBillReminders, type BillNotificationData } from './src/lib/bills';
+import { reconcileBillReminders, resolveStartupBillNotification, isBillAccount, setBillAccount, type BillNotificationData } from './src/lib/bills';
 import {
   routeForNotificationData,
   notificationTypeOf,
   nudgeContextOf,
 } from './src/lib/notificationRouting';
 import { refreshTomoCheckins } from './src/hooks/useNotifications';
+import { subscribeNotificationResponses } from './src/lib/notificationResponses';
 import ErrorBoundary from './src/components/ErrorBoundary';
 import UpdateToast from './src/components/UpdateToast';
 import { AuthProvider } from './src/context/AuthContext';
@@ -50,20 +50,23 @@ const navigationRef = createNavigationContainerRef<RootStackParamList>();
 // Pending share text buffered before the navigator is ready. Drained in onReady.
 let _pendingShareText: string | null = null;
 // Pending bill-reminder tap buffered before the navigator is ready.
-let _pendingBillPrefill: BillNotificationData | null = null;
+let _pendingBillPrefill: { data: BillNotificationData; active: () => boolean } | null = null;
 
 /** A bill reminder was tapped — open fast entry with the bill prefilled. */
-function navigateToBillEntry(data: BillNotificationData) {
+async function navigateToBillEntry(data: BillNotificationData, active: () => boolean = () => true) {
+  if (!active()) return;
   if (!navigationRef.isReady()) {
-    _pendingBillPrefill = data;
+    _pendingBillPrefill = { data, active };
     return;
   }
+  const bill = await resolveStartupBillNotification(data, active);
+  if (!active() || !bill || !isBillAccount(data.ownerId)) return;
   try {
     (navigationRef as any).navigate('Main', {
       screen: 'AddTransaction',
       params: {
         type: 'expense',
-        prefill: { amount: data.amount, description: data.name, category: data.category },
+        prefill: { amount: bill.amount, description: bill.name, category: bill.category },
       },
     });
     track('bill_reminder_opened', {});
@@ -193,7 +196,7 @@ function navigateToShare(text: string) {
   }
 }
 
-// Initialize Sentry + PostHog early so the very first render can fire events.
+// Initialize configured diagnostics and consent-gated first-party measurement.
 // `app_opened` here represents a true cold start (process boot). Warm
 // foregrounding is tracked separately via the AppState listener below.
 initSentry();
@@ -209,7 +212,9 @@ checkAndApplyUpdate();
 // Re-derive bill/EMI reminders from persisted bills on every cold start. Local
 // notifications don't survive a reinstall or an OS purge, so reconciling here
 // (idempotent: cancel-then-reschedule) is what makes reminders durable.
-reconcileBillReminders();
+// Account binding in AuthContext owns cold-start bill reconciliation. Never
+// read or schedule unattributed device-global bills before authentication.
+void setBillAccount(null).catch(() => {});
 
 // Refresh the two low-pressure Tomo check-ins on cold start so legacy daily
 // reminders are migrated and copy rotates. No-op when check-ins are off.
@@ -325,18 +330,26 @@ function App() {
   // route via navigateForPushPayload. Cold-start taps (app launched by the
   // notification) are read once; warm taps come through the response listener.
   useEffect(() => {
-    const handleResponse = (response: Notifications.NotificationResponse | null) => {
+    let lastResponseKey: string | null = null;
+    let lastResponseAt = 0;
+    const handleResponse = (response: Notifications.NotificationResponse, active: () => boolean) => {
       if (!response) return;
+      const key = `${response.notification.request.identifier}:${response.actionIdentifier}`;
+      const now = Date.now();
+      // Ignore the initial-response/listener echo, but allow a later intentional tap.
+      if (key === lastResponseKey && now - lastResponseAt < 1000) return;
+      lastResponseKey = key;
+      lastResponseAt = now;
+      trackNotificationOpen(response.notification.request.content.data);
       const bill = billDataFromResponse(response);
       if (bill) {
-        navigateToBillEntry(bill);
+        void navigateToBillEntry(bill, active).catch(() => {});
         return;
       }
       navigateForPushPayload(response.notification.request.content.data);
     };
-    Notifications.getLastNotificationResponseAsync().then(handleResponse);
-    const sub = Notifications.addNotificationResponseReceivedListener(handleResponse);
-    return () => sub.remove();
+    const unsubscribe = subscribeNotificationResponses(handleResponse);
+    return () => { unsubscribe(); _pendingBillPrefill = null; _pendingPushPayload = null; };
   }, []);
 
   // Share-intent: receive text/plain shared from other apps (e.g. bank SMS).
@@ -392,7 +405,7 @@ function App() {
                 _pendingShareText = null;
               }
               if (_pendingBillPrefill) {
-                navigateToBillEntry(_pendingBillPrefill);
+                void navigateToBillEntry(_pendingBillPrefill.data, _pendingBillPrefill.active).catch(() => {});
                 _pendingBillPrefill = null;
               }
               if (_pendingPushPayload) {

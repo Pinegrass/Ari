@@ -1,3 +1,4 @@
+import { useLanguage } from '../i18n/LanguageContext';
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { getLatestBrief, type CoachingBrief, type BriefContent } from '../api/coaching';
@@ -30,6 +31,7 @@ function TomoGlyph() {
 }
 
 export default function CoachingBriefCard() {
+  const { phrase } = useLanguage();
   const [brief, setBrief] = useState<CoachingBrief | null>(null);
   const [expanded, setExpanded] = useState(false);
 
@@ -58,14 +60,16 @@ export default function CoachingBriefCard() {
     <TouchableOpacity
       onPress={() => hasMore && setExpanded((v) => !v)}
       activeOpacity={hasMore ? 0.8 : 1}
-      accessibilityLabel="Weekly coaching brief"
+      accessibilityRole={hasMore ? 'button' : 'text'}
+      accessibilityState={hasMore ? { expanded } : undefined}
+      accessibilityLabel={phrase(brief.type === 'monthly_review' ? 'Monthly review' : 'Weekly brief')}
       style={styles.card}
     >
       <View style={styles.headRow}>
         <TomoGlyph />
         <View style={styles.headText}>
           <Text style={styles.kicker}>
-            {brief.type === 'monthly_review' ? 'Monthly review' : 'Weekly brief'}
+            {brief.type === 'monthly_review' ? phrase('Monthly review') : phrase('Weekly brief')}
           </Text>
           <Text style={styles.summary}>{summary}</Text>
         </View>
@@ -85,7 +89,7 @@ export default function CoachingBriefCard() {
 
       {shownActions.length > 0 && (
         <View style={[styles.block, styles.actionsBlock]}>
-          <Text style={styles.actionsLabel}>Next steps</Text>
+          <Text style={styles.actionsLabel}>{phrase("Next steps")}</Text>
           {shownActions.map((a, i) => (
             <View key={i} style={styles.bulletRow}>
               <Icon name="check-circle" size={12} color={color.forest2} />
@@ -96,7 +100,7 @@ export default function CoachingBriefCard() {
       )}
 
       {hasMore && (
-        <Text style={styles.expandHint}>{expanded ? 'Tap to collapse' : 'Tap to see more'}</Text>
+        <Text style={styles.expandHint}>{expanded ? phrase('Tap to collapse') : phrase('Tap to see more')}</Text>
       )}
     </TouchableOpacity>
   );

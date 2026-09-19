@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Linking,
+  Alert,
   StyleSheet,
   LayoutAnimation,
   Platform,
@@ -42,33 +43,33 @@ interface Faq {
  */
 const FAQS: Faq[] = [
   {
-    q: 'How do I add a transaction?',
-    a: 'On the Dashboard, use the Quick Actions row at the top — tap "Add Expense" or "Add Income". You can also use the Quick Entry tab to type a sentence like "350 lunch zomato" and Ari will categorise it.',
+    "q": "How do I add a transaction?",
+    "a": "Use Add Expense or Add Income from Home. Quick Entry can parse a sentence; review the suggested details before saving."
   },
   {
-    q: 'How do I set or change my budget?',
-    a: 'Open the Budget tab, then tap "+ Add" to create a category budget, or tap an existing one to edit it. Ari warns you when you cross 80% so there are no end-of-month surprises.',
+    "q": "How do I set or change my budget?",
+    "a": "Open Budgets to add a category budget or edit an existing budget. Summaries use your recorded entries."
   },
   {
-    q: 'Who is Tomo?',
-    a: 'Tomo is your AI finance coach — a chat tab built right into Ari. Ask anything, from "how should I split my salary" to "where did my money go this week". Tomo only sees the data you allow.',
+    "q": "Who is Tomo?",
+    "a": "Tomo helps review recorded spending and budgets. AI suggestions can be wrong; check the details. It does not provide specific investment advice."
   },
   {
-    q: 'Is my financial data safe?',
-    a: 'Yes. Your data is encrypted in transit and at rest. Sensitive details like card or account numbers are stripped before any AI request. Turn on Biometric Lock in Settings for an extra layer.',
+    "q": "How is my data used?",
+    "a": "See Privacy Policy for account data, voice and AI processing, optional measurement and diagnostics. Private Mode hides supported amounts; it does not withdraw account-level measurement consent."
   },
   {
-    q: 'Can I export my data?',
-    a: 'Yes — Settings → Export Data lets you download all your transactions as CSV. Your data is yours; you can take it with you any time.',
+    "q": "Can I export my data?",
+    "a": "Settings offers transaction exports and a broader account export. Review the export contents before sharing it."
   },
   {
-    q: 'How do I change Tomo’s check-in time?',
-    a: 'Settings → Tomo Check-ins. Turn check-ins on, then tap the time below. Tomo checks in twice a week and you can always ignore or disable them.',
+    "q": "How do I change Tomo check-ins?",
+    "a": "Open notification preferences in Settings. Availability depends on rollout and device permission. Review the enabled slots and quiet hours there."
   },
   {
-    q: 'How do I delete my account?',
-    a: 'Settings → Delete Account. This permanently removes your account and all financial data. The action cannot be undone.',
-  },
+    "q": "How do I delete my account?",
+    "a": "Use Delete Account in Settings and review the confirmation. Deleting Ari does not cancel store subscriptions. See Privacy Policy for retention details."
+  }
 ];
 
 const SUPPORT_EMAIL = 'support@aritomo.in';
@@ -83,17 +84,17 @@ export default function HelpSupportScreen({ onBack }: Props) {
   };
 
   const openEmail = () => {
-    const subject = encodeURIComponent('Ari Support Request');
+    const subject = encodeURIComponent(localizeCopy('Ari Support Request'));
     const body = encodeURIComponent(
-      'Hi Ari team,\n\nDescribe what you need help with:\n\n\n— Sent from the Ari app'
+      localizeCopy('Describe what you need help with:')
     );
     Linking.openURL(`mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`).catch(() => {
-      // mailto: fails on devices with no mail client — fall back silently.
+      Alert.alert(localizeCopy("Could not open email"), SUPPORT_EMAIL);
     });
   };
 
   const openWebsite = () => {
-    Linking.openURL('https://aritomo.in').catch(() => {});
+    Linking.openURL('https://aritomo.in').catch(() => Alert.alert(localizeCopy('Could not open website'), 'https://aritomo.in'));
   };
 
   return (
@@ -116,10 +117,9 @@ export default function HelpSupportScreen({ onBack }: Props) {
             <View style={styles.heroIcon}>
               <Icon name="help-circle" size={28} color={color.forest} />
             </View>
-            <Text style={styles.heroTitle}>How can we help?</Text>
+            <Text style={styles.heroTitle}>{localizeCopy("How can we help?")}</Text>
             <Text style={styles.heroSubtitle}>
-              Browse the FAQs below or get in touch — we read every message.
-            </Text>
+              {localizeCopy("Browse the FAQs below or contact support.")}</Text>
           </View>
         </AnimatedEntry>
 
@@ -130,22 +130,22 @@ export default function HelpSupportScreen({ onBack }: Props) {
               style={styles.actionCard}
               onPress={openEmail}
               activeOpacity={0.8}
-              accessibilityLabel="Email support"
+              accessibilityLabel={localizeCopy("Email support")}
               accessibilityRole="button"
             >
               <Icon name="mail" size={22} color={color.forest} />
-              <Text style={styles.actionLabel}>Email Us</Text>
+              <Text style={styles.actionLabel}>{localizeCopy("Email Us")}</Text>
               <Text style={styles.actionSubtitle}>{SUPPORT_EMAIL}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.actionCard}
               onPress={openWebsite}
               activeOpacity={0.8}
-              accessibilityLabel="Visit website"
+              accessibilityLabel={localizeCopy("Visit website")}
               accessibilityRole="button"
             >
               <Icon name="info" size={22} color={color.forest} />
-              <Text style={styles.actionLabel}>Website</Text>
+              <Text style={styles.actionLabel}>{localizeCopy("Website")}</Text>
               <Text style={styles.actionSubtitle}>aritomo.in</Text>
             </TouchableOpacity>
           </View>
@@ -153,20 +153,20 @@ export default function HelpSupportScreen({ onBack }: Props) {
 
         {/* FAQs */}
         <AnimatedEntry delay={180}>
-          <Text style={styles.sectionTitle}>Frequently Asked</Text>
+          <Text style={styles.sectionTitle}>{localizeCopy("Frequently Asked")}</Text>
           <View style={styles.faqCard}>
             {FAQS.map((f, i) => {
               const isOpen = openIndex === i;
               return (
-                <View key={f.q}>
+                <View key={localizeCopy(f.q)}>
                   <TouchableOpacity
                     style={styles.faqRow}
                     onPress={() => toggle(i)}
                     activeOpacity={0.7}
-                    accessibilityLabel={f.q}
-                    accessibilityRole="button"
+                    accessibilityLabel={localizeCopy(f.q)}
+                    accessibilityRole="button" accessibilityState={{ expanded: isOpen }}
                   >
-                    <Text style={styles.faqQuestion}>{f.q}</Text>
+                    <Text style={styles.faqQuestion}>{localizeCopy(f.q)}</Text>
                     <Icon
                       name={isOpen ? 'chevron-down' : 'chevron-right' as IconName}
                       size={18}
@@ -175,7 +175,7 @@ export default function HelpSupportScreen({ onBack }: Props) {
                   </TouchableOpacity>
                   {isOpen && (
                     <View style={styles.faqAnswerWrap}>
-                      <Text style={styles.faqAnswer}>{f.a}</Text>
+                      <Text style={styles.faqAnswer}>{localizeCopy(f.a)}</Text>
                     </View>
                   )}
                   {i < FAQS.length - 1 && <View style={styles.separator} />}
@@ -187,8 +187,7 @@ export default function HelpSupportScreen({ onBack }: Props) {
 
         <AnimatedEntry delay={240}>
           <Text style={styles.footnote}>
-            Still stuck? Email us — we usually reply within a day.
-          </Text>
+            {localizeCopy("Still need help? Contact support by email.")}</Text>
         </AnimatedEntry>
       </ScrollView>
     </ScreenShell>

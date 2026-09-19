@@ -7,13 +7,9 @@ import { color, font, type as typeScale } from '../../theme/tokens';
 import { getBills } from '../../lib/bills';
 import { selectUpcomingCharges, type UpcomingCharge } from '../../lib/upcomingCharges';
 import { useData } from '../../context/DataContext';
-import { useLocale } from '../../hooks/useLocale';
+import { usePrivacy } from '../../context/PrivacyContext';
 
-function dueLabel(daysUntil: number): string {
-  if (daysUntil <= 0) return 'today';
-  if (daysUntil === 1) return 'tomorrow';
-  return `in ${daysUntil} days`;
-}
+
 
 /**
  * The full next-30-days view of upcoming charges for the Trends screen (D2) —
@@ -23,7 +19,7 @@ function dueLabel(daysUntil: number): string {
  */
 export default function UpcomingChargesSection() {
  const {phrase:localizeCopy}=useCopyLanguage();
-  const { formatCurrency } = useLocale();
+  const { formatAmount } = usePrivacy();
   const { transactions } = useData();
   const [charges, setCharges] = useState<UpcomingCharge[] | null>(null);
 
@@ -46,8 +42,8 @@ export default function UpcomingChargesSection() {
   return (
     <View style={styles.card}>
       <View style={styles.head}>
-        <Text style={styles.title}>Upcoming charges</Text>
-        <Text style={styles.total}>{formatCurrency(total)} · 30 days</Text>
+        <Text style={styles.title}>{localizeCopy("Upcoming charges")}</Text>
+        <Text style={styles.total}>{formatAmount(total)} · {localizeCopy("30 days")}</Text>
       </View>
 
       {charges.map((charge) => (
@@ -56,11 +52,11 @@ export default function UpcomingChargesSection() {
           <View style={{ flex: 1 }}>
             <Text style={styles.name}>{charge.name}</Text>
             <Text style={styles.meta}>
-              {localizeCopy("Due")}{dueLabel(charge.daysUntil)}
-              {charge.source === 'recurring' ? ' · recurring' : ' · bill'}
+              {charge.daysUntil <= 0 ? localizeCopy("Due today") : charge.daysUntil === 1 ? localizeCopy("Due tomorrow") : localizeCopy("Due in {count} days").replace("{count}", String(charge.daysUntil))}
+              {charge.source === 'recurring' ? ` · ${localizeCopy('Recurring')}` : ` · ${localizeCopy('Bill')}`}
             </Text>
           </View>
-          <Text style={styles.amount}>{formatCurrency(charge.amount)}</Text>
+          <Text style={styles.amount}>{formatAmount(charge.amount)}</Text>
         </View>
       ))}
     </View>

@@ -36,9 +36,9 @@ export default function UpiVpaEditor({ onBack }: { onBack: () => void }) {
       await refreshFromSession(updated);
       haptics.success();
       onBack();
-    } catch (e) {
+    } catch {
       haptics.error();
-      Alert.alert('Could not save', e instanceof Error ? e.message : 'Try again');
+      Alert.alert(localizeCopy("Could not save"), localizeCopy("Check your connection and try again."));
     } finally {
       setSaving(false);
     }
@@ -48,25 +48,23 @@ export default function UpiVpaEditor({ onBack }: { onBack: () => void }) {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={onBack} hitSlop={8}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel={localizeCopy("Go back")} onPress={onBack} hitSlop={8}>
             <Icon name="arrow-left" size={22} color={color.ink} />
           </TouchableOpacity>
-          <Text style={styles.title}>UPI for settlements</Text>
+          <Text style={styles.title}>{localizeCopy("UPI for settlements")}</Text>
           <View style={{ width: 22 }} />
         </View>
 
         <ScrollView contentContainerStyle={styles.scroll}>
           <Text style={styles.help}>
-            Your UPI VPA is used to compose deeplinks when other group members
-            settle a balance owed to you. We never see your bank account
-            number.
-          </Text>
+            {localizeCopy("Group members can use this UPI address to open their payment app. Verify the recipient and amount before paying. This does not verify a transfer.")}</Text>
 
-          <ErrorBanner message={error} />
+          <ErrorBanner message={localizeCopy(error)} />
 
-          <Text style={styles.label}>Your VPA</Text>
+          <Text style={styles.label}>{localizeCopy("Your VPA")}</Text>
           <TextInput
             style={styles.input}
+            accessibilityLabel={localizeCopy("Your VPA")}
             value={vpa}
             onChangeText={setVpa}
             placeholder="9876543210@ybl"
@@ -77,7 +75,7 @@ export default function UpiVpaEditor({ onBack }: { onBack: () => void }) {
           />
 
           <Text style={styles.examples}>
-            Examples: <Text style={styles.exampleCode}>name@okhdfcbank</Text>,{' '}
+            {localizeCopy("Examples:")}<Text style={styles.exampleCode}>name@okhdfcbank</Text>,{' '}
             <Text style={styles.exampleCode}>9876543210@paytm</Text>,{' '}
             <Text style={styles.exampleCode}>name@ybl</Text>
           </Text>
@@ -90,7 +88,7 @@ export default function UpiVpaEditor({ onBack }: { onBack: () => void }) {
               onPress={() => { setVpa(''); }}
               style={styles.clearBtn}
             >
-              <Text style={styles.clearText}>Clear my VPA</Text>
+              <Text style={styles.clearText}>{localizeCopy("Clear my VPA")}</Text>
             </TouchableOpacity>
           )}
         </ScrollView>

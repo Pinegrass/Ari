@@ -1,6 +1,7 @@
+import { useLanguage } from '../i18n/LanguageContext';
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { getCategoryDef } from '../constants/categories';
+import { getCategoryDef, categoryDisplayLabel } from '../constants/categories';
 import { usePrivacy } from '../context/PrivacyContext';
 import { formatSectionDate } from '../utils/dateHelpers';
 import { color, font } from '../theme/tokens';
@@ -21,6 +22,7 @@ interface Props {
  * docs/ari-v2-forest.html. Subline uses inkSoft, not inkFaint, for legibility.
  */
 export default function TransactionItem({ transaction, onDelete, onEdit, showDelete, testID }: Props) {
+  const { phrase, language } = useLanguage();
   const cat = getCategoryDef(transaction.category);
   const isExpense = transaction.type === 'expense';
   const { formatAmount } = usePrivacy();
@@ -35,8 +37,8 @@ export default function TransactionItem({ transaction, onDelete, onEdit, showDel
     if (onEdit) onEdit(transaction);
   };
 
-  const a11yAmount = `${isExpense ? 'minus ' : 'plus '}${formatAmount(transaction.amount)}`;
-  const a11yLabel = `${transaction.description || cat.label}, ${cat.label}, ${a11yAmount}, ${formatSectionDate(transaction.date)}`;
+  const a11yAmount = `${isExpense ? phrase('minus') + ' ' : phrase('plus') + ' '}${formatAmount(transaction.amount)}`;
+  const a11yLabel = `${transaction.description || categoryDisplayLabel(cat, phrase)}, ${categoryDisplayLabel(cat, phrase)}, ${a11yAmount}, ${formatSectionDate(transaction.date, language)}`;
 
   return (
     <TouchableOpacity
@@ -47,7 +49,7 @@ export default function TransactionItem({ transaction, onDelete, onEdit, showDel
       activeOpacity={onEdit ? 0.7 : 1}
       accessibilityRole={onEdit ? 'button' : 'text'}
       accessibilityLabel={a11yLabel}
-      accessibilityHint={onEdit ? 'Tap to edit' : undefined}
+      accessibilityHint={onEdit ? phrase('Tap to edit') : undefined}
       testID={testID}
     >
       <View style={styles.iconBox}>
@@ -56,13 +58,13 @@ export default function TransactionItem({ transaction, onDelete, onEdit, showDel
 
       <View style={styles.info}>
         <Text style={styles.desc} numberOfLines={1}>
-          {transaction.description || cat.label}
+          {transaction.description || categoryDisplayLabel(cat, phrase)}
         </Text>
         <Text style={styles.meta}>
-          {cat.label} · {formatSectionDate(transaction.date)}
+          {categoryDisplayLabel(cat, phrase)} · {formatSectionDate(transaction.date, language)}
           {showSyncTag && (
             <Text style={sync === 'failed' ? styles.syncFailed : styles.syncPending}>
-              {sync === 'failed' ? '  · ✗ not synced' : '  · ↑ syncing…'}
+              {sync === 'failed' ? `  · ✗ ${phrase('not synced')}` : `  · ↑ ${phrase('syncing…')}`}
             </Text>
           )}
         </Text>
@@ -77,7 +79,7 @@ export default function TransactionItem({ transaction, onDelete, onEdit, showDel
           <TouchableOpacity
             onPress={() => onDelete(transaction.id)}
             hitSlop={{ top: 14, bottom: 14, left: 14, right: 14 }}
-            accessibilityLabel="Delete transaction"
+            accessibilityLabel={phrase("Delete transaction")}
             accessibilityRole="button"
           >
             <Icon name="trash" size={16} color={color.clay} />

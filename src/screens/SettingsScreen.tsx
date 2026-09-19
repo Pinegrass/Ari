@@ -43,6 +43,7 @@ import TermsScreen from './TermsScreen';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { submitFeedback } from '../api/feedback';
 import { deleteAccount } from '../api/account';
+import { requestSessionRevision } from '../lib/requestSession';
 import { track } from '../lib/analytics';
 
 import CountryPicker from '../components/CountryPicker';
@@ -93,7 +94,7 @@ function formatTime12h(hour: number, minute: number): string {
 
 export default function SettingsScreen() {
  const {phrase:localizeCopy}=useLanguage();
-  const { phrase } = useLanguage();
+  const { phrase, language } = useLanguage();
   const { user, logout, updateProfile } = useAuth();
   const haptics = useHaptics();
   const insets = useSafeAreaInsets();
@@ -148,7 +149,7 @@ export default function SettingsScreen() {
       haptics.success();
     } catch {
       haptics.error();
-      Alert.alert('Could not update country', 'Check your connection and try again.');
+      Alert.alert(phrase("Could not update country"), phrase("Check your connection and try again."));
     }
   };
 
@@ -161,7 +162,7 @@ export default function SettingsScreen() {
   const handleSaveProfile = async () => {
     const name = profileName.trim();
     if (!name) {
-      Alert.alert('Name required', 'Enter the name you want Ari to use.');
+      Alert.alert(phrase("Name required"), phrase("Enter the name you want Ari to use."));
       return;
     }
     setProfileLoading(true);
@@ -171,17 +172,17 @@ export default function SettingsScreen() {
       setProfileVisible(false);
     } catch {
       haptics.error();
-      Alert.alert('Could not update profile', 'Check your connection and try again.');
+      Alert.alert(phrase("Could not update profile"), phrase("Check your connection and try again."));
     } finally {
       setProfileLoading(false);
     }
   };
 
   const handleLogout = () => {
-    Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
-      { text: 'Cancel', style: 'cancel' },
+    Alert.alert(phrase("Sign Out"), phrase("Are you sure you want to sign out?"), [
+      { text: phrase("Cancel"), style: 'cancel' },
       {
-        text: 'Sign Out',
+        text: phrase("Sign Out"),
         style: 'destructive',
         onPress: async () => {
           haptics.medium();
@@ -235,17 +236,19 @@ export default function SettingsScreen() {
   const handleRate = () => {
     haptics.light();
     Alert.alert(
-      'Rate Ari',
-      'Enjoying Ari? Your rating helps us grow and build more features!',
+      phrase("Rate Ari"),
+      phrase("Enjoying Ari? Your rating helps us grow and build more features!"),
       [
-        { text: 'Maybe Later', style: 'cancel' },
+        { text: phrase("Maybe Later"), style: 'cancel' },
         {
-          text: 'Rate Now',
+          text: phrase("Rate Now"),
           onPress: () => {
-            const storeUrl = Platform.OS === 'ios'
-              ? 'https://apps.apple.com/app/ari/id0000000000'
-              : 'https://play.google.com/store/apps/details?id=com.pinegrass.ari';
-            Linking.openURL(storeUrl).catch(() => {});
+            if (Platform.OS === 'ios') {
+              Alert.alert(phrase('Store listing unavailable'), phrase('The iPhone store listing is not available from Ari yet.'));
+              return;
+            }
+            const storeUrl = 'https://play.google.com/store/apps/details?id=com.pinegrass.ari';
+            Linking.openURL(storeUrl).catch(() => Alert.alert(phrase('Could not open store'), phrase('Check your connection and try again.')));
           },
         },
       ]
@@ -263,7 +266,7 @@ export default function SettingsScreen() {
 
   const handleSubmitFeedback = async () => {
     if (!feedbackMessage.trim()) {
-      Alert.alert('Oops', 'Please write your feedback before submitting.');
+      Alert.alert(phrase("Oops"), phrase("Please write your feedback before submitting."));
       return;
     }
     setFeedbackLoading(true);
@@ -274,9 +277,9 @@ export default function SettingsScreen() {
       });
       haptics.success();
       setFeedbackVisible(false);
-      Alert.alert('Thank You! 💚', 'Your feedback helps us make Ari better for everyone.');
+      Alert.alert(phrase("Thank You! 💚"), phrase("Your feedback helps us make Ari better for everyone."));
     } catch {
-      Alert.alert('Error', 'Could not submit feedback. Please try again.');
+      Alert.alert(phrase("Error"), phrase("Could not submit feedback. Please try again."));
     } finally {
       setFeedbackLoading(false);
     }
@@ -287,12 +290,12 @@ export default function SettingsScreen() {
   const handleOpenDeleteAccount = () => {
     haptics.medium();
     Alert.alert(
-      'Delete Account',
-      'This will permanently delete your account and all your financial data. This action cannot be undone.',
+      phrase("Delete Account"),
+      phrase("This will permanently delete your account and all your financial data. This action cannot be undone."),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: phrase("Cancel"), style: 'cancel' },
         {
-          text: 'Continue',
+          text: phrase("Continue"),
           style: 'destructive',
           onPress: () => {
             setDeletePassword('');
@@ -305,13 +308,15 @@ export default function SettingsScreen() {
   };
 
   const handleConfirmDelete = async () => {
+    const revision = requestSessionRevision();
     if (!deletePassword.trim()) {
-      Alert.alert('Required', 'Please enter your password to confirm.');
+      Alert.alert(language === 'hi' ? 'पासवर्ड आवश्यक है' : 'Password required', language === 'hi' ? 'पुष्टि के लिए अपना पासवर्ड दर्ज करें।' : 'Please enter your password to confirm.');
       return;
     }
     setDeleteLoading(true);
     try {
-      await deleteAccount(deletePassword);
+      const deletion = await deleteAccount(deletePassword);
+      if (requestSessionRevision() !== revision) return;
       // DPDPA audit-trail event — fires after server confirms delete but
       // BEFORE logout() so the user_id is still in the analytics context.
       // This is the single trust signal the App Store reviewer will ask
@@ -319,11 +324,14 @@ export default function SettingsScreen() {
       track('account_deleted', { source: 'settings' });
       haptics.medium();
       setDeleteVisible(false);
-      Alert.alert('Account Deleted', 'Your account has been permanently deleted. We are sorry to see you go.');
+      Alert.alert(phrase('Account Deleted'), deletion.localBillCleanupComplete
+        ? phrase('Your account has been permanently deleted. We are sorry to see you go.')
+        : language === 'hi' ? 'आपका सर्वर खाता हट गया है, लेकिन इस डिवाइस पर बिल की स्थानीय कॉपी मिटने की पुष्टि नहीं हुई। स्थानीय सफ़ाई के लिए सहायता लें। दूसरे खातों के बिल नहीं मिटाए गए हैं।'
+          : 'Your server account was deleted, but local bill cleanup could not be verified. Please contact support for local cleanup. Bills belonging to other accounts were preserved.');
       await logout();
-    } catch (err: any) {
-      const msg = err?.message ?? 'Could not delete account. Please check your password and try again.';
-      Alert.alert('Error', msg);
+    } catch {
+      if (requestSessionRevision() !== revision) return;
+      Alert.alert(language === 'hi' ? 'हटाने की पुष्टि नहीं हुई' : 'Deletion not confirmed', language === 'hi' ? 'खाता हटने की पुष्टि नहीं हो सकी। दोबारा कोशिश करने से पहले अपना कनेक्शन और खाते की स्थिति जाँचें।' : 'Account deletion could not be confirmed. Check your connection and account status before trying again.');
     } finally {
       setDeleteLoading(false);
     }

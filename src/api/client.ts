@@ -127,7 +127,7 @@ export async function apiRequest<T>(
   // mutations fail. Retry exactly once for methods the server can repeat
   // without duplicating financial records. POST is deliberately excluded.
   const method = (options.method ?? 'GET').toUpperCase();
-  if (first.status === 0 && ['GET', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+  if (first.status === 0 && path !== '/auth/account' && ['GET', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
     assertSession();
     first = await _doRequest<T>(path, options, token);
     assertSession();
@@ -151,4 +151,23 @@ export async function apiRequest<T>(
   }
 
   throw new ApiError(first.status, first.message, first.body);
+}
+
+/** Destructive account deletion is never automatically replayed. The only
+ * pre-discard side effect allowed is captured-owner local cleanup after an
+ * authoritative success; stale account response data still cannot escape. */
+export async function deleteAccountRequest(password: string, confirmedCleanup: () => Promise<void>): Promise<{ message: string }> {
+  const revision = requestSessionRevision();
+  const token = await getToken();
+  const assertSession = () => {
+    if (revision !== requestSessionRevision()) throw new ApiError(409, 'Session changed; retry from the current account.');
+  };
+  assertSession();
+  const result = await _doRequest<{ message: string }>('/auth/account', {
+    method: 'DELETE', body: JSON.stringify({ password }),
+  }, token);
+  if (result.ok) await confirmedCleanup();
+  assertSession();
+  if (!result.ok) throw new ApiError(result.status, result.message, result.body);
+  return result.data;
 }

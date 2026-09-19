@@ -83,7 +83,7 @@ export default function GroupBalanceCard() {
       activeOpacity={0.85}
       onPress={() => navigation.navigate('Groups')}
       accessibilityRole="button"
-      accessibilityLabel="Open shared expenses"
+      accessibilityLabel={localizeCopy("Open shared expenses")}
     >
       <View style={styles.row}>
         <View style={[styles.iconWrap, { backgroundColor: color.cream2 }]}>
@@ -96,7 +96,7 @@ export default function GroupBalanceCard() {
       <View style={styles.amounts}>
         {summary.owed_to_me > 0 && (
           <View style={styles.amountBlock}>
-            <Text style={styles.label}>Owed to you</Text>
+            <Text style={styles.label}>{localizeCopy("Owed to you")}</Text>
             <Text style={[styles.amount, { color: color.forest }]}>
               +{formatAmount(summary.owed_to_me)}
             </Text>
@@ -104,7 +104,7 @@ export default function GroupBalanceCard() {
         )}
         {summary.i_owe > 0 && (
           <View style={styles.amountBlock}>
-            <Text style={styles.label}>You owe</Text>
+            <Text style={styles.label}>{localizeCopy("You owe")}</Text>
             <Text style={[styles.amount, { color: color.clay }]}>
               -{formatAmount(summary.i_owe)}
             </Text>
@@ -113,9 +113,7 @@ export default function GroupBalanceCard() {
       </View>
 
       <Text style={styles.footer}>
-        Across {summary.groups_with_activity}{' '}
-        {summary.groups_with_activity === 1 ? 'group' : 'groups'} • Tap to settle
-      </Text>
+        {localizeCopy('Across {count} groups · Tap to settle').replace('{count}', String(summary.groups_with_activity))}</Text>
     </TouchableOpacity>
   );
 }

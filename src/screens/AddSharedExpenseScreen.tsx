@@ -1,5 +1,7 @@
-import {useLanguage as useCopyLanguage} from '../i18n/LanguageContext';
-import React, { useCallback, useEffect, useState } from 'react';
+import {useLanguage} from '../i18n/LanguageContext';
+import {groupCopy} from '../i18n/groupFlowCopy';
+import { randomUUID } from 'expo-crypto';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet,
   KeyboardAvoidingView, Platform, ActivityIndicator,
@@ -14,7 +16,6 @@ import ErrorBanner from '../components/ui/ErrorBanner';
 import { color, font } from '../theme/tokens';
 import { useHaptics } from '../hooks/useHaptics';
 import { useAuth } from '../context/AuthContext';
-import { useLocale } from '../hooks/useLocale';
 import { getGroupDetail, logSharedExpense, type GroupDetail } from '../api/groups';
 import { todayISO } from '../utils/dateHelpers';
 import type { MainStackParamList } from '../navigation/navigationTypes';
@@ -23,12 +24,12 @@ type Nav = StackNavigationProp<MainStackParamList>;
 type Rt = RouteProp<MainStackParamList, 'AddSharedExpense'>;
 
 export default function AddSharedExpenseScreen() {
- const {phrase:localizeCopy}=useCopyLanguage();
+ const {language}=useLanguage();
+ const c = (text: string, values?: Record<string, string | number>) => groupCopy(language, text, values);
   const navigation = useNavigation<Nav>();
   const { params } = useRoute<Rt>();
   const haptics = useHaptics();
   const { user } = useAuth();
-  const { locale } = useLocale();
 
   const [group, setGroup] = useState<GroupDetail | null>(null);
   const [amount, setAmount] = useState('');
@@ -40,14 +41,38 @@ export default function AddSharedExpenseScreen() {
   const [included, setIncluded] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [loadError, setLoadError] = useState(false);
+  const [locked, setLocked] = useState(false);
+  const busy = useRef(false);
+  const scope = user?.id ? `${user.id}:${params.groupId}` : undefined;
+  const account = useRef(scope);
+  account.current = scope;
+  const revision = useRef(0);
+  const owner = useRef<string | undefined>(undefined);
+  const pending = useRef<Parameters<typeof logSharedExpense>[1] | null>(null);
+
+  useEffect(() => {
+    account.current = scope; busy.current = false; setSaving(false);
+    return () => { account.current = undefined; revision.current += 1; };
+  }, [scope]);
 
   const load = useCallback(async () => {
-    const g = await getGroupDetail(params.groupId);
-    setGroup(g);
-    setIncluded(new Set(g.members.map((m) => m.id)));
-  }, [params.groupId]);
+    const uid = scope;
+    const requestRevision = ++revision.current;
+    setLoadError(false);
+    if (owner.current !== uid) {
+      setGroup(null); setAmount(''); setDescription(''); setIncluded(new Set());
+      pending.current = null; setLocked(false); setError('');
+    }
+    try {
+      const g = await getGroupDetail(params.groupId);
+      if (account.current !== uid || requestRevision !== revision.current) return;
+      owner.current = uid; setGroup(g);
+      if (!pending.current) setIncluded(new Set(g.members.map((m) => m.id)));
+    } catch { if (account.current === uid && requestRevision === revision.current) setLoadError(true); }
+  }, [params.groupId, scope]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { void load(); }, [load]);
 
   const toggleIncluded = (uid: string) => {
     haptics.light();
@@ -59,19 +84,20 @@ export default function AddSharedExpenseScreen() {
   };
 
   const handleSave = async () => {
-    if (!user || !group) return;
+    if (!user || !group?.currency || busy.current) return;
+    const uid = account.current;
     setError('');
-    const amt = parseFloat(amount);
-    if (!amount || isNaN(amt) || amt <= 0) {
-      setError('Enter a valid amount');
+    const amt = Number(amount);
+    if (!/^\d+(\.\d{1,2})?$/.test(amount) || !Number.isFinite(amt) || amt <= 0 || amt > 10_000_000) {
+      setError(c('Enter a valid amount'));
       return;
     }
     if (included.size === 0) {
-      setError('Pick at least one person to split with');
+      setError(c('Pick at least one person to split with'));
       return;
     }
     if (!description.trim()) {
-      setError('Add a short description');
+      setError(c('Add a short description'));
       return;
     }
 
@@ -85,26 +111,34 @@ export default function AddSharedExpenseScreen() {
       amount: (each + (idx < remainder ? 0.01 : 0)).toFixed(2),
     }));
 
-    setSaving(true);
+    busy.current = true; setSaving(true);
     try {
-      await logSharedExpense(params.groupId, {
+      if (!pending.current) pending.current = {
+        id: randomUUID(),
+        currency: group.currency,
         amount: amt,
         description: description.trim(),
         category: 'other',
         date: todayISO(),
         splits,
-      });
+      };
+      setLocked(true);
+      const result = await logSharedExpense(params.groupId, pending.current);
+      if (account.current !== uid) return;
+      if (result.id !== pending.current.id) throw new Error('Unconfirmed');
       haptics.success();
       navigation.goBack();
-    } catch (e) {
+    } catch {
+      if (account.current !== uid) return;
       haptics.error();
-      setError(e instanceof Error ? e.message : 'Could not save');
+      setError(c('Save is unconfirmed. Your draft is kept. Retry the same draft safely, or go back to check the group.'));
     } finally {
-      setSaving(false);
+      if (account.current === uid) { busy.current = false; setSaving(false); }
     }
   };
 
-  if (!group) {
+  if (loadError) return <ScreenShell edges={['top']}><Text>{c('Could not load group')}</Text><TouchableOpacity accessibilityRole="button" onPress={() => { void load(); }}><Text>{c('Retry')}</Text></TouchableOpacity><TouchableOpacity onPress={() => navigation.goBack()}><Text>{c('Back')}</Text></TouchableOpacity></ScreenShell>;
+  if (!group || owner.current !== scope) {
     return (
       <ScreenShell edges={['top']}>
         <ActivityIndicator color={color.forest} style={{ marginTop: 40 }} />
@@ -112,6 +146,7 @@ export default function AddSharedExpenseScreen() {
     );
   }
 
+  if (!group.currency) return <ScreenShell edges={['top']}><Text>{c('Recorded currency unknown')}</Text><Text>{c('The group creator must confirm the original currency before adding expenses or recording payments.')}</Text><TouchableOpacity onPress={() => navigation.goBack()}><Text>{c('Back')}</Text></TouchableOpacity></ScreenShell>;
   return (
     <ScreenShell edges={['top', 'bottom']}>
       <KeyboardAvoidingView
@@ -120,9 +155,9 @@ export default function AddSharedExpenseScreen() {
       >
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Text style={styles.cancel}>{localizeCopy("Cancel")}</Text>
+            <Text style={styles.cancel}>{c("Cancel")}</Text>
           </TouchableOpacity>
-          <Text style={styles.title}>Add to {group.name}</Text>
+          <Text style={styles.title}>{c('Add to {name}', {name: group.name})}</Text>
           <View style={{ width: 60 }} />
         </View>
 
@@ -130,9 +165,11 @@ export default function AddSharedExpenseScreen() {
           <ErrorBanner message={error} />
 
           <View style={styles.amountRow}>
-            <Text style={styles.rupee}>{locale.symbol}</Text>
+            <Text style={styles.rupee}>{group.currency} </Text>
             <TextInput
               style={styles.amount}
+              accessibilityLabel={c('Amount')}
+              editable={!locked}
               value={amount}
               onChangeText={setAmount}
               placeholder="0"
@@ -142,16 +179,19 @@ export default function AddSharedExpenseScreen() {
             />
           </View>
 
-          <Text style={styles.label}>What was it for?</Text>
+          <Text style={styles.label}>{c('What was it for?')}</Text>
           <TextInput
             style={styles.input}
+            accessibilityLabel={c('Description')}
+            editable={!locked}
+            maxLength={500}
             value={description}
             onChangeText={setDescription}
-            placeholder="Hotel, dinner, cab…"
+            placeholder={c('Hotel, dinner, cab…')}
             placeholderTextColor={color.inkFaint}
           />
 
-          <Text style={styles.label}>Split equally between</Text>
+          <Text style={styles.label}>{c('Split equally between')}</Text>
           {group.members.map((m) => {
             const checked = included.has(m.id);
             const isYou = m.id === user?.id;
@@ -160,17 +200,20 @@ export default function AddSharedExpenseScreen() {
                 key={m.id}
                 style={styles.memberRow}
                 activeOpacity={0.8}
+                accessibilityRole="checkbox"
+                accessibilityState={{checked, disabled: locked}}
+                disabled={locked}
                 onPress={() => toggleIncluded(m.id)}
               >
                 <View style={[styles.checkbox, checked && styles.checkboxOn]}>
                   {checked && <Icon name="check-circle" size={14} color={color.cream} />}
                 </View>
                 <Text style={styles.memberName}>
-                  {m.name}{isYou ? ' (you)' : ''}
+                  {m.name}{isYou ? c(' (you)') : ''}
                 </Text>
                 {checked && amount && parseFloat(amount) > 0 && (
                   <Text style={styles.share}>
-                    {locale.symbol}{(parseFloat(amount) / included.size).toFixed(2)}
+                    {group.currency} {((Math.floor(Math.round(Number(amount) * 100) / included.size) + ([...included].indexOf(m.id) < Math.round(Number(amount) * 100) % included.size ? 1 : 0)) / 100).toFixed(2)}
                   </Text>
                 )}
               </TouchableOpacity>
@@ -178,7 +221,7 @@ export default function AddSharedExpenseScreen() {
           })}
 
           <Button onPress={handleSave} loading={saving} fullWidth style={{ marginTop: 24 }}>
-            {localizeCopy("Save")}</Button>
+            {c(locked ? "Retry" : "Save")}</Button>
         </ScrollView>
       </KeyboardAvoidingView>
     </ScreenShell>

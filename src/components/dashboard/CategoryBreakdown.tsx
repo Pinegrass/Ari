@@ -1,3 +1,4 @@
+import { useLanguage } from '../../i18n/LanguageContext';
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { PieChart } from 'react-native-gifted-charts';
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export default function CategoryBreakdown({ categories }: Props) {
+  const { phrase } = useLanguage();
   const { formatAmount } = usePrivacy();
 
   const pieData = useMemo(() => {
@@ -35,15 +37,15 @@ export default function CategoryBreakdown({ categories }: Props) {
   if (pieData.length === 0) {
     return (
       <View style={styles.card}>
-        <Text style={styles.title}>Spending by category</Text>
-        <Text style={styles.empty}>Add expenses to see the breakdown.</Text>
+        <Text style={styles.title}>{phrase("Spending by category")}</Text>
+        <Text style={styles.empty}>{phrase("Add expenses to see the breakdown.")}</Text>
       </View>
     );
   }
 
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>Spending by category</Text>
+      <Text style={styles.title}>{phrase("Spending by category")}</Text>
       <View style={styles.chartRow}>
         <PieChart
           data={pieData}

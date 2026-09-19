@@ -17,14 +17,10 @@ const CARD_PAD = 18;
 const CHART_WIDTH = SCREEN_WIDTH - 40 - CARD_PAD * 2;
 const CHART_HEIGHT = 140;
 
-const MONTH_SHORT: Record<string, string> = {
-  '01': 'Jan', '02': 'Feb', '03': 'Mar', '04': 'Apr',
-  '05': 'May', '06': 'Jun', '07': 'Jul', '08': 'Aug',
-  '09': 'Sep', '10': 'Oct', '11': 'Nov', '12': 'Dec',
-};
+
 
 export default function TrendLineChart({ report, loading }: Props) {
- const {phrase:localizeCopy}=useCopyLanguage();
+ const {phrase:localizeCopy, language}=useCopyLanguage();
   const c = useColors();
   const styles = useMemo(() => makeStyles(c), [c]);
 
@@ -32,17 +28,17 @@ export default function TrendLineChart({ report, loading }: Props) {
     if (!report) return [];
     return report.months.map((m) => ({
       value: m.income,
-      label: MONTH_SHORT[m.month.split('-')[1]] ?? m.month,
+      label: new Date(`${m.month}-01T12:00:00`).toLocaleDateString(language === 'hi' ? 'hi-IN' : 'en', { month: 'short' }),
     }));
-  }, [report]);
+  }, [report, language]);
 
   const expenseData = useMemo(() => {
     if (!report) return [];
     return report.months.map((m) => ({
       value: m.expenses,
-      label: MONTH_SHORT[m.month.split('-')[1]] ?? m.month,
+      label: new Date(`${m.month}-01T12:00:00`).toLocaleDateString(language === 'hi' ? 'hi-IN' : 'en', { month: 'short' }),
     }));
-  }, [report]);
+  }, [report, language]);
 
   const maxValue = useMemo(() => {
     const maxIncome = incomeData.length > 0 ? Math.max(...incomeData.map(d => d.value)) : 0;
@@ -65,7 +61,7 @@ export default function TrendLineChart({ report, loading }: Props) {
     return (
       <View style={styles.card}>
         <Text style={styles.title}>{localizeCopy("Income vs Expenses")}</Text>
-        <Text style={styles.empty}>Add transactions to see trends.</Text>
+        <Text style={styles.empty}>{localizeCopy("Add transactions to see trends.")}</Text>
       </View>
     );
   }

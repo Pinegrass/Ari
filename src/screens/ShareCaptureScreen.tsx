@@ -1,5 +1,5 @@
 import {useLanguage as useCopyLanguage} from '../i18n/LanguageContext';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,7 @@ import type { RouteProp } from '@react-navigation/native';
 import { color, font } from '../theme/tokens';
 import { parseExpenseAI } from '../api/parse';
 import { useData } from '../context/DataContext';
-import { formatCurrency } from '../utils/formatCurrency';
+import { usePrivacy } from '../context/PrivacyContext';
 import { todayISO } from '../utils/dateHelpers';
 import type { MainStackParamList } from '../navigation/navigationTypes';
 
@@ -25,19 +25,26 @@ type Props = {
 
 export default function ShareCaptureScreen({ navigation, route }: Props) {
  const {phrase:localizeCopy}=useCopyLanguage();
+  const { formatAmount } = usePrivacy();
   const { text } = route.params;
   const { addTransaction } = useData();
 
+  const generation = useRef(0);
   const [loading, setLoading] = useState(true);
   const [parsed, setParsed] = useState<Awaited<ReturnType<typeof parseExpenseAI>> | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
+    const current = ++generation.current;
+    setLoading(true);
+    setParsed(null);
+    setError(null);
     parseExpenseAI(text)
-      .then(setParsed)
-      .catch(() => setError('Could not parse — add manually'))
-      .finally(() => setLoading(false));
+      .then(value => { if (generation.current === current) setParsed(value); })
+      .catch(() => { if (generation.current === current) setError('Could not parse — add manually'); })
+      .finally(() => { if (generation.current === current) setLoading(false); });
+    return () => { generation.current += 1; };
   }, [text]);
 
   // amount === 0 means the AI couldn't extract a number — route to manual entry.
@@ -45,11 +52,12 @@ export default function ShareCaptureScreen({ navigation, route }: Props) {
 
   const handleAddNow = async () => {
     if (!parsed || amountUnknown) return;
+    const current = generation.current;
     setSaving(true);
     try {
       const outcome = await addTransaction({
         type: parsed.type,
-        amount: Math.round(parsed.amount),
+        amount: parsed.amount,
         category: parsed.category,
         description: parsed.description,
         note: '',
@@ -59,15 +67,17 @@ export default function ShareCaptureScreen({ navigation, route }: Props) {
         merchant: parsed.merchant,
         rawInput: text,
       });
+      if (generation.current !== current) return;
       if (!outcome.ok) {
-        setError(outcome.message);
+        setError("Could not save this entry. Review it before trying again.");
         return;
       }
       navigation.goBack();
     } catch {
+      if (generation.current !== current) return;
       setError("Couldn't save that entry. Please try again.");
     } finally {
-      setSaving(false);
+      if (generation.current === current) setSaving(false);
     }
   };
 
@@ -95,7 +105,7 @@ export default function ShareCaptureScreen({ navigation, route }: Props) {
       <View style={styles.sheet}>
         <View style={styles.handle} />
 
-        <Text style={styles.heading}>SMS Capture</Text>
+        <Text style={styles.heading}>{localizeCopy("SMS Capture")}</Text>
 
         {/* Raw text preview */}
         <ScrollView style={styles.rawBox} showsVerticalScrollIndicator={false}>
@@ -107,15 +117,15 @@ export default function ShareCaptureScreen({ navigation, route }: Props) {
         {loading && (
           <View style={styles.stateRow}>
             <ActivityIndicator color={color.forest} />
-            <Text style={styles.stateText}>Parsing with AI…</Text>
+            <Text style={styles.stateText}>{localizeCopy("Parsing with AI\u2026")}</Text>
           </View>
         )}
 
         {!loading && error && (
           <>
-            <Text style={styles.errorText}>{error}</Text>
+            <Text style={styles.errorText}>{localizeCopy(error)}</Text>
             <TouchableOpacity style={styles.btnClay} onPress={handleManual} activeOpacity={0.85}>
-              <Text style={styles.btnClayText}>Add manually</Text>
+              <Text style={styles.btnClayText}>{localizeCopy("Add manually")}</Text>
             </TouchableOpacity>
           </>
         )}
@@ -128,7 +138,7 @@ export default function ShareCaptureScreen({ navigation, route }: Props) {
                   {parsed.type === 'expense' ? localizeCopy("Spent") : localizeCopy("Received")}
                 </Text>
                 <Text style={styles.parsedAmount}>
-                  {parsed.amount > 0 ? formatCurrency(parsed.amount) : '—'}
+                  {parsed.amount > 0 ? formatAmount(parsed.amount) : '—'}
                 </Text>
               </View>
               <View style={styles.parsedRight}>
@@ -148,17 +158,17 @@ export default function ShareCaptureScreen({ navigation, route }: Props) {
               {saving ? (
                 <ActivityIndicator color={color.cream} />
               ) : (
-                <Text style={styles.btnForestText}>Add entry</Text>
+                <Text style={styles.btnForestText}>{localizeCopy("Add entry")}</Text>
               )}
             </TouchableOpacity>
             <TouchableOpacity style={styles.btnGhost} onPress={handleEditFirst} activeOpacity={0.8}>
-              <Text style={styles.btnGhostText}>Edit first</Text>
+              <Text style={styles.btnGhostText}>{localizeCopy("Edit first")}</Text>
             </TouchableOpacity>
           </>
         )}
 
         <TouchableOpacity style={styles.cancel} onPress={navigation.goBack} activeOpacity={0.7}>
-          <Text style={styles.cancelText}>Dismiss</Text>
+          <Text style={styles.cancelText}>{localizeCopy("Dismiss")}</Text>
         </TouchableOpacity>
       </View>
     </ScreenShell>

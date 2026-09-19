@@ -12,10 +12,12 @@ import * as authApi from '../api/auth';
 import { ApiError } from '../api/client';
 import { registerPushToken, clearPushToken } from '../api/push';
 import { getExpoPushToken } from '../lib/push';
-import { identifyUser, resetAnalytics, track } from '../lib/analytics';
+import { identifyUser, identifyRestoredUser, resetAnalytics, track } from '../lib/analytics';
 import { signOutGoogle } from '../lib/socialAuth';
 import { secureStorage } from '../lib/secureStorage';
 import { localStore } from '../lib/localStore';
+import { setBillAccount, isBillAccount, observeInitialBillSession } from '../lib/bills';
+import { cancelTomoCheckins, refreshTomoCheckins } from '../hooks/useNotifications';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { addBreadcrumb, captureError, setUserContext, clearUserContext } from '../config/sentry';
 import type { User, RegisterPayload } from '../types';
@@ -152,6 +154,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // cache stays in lockstep. Avoids subtle drift between cache + state.
   const setUserAndCache = useCallback((u: User | null) => {
     observeRequestAccount(u?.id ?? null);
+    void setBillAccount(u?.id ?? null).catch(() => {});
+    void cancelTomoCheckins().then(() => { if (u) return refreshTomoCheckins(); }).catch(() => {});
     setUser(u);
     void cacheUser(u);
   }, []);
@@ -220,7 +224,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         addBreadcrumb('auth', 'startup: validating cached session');
         try {
           const me = await authApi.getMe();
-          if (!cancelled) setUserAndCache(me);
+          if (!cancelled) { setUserAndCache(me); identifyRestoredUser(me.id); }
         } catch (err) {
           if (err instanceof ApiError && err.status === 401) {
             // Real auth failure — token is invalid or expired beyond refresh.
@@ -229,7 +233,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             resetAnalytics();
             await secureStorage.removeItem('ari_token');
             await cacheUser(null);
-            if (!cancelled) setUser(null);
+            if (!cancelled) { void setBillAccount(null).catch(() => {}); void cancelTomoCheckins(); setUser(null); }
           } else {
             // Transient (network, 5xx, server cold start). Keep the cached
             // user logged in — the navigator already showed them Main.
@@ -256,8 +260,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let sub: { unsubscribe: () => void } | null = null;
     try {
       const { data } = supabase.auth.onAuthStateChange((event, session) => {
-        if(event === 'SIGNED_OUT') { resetRequestSession(); resetAnalytics(); }
-        if(session?.user?.id) observeRequestAccount(session.user.id);
+        if(event === 'SIGNED_OUT') { resetRequestSession(); resetAnalytics(); void setBillAccount(null).catch(() => {}); void cancelTomoCheckins(); setUser(null); void cacheUser(null); }
+        if(session?.user?.id) {
+          observeRequestAccount(session.user.id);
+          if (!isBillAccount(session.user.id)) {
+            // INITIAL_SESSION precedes backend /me validation; it must not
+            // discard a matching cold-start tap or authorize bill access.
+            if (event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') {
+              void observeInitialBillSession(session.user.id).catch(() => {});
+            } else { void setBillAccount(null).catch(() => {}); }
+            void cancelTomoCheckins();
+          }
+        }
         if (event === 'TOKEN_REFRESHED' && session?.access_token) {
           addBreadcrumb('auth', 'TOKEN_REFRESHED — mirroring to ari_token');
           void secureStorage.setItem('ari_token', session.access_token);
@@ -333,6 +347,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [setUserAndCache]);
 
   const logout = useCallback(async () => {
+    void setBillAccount(null).catch(() => {});
+    void cancelTomoCheckins();
     resetRequestSession();
     resetAnalytics();
     addBreadcrumb('auth', 'logout: starting');

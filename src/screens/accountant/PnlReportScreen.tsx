@@ -21,33 +21,30 @@ const CHART_WIDTH = SCREEN_WIDTH - CHART_PADDING * 2;
 
 const PERIOD_OPTIONS = [3, 6, 12] as const;
 
-const MONTH_SHORT: Record<string, string> = {
-  '01': 'Jan', '02': 'Feb', '03': 'Mar', '04': 'Apr',
-  '05': 'May', '06': 'Jun', '07': 'Jul', '08': 'Aug',
-  '09': 'Sep', '10': 'Oct', '11': 'Nov', '12': 'Dec',
-};
-
-function monthLabel(m: string): string {
-  const parts = m.split('-');
-  return MONTH_SHORT[parts[1]] || parts[1];
+function monthLabel(month: string, language: string): string {
+  const [year, number] = month.split('-').map(Number);
+  return new Date(year, number - 1, 1).toLocaleDateString(language === 'hi' ? 'hi-IN' : 'en-US', {month:'short'});
 }
 
 export default function PnlReportScreen() {
- const {phrase:localizeCopy}=useCopyLanguage();
+ const {phrase:localizeCopy, language}=useCopyLanguage();
   const navigation = useNavigation();
   const haptics = useHaptics();
-  const { formatAmount } = usePrivacy();
+  const { formatAmount, isPrivate } = usePrivacy();
 
   const [report, setReport] = useState<PnlReport | null>(null);
+  const [loadError, setLoadError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [months, setMonths] = useState<3 | 6 | 12>(6);
 
   const fetchReport = useCallback(async () => {
     setLoading(true);
+    setLoadError(false);
     try {
       const data = await reportsApi.getPnlReport(months);
       setReport(data);
     } catch {
+      setLoadError(true);
       setReport(null);
     } finally {
       setLoading(false);
@@ -74,6 +71,8 @@ export default function PnlReportScreen() {
     );
   }
 
+  if (loadError) return <ScreenShell edges={['top']}><Header onBack={() => navigation.goBack()} /><EmptyState emoji="📡" title={localizeCopy('Could not load report.')} subtitle={localizeCopy('Check your connection and try again.')} actionLabel={localizeCopy('Retry')} onAction={() => void fetchReport()} /></ScreenShell>;
+
   if (!report || report.months.length === 0) {
     return (
       <ScreenShell edges={['top']}>
@@ -81,7 +80,7 @@ export default function PnlReportScreen() {
         <EmptyState
           emoji="📊"
           title={localizeCopy("No Data Yet")}
-          subtitle="Add some transactions to see your P&L report"
+          subtitle={localizeCopy("Add some transactions to see your P&L report")}
         />
       </ScreenShell>
     );
@@ -107,12 +106,13 @@ export default function PnlReportScreen() {
           <View style={styles.periodRow}>
             {PERIOD_OPTIONS.map((p) => (
               <TouchableOpacity
+                accessibilityRole="radio" accessibilityState={{ selected: months === p }} accessibilityLabel={localizeCopy("{count} months").replace("{count}", String(p))}
                 key={p}
                 style={[styles.periodBtn, months === p && styles.periodBtnActive]}
                 onPress={() => { haptics.light(); setMonths(p); }}
               >
                 <Text style={[styles.periodText, months === p && styles.periodTextActive]}>
-                  {p}M
+                  {localizeCopy("{count} months").replace("{count}", String(p))}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -185,7 +185,7 @@ export default function PnlReportScreen() {
                         }]}
                       />
                     </View>
-                    <Text style={styles.barLabel}>{monthLabel(m.month)}</Text>
+                    <Text style={styles.barLabel}>{monthLabel(m.month, language)}</Text>
                   </View>
                 );
               })}
@@ -220,9 +220,9 @@ export default function PnlReportScreen() {
                         backgroundColor: isPos ? color.forest : color.clay,
                       }]}
                     />
-                    <Text style={styles.barLabel}>{monthLabel(m.month)}</Text>
-                    <Text style={[styles.savingsVal, { color: isPos ? color.forest : color.clay }]}>
-                      {isPos ? '+' : ''}{Math.round(m.net / 1000)}k
+                    <Text style={styles.barLabel}>{monthLabel(m.month, language)}</Text>
+                    <Text style={[styles.savingsVal, { color: isPrivate ? color.ink : isPos ? color.forest : color.clay }]}>
+                      {isPrivate ? formatAmount(m.net) : `${isPos ? '+' : ''}${formatAmount(m.net)}`}
                     </Text>
                   </View>
                 );
@@ -301,11 +301,11 @@ export default function PnlReportScreen() {
             </View>
             {pnlMonths.map((m, i) => (
               <View key={m.month} style={[styles.tableRow, i % 2 === 0 && styles.tableRowAlt]}>
-                <Text style={[styles.tableCell, { flex: 1.2, fontFamily: font.bodySemi }]}>{monthLabel(m.month)}</Text>
+                <Text style={[styles.tableCell, { flex: 1.2, fontFamily: font.bodySemi }]}>{monthLabel(m.month, language)}</Text>
                 <Text style={[styles.tableCell, { color: color.forest }]}>{formatAmount(m.income)}</Text>
                 <Text style={[styles.tableCell, { color: color.clay }]}>{formatAmount(m.expenses)}</Text>
-                <Text style={[styles.tableCell, { color: m.net >= 0 ? color.forest : color.clay, fontFamily: font.bodyBold }]}>
-                  {m.net >= 0 ? '+' : ''}{formatAmount(m.net)}
+                <Text style={[styles.tableCell, { color: isPrivate ? color.ink : m.net >= 0 ? color.forest : color.clay, fontFamily: font.bodyBold }]}>
+                  {isPrivate ? formatAmount(m.net) : `${m.net >= 0 ? '+' : ''}${formatAmount(m.net)}`}
                 </Text>
               </View>
             ))}
@@ -322,7 +322,7 @@ function Header({ onBack }: { onBack: () => void }) {
  const {phrase:localizeCopy}=useCopyLanguage();
   return (
     <View style={styles.header}>
-      <TouchableOpacity onPress={onBack} style={styles.backBtn}>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel={localizeCopy("Go back")} onPress={onBack} style={styles.backBtn}>
         <Icon name="arrow-left" size={22} color={color.ink} />
       </TouchableOpacity>
       <View>

@@ -1,9 +1,11 @@
+import { useLanguage } from '../i18n/LanguageContext';
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import {
   EXPENSE_CATEGORIES,
   INCOME_CATEGORIES,
   buildCategoryList,
+  categoryDisplayLabel,
   CategoryDef,
 } from '../constants/categories';
 import { color, font } from '../theme/tokens';
@@ -18,6 +20,7 @@ interface Props {
 }
 
 export default function CategoryPicker({ selected, type, onSelect, customCategories }: Props) {
+  const { phrase } = useLanguage();
   const cats: CategoryDef[] = customCategories
     ? buildCategoryList(type, customCategories)
     : type === 'expense'
@@ -31,6 +34,7 @@ export default function CategoryPicker({ selected, type, onSelect, customCategor
         return (
           <TouchableOpacity
             key={cat.value}
+            accessibilityRole="radio" accessibilityState={{ selected: isSelected }} accessibilityLabel={categoryDisplayLabel(cat, phrase)}
             onPress={() => onSelect(cat.value)}
             activeOpacity={0.75}
             style={[
@@ -47,7 +51,7 @@ export default function CategoryPicker({ selected, type, onSelect, customCategor
               ]}
               numberOfLines={1}
             >
-              {cat.label}
+              {categoryDisplayLabel(cat, phrase)}
             </Text>
           </TouchableOpacity>
         );

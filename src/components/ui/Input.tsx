@@ -10,6 +10,7 @@ import {
 import { color, font } from '../../theme/tokens';
 import { Layout } from '../../constants/layout';
 import Icon from './Icon';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -28,6 +29,7 @@ export default function Input({
   ...props
 }: InputProps) {
   const [visible, setVisible] = useState(false);
+  const { phrase } = useLanguage();
 
   return (
     <View style={styles.wrapper}>
@@ -38,13 +40,14 @@ export default function Input({
           placeholderTextColor={color.inkFaint}
           selectionColor={color.forest}
           secureTextEntry={showPasswordToggle ? !visible : secureTextEntry}
+          accessibilityLabel={label}
           {...props}
         />
         {showPasswordToggle && (
           <TouchableOpacity
             onPress={() => setVisible((v) => !v)}
             style={styles.toggle}
-            accessibilityLabel="Toggle password visibility"
+            accessibilityLabel={phrase(visible ? 'Hide password' : 'Show password')}
             accessibilityRole="button"
           >
             <Icon name={visible ? 'eye-off' : 'eye'} size={18} color={color.inkSoft} />
@@ -54,7 +57,7 @@ export default function Input({
           <View style={styles.toggle}>{rightElement}</View>
         )}
       </View>
-      {error && <Text style={styles.errorText}>{error}</Text>}
+      {error && <Text accessibilityRole="alert" style={styles.errorText}>{error}</Text>}
     </View>
   );
 }

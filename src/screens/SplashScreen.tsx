@@ -1,3 +1,4 @@
+import { useLanguage } from '../i18n/LanguageContext';
 import React, { useEffect, useMemo, useRef } from 'react';
 import { View, Text, TouchableOpacity, Animated, StyleSheet, Dimensions } from 'react-native';
 import ScreenShell from '../components/ScreenShell';
@@ -9,14 +10,15 @@ import Icon from '../components/ui/Icon';
 type Props = StackScreenProps<AuthStackParamList, 'Splash'>;
 
 const FEATURES = [
-  { icon: 'bar-chart' as const, title: 'Smart Tracking', desc: 'Auto-categorize every rupee' },
-  { icon: 'bot' as const, title: 'Tomo AI Coach', desc: 'Personal finance advice, anytime' },
-  { icon: 'target' as const, title: 'Budget Goals', desc: 'Hit your savings targets faster' },
+  { icon: 'bar-chart' as const, title: 'Smart Tracking', desc: 'Review suggested entry categories' },
+  { icon: 'bot' as const, title: 'Tomo AI Coach', desc: 'Review recorded spending with AI' },
+  { icon: 'target' as const, title: 'Budget Goals', desc: 'Plan budgets and savings goals' },
 ];
 
 const { height } = Dimensions.get('window');
 
 export default function SplashScreen({ navigation }: Props) {
+  const { phrase } = useLanguage();
   const logoScale = useRef(new Animated.Value(0.6)).current;
   const logoOpacity = useRef(new Animated.Value(0)).current;
   const f0 = useRef(new Animated.Value(0)).current;
@@ -70,22 +72,22 @@ export default function SplashScreen({ navigation }: Props) {
             <Icon name="sprout" size={44} color={color.cream} />
           </View>
           <Text style={styles.appName}>Ari</Text>
-          <Text style={styles.tagline}>Your Money, Your Future</Text>
+          <Text style={styles.tagline}>{phrase("Your Money, Your Future")}</Text>
         </Animated.View>
 
         {/* Features */}
         <View style={styles.features}>
           {FEATURES.map((f, i) => (
             <Animated.View
-              key={f.title}
+              key={phrase(f.title)}
               style={[styles.featureRow, { opacity: featureOpacities[i] }]}
             >
               <View style={styles.featureIcon}>
                 <Icon name={f.icon} size={22} color={color.cream} />
               </View>
               <View style={styles.featureText}>
-                <Text style={styles.featureTitle}>{f.title}</Text>
-                <Text style={styles.featureDesc}>{f.desc}</Text>
+                <Text style={styles.featureTitle}>{phrase(f.title)}</Text>
+                <Text style={styles.featureDesc}>{phrase(f.desc)}</Text>
               </View>
             </Animated.View>
           ))}
@@ -105,19 +107,19 @@ export default function SplashScreen({ navigation }: Props) {
             style={styles.primaryBtn}
             onPress={() => navigation.navigate('Register')}
             activeOpacity={0.85}
-            accessibilityLabel="Let's Get Started"
+            accessibilityLabel={phrase("Let’s Get Started")}
             accessibilityRole="button"
           >
-            <Text style={styles.primaryBtnText}>Let&apos;s Get Started</Text>
+            <Text style={styles.primaryBtnText}>{phrase("Let’s Get Started")}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.secondaryBtn}
             onPress={() => navigation.navigate('Login')}
             activeOpacity={0.75}
-            accessibilityLabel="I already have an account"
+            accessibilityLabel={phrase("I already have an account")}
             accessibilityRole="button"
           >
-            <Text style={styles.secondaryBtnText}>I already have an account</Text>
+            <Text style={styles.secondaryBtnText}>{phrase("I already have an account")}</Text>
           </TouchableOpacity>
         </Animated.View>
       </ScreenShell>

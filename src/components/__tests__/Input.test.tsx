@@ -38,7 +38,7 @@ describe('Input', () => {
     const { getByLabelText } = render(
       <Input label="Password" showPasswordToggle />
     );
-    expect(getByLabelText('Toggle password visibility')).toBeTruthy();
+    expect(getByLabelText('Show password')).toBeTruthy();
   });
 
   it('toggles password visibility on press', () => {
@@ -46,9 +46,16 @@ describe('Input', () => {
       <Input label="Password" showPasswordToggle />
     );
 
-    const toggle = getByLabelText('Toggle password visibility');
+    const toggle = getByLabelText('Show password');
     fireEvent.press(toggle);
-    // Should still be there after toggle
-    expect(getByLabelText('Toggle password visibility')).toBeTruthy();
+    expect(getByLabelText('Hide password')).toBeTruthy();
+    expect(getByLabelText('Password').props.secureTextEntry).toBe(false);
+  });
+
+  it('uses visible labels by default and preserves an explicit accessible name', () => {
+    const screen = render(<Input label="Amount" accessibilityLabel="Bill amount" />);
+    expect(screen.getByLabelText('Bill amount')).toBeTruthy();
+    screen.rerender(<Input label="Amount" />);
+    expect(screen.getByLabelText('Amount')).toBeTruthy();
   });
 });

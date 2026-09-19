@@ -34,6 +34,7 @@ import {
   saveBill,
   deleteBill,
   ensureNotificationPermission,
+  billTimeZone,
   type Bill,
 } from '../lib/bills';
 import { nextMonthlyOccurrence, toISODate } from '../lib/billSchedule';
@@ -58,7 +59,7 @@ function genId(): string {
 function nextDueLabel(bill: Bill, localeTag: string): string {
   let iso: string;
   if (bill.repeatMonthly) {
-    iso = toISODate(nextMonthlyOccurrence(bill.dueDay, new Date()));
+    iso = toISODate(nextMonthlyOccurrence(bill.dueDay, new Date(), billTimeZone()));
   } else {
     iso = bill.oneTimeDate ?? '';
   }
@@ -70,7 +71,7 @@ function nextDueLabel(bill: Bill, localeTag: string): string {
 
 export default function BillsScreen() {
  const {phrase:localizeCopy}=useLanguage();
-  const { phrase } = useLanguage();
+  const { phrase, language } = useLanguage();
   const { locale, formatCurrency } = useLocale();
   const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
   const haptics = useHaptics();
@@ -93,10 +94,10 @@ export default function BillsScreen() {
   const [deleting, setDeleting] = useState(false);
 
   const load = useCallback(async () => {
-    const data = await getBills();
-    setBills(data);
-    setLoading(false);
-  }, []);
+    try { setBills(await getBills(true)); }
+    catch { Alert.alert(language === 'hi' ? 'बिल लोड नहीं हुए' : 'Could not load bills', language === 'hi' ? 'बिल पढ़े नहीं जा सके। फिर कोशिश करें।' : 'Bills could not be read. Please try again.'); }
+    finally { setLoading(false); }
+  }, [language]);
 
   useFocusEffect(
     useCallback(() => {
@@ -149,20 +150,21 @@ export default function BillsScreen() {
       const granted = await ensureNotificationPermission();
       if (!granted) {
         Alert.alert(
-          'Notifications off',
-          'Reminders need notification permission. The bill is saved, but reminders won’t fire until you enable notifications in Settings.'
+          phrase('Notifications off'),
+          phrase('Reminders need notification permission. Enable notifications in Settings to receive bill reminders.')
         );
       }
 
       const bill: Bill = {
         id: editing?.id ?? genId(),
+        ownerId: editing?.ownerId,
         name: trimmedName,
         amount: amt,
         category,
         dueDay: day,
         repeatMonthly,
         // One-time bills resolve to the next occurrence of the chosen day.
-        oneTimeDate: repeatMonthly ? undefined : toISODate(nextMonthlyOccurrence(day, new Date())),
+        oneTimeDate: repeatMonthly ? undefined : toISODate(nextMonthlyOccurrence(day, new Date(), billTimeZone())),
         createdAt: editing?.createdAt ?? new Date().toISOString(),
       };
 
@@ -191,6 +193,8 @@ export default function BillsScreen() {
       haptics.success();
       setDeleteTarget(null);
       await load();
+    } catch {
+      Alert.alert(language === 'hi' ? 'बिल हटाया नहीं गया' : 'Could not delete', language === 'hi' ? 'बिल हटाया नहीं जा सका। फिर कोशिश करें।' : 'The bill could not be deleted. Please try again.');
     } finally {
       setDeleting(false);
     }
@@ -232,7 +236,7 @@ export default function BillsScreen() {
                 <View style={{ flex: 1 }}>
                   <Text style={styles.cardName}>{bill.name}</Text>
                   <Text style={styles.cardMeta}>
-                    {formatCurrency(bill.amount)} · due {nextDueLabel(bill, locale.localeTag)}
+                    {formatCurrency(bill.amount)} · {language === 'hi' ? 'देय' : 'due'} {nextDueLabel(bill, locale.localeTag)}
                     {bill.repeatMonthly ? ' · monthly' : ''}
                   </Text>
                 </View>
@@ -245,7 +249,7 @@ export default function BillsScreen() {
                     setDeleteTarget(bill);
                   }}
                   style={styles.cardAction}
-                  accessibilityLabel={`Delete ${bill.name}`}
+                  accessibilityLabel={`${language === 'hi' ? 'हटाएँ' : 'Delete'} ${bill.name}`}
                 >
                   <Icon name="trash" size={18} color={color.clay} />
                 </TouchableOpacity>
@@ -328,7 +332,7 @@ export default function BillsScreen() {
       <DeleteConfirmSheet
         visible={!!deleteTarget}
         title={phrase("Delete bill?")}
-        message={`This removes "${deleteTarget?.name}" and cancels its reminders.`}
+        message={language === 'hi' ? `इससे "${deleteTarget?.name}" हट जाएगा और उसके रिमाइंडर बंद हो जाएँगे।` : `This removes "${deleteTarget?.name}" and cancels its reminders.`}
         onConfirm={handleDelete}
         onCancel={() => setDeleteTarget(null)}
         loading={deleting}

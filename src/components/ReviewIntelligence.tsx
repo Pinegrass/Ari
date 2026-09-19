@@ -15,15 +15,17 @@ export function ReviewIntelligence({ provenance, outlook, baseline, language, mo
   const [candidates, setCandidates] = useState<RecurringCandidate[] | null>(null);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [historyLimited, setHistoryLimited] = useState(false);
   const serial = useRef(0);
   const load = useCallback(async () => {
     const request = ++serial.current; setBusy(true); setMessage(null);
-    try { const data = await getRecurringCandidates(); if (request === serial.current) setCandidates(data.candidates); }
+    try { const data = await getRecurringCandidates(); if (request === serial.current) { setCandidates(data.candidates); setHistoryLimited(data.status === 'history_limit'); } }
     catch { if (request === serial.current) setMessage(copy.failure); }
     finally { if (request === serial.current) setBusy(false); }
   }, [copy.failure]);
   useEffect(() => { void load(); return () => { serial.current += 1; }; }, [load]);
-  const confirm = (candidate: RecurringCandidate) => Alert.alert(copy.confirmTitle, copy.patternHelp, [
+  const confirmationLabel = (candidate: RecurringCandidate) => `${copy.confirm} · ${copy.cadences[candidate.confirmation.body.recurrenceRule]}`;
+  const confirm = (candidate: RecurringCandidate) => Alert.alert(`${copy.confirmTitle} ${copy.cadences[candidate.confirmation.body.recurrenceRule]}`, copy.patternHelp, [
     { text: copy.cancel, style: 'cancel' }, { text: copy.confirm, onPress: () => {
       setBusy(true); setMessage(null);
       void confirmRecurringCandidate(candidate).then(async () => { await load(); await onChanged(); })
@@ -55,6 +57,7 @@ export function ReviewIntelligence({ provenance, outlook, baseline, language, mo
     {outlook && <><Text accessibilityRole="header" style={{ fontWeight: '600' }}>{copy.outlook}</Text>
       {outlook.status === 'ready' && outlook.payday ? <>
         <Text selectable>{copy.payday}: {day(outlook.payday)}</Text>
+        {outlook.horizon && <><Text selectable>{copy.horizon}: {day(outlook.horizon.start)} – {day(outlook.horizon.end)}</Text><Text>{copy.horizonHelp}</Text></>}
         {outlook.obligations?.map((item, index) => <Text selectable key={index}>{copy.obligation}: {day(item.dueOn)} · {money(Number(item.amount))}</Text>)}
         {outlook.asOf && <Text selectable>{copy.confirmedAt}: {new Date(outlook.asOf).toLocaleString(language === 'hi' ? 'hi-IN' : undefined)}</Text>}
         {outlook.expiresAt && <Text selectable>{copy.expires}: {new Date(outlook.expiresAt).toLocaleString(language === 'hi' ? 'hi-IN' : undefined)}</Text>}
@@ -65,12 +68,13 @@ export function ReviewIntelligence({ provenance, outlook, baseline, language, mo
     <Text>{copy.patternHelp}</Text>
     {busy && <Text accessibilityLiveRegion="polite">{candidates === null ? copy.loading : copy.saving}</Text>}
     {message && <Text accessibilityRole="alert" selectable>{message}</Text>}
-    {candidates?.length === 0 && <Text>{copy.empty}</Text>}
+    {historyLimited && <Text accessibilityRole="alert">{copy.historyLimited}</Text>}
+    {candidates?.length === 0 && !historyLimited && <Text>{copy.empty}</Text>}
     {candidates?.map(candidate => <View key={candidate.id} style={{ gap: 8 }}>
       <Text selectable style={{ fontWeight: '600' }}>{candidate.label}</Text><Text>{copy.predict}</Text>
       <Text selectable>{day(candidate.expectedOn)} · {money(Number(candidate.amount))}</Text>
       <Text selectable>{candidate.sourceEntries.map(entry => day(entry.date)).join(' · ')}</Text>
-      {button(copy.confirm, () => confirm(candidate), busy || message === copy.conflict)}
+      {button(confirmationLabel(candidate), () => confirm(candidate), busy || message === copy.conflict)}
     </View>)}
     {button(copy.retry, () => { void load(); }, busy)}
   </View>;

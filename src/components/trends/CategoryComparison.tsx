@@ -1,3 +1,4 @@
+import { useLanguage } from '../../i18n/LanguageContext';
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { font, type as ftype } from '../../theme/tokens';
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export default function CategoryComparison({ categories }: Props) {
+  const { phrase } = useLanguage();
   const { formatAmount } = usePrivacy();
   const c = useColors();
   const styles = useMemo(() => makeStyles(c), [c]);
@@ -27,15 +29,15 @@ export default function CategoryComparison({ categories }: Props) {
   if (entries.length === 0) {
     return (
       <View style={styles.card}>
-        <Text style={styles.title}>Top categories</Text>
-        <Text style={styles.empty}>No spending data yet.</Text>
+        <Text style={styles.title}>{phrase("Top categories")}</Text>
+        <Text style={styles.empty}>{phrase("No spending data yet.")}</Text>
       </View>
     );
   }
 
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>Top categories</Text>
+      <Text style={styles.title}>{phrase("Top categories")}</Text>
       {entries.map(([name, amount]) => {
         const pct = total > 0 ? Math.round((amount / total) * 100) : 0;
         const meta = CATEGORY_ICONS[name] || { color: c.inkFaint };

@@ -1,5 +1,7 @@
 import { apiRequest } from './client';
 import type { User, RegisterPayload } from '../types';
+import { currentBillAccount, exportOwnedBills } from '../lib/bills';
+import { requestAccountId, requestSessionRevision } from '../lib/requestSession';
 
 // refresh_token is optional so the frontend keeps working against a backend
 // that hasn't been redeployed with the refresh_token field yet. The Supabase
@@ -25,7 +27,7 @@ export const register = (payload: RegisterPayload) =>
 
 export const getMe = () => apiRequest<User>('/auth/me');
 
-/** Full account data dump (DPDP §11 / GDPR Art. 15+20) as JSON. */
+/** Server account records plus this device's verified-owner local bills. */
 export interface DataExport {
   exported_at: string;
   profile: User;
@@ -38,7 +40,21 @@ export interface DataExport {
   feedback: unknown[];
 }
 
-export const exportMyData = () => apiRequest<DataExport>('/auth/export');
+export const exportMyData = async () => {
+  const owner = currentBillAccount();
+  const revision = requestSessionRevision();
+  if (!owner || requestAccountId() !== owner) throw new Error('Export account unavailable');
+  const [data, local] = await Promise.all([apiRequest<DataExport>('/auth/export'), exportOwnedBills()]);
+  if (requestSessionRevision() !== revision || requestAccountId() !== owner
+      || currentBillAccount() !== owner || local.ownerId !== owner || data.profile.id !== owner) {
+    throw new Error('Export account changed');
+  }
+  return { ...data, localBills: local.bills, exportScope: {
+    serverAccountRecords: true, currentDeviceOwnedBills: true,
+    otherDeviceBills: false, unassignedLegacyBills: false, unsyncedTransactionsIncluded: false,
+    atomicAcrossServerAndDevice: false,
+  } };
+};
 
 export interface PatchMePayload {
   name?: string;

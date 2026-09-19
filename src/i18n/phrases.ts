@@ -1,11 +1,13 @@
 /** Migration catalog for legacy UI copy (gettext-style English message IDs).
  * Only explicit UI call sites use this catalog; never translate user-authored data.
  */
+import { secondaryHindi } from './secondaryHindi';
 import {extraHindi} from './phrasesExtra';
 export const hindiPhrases: Record<string, string> = {
   'Show trends': 'रुझान दिखाएँ', 'Hide trends': 'रुझान छिपाएँ', 'Clear date filter': 'तारीख का फ़िल्टर हटाएँ', 'Delete entry': 'एंट्री हटाएँ', 'Delete entry?': 'एंट्री हटाएँ?', 'Could not load transactions.': 'एंट्री लोड नहीं हुईं।',
 
   ...extraHindi,
+  ...secondaryHindi,
   'Trends & Insights': 'रुझान और जानकारी', 'Spending patterns, categories and recent activity': 'खर्च के रुझान, श्रेणियाँ और हाल की एंट्री',
   'Smart Ledger': 'स्मार्ट हिसाब', 'Recurring entries, tags & multi-source income': 'दोहराई जाने वाली एंट्री, टैग और अलग-अलग स्रोतों की आमदनी',
   'Budget Planner': 'बजट बनाएँ', 'Monthly targets with rollover tracking': 'मासिक लक्ष्य और अगले महीने बची रकम का हिसाब',

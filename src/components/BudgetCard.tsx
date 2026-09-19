@@ -2,7 +2,7 @@ import {useLanguage as useCopyLanguage} from '../i18n/LanguageContext';
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import ProgressBar from './ui/ProgressBar';
-import { getCategoryDef } from '../constants/categories';
+import { getCategoryDef, categoryDisplayLabel } from '../constants/categories';
 import { usePrivacy } from '../context/PrivacyContext';
 import { color, font } from '../theme/tokens';
 import { effectiveProgress, hasRollover } from '../utils/budgetRollover';
@@ -35,15 +35,15 @@ export default function BudgetCard({ budget, onDelete, onEdit }: Props) {
         </View>
 
         <View style={styles.info}>
-          <Text style={styles.catName}>{cat.label}</Text>
+          <Text style={styles.catName}>{categoryDisplayLabel(cat, localizeCopy)}</Text>
           <Text style={styles.meta}>
-            {formatAmount(budget.spent)} {localizeCopy("of")}{formatAmount(available)}
+            {formatAmount(budget.spent)} {localizeCopy("of")} {formatAmount(available)}
           </Text>
           {carried && (
             <Text style={[styles.carried, { color: budget.rollover > 0 ? color.forest : color.clay }]}>
               {budget.rollover > 0
-                ? `+${formatAmount(budget.rollover)} carried from last month`
-                : `−${formatAmount(Math.abs(budget.rollover))} overspend carried`}
+                ? localizeCopy('{amount} carried from last month').replace('{amount}', formatAmount(budget.rollover))
+                : localizeCopy('{amount} overspend carried').replace('{amount}', formatAmount(Math.abs(budget.rollover)))}
             </Text>
           )}
         </View>
@@ -52,7 +52,7 @@ export default function BudgetCard({ budget, onDelete, onEdit }: Props) {
           <TouchableOpacity
             onPress={() => onEdit(budget)}
             style={styles.actionBtn}
-            accessibilityLabel="Edit budget"
+            accessibilityLabel={localizeCopy("Edit budget")}
             accessibilityRole="button"
           >
             <Icon name="edit" size={14} color={color.inkSoft} />
@@ -60,7 +60,7 @@ export default function BudgetCard({ budget, onDelete, onEdit }: Props) {
           <TouchableOpacity
             onPress={() => onDelete(budget.id)}
             style={styles.actionBtn}
-            accessibilityLabel="Delete budget"
+            accessibilityLabel={localizeCopy("Delete budget")}
             accessibilityRole="button"
           >
             <Icon name="trash" size={14} color={color.clay} />
@@ -72,12 +72,12 @@ export default function BudgetCard({ budget, onDelete, onEdit }: Props) {
 
       <View style={styles.footer}>
         <Text style={[styles.pct, isOver ? styles.over : null]}>
-          {progress.percentage}% used
+          {localizeCopy('{count}% used').replace('{count}', String(progress.percentage))}
         </Text>
         <Text style={[styles.remaining, isOver ? styles.over : null]}>
           {isOver
-            ? `${formatAmount(Math.abs(progress.remaining))} over`
-            : `${formatAmount(progress.remaining)} left`}
+            ? localizeCopy('{amount} over').replace('{amount}', formatAmount(Math.abs(progress.remaining)))
+            : localizeCopy('{amount} left').replace('{amount}', formatAmount(progress.remaining))}
         </Text>
       </View>
     </View>

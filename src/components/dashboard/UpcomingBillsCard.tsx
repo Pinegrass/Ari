@@ -7,7 +7,7 @@ import type { CompositeNavigationProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 
 import Icon from '../ui/Icon';
-import { useLocale } from '../../hooks/useLocale';
+import { usePrivacy } from '../../context/PrivacyContext';
 import { color, font, type as typeScale } from '../../theme/tokens';
 import { getBills } from '../../lib/bills';
 import { selectUpcomingCharges, type UpcomingCharge } from '../../lib/upcomingCharges';
@@ -19,11 +19,7 @@ type Nav = CompositeNavigationProp<
   StackNavigationProp<MainStackParamList>
 >;
 
-function dueLabel(daysUntil: number): string {
-  if (daysUntil <= 0) return 'Due today';
-  if (daysUntil === 1) return 'Due tomorrow';
-  return `Due in ${daysUntil} days`;
-}
+
 
 /**
  * "Upcoming charges" — the next ~30 days of money going out, merging scheduled
@@ -33,7 +29,7 @@ function dueLabel(daysUntil: number): string {
  */
 export default function UpcomingBillsCard() {
  const {phrase:localizeCopy}=useCopyLanguage();
-  const { formatCurrency } = useLocale();
+  const { formatAmount } = usePrivacy();
   const navigation = useNavigation<Nav>();
   const { transactions } = useData();
   const [charges, setCharges] = useState<UpcomingCharge[] | null>(null);
@@ -55,7 +51,7 @@ export default function UpcomingBillsCard() {
   return (
     <View style={styles.card}>
       <View style={styles.head}>
-        <Text style={styles.title}>Upcoming charges</Text>
+        <Text style={styles.title}>{localizeCopy("Upcoming charges")}</Text>
         <View style={styles.headLinks}>
           <TouchableOpacity
             onPress={() => navigation.navigate('RecurringPayments')}
@@ -67,9 +63,9 @@ export default function UpcomingBillsCard() {
           <TouchableOpacity
             onPress={() => navigation.navigate('Bills')}
             accessibilityRole="link"
-            accessibilityLabel="Manage bills"
+            accessibilityLabel={localizeCopy("Manage bills")}
           >
-            <Text style={styles.manage}>Manage</Text>
+            <Text style={styles.manage}>{localizeCopy("Manage")}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -85,17 +81,18 @@ export default function UpcomingBillsCard() {
               prefill: { amount: charge.amount, description: charge.name, category: charge.category },
             })
           }
-          accessibilityLabel={`Log ${charge.name}`}
+          accessibilityRole="button"
+          accessibilityLabel={localizeCopy("Log {name}").replace("{name}", charge.name)}
         >
           <View style={[styles.dot, charge.daysUntil <= 1 && styles.dotSoon]} />
           <View style={{ flex: 1 }}>
             <Text style={styles.name}>{charge.name}</Text>
             <Text style={styles.meta}>
-              {dueLabel(charge.daysUntil)}
-              {charge.source === 'recurring' ? ' · recurring' : ''}
+              {charge.daysUntil <= 0 ? localizeCopy("Due today") : charge.daysUntil === 1 ? localizeCopy("Due tomorrow") : localizeCopy("Due in {count} days").replace("{count}", String(charge.daysUntil))}
+              {charge.source === 'recurring' ? ` · ${localizeCopy('Recurring')}` : ''}
             </Text>
           </View>
-          <Text style={styles.amount}>{formatCurrency(charge.amount)}</Text>
+          <Text style={styles.amount}>{formatAmount(charge.amount)}</Text>
           <Icon name="chevron-right" size={16} color={color.inkFaint} />
         </TouchableOpacity>
       ))}

@@ -33,13 +33,14 @@ const NOTE_COLORS = [
 type Filter = 'all' | 'active' | 'done' | 'pinned';
 
 export default function TodoNotesScreen() {
- const {phrase:localizeCopy}=useCopyLanguage();
+ const {phrase:localizeCopy, language}=useCopyLanguage();
   const navigation = useNavigation();
   const haptics = useHaptics();
   const { locale } = useLocale();
   const insets = useSafeAreaInsets();
 
   const [todos, setTodos] = useState<TodoNote[]>([]);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState<Filter>('all');
@@ -62,8 +63,9 @@ export default function TodoNotesScreen() {
     try {
       const data = await todosApi.getTodos();
       setTodos(data);
+      setLoadFailed(false);
     } catch {
-      // silent
+      setLoadFailed(true);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -123,7 +125,7 @@ export default function TodoNotesScreen() {
 
   const handleSave = async () => {
     if (!title.trim()) {
-      Alert.alert('Required', 'Please enter a title.');
+      Alert.alert(localizeCopy("Required"), localizeCopy("Please enter a title."));
       return;
     }
     setSaving(true);
@@ -148,7 +150,7 @@ export default function TodoNotesScreen() {
       haptics.success();
       setModalVisible(false);
     } catch {
-      Alert.alert('Error', 'Could not save note.');
+      Alert.alert(localizeCopy("Error"), localizeCopy("Could not save note."));
     } finally {
       setSaving(false);
     }
@@ -164,6 +166,7 @@ export default function TodoNotesScreen() {
     try {
       await todosApi.updateTodo(todo.id, { isDone: newDone });
     } catch {
+      Alert.alert(localizeCopy("Error"), localizeCopy("Could not update note. Your change was not saved."));
       // Rollback
       setTodos((prev) => prev.map((t) => (t.id === todo.id ? { ...t, isDone: !newDone } : t)));
     }
@@ -178,6 +181,7 @@ export default function TodoNotesScreen() {
     try {
       await todosApi.updateTodo(todo.id, { pinned: newPin });
     } catch {
+      Alert.alert(localizeCopy("Error"), localizeCopy("Could not update note. Your change was not saved."));
       setTodos((prev) => prev.map((t) => (t.id === todo.id ? { ...t, pinned: !newPin } : t)));
     }
   };
@@ -186,10 +190,10 @@ export default function TodoNotesScreen() {
 
   const handleDelete = (todo: TodoNote) => {
     haptics.medium();
-    Alert.alert('Delete Note', `Delete "${todo.title}"?`, [
-      { text: 'Cancel', style: 'cancel' },
+    Alert.alert(localizeCopy("Delete Note"), localizeCopy('Delete {name}?').replace('{name}', todo.title), [
+      { text: localizeCopy("Cancel"), style: 'cancel' },
       {
-        text: 'Delete',
+        text: localizeCopy("Delete"),
         style: 'destructive',
         onPress: async () => {
           try {
@@ -197,7 +201,7 @@ export default function TodoNotesScreen() {
             setTodos((prev) => prev.filter((t) => t.id !== todo.id));
             haptics.success();
           } catch {
-            Alert.alert('Error', 'Could not delete note.');
+            Alert.alert(localizeCopy("Error"), localizeCopy("Could not delete note."));
           }
         },
       },
@@ -210,8 +214,8 @@ export default function TodoNotesScreen() {
     if (!date) return null;
     try {
       const d = new Date(date + 'T00:00:00');
-      const label = d.toLocaleDateString(locale.localeTag, { day: 'numeric', month: 'short' });
-      return time ? `${label} at ${time}` : label;
+      const label = d.toLocaleDateString(language === "hi" ? "hi-IN" : locale.localeTag, { day: 'numeric', month: 'short' });
+      return time ? localizeCopy('{date} at {time}').replace('{date}', label).replace('{time}', time) : label;
     } catch {
       return date;
     }
@@ -233,14 +237,13 @@ export default function TodoNotesScreen() {
     <ScreenShell edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel={localizeCopy("Go back")} onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Icon name="arrow-left" size={22} color={color.ink} />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
-          <Text style={styles.headerTitle}>Notes & To-Do</Text>
+          <Text style={styles.headerTitle}>{localizeCopy("Notes & To-Do")}</Text>
           <Text style={styles.headerSub}>
-            {activeCount} active · {doneCount} done
-          </Text>
+            {localizeCopy('{active} active · {done} done').replace('{active}', String(activeCount)).replace('{done}', String(doneCount))}</Text>
         </View>
         <TouchableOpacity onPress={handleAdd} style={styles.addHeaderBtn}>
           <Icon name="plus" size={20} color={color.forest} />
@@ -261,7 +264,7 @@ export default function TodoNotesScreen() {
             onPress={() => { haptics.light(); setFilter(f.key); }}
           >
             <Text style={[styles.filterText, filter === f.key && styles.filterTextActive]}>
-              {f.label}
+              {localizeCopy(f.label)}
             </Text>
           </TouchableOpacity>
         ))}
@@ -272,12 +275,12 @@ export default function TodoNotesScreen() {
         <View style={styles.loadingWrap}>
           <ActivityIndicator size="large" color={color.forest} />
         </View>
-      ) : filtered.length === 0 ? (
+      ) : loadFailed ? (<EmptyState emoji="⚠️" title={localizeCopy("Could not load notes.")} subtitle={localizeCopy("Check your connection and try again.")} actionLabel={localizeCopy("Retry")} onAction={fetchTodos}/>) : filtered.length === 0 ? (
         <EmptyState
           emoji={filter !== 'all' ? '🔍' : '📝'}
-          title={filter !== 'all' ? 'No matching notes' : 'No notes yet'}
-          subtitle={filter !== 'all' ? 'Try a different filter' : 'Tap + to create your first note or to-do'}
-          actionLabel={filter === 'all' ? 'Add Note' : undefined}
+          title={filter !== 'all' ? localizeCopy("No matching notes") : localizeCopy("No notes yet")}
+          subtitle={filter !== 'all' ? localizeCopy("Try a different filter") : localizeCopy("Tap + to create your first note or to-do")}
+          actionLabel={filter === 'all' ? localizeCopy("Add Note") : undefined}
           onAction={filter === 'all' ? handleAdd : undefined}
         />
       ) : (
@@ -309,6 +312,7 @@ export default function TodoNotesScreen() {
                   {/* Checkbox + Content */}
                   <View style={styles.todoRow}>
                     <TouchableOpacity
+                      accessibilityRole="checkbox" accessibilityState={{ checked: todo.isDone }} accessibilityLabel={todo.title}
                       onPress={() => handleToggleDone(todo)}
                       style={[styles.checkbox, todo.isDone && styles.checkboxDone]}
                       hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -335,7 +339,7 @@ export default function TodoNotesScreen() {
 
                       <View style={styles.todoMeta}>
                         <Text style={styles.priorityBadge}>
-                          {prio.emoji} {prio.label}
+                          {prio.emoji} {localizeCopy(prio.label)}
                         </Text>
                         {dueLabel && (
                           <Text style={[styles.dueBadge, overdue && styles.dueOverdue]}>
@@ -347,6 +351,7 @@ export default function TodoNotesScreen() {
 
                     {/* Actions */}
                     <TouchableOpacity
+                      accessibilityRole="button" accessibilityLabel={localizeCopy(todo.pinned ? "Unpin note" : "Pin note")}
                       onPress={() => handleTogglePin(todo)}
                       style={styles.pinBtn}
                       hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -368,7 +373,7 @@ export default function TodoNotesScreen() {
       {/* FAB */}
       <TouchableOpacity
         style={[styles.fab, { bottom: insets.bottom + 20 }]}
-        onPress={handleAdd}
+        accessibilityRole="button" accessibilityLabel={localizeCopy("Add Note")} onPress={handleAdd}
         activeOpacity={0.85}
       >
         <Icon name="plus" size={24} color={color.cream} />
@@ -383,7 +388,7 @@ export default function TodoNotesScreen() {
           <View style={[styles.modalContent, { paddingBottom: Math.max(insets.bottom, 24) + 16 }]}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>
-                {editTodo ? 'Edit Note' : 'New Note'}
+                {editTodo ? localizeCopy("Edit Note") : localizeCopy("New Note")}
               </Text>
               <TouchableOpacity onPress={() => setModalVisible(false)}>
                 <Icon name="x" size={22} color={color.inkSoft} />
@@ -392,31 +397,31 @@ export default function TodoNotesScreen() {
 
             <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
               {/* Title */}
-              <Text style={styles.fieldLabel}>Title</Text>
+              <Text style={styles.fieldLabel}>{localizeCopy("Title")}</Text>
               <TextInput
                 style={styles.input}
                 value={title}
                 onChangeText={setTitle}
-                placeholder="What needs to be done?"
+                placeholder={localizeCopy("What needs to be done?")}
                 placeholderTextColor={color.inkFaint}
                 maxLength={200}
                 autoFocus={!editTodo}
               />
 
               {/* Body */}
-              <Text style={[styles.fieldLabel, { marginTop: 14 }]}>Notes (optional)</Text>
+              <Text style={[styles.fieldLabel, { marginTop: 14 }]}>{localizeCopy("Notes (optional)")}</Text>
               <TextInput
                 style={[styles.input, { minHeight: 80, textAlignVertical: 'top' }]}
                 value={body}
                 onChangeText={setBody}
-                placeholder="Add details..."
+                placeholder={localizeCopy("Add details...")}
                 placeholderTextColor={color.inkFaint}
                 multiline
                 maxLength={2000}
               />
 
               {/* Priority */}
-              <Text style={[styles.fieldLabel, { marginTop: 14 }]}>Priority</Text>
+              <Text style={[styles.fieldLabel, { marginTop: 14 }]}>{localizeCopy("Priority")}</Text>
               <View style={styles.priorityRow}>
                 {(['low', 'medium', 'high'] as const).map((p) => {
                   const cfg = PRIORITY_CONFIG[p];
@@ -428,14 +433,14 @@ export default function TodoNotesScreen() {
                       onPress={() => { haptics.light(); setPriority(p); }}
                     >
                       <Text style={styles.priorityEmoji}>{cfg.emoji}</Text>
-                      <Text style={[styles.priorityLabel, isActive && { color: cfg.color }]}>{cfg.label}</Text>
+                      <Text style={[styles.priorityLabel, isActive && { color: cfg.color }]}>{localizeCopy(cfg.label)}</Text>
                     </TouchableOpacity>
                   );
                 })}
               </View>
 
               {/* Due Date */}
-              <Text style={[styles.fieldLabel, { marginTop: 14 }]}>Due Date (optional)</Text>
+              <Text style={[styles.fieldLabel, { marginTop: 14 }]}>{localizeCopy("Due Date (optional)")}</Text>
               <TextInput
                 style={styles.input}
                 value={dueDate}
@@ -447,12 +452,12 @@ export default function TodoNotesScreen() {
               />
 
               {/* Due Time */}
-              <Text style={[styles.fieldLabel, { marginTop: 14 }]}>Time (optional)</Text>
+              <Text style={[styles.fieldLabel, { marginTop: 14 }]}>{localizeCopy("Time (optional)")}</Text>
               <TextInput
                 style={styles.input}
                 value={dueTime}
                 onChangeText={setDueTime}
-                placeholder="HH:MM (e.g. 14:30)"
+                placeholder={localizeCopy("HH:MM (e.g. 14:30)")}
                 placeholderTextColor={color.inkFaint}
                 maxLength={5}
                 keyboardType="numbers-and-punctuation"
@@ -474,7 +479,7 @@ export default function TodoNotesScreen() {
 
               {/* Pinned toggle */}
               <View style={styles.switchRow}>
-                <Text style={styles.switchLabel}>Pin to top</Text>
+                <Text style={styles.switchLabel}>{localizeCopy("Pin to top")}</Text>
                 <Switch
                   value={pinned}
                   onValueChange={setPinned}
@@ -495,7 +500,7 @@ export default function TodoNotesScreen() {
                 <ActivityIndicator color={color.cream} size="small" />
               ) : (
                 <Text style={styles.saveBtnText}>
-                  {editTodo ? 'Save Changes' : 'Create Note'}
+                  {editTodo ? localizeCopy("Save Changes") : localizeCopy("Create Note")}
                 </Text>
               )}
             </TouchableOpacity>

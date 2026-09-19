@@ -47,7 +47,7 @@ export function PrivacyProvider({ children }: { children: React.ReactNode }) {
         if (changed.current) return;
         const v = raw === '1';
         setPrivateState(v);
-        setPrivacyEnabled(v);
+        setPrivacyEnabled(v, 'hydrate');
       } catch {
         /* noop */
       }

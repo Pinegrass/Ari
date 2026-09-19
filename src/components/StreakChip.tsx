@@ -1,3 +1,4 @@
+import { useLanguage } from '../i18n/LanguageContext';
 import React, { useState, useCallback } from 'react';
 import { Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -33,6 +34,7 @@ const CACHE_KEY = 'streak_days'; // useOfflineCache 30-min TTL, prefix added ins
  * so Home stays clean for brand-new users.
  */
 export default function StreakChip() {
+  const { phrase } = useLanguage();
   const navigation = useNavigation<Nav>();
   const { fetchWithCache } = useOfflineCache();
   const haptics = useHaptics();
@@ -70,16 +72,11 @@ export default function StreakChip() {
         navigation.navigate('DailyHeatmap');
       }}
       accessibilityRole="button"
-      accessibilityLabel={
-        atRisk
-          ? `${streak.current} day streak, log something today to keep it`
-          : `${streak.current} day streak`
-      }
+      accessibilityLabel={phrase('{count} logged days. Open your activity calendar.').replace('{count}', String(streak.current))}
     >
       <Icon name="zap" size={13} color={atRisk ? color.clay : color.gold} />
       <Text style={styles.text}>
-        {streak.current} day{streak.current === 1 ? '' : 's'}
-        {atRisk ? ' · log today' : ''}
+        {phrase('{count} days').replace('{count}', String(streak.current))}
       </Text>
     </TouchableOpacity>
   );

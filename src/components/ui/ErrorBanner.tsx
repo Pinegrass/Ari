@@ -10,7 +10,7 @@ export default function ErrorBanner({ message }: Props) {
   if (!message) return null;
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>⚠️ {message}</Text>
+      <Text accessibilityRole="alert" style={styles.text}>⚠️ {message}</Text>
     </View>
   );
 }

@@ -1,3 +1,4 @@
+import { useLanguage } from '../../i18n/LanguageContext';
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { LineChart } from 'react-native-gifted-charts';
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export default function MonthSpendChart({ data, loading }: Props) {
+  const { phrase } = useLanguage();
   const { formatAmount } = usePrivacy();
   const chartData = useMemo(() => {
     if (!data) return [];
@@ -31,7 +33,7 @@ export default function MonthSpendChart({ data, loading }: Props) {
   if (loading) {
     return (
       <View style={styles.card}>
-        <Text style={styles.title}>Daily spending</Text>
+        <Text style={styles.title}>{phrase("Daily spending")}</Text>
         <Skeleton width="100%" height={140} radius={12} style={{ marginTop: 12 }} />
       </View>
     );
@@ -40,8 +42,8 @@ export default function MonthSpendChart({ data, loading }: Props) {
   if (!data || chartData.length === 0) {
     return (
       <View style={styles.card}>
-        <Text style={styles.title}>Daily spending</Text>
-        <Text style={styles.empty}>No spending this month yet.</Text>
+        <Text style={styles.title}>{phrase("Daily spending")}</Text>
+        <Text style={styles.empty}>{phrase("No spending this month yet.")}</Text>
       </View>
     );
   }
@@ -50,7 +52,7 @@ export default function MonthSpendChart({ data, loading }: Props) {
 
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>Daily spending</Text>
+      <Text style={styles.title}>{phrase("Daily spending")}</Text>
       <ErrorBoundary>
         <LineChart
           data={chartData}
@@ -79,7 +81,7 @@ export default function MonthSpendChart({ data, loading }: Props) {
       </ErrorBoundary>
       <View style={styles.footer}>
         <Text style={styles.footerText}>
-          Total <Text style={styles.footerBold}>{formatAmount(data.total)}</Text>
+          {phrase('Total')} <Text style={styles.footerBold}>{formatAmount(data.total)}</Text>
         </Text>
       </View>
     </View>

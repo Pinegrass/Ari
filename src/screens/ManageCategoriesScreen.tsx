@@ -65,11 +65,11 @@ export default function ManageCategoriesScreen({ onBack }: Props) {
       const data = await catApi.getCategories();
       setCategories(data);
     } catch {
-      Alert.alert('Error', 'Could not load categories.');
+      Alert.alert(localizeCopy("Error"), localizeCopy("Could not load categories."));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [localizeCopy]);
 
   useEffect(() => {
     fetchCategories();
@@ -108,7 +108,7 @@ export default function ManageCategoriesScreen({ onBack }: Props) {
   const handleSave = async () => {
     const name = formName.trim().toLowerCase();
     if (!name) {
-      Alert.alert('Required', 'Please enter a category name.');
+      Alert.alert(localizeCopy("Required"), localizeCopy("Please enter a category name."));
       return;
     }
     setSaving(true);
@@ -131,8 +131,8 @@ export default function ManageCategoriesScreen({ onBack }: Props) {
       }
       haptics.success();
       setModalVisible(false);
-    } catch (err: any) {
-      Alert.alert('Error', err?.message ?? 'Could not save category.');
+    } catch {
+      Alert.alert(localizeCopy("Error"), localizeCopy('Could not save category.'));
     } finally {
       setSaving(false);
     }
@@ -141,25 +141,25 @@ export default function ManageCategoriesScreen({ onBack }: Props) {
   // ── Delete ────────────────────────────────────────────────────────
   const handleDelete = (cat: UserCategoryData) => {
     if (cat.isDefault) {
-      Alert.alert('Cannot Delete', 'Default categories cannot be deleted.');
+      Alert.alert(localizeCopy("Cannot Delete"), localizeCopy("Default categories cannot be deleted."));
       return;
     }
     haptics.medium();
     Alert.alert(
-      'Delete Category',
-      `Are you sure you want to delete "${cat.name}"? Existing transactions with this category will keep their category label.`,
+      localizeCopy("Delete Category"),
+      localizeCopy('Delete {name}? Existing transactions keep their category label.').replace('{name}', cat.name),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: localizeCopy("Cancel"), style: 'cancel' },
         {
-          text: 'Delete',
+          text: localizeCopy("Delete"),
           style: 'destructive',
           onPress: async () => {
             try {
               await catApi.deleteCategory(cat.id);
               setCategories((prev) => prev.filter((c) => c.id !== cat.id));
               haptics.success();
-            } catch (err: any) {
-              Alert.alert('Error', err?.message ?? 'Could not delete category.');
+            } catch {
+              Alert.alert(localizeCopy("Error"), localizeCopy('Could not delete category.'));
             }
           },
         },
@@ -181,11 +181,11 @@ export default function ManageCategoriesScreen({ onBack }: Props) {
     <ScreenShell edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel={localizeCopy("Go back")} onPress={onBack} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
           <Icon name="arrow-left" size={22} color={color.ink} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{localizeCopy("Manage Categories")}</Text>
-        <TouchableOpacity onPress={handleAdd} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel={localizeCopy("Add Custom Category")} onPress={handleAdd} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
           <Icon name="plus" size={22} color={color.forest} />
         </TouchableOpacity>
       </View>
@@ -211,7 +211,7 @@ export default function ManageCategoriesScreen({ onBack }: Props) {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={color.forest} />}
       >
         {/* Default categories */}
-        <Text style={styles.sectionLabel}>DEFAULT</Text>
+        <Text style={styles.sectionLabel}>{localizeCopy("DEFAULT")}</Text>
         {filtered.filter((c) => c.isDefault).map((cat, i) => (
           <AnimatedEntry key={cat.id} delay={i * 40}>
             <TouchableOpacity style={styles.catRow} onPress={() => handleEdit(cat)} activeOpacity={0.7}>
@@ -230,7 +230,7 @@ export default function ManageCategoriesScreen({ onBack }: Props) {
         {/* Custom categories */}
         {customCount > 0 && (
           <>
-            <Text style={[styles.sectionLabel, { marginTop: 24 }]}>CUSTOM</Text>
+            <Text style={[styles.sectionLabel, { marginTop: 24 }]}>{localizeCopy("CUSTOM")}</Text>
             {filtered.filter((c) => !c.isDefault).map((cat, i) => (
               <AnimatedEntry key={cat.id} delay={i * 40}>
                 <View style={styles.catRow}>
@@ -240,7 +240,7 @@ export default function ManageCategoriesScreen({ onBack }: Props) {
                     </View>
                     <View style={styles.catInfo}>
                       <Text style={styles.catName}>{cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}</Text>
-                      <Text style={[styles.catBadge, { color: color.forest }]}>Custom</Text>
+                      <Text style={[styles.catBadge, { color: color.forest }]}>{localizeCopy("Custom")}</Text>
                     </View>
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => handleDelete(cat)} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
@@ -255,7 +255,7 @@ export default function ManageCategoriesScreen({ onBack }: Props) {
         {/* Add button */}
         <TouchableOpacity style={styles.addBtn} onPress={handleAdd} activeOpacity={0.8}>
           <Icon name="plus" size={18} color={color.forest} />
-          <Text style={styles.addBtnText}>Add Custom Category</Text>
+          <Text style={styles.addBtnText}>{localizeCopy("Add Custom Category")}</Text>
         </TouchableOpacity>
       </ScrollView>
 
@@ -268,7 +268,7 @@ export default function ManageCategoriesScreen({ onBack }: Props) {
           <View style={[styles.modalContent, { paddingBottom: Math.max(insets.bottom, 24) + 16 }]}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>
-                {editingCat ? 'Edit Category' : 'New Category'}
+                {editingCat ? localizeCopy("Edit Category") : localizeCopy("New Category")}
               </Text>
               <TouchableOpacity onPress={() => setModalVisible(false)} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
                 <Icon name="x" size={22} color={color.inkSoft} />
@@ -279,7 +279,8 @@ export default function ManageCategoriesScreen({ onBack }: Props) {
             <Text style={styles.fieldLabel}>{localizeCopy("Name")}</Text>
             <TextInput
               style={[styles.input, editingCat?.isDefault && styles.inputDisabled]}
-              placeholder="e.g. Groceries, Pet, Gym..."
+              accessibilityLabel={localizeCopy("Name")}
+              placeholder={localizeCopy("e.g. Groceries, Pet, Gym...")}
               placeholderTextColor={color.inkFaint}
               value={formName}
               onChangeText={setFormName}
@@ -288,11 +289,11 @@ export default function ManageCategoriesScreen({ onBack }: Props) {
               autoCapitalize="none"
             />
             {editingCat?.isDefault && (
-              <Text style={styles.hintText}>Default category names cannot be changed</Text>
+              <Text style={styles.hintText}>{localizeCopy("Default category names cannot be changed")}</Text>
             )}
 
             {/* Emoji */}
-            <Text style={[styles.fieldLabel, { marginTop: 16 }]}>Emoji</Text>
+            <Text style={[styles.fieldLabel, { marginTop: 16 }]}>{localizeCopy("Emoji")}</Text>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -329,7 +330,7 @@ export default function ManageCategoriesScreen({ onBack }: Props) {
                 <Text style={styles.emojiText}>{formEmoji}</Text>
               </View>
               <Text style={styles.previewName}>
-                {(formName || 'Category').charAt(0).toUpperCase() + (formName || 'Category').slice(1)}
+                {(formName || localizeCopy('Category')).charAt(0).toUpperCase() + (formName || localizeCopy('Category')).slice(1)}
               </Text>
             </View>
 
@@ -344,7 +345,7 @@ export default function ManageCategoriesScreen({ onBack }: Props) {
                 <ActivityIndicator color={color.cream} size="small" />
               ) : (
                 <Text style={styles.saveBtnText}>
-                  {editingCat ? 'Save Changes' : 'Create Category'}
+                  {editingCat ? localizeCopy("Save Changes") : localizeCopy("Create Category")}
                 </Text>
               )}
             </TouchableOpacity>

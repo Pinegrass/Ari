@@ -23,5 +23,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
 export function useLanguage() {
   const context = useContext(LanguageContext);
-  return { ...context, phrase: (text: string) => phrase(context.language, text), t: (key: MessageKey, values?: Record<string, string | number>) => translate(context.language, key, values) };
+  const localize = useCallback((text: string) => phrase(context.language, text), [context.language]);
+  const t = useCallback((key: MessageKey, values?: Record<string, string | number>) => translate(context.language, key, values), [context.language]);
+  return { ...context, phrase: localize, t };
 }

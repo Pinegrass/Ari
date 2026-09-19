@@ -22,12 +22,12 @@ it('requires explicit confirmation and keeps a failed save retryable', async () 
   confirm.mockRejectedValueOnce({ status: 500 });
   const ui = render(<ReviewIntelligence {...props} />);
   await act(async () => {});
-  fireEvent.press(ui.getByText('Confirm monthly recurrence'));
+  fireEvent.press(ui.getByText('Confirm recurrence · Monthly'));
   expect(confirm).not.toHaveBeenCalled();
   await act(async () => { alert.mock.calls[0][2]?.[1].onPress?.(); });
   expect(ui.getByText('Could not complete this request. Please retry.')).toBeTruthy();
   expect(props.onChanged).not.toHaveBeenCalled();
-  fireEvent.press(ui.getByText('Confirm monthly recurrence'));
+  fireEvent.press(ui.getByText('Confirm recurrence · Monthly'));
   await act(async () => { alert.mock.calls[1][2]?.[1].onPress?.(); });
   expect(props.onChanged).toHaveBeenCalledTimes(1);
   alert.mockRestore();
@@ -37,8 +37,30 @@ it('keeps loading failure distinct from empty and supports Hindi retry', async (
   const ui = render(<ReviewIntelligence {...props} language="hi" />);
   await act(async () => {});
   expect(ui.getByText('अनुरोध पूरा नहीं हुआ। फिर कोशिश करें।')).toBeTruthy();
-  expect(ui.queryByText('अभी कोई भरोसेमंद मासिक पैटर्न नहीं मिला।')).toBeNull();
+  expect(ui.queryByText('अभी कोई भरोसेमंद दोहराव का पैटर्न नहीं मिला।')).toBeNull();
   getCandidates.mockResolvedValueOnce({ candidates: [] });
   await act(async () => { fireEvent.press(ui.getByText('सुझाव रीफ़्रेश करें')); });
-  expect(ui.getByText('अभी कोई भरोसेमंद मासिक पैटर्न नहीं मिला।')).toBeTruthy();
+  expect(ui.getByText('अभी कोई भरोसेमंद दोहराव का पैटर्न नहीं मिला।')).toBeTruthy();
+});
+
+it('shows the actual weekly cadence in confirmation without silently enabling it', async () => {
+  const weekly = { ...candidate, confirmation: { body: { ...candidate.confirmation.body, recurrenceRule: 'weekly' as const } } };
+  getCandidates.mockResolvedValueOnce({ candidates: [weekly] });
+  const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+  const ui = render(<ReviewIntelligence {...props} />);
+  await act(async () => {});
+  fireEvent.press(ui.getByText('Confirm recurrence · Weekly'));
+  expect(alert.mock.calls[0][0]).toBe('Enable this recurrence? Weekly');
+  expect(confirm).not.toHaveBeenCalled();
+  await act(async () => { alert.mock.calls[0][2]?.[1].onPress?.(); });
+  expect(confirm).toHaveBeenCalledWith(weekly);
+  alert.mockRestore();
+});
+
+it('labels capped history as unavailable instead of claiming no pattern', async () => {
+  getCandidates.mockResolvedValueOnce({ candidates: [], status: 'history_limit' });
+  const ui = render(<ReviewIntelligence {...props} />);
+  await act(async () => {});
+  expect(ui.getByText('There are too many entries to assess this history safely. No pattern is suggested from an incomplete sample.')).toBeTruthy();
+  expect(ui.queryByText('No reliable recurring pattern found yet.')).toBeNull();
 });

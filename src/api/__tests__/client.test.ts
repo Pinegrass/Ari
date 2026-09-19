@@ -1,7 +1,7 @@
 import {resetRequestSession,observeRequestAccount} from '../../lib/requestSession';
 import {setMeasurementEpoch,setMeasurementPrivate} from '../../lib/measurementSession';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { apiRequest, ApiError } from '../client';
+import { apiRequest, ApiError, deleteAccountRequest } from '../client';
 import { isSupabaseConfigured, supabase } from '../../lib/supabase';
 
 jest.mock('../../lib/supabase', () => ({
@@ -24,6 +24,34 @@ describe('apiRequest', () => {
     setMeasurementEpoch(null);setMeasurementPrivate(false);
     (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
     (isSupabaseConfigured as jest.Mock).mockReturnValue(false);
+  });
+
+  it('cleans the captured deleted owner on authoritative success but discards stale response data', async () => {
+    observeRequestAccount('owner-a');
+    const cleanup = jest.fn().mockResolvedValue(undefined);
+    mockFetch.mockImplementationOnce(async () => {
+      resetRequestSession(); observeRequestAccount('owner-b');
+      return { ok: true, json: async () => ({ message: 'deleted owner-a' }) };
+    });
+    await expect(deleteAccountRequest('password', cleanup)).rejects.toMatchObject({ status: 409 });
+    expect(cleanup).toHaveBeenCalledTimes(1);
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('never retries uncertain account deletion and never cleans on network failure', async () => {
+    const cleanup = jest.fn();
+    mockFetch.mockRejectedValueOnce(new Error('uncertain'));
+    await expect(deleteAccountRequest('password', cleanup)).rejects.toMatchObject({ status: 0 });
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(cleanup).not.toHaveBeenCalled();
+  });
+
+  it('does not retry or clean local records on an unparseable deletion response', async () => {
+    const cleanup = jest.fn();
+    mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: async () => { throw new Error('truncated'); } });
+    await expect(deleteAccountRequest('password', cleanup)).rejects.toMatchObject({ status: 200, message: 'Invalid server response' });
+    expect(cleanup).not.toHaveBeenCalled();
+    expect(mockFetch).toHaveBeenCalledTimes(1);
   });
 
   it('makes GET request with correct URL', async () => {

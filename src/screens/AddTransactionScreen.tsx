@@ -27,7 +27,7 @@ import Icon from '../components/ui/Icon';
 import { font, type as ftype } from '../theme/tokens';
 import { useColors } from '../context/ThemeContext';
 import type { Palette } from '../theme/palettes';
-import { getCategoryDef } from '../constants/categories';
+import { getCategoryDef, categoryDisplayLabel } from '../constants/categories';
 import { autoDetectCategory } from '../utils/autoDetectCategory';
 import { parseMerchant } from '../utils/merchantParser';
 import { parseExpenseAI, type AiParseResult } from '../api/parse';
@@ -57,7 +57,7 @@ const KEYS_DECIMAL = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', 'de
  */
 export default function AddTransactionScreen({ navigation, route }: Props) {
  const {phrase:localizeCopy}=useLanguage();
-  const { phrase } = useLanguage();
+  const { phrase, language } = useLanguage();
   const params = route.params as
     | { type?: 'expense' | 'income'; prefill?: { amount?: number; description?: string; category?: string } }
     | { editTransaction: { id: string; type: 'expense' | 'income'; amount: number; category: string; description: string; note: string; date: string; isRecurring?: boolean; recurrenceRule?: Transaction['recurrenceRule'] } }
@@ -122,6 +122,9 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
   const [aiConfirmVisible, setAiConfirmVisible] = useState(false);
   const [entryType, setEntryType] = useState<'manual' | 'voice'>('manual');
   const aiDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const savedNavigationRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const saveMountedRef = useRef(true);
+  useEffect(() => { saveMountedRef.current = true; return () => { saveMountedRef.current = false; if (savedNavigationRef.current) clearTimeout(savedNavigationRef.current); }; }, []);
   const latestTextRef = useRef('');
 
   const caretOpacity = useRef(new Animated.Value(1)).current;
@@ -302,6 +305,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
           // Template edits may also change the schedule (rule pills shown).
           ...(editingTemplate && recurrenceRule && { recurrenceRule }),
         });
+        if (!saveMountedRef.current) return;
         if (!outcome.ok) {
           haptics.error();
           setError(outcome.message);
@@ -325,6 +329,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
         });
         // A genuine failure (local write failed or server permanently rejected
         // it) must never look like a save — surface it instead of the toast.
+        if (!saveMountedRef.current) return;
         if (!outcome.ok) {
           haptics.error();
           setError(outcome.message);
@@ -337,8 +342,9 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
       // is instant even offline.
       setToast(true);
       Animated.timing(toastY, { toValue: 0, duration: 220, useNativeDriver: true }).start();
-      setTimeout(() => navigation.goBack(), 850);
+      savedNavigationRef.current = setTimeout(() => { if (saveMountedRef.current) navigation.goBack(); }, 850);
     } catch (err) {
+      if (!saveMountedRef.current) return;
       haptics.error();
       setError(err instanceof ApiError ? err.message : 'Could not save. Try again.');
       setSaving(false);
@@ -350,7 +356,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
   const cat = getCategoryDef(category);
   const [wholeAmount,fractionAmount]=amount.split('.');
   const displayAmount = Number(wholeAmount||0).toLocaleString(locale.localeTag)+(fractionAmount!==undefined?'.'+fractionAmount:'');
-  const dateLabel = date === todayISO() ? 'Today' : formatSectionDate(date);
+  const dateLabel = formatSectionDate(date, language);
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
@@ -425,7 +431,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
         >
           {parseSource && <Text style={styles.chipAi}>✦</Text>}
           <Text style={styles.chipAutoText}>
-            {cat.emoji} {cat.label}
+            {cat.emoji} {categoryDisplayLabel(cat, phrase)}
           </Text>
         </TouchableOpacity>
 

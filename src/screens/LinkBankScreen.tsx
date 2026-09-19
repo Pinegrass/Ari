@@ -28,7 +28,7 @@ function statusLabel(status: string): string {
     case 'REVOKED':
       return 'Revoked';
     default:
-      return status || 'Unknown';
+      return 'Unknown';
   }
 }
 
@@ -66,7 +66,7 @@ export default function LinkBankScreen() {
   if (loading) {
     return (
       <ScreenShell edges={['top', 'bottom']} backgroundColor={c.cream}>
-        <LoadingSpinner message="Checking bank linking…" fullScreen />
+        <LoadingSpinner message={localizeCopy("Checking bank linking…")} fullScreen />
       </ScreenShell>
     );
   }
@@ -76,8 +76,8 @@ export default function LinkBankScreen() {
       <ScreenShell edges={['top', 'bottom']} backgroundColor={c.cream}>
         <EmptyState
           emoji="📡"
-          title="Couldn't reach Ari"
-          subtitle="Check your connection and try again."
+          title={localizeCopy("Couldn't reach Ari")}
+          subtitle={localizeCopy("Check your connection and try again.")}
           actionLabel="Retry"
           onAction={() => {
             setLoading(true);
@@ -93,8 +93,8 @@ export default function LinkBankScreen() {
       <ScreenShell edges={['top', 'bottom']} backgroundColor={c.cream}>
         <EmptyState
           emoji="🏦"
-          title="Bank linking isn't available yet"
-          subtitle="We're finishing the secure bank-sync pilot with Setu. It'll show up here once it's live."
+          title={localizeCopy("Bank linking isn't available yet")}
+          subtitle={localizeCopy("We're finishing the secure bank-sync pilot with Setu. It'll show up here once it's live.")}
         />
       </ScreenShell>
     );
@@ -121,19 +121,19 @@ export default function LinkBankScreen() {
 
         <Text style={[styles.title, { color: c.ink }]}>{localizeCopy("Link bank account")}</Text>
         <Text style={[styles.subtitle, { color: c.inkSoft }]}>
-          Securely import your bank transactions so Ari can track spending you didn’t type yourself.
+          {localizeCopy("Securely import your bank transactions so Ari can track spending you didn’t type yourself.")}
         </Text>
 
         <AnimatedEntry>
           <View style={[styles.hero, { backgroundColor: c.card, borderColor: c.line }]}>
             <Icon name={status.linked ? 'check-circle' : 'wallet'} size={30} color={status.linked ? c.forest : c.inkSoft} />
             <Text style={[styles.heroTitle, { color: c.ink }]}>
-              {status.linked ? 'Bank account linked' : 'No bank linked yet'}
+              {status.linked ? localizeCopy("Bank account linked") : localizeCopy("No bank linked yet")}
             </Text>
             <Text style={[styles.heroBody, { color: c.inkSoft }]}>
               {status.linked
-                ? 'Your linked accounts appear below. Tap one to sync the latest transactions.'
-                : 'You’ll approve a one-year read-only consent with your bank via Setu’s secure page.'}
+                ? localizeCopy("Your linked accounts appear below. Tap one to sync the latest transactions.")
+                : localizeCopy("You’ll approve a one-year read-only consent with your bank via Setu’s secure page.")}
             </Text>
             {!status.linked && (
               <Button
@@ -151,7 +151,7 @@ export default function LinkBankScreen() {
 
         {consents.length > 0 && (
           <View style={styles.section}>
-            <Text style={[styles.sectionLabel, { color: c.inkSoft }]}>Linked accounts</Text>
+            <Text style={[styles.sectionLabel, { color: c.inkSoft }]}>{localizeCopy("Linked accounts")}</Text>
             {consents.map((row) => (
               <TouchableOpacity
                 key={row.id}
@@ -160,21 +160,21 @@ export default function LinkBankScreen() {
                   navigation.navigate('LinkBankConsentDetail', { consentHandle: row.consentHandle });
                 }}
                 style={[styles.row, { backgroundColor: c.card, borderColor: c.line }]}
-                accessibilityLabel={`Bank consent ${statusLabel(row.status)}`}
+                accessibilityLabel={`${localizeCopy("Bank consent")} ${localizeCopy(statusLabel(row.status))}`}
                 accessibilityRole="button"
               >
                 <View style={styles.rowMain}>
                   <Text style={[styles.rowTitle, { color: c.ink }]}>
-                    {row.fiTypes?.join(', ') || 'Bank account'}
+                    {row.fiTypes?.join(', ') || localizeCopy("Bank account")}
                   </Text>
                   <Text style={[styles.rowMeta, { color: c.inkSoft }]}>
                     {row.lastFetchedAt
-                      ? `Synced ${formatDate(new Date(row.lastFetchedAt), { day: 'numeric', month: 'short' })}`
-                      : `Started ${formatDate(new Date(row.createdAt), { day: 'numeric', month: 'short' })}`}
+                      ? `${localizeCopy("Synced")} ${formatDate(new Date(row.lastFetchedAt), { day: 'numeric', month: 'short' })}`
+                      : `${localizeCopy("Started")} ${formatDate(new Date(row.createdAt), { day: 'numeric', month: 'short' })}`}
                   </Text>
                 </View>
                 <View style={[styles.badge, { backgroundColor: row.status === 'ACTIVE' ? c.clayTint : c.line }]}>
-                  <Text style={[styles.badgeText, { color: c.inkSoft }]}>{statusLabel(row.status)}</Text>
+                  <Text style={[styles.badgeText, { color: c.inkSoft }]}>{localizeCopy(statusLabel(row.status))}</Text>
                 </View>
                 <Icon name="chevron-right" size={18} color={c.inkFaint} />
               </TouchableOpacity>

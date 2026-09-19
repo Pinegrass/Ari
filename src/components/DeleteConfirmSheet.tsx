@@ -50,15 +50,15 @@ export default function DeleteConfirmSheet({
           <View style={styles.iconContainer}>
             <Icon name="alert-triangle" size={40} color={color.clay} />
           </View>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.message}>{message}</Text>
+          <Text style={styles.title}>{localizeCopy(title)}</Text>
+          <Text style={styles.message}>{localizeCopy(message)}</Text>
           <View style={styles.buttons}>
             <Button
               variant="secondary"
               onPress={onCancel}
               style={styles.btn}
               disabled={loading}
-              accessibilityLabel="Cancel deletion"
+              accessibilityLabel={localizeCopy("Cancel deletion")}
             >
               {localizeCopy("Cancel")}</Button>
             <Button
@@ -66,9 +66,9 @@ export default function DeleteConfirmSheet({
               onPress={onConfirm}
               style={styles.btn}
               loading={loading}
-              accessibilityLabel="Confirm deletion"
+              accessibilityLabel={localizeCopy("Confirm deletion")}
             >
-              {confirmLabel}
+              {localizeCopy(confirmLabel)}
             </Button>
           </View>
         </View>

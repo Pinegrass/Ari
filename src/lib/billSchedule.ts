@@ -1,10 +1,9 @@
 /**
  * billSchedule — pure date math for bill / EMI due-date reminders (Sprint 3, D1).
  *
- * All calendar reasoning is anchored to IST (India Standard Time, UTC+5:30).
- * India observes no DST, so the offset is a fixed +5:30 year-round — which is
- * what makes this module deterministic and cheap to test regardless of the
- * machine's local timezone (CI, a US laptop, an Indian phone all agree).
+ * Live bill callers supply the device IANA timezone explicitly. Calendar math
+ * stays deterministic across DST; legacy helper defaults remain Asia/Kolkata
+ * for callers deliberately using the original India-only contract.
  *
  * The module is intentionally free of React, storage, and expo-notifications so
  * every branch (month-end clamping, Feb, leap years, month-boundary "day
@@ -79,6 +78,28 @@ export function istInstant(
   return new Date(Date.UTC(d.year, d.month - 1, d.day, hour, minute) - IST_OFFSET_MS);
 }
 
+/** Explicit device/account zone; the legacy IST helpers remain for callers
+ * that deliberately request India calendar semantics. */
+export function calendarToday(now: Date, timeZone: string): CalDate {
+  const parts = new Intl.DateTimeFormat('en-US', { timeZone, year: 'numeric', month: 'numeric', day: 'numeric' }).formatToParts(now);
+  const value = (key: string) => Number(parts.find(part => part.type === key)?.value);
+  return { year: value('year'), month: value('month'), day: value('day') };
+}
+
+export function zonedInstant(d: CalDate, hour: number, minute: number, timeZone: string): Date {
+  const wanted = Date.UTC(d.year, d.month - 1, d.day, hour, minute);
+  let instant = wanted;
+  const formatter = new Intl.DateTimeFormat('en-GB', { timeZone, year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', hourCycle: 'h23' });
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    const parts = formatter.formatToParts(new Date(instant));
+    const value = (key: string) => Number(parts.find(part => part.type === key)?.value);
+    const displayed = Date.UTC(value('year'), value('month') - 1, value('day'), value('hour'), value('minute'));
+    if (displayed === wanted) return new Date(instant);
+    instant += wanted - displayed;
+  }
+  throw new Error('Unavailable local reminder time');
+}
+
 /** The calendar date `n` days before `d` (n days after if negative), IST. */
 export function addDays(d: CalDate, n: number): CalDate {
   const shifted = new Date(Date.UTC(d.year, d.month - 1, d.day) + n * 86_400_000);
@@ -112,8 +133,8 @@ function occurrenceInMonth(dueDay: number, base: CalDate, monthsAhead: number): 
  * Next monthly occurrence of `dueDay` on or after today (IST). If this month's
  * (clamped) occurrence has already passed, rolls to next month.
  */
-export function nextMonthlyOccurrence(dueDay: number, now: Date): CalDate {
-  const today = istToday(now);
+export function nextMonthlyOccurrence(dueDay: number, now: Date, timeZone = 'Asia/Kolkata'): CalDate {
+  const today = calendarToday(now, timeZone);
   const thisMonth = occurrenceInMonth(dueDay, today, 0);
   if (isBefore(thisMonth, today)) {
     return occurrenceInMonth(dueDay, today, 1);
@@ -129,13 +150,14 @@ export function remindersForOccurrence(
   occurrence: CalDate,
   now: Date,
   hour: number = DEFAULT_REMINDER_HOUR,
-  minute: number = DEFAULT_REMINDER_MINUTE
+  minute: number = DEFAULT_REMINDER_MINUTE,
+  timeZone = 'Asia/Kolkata'
 ): BillReminder[] {
   const occIso = toISODate(occurrence);
   const dayBefore = addDays(occurrence, -1);
   const candidates: BillReminder[] = [
-    { kind: 'day_before', fireAt: istInstant(dayBefore, hour, minute), occurrenceDate: occIso },
-    { kind: 'day_of', fireAt: istInstant(occurrence, hour, minute), occurrenceDate: occIso },
+    { kind: 'day_before', fireAt: zonedInstant(dayBefore, hour, minute, timeZone), occurrenceDate: occIso },
+    { kind: 'day_of', fireAt: zonedInstant(occurrence, hour, minute, timeZone), occurrenceDate: occIso },
   ];
   return candidates.filter((r) => r.fireAt.getTime() > now.getTime());
 }
@@ -164,16 +186,17 @@ export function upcomingReminders(
   bill: BillLike,
   now: Date,
   hour: number = DEFAULT_REMINDER_HOUR,
-  minute: number = DEFAULT_REMINDER_MINUTE
+  minute: number = DEFAULT_REMINDER_MINUTE,
+  timeZone = 'Asia/Kolkata'
 ): BillReminder[] {
   if (!bill.repeatMonthly) {
     if (!bill.oneTimeDate) return [];
     const [y, m, d] = bill.oneTimeDate.split('-').map(Number);
-    return remindersForOccurrence({ year: y, month: m, day: d }, now, hour, minute);
+    return remindersForOccurrence({ year: y, month: m, day: d }, now, hour, minute, timeZone);
   }
 
-  const occurrence = nextMonthlyOccurrence(bill.dueDay, now);
-  let reminders = remindersForOccurrence(occurrence, now, hour, minute);
+  const occurrence = nextMonthlyOccurrence(bill.dueDay, now, timeZone);
+  let reminders = remindersForOccurrence(occurrence, now, hour, minute, timeZone);
   if (reminders.length === 0) {
     // The chosen occurrence is fully in the past (e.g. app opened the evening of
     // the due day) — schedule the following month's occurrence instead. Base the
@@ -183,7 +206,7 @@ export function upcomingReminders(
       { year: occurrence.year, month: occurrence.month, day: 1 },
       1
     );
-    reminders = remindersForOccurrence(next, now, hour, minute);
+    reminders = remindersForOccurrence(next, now, hour, minute, timeZone);
   }
   return reminders;
 }

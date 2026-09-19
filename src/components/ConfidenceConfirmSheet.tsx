@@ -33,7 +33,6 @@ interface Props {
  */
 export default function ConfidenceConfirmSheet({
   visible,
-  confidence,
   amount,
   category,
   type,
@@ -44,7 +43,6 @@ export default function ConfidenceConfirmSheet({
  const {phrase:localizeCopy}=useCopyLanguage();
   const insets = useSafeAreaInsets();
   const { formatCurrency } = useLocale();
-  const pct = Math.round(confidence * 100);
 
   return (
     <Modal
@@ -62,28 +60,29 @@ export default function ConfidenceConfirmSheet({
           <View style={styles.iconContainer}>
             <Icon name="help-circle" size={40} color={color.forest} />
           </View>
-          <Text style={styles.title}>Confirm this category?</Text>
+          <Text style={styles.title}>{localizeCopy("Confirm this category?")}</Text>
           <Text style={styles.message}>
-            Our AI is {pct}% confident this is a{' '}
-            <Text style={styles.bold}>{category}</Text> {type}
-            {merchant ? ` at ${merchant}` : ''}
-            {amount > 0 ? ` for ${formatCurrency(amount)}` : ''}.
+            {localizeCopy('AI suggested these details. Check them before saving.')}{'\n'}
+            <Text style={styles.bold}>{category}</Text> · {localizeCopy(type === 'income' ? 'Income' : 'Expense')}
+            {merchant ? ` · ${merchant}` : ''}
+            {amount > 0 ? ` · ${formatCurrency(amount)}` : ''}
+
           </Text>
           <View style={styles.buttons}>
             <Button
               variant="secondary"
               onPress={onCancel}
               style={styles.btn}
-              accessibilityLabel="Edit manually"
+              accessibilityLabel={localizeCopy("Edit manually")}
             >
               {localizeCopy("Edit")}</Button>
             <Button
               variant="primary"
               onPress={onConfirm}
               style={styles.btn}
-              accessibilityLabel="Confirm the AI's parse"
+              accessibilityLabel={localizeCopy("Confirm the AI's parse")}
             >
-              Confirm
+              {localizeCopy("Confirm")}
             </Button>
           </View>
         </View>

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert,
   ActivityIndicator, Linking, Share,
@@ -15,205 +15,153 @@ import { usePrivacy } from '../context/PrivacyContext';
 import { useAuth } from '../context/AuthContext';
 import {
   getGroupDetail, listSharedExpenses, getBalances, createInvite,
-  settleSplit, confirmUpiSettlement,
+  settleSplit, confirmUpiSettlement, confirmGroupCurrency,
   type GroupDetail, type SharedExpense, type BalancesResponse,
 } from '../api/groups';
 import type { MainStackParamList } from '../navigation/navigationTypes';
-import { buildUpiUri } from '../utils/upi';
-import { track } from '../lib/analytics';
+import { useLanguage } from '../i18n/LanguageContext';
+import { groupCopy } from '../i18n/groupFlowCopy';
+import { formatGroupAmount } from '../utils/groupCurrency';
 
 type Nav = StackNavigationProp<MainStackParamList>;
 type Rt = RouteProp<MainStackParamList, 'GroupDetail'>;
 
 export default function GroupDetailScreen() {
+  const { language } = useLanguage();
+  const c = (text: string, values?: Record<string, string | number>) => groupCopy(language, text, values);
   const navigation = useNavigation<Nav>();
   const { params } = useRoute<Rt>();
   const haptics = useHaptics();
-  const { formatAmount } = usePrivacy();
+  const { isPrivate } = usePrivacy();
   const { user } = useAuth();
   const { formatDate } = useLocale();
+  const scope = user?.id ? `${user.id}:${params.groupId}` : undefined;
+  const account = useRef(scope);
+  account.current = scope;
+  const revision = useRef(0);
+  const busy = useRef(false);
+  const owner = useRef<string | undefined>(undefined);
+  const [loadError, setLoadError] = useState(false);
 
   const [group, setGroup] = useState<GroupDetail | null>(null);
+  const formatAmount = (amount: number) => formatGroupAmount(amount, group?.currency ?? null, language, isPrivate);
   const [expenses, setExpenses] = useState<SharedExpense[]>([]);
   const [balances, setBalances] = useState<BalancesResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [settling, setSettling] = useState<string | null>(null);
+  useEffect(() => {
+    account.current = scope; busy.current = false; setSettling(null);
+    return () => { account.current = undefined; revision.current += 1; };
+  }, [scope]);
 
   const load = useCallback(async () => {
+    const uid = scope;
+    const requestRevision = ++revision.current;
     setLoading(true);
+    setLoadError(false);
+    if (owner.current !== uid) { setGroup(null); setExpenses([]); setBalances(null); }
     try {
       const [g, e, b] = await Promise.all([
         getGroupDetail(params.groupId),
         listSharedExpenses(params.groupId),
         getBalances(params.groupId),
       ]);
+      if (account.current !== uid || requestRevision !== revision.current) return;
+      owner.current = uid;
       setGroup(g);
       setExpenses(e.expenses);
       setBalances(b);
-    } catch (err) {
-      Alert.alert('Could not load group', err instanceof Error ? err.message : 'Try again');
+    } catch {
+      if (account.current === uid && requestRevision === revision.current) setLoadError(true);
     } finally {
-      setLoading(false);
+      if (account.current === uid && requestRevision === revision.current) setLoading(false);
     }
-  }, [params.groupId]);
+  }, [params.groupId, scope]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
   const handleInvite = async () => {
     haptics.light();
+    const uid = account.current;
     try {
       const inv = await createInvite(params.groupId);
+      if (account.current !== uid) return;
       await Share.share({
-        message: `Join my Ari group "${group?.name}" with code ${inv.code} (expires in 7 days).`,
-        title: 'Ari group invite',
+        message: c('Join my Ari group "{name}" with code {code} (expires in 7 days).', {name: group?.name ?? '', code: inv.code}),
+        title: c('Ari group invite'),
       });
-    } catch (e) {
-      Alert.alert('Could not create invite', e instanceof Error ? e.message : 'Try again');
+    } catch {
+      if (account.current === uid) Alert.alert(c('Could not create invite'), c('Check your connection and retry.'));
     }
   };
 
+  const settlementError = () => Alert.alert(c('Could not record settlement'),
+    c('The result is unconfirmed. Refresh the group before paying again. No cash payment has been assumed.'),
+    [{ text: c('Retry'), onPress: () => { void load(); } }, { text: c('Cancel'), style: 'cancel' }]);
+
+  const confirmPaid = async (splitId: string, uid: string) => {
+    if (account.current !== uid || busy.current || !group?.currency) return;
+    busy.current = true; setSettling(splitId);
+    try {
+      const result = await confirmUpiSettlement(params.groupId, splitId, group.currency);
+      if (account.current !== uid) return;
+      if (result.settled !== true) throw new Error('Unconfirmed');
+      haptics.success(); void load();
+    } catch { if (account.current === uid) settlementError(); }
+    finally { if (account.current === uid) { busy.current = false; setSettling(null); } }
+  };
   const handleSettle = async (splitId: string, method: 'upi' | 'cash') => {
-    if (!user) return;
-    setSettling(splitId);
+    const uid = account.current;
+    if (!uid || busy.current || !group?.currency) return;
+    busy.current = true; setSettling(splitId);
     try {
-      const r = await settleSplit(params.groupId, splitId, method);
-      if (method === 'upi' && r.upiLink) {
-        const supported = await Linking.canOpenURL(r.upiLink);
-        if (!supported) {
-          Alert.alert('No UPI app installed', 'Install PhonePe / GPay / Paytm and try again.');
-          return;
-        }
-        await Linking.openURL(r.upiLink);
-        Alert.alert(
-          'Did the payment go through?',
-          'Tap "Yes" only after you confirmed the transfer in your UPI app.',
-          [
-            { text: 'Not yet', style: 'cancel' },
-            {
-              text: 'Yes, I paid',
-              onPress: async () => {
-                try {
-                  await confirmUpiSettlement(params.groupId, splitId);
-                  haptics.success();
-                  load();
-                } catch (e) {
-                  Alert.alert('Could not confirm', e instanceof Error ? e.message : 'Try again');
-                }
-              },
-            },
-          ],
-        );
-      } else {
-        haptics.success();
-        load();
-      }
-    } catch (e: unknown) {
-      const err = e as { message?: string };
-      // The 422 'no_creditor_vpa' surfaces here; offer the fallback inline.
-      Alert.alert(
-        'Settle by cash instead?',
-        err.message ?? 'Cash settlement marks the split as paid without a UPI transfer.',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Mark cash',
-            onPress: async () => {
-              try {
-                await settleSplit(params.groupId, splitId, 'cash');
-                haptics.success();
-                load();
-              } catch (e2) {
-                Alert.alert('Could not settle', e2 instanceof Error ? e2.message : 'Try again');
-              }
-            },
-          },
-        ],
-      );
-    } finally {
-      setSettling(null);
-    }
-  };
-
-  /**
-   * Per-member "Settle now": pay a creditor their whole net pair amount in one
-   * UPI intent (built client-side from their stored VPA), then record it by
-   * marking every unsettled split I owe them. Missing VPA → prompt to request.
-   */
-  const handleSettleMember = async (
-    creditor: GroupDetail['members'][number],
-    amount: number,
-  ) => {
-    if (!user) return;
-    if (!creditor.upiVpa) {
-      Alert.alert(
-        'No UPI ID yet',
-        `${creditor.name} hasn't added a UPI ID. Ask them to add one in Settings → UPI ID, then settle here — or mark it paid by cash.`,
-        [
-          { text: 'OK', style: 'cancel' },
-          { text: 'Mark cash', onPress: () => settleMemberSplits(creditor.id, 'cash') },
-        ],
-      );
-      return;
-    }
-
-    setSettling(`member:${creditor.id}`);
-    try {
-      const uri = buildUpiUri({
-        vpa: creditor.upiVpa,
-        payeeName: creditor.name,
-        amount,
-        note: `Ari · ${group?.name ?? 'group'}`,
-      });
-      const supported = await Linking.canOpenURL(uri);
-      if (!supported) {
-        Alert.alert('No UPI app installed', 'Install PhonePe / GPay / Paytm and try again.');
+      const result = await settleSplit(params.groupId, splitId, method, group.currency);
+      if (account.current !== uid) return;
+      if (result.settled === true) { haptics.success(); void load(); return; }
+      if (method !== 'upi' || !result.upiLink || !result.upiLink.startsWith('upi://pay?')) throw new Error('Unconfirmed');
+      if (!await Linking.canOpenURL(result.upiLink)) {
+        if (account.current === uid) Alert.alert(c('No UPI app available'), c('Open your payment app directly and check its status.'));
         return;
       }
-      await Linking.openURL(uri);
-      Alert.alert(
-        'Did the payment go through?',
-        `Tap "Yes" only after you confirmed the ${formatAmount(amount)} transfer in your UPI app.`,
-        [
-          { text: 'Not yet', style: 'cancel' },
-          { text: 'Yes, I paid', onPress: () => settleMemberSplits(creditor.id, 'upi') },
-        ],
-      );
-    } catch (e) {
-      Alert.alert('Could not open UPI', e instanceof Error ? e.message : 'Try again');
-    } finally {
-      setSettling(null);
-    }
+      if (account.current !== uid) return;
+      await Linking.openURL(result.upiLink);
+      if (account.current !== uid) return;
+      Alert.alert(c('Record your payment?'), c('Only confirm after checking the completed transfer in your payment app. Ari does not verify the bank transfer.'), [
+        { text: c('Not yet'), style: 'cancel' },
+        { text: c('I checked and paid'), onPress: () => { void confirmPaid(splitId, uid); } },
+      ]);
+    } catch { if (account.current === uid) settlementError(); }
+    finally { if (account.current === uid) { busy.current = false; setSettling(null); } }
+  };
+  const recordCash = (splitId: string) => {
+    const uid = account.current;
+    Alert.alert(c('Record cash already paid?'), c('This only records cash you already paid. It does not transfer money.'), [
+      { text: c('Cancel'), style: 'cancel' },
+      { text: c('Record cash'), onPress: () => { if (account.current === uid) void handleSettle(splitId, 'cash'); } },
+    ]);
   };
 
-  /** Mark every unsettled split I owe this creditor as settled by `method`. */
-  const settleMemberSplits = async (creditorId: string, method: 'upi' | 'cash') => {
-    if (!user) return;
-    const mySplits = expenses
-      .filter((e) => e.paidBy === creditorId)
-      .flatMap((e) => e.splits.filter((s) => s.owedBy === user.id && !s.settledAt));
-    if (mySplits.length === 0) {
-      load();
-      return;
-    }
-    setSettling(`member:${creditorId}`);
-    try {
-      for (const s of mySplits) {
-        await settleSplit(params.groupId, s.id, method);
-        if (method === 'upi') await confirmUpiSettlement(params.groupId, s.id);
-      }
-      track(method === 'upi' ? 'split_settled_upi' : 'split_settled_cash', {
-        splits: mySplits.length,
-      });
-      haptics.success();
-    } catch (e) {
-      Alert.alert('Could not record settlement', e instanceof Error ? e.message : 'Try again');
-    } finally {
-      setSettling(null);
-      load();
-    }
+  const chooseCurrency = (currency: string) => {
+    const uid = account.current;
+    Alert.alert(c('Confirm {currency} for existing amounts?', {currency}),
+      c('Only confirm after checking the original records with your group. This labels existing amounts; it does not convert them. This cannot be changed later.'), [
+        {text: c('Cancel'), style: 'cancel'},
+        {text: c('Confirm currency'), onPress: async () => {
+          if (account.current !== uid || busy.current) return;
+          busy.current = true; setSettling('currency');
+          try {
+            const result = await confirmGroupCurrency(params.groupId, currency);
+            if (account.current !== uid) return;
+            if (result.currency !== currency || result.amountsConverted !== false) throw new Error('Unconfirmed');
+            void load();
+          } catch { if (account.current === uid) Alert.alert(c('Could not confirm currency'), c('Check your connection and retry.')); }
+          finally { if (account.current === uid) { busy.current = false; setSettling(null); } }
+        }},
+      ]);
   };
 
-  if (loading || !group) {
+  if (loadError) return <ScreenShell edges={['top']}><Text>{c('Could not load group')}</Text><TouchableOpacity accessibilityRole="button" onPress={() => { void load(); }}><Text>{c('Retry')}</Text></TouchableOpacity><TouchableOpacity onPress={() => navigation.goBack()}><Text>{c('Back')}</Text></TouchableOpacity></ScreenShell>;
+  if (loading || !group || owner.current !== scope) {
     return (
       <ScreenShell edges={['top']}>
         <ActivityIndicator color={color.forest} style={{ marginTop: 40 }} />
@@ -239,46 +187,37 @@ export default function GroupDetailScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll}>
+        <Text>{group.currency ? c('Recorded currency: {currency}', {currency: group.currency}) : c('Recorded currency unknown')}</Text>
+        {!group.currency && <View>
+          <Text>{c('The group creator must confirm the original currency before adding expenses or recording payments.')}</Text>
+          {group.createdBy === user?.id && <View><Text>{c('Confirm recorded currency')}</Text>
+            {['INR', 'USD', 'GBP', 'AUD'].map(currency => <TouchableOpacity key={currency} accessibilityRole="button" disabled={settling !== null} onPress={() => chooseCurrency(currency)}><Text>{currency}</Text></TouchableOpacity>)}
+          </View>}
+        </View>}
+        {group.currency && group.currency !== 'INR' && <Text>{c('UPI is available only for INR groups.')}</Text>}
         {/* Net balance summary */}
         <View style={[styles.summaryCard, myNet > 0 ? styles.summaryPositive : myNet < 0 ? styles.summaryNegative : null]}>
-          <Text style={styles.summaryLabel}>Your net balance</Text>
+          <Text style={styles.summaryLabel}>{c('Your net balance')}</Text>
           <Text style={styles.summaryAmount}>
             {myNet >= 0 ? '+' : '-'}{formatAmount(Math.abs(myNet))}
           </Text>
           <Text style={styles.summarySub}>
-            {myNet > 0 ? 'You are owed money' : myNet < 0 ? 'You owe money' : 'All settled up'}
+            {myNet > 0 ? c('You are owed money') : myNet < 0 ? c('You owe money') : c('All settled up')}
           </Text>
         </View>
 
         {/* Pairs you owe — actionable */}
         {iOwe.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>You owe</Text>
-            {iOwe.map((p) => {
-              const busy = settling === `member:${p.creditor.id}`;
-              return (
-                <View key={`${p.debtor.id}-${p.creditor.id}`} style={styles.pairRow}>
-                  <Text style={styles.pairText}>
-                    {p.creditor.name} • {formatAmount(p.amount)}
-                  </Text>
-                  <TouchableOpacity
-                    style={styles.settleNowBtn}
-                    disabled={busy}
-                    onPress={() => handleSettleMember(p.creditor, p.amount)}
-                    accessibilityRole="button"
-                    accessibilityLabel={`Settle ${formatAmount(p.amount)} with ${p.creditor.name} via UPI`}
-                  >
-                    <Text style={styles.settleNowText}>{busy ? 'Settling…' : 'Settle now'}</Text>
-                  </TouchableOpacity>
-                </View>
-              );
-            })}
+            <Text style={styles.sectionLabel}>{c('You owe')}</Text>
+            <Text>{c('Record individual expense payments below. Net balances may offset several expenses.')}</Text>
+            {iOwe.map((p) => <View key={`${p.debtor.id}-${p.creditor.id}`} style={styles.pairRow}><Text style={styles.pairText}>{p.creditor.name} • {formatAmount(p.amount)}</Text></View>)}
           </View>
         )}
 
         {owedToMe.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Owed to you</Text>
+            <Text style={styles.sectionLabel}>{c('Owed to you')}</Text>
             {owedToMe.map((p) => (
               <View key={`${p.debtor.id}-${p.creditor.id}`} style={styles.pairRow}>
                 <Text style={styles.pairText}>
@@ -292,19 +231,20 @@ export default function GroupDetailScreen() {
         {/* Add expense */}
         <TouchableOpacity
           style={styles.addExpenseBtn}
+          disabled={!group.currency}
           onPress={() => navigation.navigate('AddSharedExpense', { groupId: params.groupId })}
         >
           <Icon name="plus" size={16} color={color.cream} />
-          <Text style={styles.addExpenseText}>Add shared expense</Text>
+          <Text style={styles.addExpenseText}>{c('Add shared expense')}</Text>
         </TouchableOpacity>
 
         {/* Expense list */}
-        <Text style={styles.sectionLabel}>Recent expenses</Text>
+        <Text style={styles.sectionLabel}>{c('Recent expenses')}</Text>
         {expenses.length === 0 ? (
-          <Text style={styles.empty}>No shared expenses yet.</Text>
+          <Text style={styles.empty}>{c('No shared expenses yet.')}</Text>
         ) : (
           expenses.map((e) => {
-            const payerName = memberMap[e.paidBy]?.name ?? 'Someone';
+            const payerName = memberMap[e.paidBy]?.name ?? c('Someone');
             const myUnsettledSplit = e.splits.find(
               (s) => s.owedBy === user?.id && !s.settledAt,
             );
@@ -312,9 +252,9 @@ export default function GroupDetailScreen() {
               <View key={e.id} style={styles.expenseCard}>
                 <View style={styles.expenseTop}>
                   <View style={{ flex: 1 }}>
-                    <Text style={styles.expenseDesc}>{e.description || 'Shared expense'}</Text>
+                    <Text style={styles.expenseDesc}>{e.description || c('Shared expense')}</Text>
                     <Text style={styles.expenseSub}>
-                      {payerName} paid • {formatDate(new Date(e.date + 'T00:00:00'), { day: 'numeric', month: 'short' })}
+                      {c('{name} paid', {name: payerName})} • {formatDate(new Date(e.date + 'T00:00:00'), { day: 'numeric', month: 'short' })}
                     </Text>
                   </View>
                   <Text style={styles.expenseAmount}>{formatAmount(e.amount)}</Text>
@@ -323,17 +263,18 @@ export default function GroupDetailScreen() {
                 {myUnsettledSplit && (
                   <View style={styles.settleRow}>
                     <Text style={styles.youOwe}>
-                      You owe {formatAmount(myUnsettledSplit.amount)}
+                      {c('You owe {amount}', {amount: formatAmount(myUnsettledSplit.amount)})}
                     </Text>
                     <TouchableOpacity
                       style={styles.settleBtn}
-                      disabled={settling === myUnsettledSplit.id}
+                      disabled={settling !== null || group.currency !== 'INR'}
                       onPress={() => handleSettle(myUnsettledSplit.id, 'upi')}
                     >
                       <Text style={styles.settleText}>
-                        {settling === myUnsettledSplit.id ? 'Opening UPI…' : 'Settle via UPI'}
+                        {c(settling === myUnsettledSplit.id ? 'Opening UPI…' : 'Settle via UPI')}
                       </Text>
                     </TouchableOpacity>
+                    <TouchableOpacity accessibilityRole="button" disabled={settling !== null || !group.currency} onPress={() => recordCash(myUnsettledSplit.id)}><Text>{c('Record cash')}</Text></TouchableOpacity>
                   </View>
                 )}
               </View>

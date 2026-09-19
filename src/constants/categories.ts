@@ -92,3 +92,9 @@ export function buildCategoryList(
 
   return result;
 }
+
+/** Translate only built-in labels; user-authored category names remain unchanged. */
+export function categoryDisplayLabel(category: CategoryDef, translate: (text: string) => string): string {
+  const builtIn = ALL_CATEGORIES.find(item => item.value === category.value && item.label === category.label);
+  return builtIn ? translate(category.label) : category.label;
+}

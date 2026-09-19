@@ -73,7 +73,7 @@ export default function LinkBankConsentScreen() {
   const startConsent = async () => {
     const trimmed = vua.trim();
     if (!trimmed) {
-      Alert.alert('Bank ID needed', 'Enter your AA VUA — usually your phone number @onemoney (e.g. 9876543210@onemoney).');
+      Alert.alert(localizeCopy("Bank ID needed"), localizeCopy("Enter your AA VUA — usually your phone number @onemoney (e.g. 9876543210@onemoney)."));
       return;
     }
 
@@ -81,7 +81,7 @@ export default function LinkBankConsentScreen() {
     try {
       const created = await createAaConsent(trimmed, fiTypes.length ? fiTypes : ['DEPOSIT']);
       if (!created.redirectUrl) {
-        Alert.alert('Consent created', 'Your bank approval link is not ready yet. Try again in a minute.');
+        Alert.alert(localizeCopy("Consent created"), localizeCopy("Your bank approval link is not ready yet. Try again in a minute."));
         return;
       }
 
@@ -102,15 +102,15 @@ export default function LinkBankConsentScreen() {
           if (detail.status === 'ACTIVE') {
             stopPolling();
             track('aa_consent_completed', { consentHandle: created.consentHandle });
-            Alert.alert('Bank linked', 'Your bank transactions will start syncing shortly.', [
-              { text: 'Done', onPress: () => navigation.goBack() },
+            Alert.alert(localizeCopy("Bank linked"), localizeCopy("Your bank transactions will start syncing shortly."), [
+              { text: localizeCopy("Done"), onPress: () => navigation.goBack() },
             ]);
             return;
           }
           if (detail.status === 'EXPIRED' || detail.status === 'REVOKED') {
             stopPolling();
             setWaiting(false);
-            Alert.alert('Approval expired', 'The bank approval window closed. Start again to link your bank.');
+            Alert.alert(localizeCopy("Approval expired"), localizeCopy("The bank approval window closed. Start again to link your bank."));
             return;
           }
         } catch {
@@ -120,14 +120,13 @@ export default function LinkBankConsentScreen() {
           stopPolling();
           setWaiting(false);
           Alert.alert(
-            'Still waiting',
-            'Your bank is taking longer than usual. We’ll keep checking in the background â pull to refresh the Link bank screen in a minute.',
+            localizeCopy("Still waiting"),
+            localizeCopy("Your bank is taking longer than usual. Open the Link bank screen again later to check its status."),
           );
         }
       }, POLL_INTERVAL_MS);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Something went wrong while contacting your bank.';
-      Alert.alert('Couldn’t link bank', message);
+    } catch {
+      Alert.alert(localizeCopy("Couldn’t link bank"), localizeCopy("Something went wrong while contacting your bank."));
     } finally {
       setSubmitting(false);
     }
@@ -137,9 +136,9 @@ export default function LinkBankConsentScreen() {
     return (
       <ScreenShell edges={['top', 'bottom']} backgroundColor={c.cream}>
         <View style={styles.waitingWrap}>
-          <LoadingSpinner message="Waiting for your bank approval…" fullScreen />
+          <LoadingSpinner message={localizeCopy("Waiting for your bank approval…")} fullScreen />
           <Text style={[styles.waitingHint, { color: c.inkSoft }]}>
-            Approve the consent on your bank’s page, then come back here.
+            {localizeCopy("Approve the consent on your bank’s page, then come back here.")}
           </Text>
         </View>
       </ScreenShell>
@@ -167,17 +166,16 @@ export default function LinkBankConsentScreen() {
             accessibilityRole="button"
           >
             <Icon name="arrow-left" size={22} color={c.inkSoft} />
-            <Text style={[styles.backText, { color: c.inkSoft }]}>Link bank</Text>
+            <Text style={[styles.backText, { color: c.inkSoft }]}>{localizeCopy("Link bank")}</Text>
           </TouchableOpacity>
 
-          <Text style={[styles.title, { color: c.ink }]}>Approve bank access</Text>
+          <Text style={[styles.title, { color: c.ink }]}>{localizeCopy("Approve bank access")}</Text>
           <Text style={[styles.subtitle, { color: c.inkSoft }]}>
-            Ari uses Setu (an RBI-licensed Account Aggregator) to read your statements read-only.
-            You approve the exact accounts and can revoke access any time.
+            {localizeCopy("You choose the accounts and permission on the bank approval page. You can revoke access later.")}
           </Text>
 
           <Input
-            label="Bank ID (AA VUA)"
+            label={localizeCopy("Bank ID (AA VUA)")}
             value={vua}
             onChangeText={setVua}
             autoCapitalize="none"
@@ -187,7 +185,7 @@ export default function LinkBankConsentScreen() {
             editable={!submitting}
           />
 
-          <Text style={[styles.sectionLabel, { color: c.inkSoft }]}>Accounts to include</Text>
+          <Text style={[styles.sectionLabel, { color: c.inkSoft }]}>{localizeCopy("Accounts to include")}</Text>
           <View style={styles.chipWrap}>
             {FI_TYPES.map((ft) => {
               const selected = fiTypes.includes(ft.key);
@@ -202,10 +200,10 @@ export default function LinkBankConsentScreen() {
                   ]}
                   accessibilityRole="checkbox"
                   accessibilityState={{ checked: selected }}
-                  accessibilityLabel={ft.label}
+                  accessibilityLabel={localizeCopy(ft.label)}
                 >
-                  <Text style={[styles.chipLabel, { color: c.ink }]}>{ft.label}</Text>
-                  <Text style={[styles.chipHint, { color: c.inkSoft }]}>{ft.hint}</Text>
+                  <Text style={[styles.chipLabel, { color: c.ink }]}>{localizeCopy(ft.label)}</Text>
+                  <Text style={[styles.chipHint, { color: c.inkSoft }]}>{localizeCopy(ft.hint)}</Text>
                 </TouchableOpacity>
               );
             })}
@@ -216,15 +214,15 @@ export default function LinkBankConsentScreen() {
             loading={submitting}
             disabled={submitting || fiTypes.length === 0}
             fullWidth
-            accessibilityLabel="Continue to bank approval"
+            accessibilityLabel={localizeCopy("Continue to bank approval")}
             style={styles.cta}
           >
-            Continue to bank approval
+            {localizeCopy("Continue to bank approval")}
           </Button>
 
           <Text style={[styles.finePrint, { color: c.inkFaint }]}>
-            Consent is valid for one year and can be revoked from Settings at any time.
-            Ari never sees your bank login or password.
+            {localizeCopy("Review the permission duration and revocation options on the bank approval page.")}
+            {localizeCopy("Ari never sees your bank login or password.")}
           </Text>
         </ScrollView>
       </KeyboardAvoidingView>

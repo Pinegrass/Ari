@@ -52,15 +52,14 @@ export default function LinkBankConsentDetailScreen() {
       const imported = result.imported ?? 0;
       const duplicates = result.duplicates ?? 0;
       Alert.alert(
-        'Sync complete',
+        localizeCopy('Sync complete'),
         imported > 0
-          ? `Imported ${imported} transaction${imported === 1 ? '' : 's'}${duplicates ? ` (${duplicates} already tracked)` : ''}.`
-          : 'No new transactions found.',
+          ? localizeCopy('Imported entries: {count}. Already recorded: {duplicates}.').replace('{count}', String(imported)).replace('{duplicates}', String(duplicates))
+          : localizeCopy('No new transactions found.'),
       );
       await load();
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Sync failed. Please try again.';
-      Alert.alert('Sync failed', message);
+    } catch {
+      Alert.alert(localizeCopy('Sync failed'), localizeCopy('Sync failed. Please try again.'));
     } finally {
       setSyncing(false);
     }
@@ -69,7 +68,7 @@ export default function LinkBankConsentDetailScreen() {
   if (loading) {
     return (
       <ScreenShell edges={['top', 'bottom']} backgroundColor={c.cream}>
-        <LoadingSpinner message="Loading bank link…" fullScreen />
+        <LoadingSpinner message={localizeCopy("Loading bank link…")} fullScreen />
       </ScreenShell>
     );
   }
@@ -79,9 +78,9 @@ export default function LinkBankConsentDetailScreen() {
       <ScreenShell edges={['top', 'bottom']} backgroundColor={c.cream}>
         <EmptyState
           emoji="📡"
-          title="Couldn't load this bank link"
-          subtitle="Check your connection and try again."
-          actionLabel="Retry"
+          title={localizeCopy("Couldn't load this bank link")}
+          subtitle={localizeCopy("Check your connection and try again.")}
+          actionLabel={localizeCopy("Retry")}
           onAction={() => {
             setLoading(true);
             void load();
@@ -106,21 +105,21 @@ export default function LinkBankConsentDetailScreen() {
           accessibilityRole="button"
         >
           <Icon name="arrow-left" size={22} color={c.inkSoft} />
-          <Text style={[styles.backText, { color: c.inkSoft }]}>Linked accounts</Text>
+          <Text style={[styles.backText, { color: c.inkSoft }]}>{localizeCopy("Linked accounts")}</Text>
         </TouchableOpacity>
 
         <View style={[styles.card, { backgroundColor: c.card, borderColor: c.line }]}>
           <View style={styles.cardHead}>
             <Icon name={active ? 'check-circle' : 'clock'} size={26} color={active ? c.forest : c.inkSoft} />
             <Text style={[styles.cardTitle, { color: c.ink }]}>
-              {active ? 'Linked & syncing' : 'Not active yet'}
+              {localizeCopy(active ? 'Linked & syncing' : 'Not active yet')}
             </Text>
           </View>
           <Text style={[styles.cardMeta, { color: c.inkSoft }]}>
-            Status: {detail.status}
+            {localizeCopy("Status")}: {localizeCopy(({ ACTIVE: "Linked", PENDING: "Awaiting approval", EXPIRED: "Expired", REVOKED: "Revoked" } as Record<string, string>)[detail.status] ?? "Unknown")}
           </Text>
           <Text style={[styles.cardMeta, { color: c.inkSoft }]}>
-            Accounts: {detail.fiTypes?.join(', ') || 'Deposit'}
+            {localizeCopy("Accounts")}: {detail.fiTypes?.map(type => localizeCopy(({ DEPOSIT: "Deposit", TERM_DEPOSIT: "Fixed deposit", RECURRING_DEPOSIT: "Recurring deposit", CREDIT_CARD: "Credit card" } as Record<string, string>)[type] ?? "Bank account")).join(", ") || localizeCopy("Deposit")}
           </Text>
         </View>
 
@@ -130,15 +129,15 @@ export default function LinkBankConsentDetailScreen() {
             loading={syncing}
             fullWidth
             style={styles.cta}
-            accessibilityLabel="Sync latest transactions"
+            accessibilityLabel={localizeCopy("Sync latest transactions")}
           >
-            Sync latest transactions
+            {localizeCopy("Sync latest transactions")}
           </Button>
         ) : (
           <Text style={[styles.pendingHint, { color: c.inkSoft }]}>
             {detail.status === 'PENDING'
-              ? 'Your bank approval is still in progress. Open the approval link from the previous step, or start a fresh link.'
-              : 'This consent is no longer active. Start a new link from the Link bank screen.'}
+              ? localizeCopy("Your bank approval is still in progress. Open the approval link from the previous step, or start a fresh link.")
+              : localizeCopy("This consent is no longer active. Start a new link from the Link bank screen.")}
           </Text>
         )}
       </ScrollView>

@@ -1,4 +1,5 @@
-import {useLanguage as useCopyLanguage} from '../i18n/LanguageContext';
+import { termsHindi } from '../i18n/legalHindi';
+import { useLanguage } from '../i18n/LanguageContext';
 /* eslint-disable react/no-unescaped-entities */
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
@@ -9,56 +10,58 @@ import Icon from '../components/ui/Icon';
 
 interface Props { onBack: () => void; }
 
-const LAST_UPDATED = '2026-07-08';
+const LAST_UPDATED = '2026-09-20';
 
 export default function TermsScreen({ onBack }: Props) {
- const {phrase:localizeCopy}=useCopyLanguage();
+  const {phrase, language, setLanguage}=useLanguage();
   return (
     <ScreenShell edges={['top']}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} style={styles.backBtn}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel={phrase('Go back')} onPress={onBack} style={styles.backBtn}>
           <Icon name="chevron-left" size={24} color={color.ink} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{localizeCopy("Terms of Service")}</Text>
+        <Text accessibilityLanguage={language} style={styles.headerTitle}>{phrase('Terms of Service')}</Text>
         <View style={styles.backBtn} />
       </View>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <AnimatedEntry delay={0}>
-          <Text style={styles.lastUpdated}>Last updated: {LAST_UPDATED}</Text>
+          <TouchableOpacity accessibilityRole="button" onPress={() => { void setLanguage(language === 'hi' ? 'en' : 'hi'); }}><Text accessibilityLanguage={language === 'hi' ? 'en' : 'hi'} style={styles.lastUpdated}>{language === 'hi' ? 'Read in English' : 'हिन्दी में पढ़ें'}</Text></TouchableOpacity>
+          <Text accessibilityLanguage={language} style={styles.lastUpdated}>{language === 'hi' ? 'अंतिम अपडेट: 20 सितंबर 2026' : `Last updated: ${LAST_UPDATED}`}</Text>
+          {language === 'hi' ? termsHindi.map(([title, body]) => <View key={title}><Text accessibilityLanguage="hi" accessibilityRole="header" style={styles.sectionTitle}>{title}</Text><Text accessibilityLanguage="hi" style={styles.body}>{body}</Text></View>) : <>
 
-          <Text style={styles.sectionTitle}>1. Acceptance of Terms</Text>
-          <Text style={styles.body}>
+          <Text accessibilityLanguage={language} style={styles.sectionTitle}>1. Acceptance of Terms</Text>
+          <Text accessibilityLanguage={language} style={styles.body}>
             By downloading, installing, or using the Ari mobile application ("Ari" or the "Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree, do not use Ari.
           </Text>
-          <Text style={styles.body}>
+          <Text accessibilityLanguage={language} style={styles.body}>
             These Terms form a binding agreement between you and Pinegrass Technologies Private Limited ("Pinegrass", "we", "our", "us"), a company incorporated in India (CIN U62011MN2026PTC015607).
           </Text>
 
-          <Text style={styles.sectionTitle}>2. Eligibility</Text>
-          <Text style={styles.body}>
+          <Text accessibilityLanguage={language} style={styles.sectionTitle}>2. Eligibility</Text>
+          <Text accessibilityLanguage={language} style={styles.body}>
             You must be at least 18 years of age to use Ari. By using Ari, you represent that you meet this age requirement. Ari is designed for users in India and complies with Indian laws including the DPDP Act, 2023.
           </Text>
 
-          <Text style={styles.sectionTitle}>3. Description of Service</Text>
-          <Text style={styles.body}>
+          <Text accessibilityLanguage={language} style={styles.sectionTitle}>3. Description of Service</Text>
+          <Text accessibilityLanguage={language} style={styles.body}>
             Ari is a personal finance management application that helps you track expenses, manage budgets, set savings goals, receive AI-powered financial coaching ("Tomo"), and generate tax estimates. Ari does not provide financial, legal, or tax advice. All insights are informational only.
           </Text>
 
-          <Text style={styles.sectionTitle}>4. User Accounts</Text>
-          <Text style={styles.body}>
+          <Text accessibilityLanguage={language} style={styles.sectionTitle}>4. User Accounts</Text>
+          <Text accessibilityLanguage={language} style={styles.body}>
             You are responsible for maintaining the confidentiality of your account credentials. You agree to provide accurate information and to update it as necessary. We reserve the right to suspend or terminate accounts that violate these Terms.
           </Text>
-          <Text style={styles.body}>
+          <Text accessibilityLanguage={language} style={styles.body}>
             You may delete your account at any time through Settings. Account deletion is governed by our Privacy Policy.
           </Text>
 
-          <Text style={styles.sectionTitle}>5. Subscriptions and Payments</Text>
-          <Text style={styles.body}>
-            Ari offers both free and paid subscription tiers ("Ari Pro"). Paid subscriptions are processed through the Google Play Store or Apple App Store billing systems. Ari Pro starts with a 14-day free trial; after the trial, the subscription continues at the price shown at the point of purchase unless you cancel. You may manage or cancel your subscription through your device's app store settings at any time.
+          <Text accessibilityLanguage={language} style={styles.sectionTitle}>5. Subscriptions and Payments</Text>
+          <Text accessibilityLanguage={language} style={styles.body}>
+            Ari offers free features and optional paid access ("Ari Pro"), subject to availability. The eligible 14-day Ari trial requires no card and does not automatically become a paid subscription. A purchase requires a separate checkout. Before purchasing, review the price, billing period, renewal, cancellation and refund terms shown by the applicable store or checkout provider. Manage an existing subscription through the provider used to purchase it.
           </Text>
 
-          <Text style={styles.sectionTitle}>6. Acceptable Use</Text>
-          <Text style={styles.body}>
+          <Text accessibilityLanguage={language} style={styles.sectionTitle}>6. Acceptable Use</Text>
+          <Text accessibilityLanguage={language} style={styles.body}>
             You agree not to:{'\n'}
             • Use Ari for any unlawful purpose{'\n'}
             • Attempt to gain unauthorized access to Ari's systems{'\n'}
@@ -66,41 +69,42 @@ export default function TermsScreen({ onBack }: Props) {
             • Violate any applicable laws or regulations
           </Text>
 
-          <Text style={styles.sectionTitle}>7. Intellectual Property</Text>
-          <Text style={styles.body}>
+          <Text accessibilityLanguage={language} style={styles.sectionTitle}>7. Intellectual Property</Text>
+          <Text accessibilityLanguage={language} style={styles.body}>
             Ari, its name, logo, design, and code are the intellectual property of Pinegrass Technologies Pvt. Ltd. You may not copy, modify, distribute, or create derivative works without our written permission.
           </Text>
 
-          <Text style={styles.sectionTitle}>8. Limitation of Liability</Text>
-          <Text style={styles.body}>
+          <Text accessibilityLanguage={language} style={styles.sectionTitle}>8. Limitation of Liability</Text>
+          <Text accessibilityLanguage={language} style={styles.body}>
             To the maximum extent permitted by law, Pinegrass shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of Ari. Our total liability shall not exceed the amount you paid us in the 12 months preceding the claim, or ₹5,000, whichever is greater.
           </Text>
-          <Text style={styles.body}>
+          <Text accessibilityLanguage={language} style={styles.body}>
             Ari provides informational tools, not professional financial advice. You are solely responsible for your financial decisions.
           </Text>
 
-          <Text style={styles.sectionTitle}>9. Disclaimer of Warranties</Text>
-          <Text style={styles.body}>
+          <Text accessibilityLanguage={language} style={styles.sectionTitle}>9. Disclaimer of Warranties</Text>
+          <Text accessibilityLanguage={language} style={styles.body}>
             Ari is provided "as is" without warranties of any kind, express or implied. We do not warrant that Ari will be uninterrupted, error-free, or completely secure.
           </Text>
 
-          <Text style={styles.sectionTitle}>10. Governing Law and Dispute Resolution</Text>
-          <Text style={styles.body}>
+          <Text accessibilityLanguage={language} style={styles.sectionTitle}>10. Governing Law and Dispute Resolution</Text>
+          <Text accessibilityLanguage={language} style={styles.body}>
             These Terms are governed by the laws of India. Any dispute arising from these Terms shall be subject to the exclusive jurisdiction of courts in Manipur, India. Before initiating formal proceedings, you agree to attempt resolution through our Grievance Officer at privacy@pinegrass.in.
           </Text>
 
-          <Text style={styles.sectionTitle}>11. Changes to Terms</Text>
-          <Text style={styles.body}>
+          <Text accessibilityLanguage={language} style={styles.sectionTitle}>11. Changes to Terms</Text>
+          <Text accessibilityLanguage={language} style={styles.body}>
             We may update these Terms from time to time. Material changes will be notified through the app. Continued use after changes constitutes acceptance.
           </Text>
 
-          <Text style={styles.sectionTitle}>12. Contact</Text>
-          <Text style={styles.body}>
+          <Text accessibilityLanguage={language} style={styles.sectionTitle}>12. Contact</Text>
+          <Text accessibilityLanguage={language} style={styles.body}>
             Pinegrass Technologies Pvt. Ltd.{'\n'}
             Email: privacy@pinegrass.in{'\n'}
             CIN: U62011MN2026PTC015607{'\n'}
             Manipur, India
           </Text>
+          </>}
         </AnimatedEntry>
       </ScrollView>
     </ScreenShell>

@@ -3,12 +3,13 @@ import {
   ExpoSpeechRecognitionModule,
   useSpeechRecognitionEvent,
 } from 'expo-speech-recognition';
+import { useLanguage } from '../i18n/LanguageContext';
 import { useLocale } from './useLocale';
 
 /**
  * Voice input for expense logging (spec §1 core differentiator, §2 Voice
- * row: "React Native device native Speech-to-Text. No third-party
- * dependency. Works offline for transcription").
+ * Device speech recognition may use an OS/provider network service; this
+ * hook does not enforce on-device-only processing.
  *
  * Hook contract:
  *   const { isListening, transcript, isAvailable, start, stop, reset } =
@@ -33,6 +34,7 @@ export interface VoiceInputState {
 
 export function useVoiceInput(): VoiceInputState {
   const { locale } = useLocale();
+  const { language, phrase } = useLanguage();
   const [isAvailable, setIsAvailable] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
@@ -82,7 +84,7 @@ export function useVoiceInput(): VoiceInputState {
       setIsListening(false);
       return;
     }
-    setError(event.message || event.error || 'Speech recognition failed');
+    setError(phrase('Speech recognition failed. Try again.'));
     setIsListening(false);
   });
 
@@ -92,16 +94,16 @@ export function useVoiceInput(): VoiceInputState {
     try {
       const perms = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
       if (!perms.granted) {
-        setError('Microphone or speech permission denied');
+        setError(phrase('Allow microphone and speech access in device settings.'));
         return;
       }
       ExpoSpeechRecognitionModule.start({
-        lang: locale.localeTag,
+        lang: language === 'hi' ? 'hi-IN' : locale.localeTag,
         interimResults: true,
         // en-IN + noun biasing for Indian merchants could go here later.
       });
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Could not start speech recognition');
+    } catch {
+      setError(phrase('Could not start speech recognition. Try again.'));
     }
   };
 

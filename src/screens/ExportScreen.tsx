@@ -19,13 +19,16 @@ import { useHaptics } from '../hooks/useHaptics';
 import Button from '../components/ui/Button';
 import AnimatedEntry from '../components/ui/AnimatedEntry';
 import Icon from '../components/ui/Icon';
+import { exportCopy } from '../i18n/exportCopy';
+import { requestSessionRevision } from '../lib/requestSession';
 
 interface Props {
   onBack: () => void;
 }
 
 export default function ExportScreen({ onBack }: Props) {
- const {phrase:localizeCopy}=useCopyLanguage();
+ const {phrase:localizeCopy,language}=useCopyLanguage();
+ const copy = exportCopy[language];
   const { transactions } = useData();
   const haptics = useHaptics();
   const [exporting, setExporting] = useState<'transactions' | 'pnl' | 'full' | null>(null);
@@ -38,13 +41,16 @@ export default function ExportScreen({ onBack }: Props) {
     mimeType: string,
     fallbackTitle: string,
   ) => {
+    const revision = requestSessionRevision();
     try {
       const outcome = await saveOrShareFile(filename, contents, mimeType);
+      if (requestSessionRevision() !== revision) return;
       if (outcome === 'saved') {
-        Alert.alert('Export Complete', `${filename} saved. Open it in Excel, Sheets, or Files.`);
+        Alert.alert(copy.complete, `${filename}\n${copy.saved}`);
       }
       if (outcome !== 'cancelled') haptics.success();
     } catch {
+      if (requestSessionRevision() !== revision) throw new Error('Export account changed');
       await Share.share({ message: contents, title: fallbackTitle });
       haptics.success();
     }
@@ -52,7 +58,7 @@ export default function ExportScreen({ onBack }: Props) {
 
   const handleExport = async () => {
     if (transactions.length === 0) {
-      Alert.alert('No Data', 'Add some transactions first to export.');
+      Alert.alert(copy.noData, copy.addEntries);
       return;
     }
 
@@ -67,7 +73,7 @@ export default function ExportScreen({ onBack }: Props) {
         'Ari Transactions Export',
       );
     } catch {
-      Alert.alert('Export Failed', 'Could not export your data. Please try again.');
+      Alert.alert(copy.failed, copy.retry);
       haptics.error();
     } finally {
       setExporting(null);
@@ -75,12 +81,14 @@ export default function ExportScreen({ onBack }: Props) {
   };
 
   const handlePnlExport = async () => {
+    const revision = requestSessionRevision();
     setExporting('pnl');
     haptics.light();
     try {
       const report = await getPnlReport(12);
+      if (requestSessionRevision() !== revision) throw new Error('Export account changed');
       if (report.months.length === 0) {
-        Alert.alert('No Data', 'Add some transactions first to build a P&L report.');
+        Alert.alert(copy.noData, copy.addEntries);
         return;
       }
       await deliverFile(
@@ -90,30 +98,30 @@ export default function ExportScreen({ onBack }: Props) {
         'Ari P&L Export',
       );
     } catch {
-      Alert.alert('Export Failed', 'Could not build your P&L report. Check your connection and try again.');
+      Alert.alert(copy.failed, copy.retry);
       haptics.error();
     } finally {
       setExporting(null);
     }
   };
 
-  // Full account dump from the server (profile, budgets, goals, tax profile,
-  // notes — not just transactions). This is the DPDP §11 / GDPR Art. 15+20
-  // access + portability export promised in the privacy policy.
+  // Explicitly scoped server records plus current-device account-owned bills.
   const handleFullExport = async () => {
+    const revision = requestSessionRevision();
     setExporting('full');
     haptics.light();
 
     try {
       const data = await authApi.exportMyData();
+      if (requestSessionRevision() !== revision) throw new Error('Export account changed');
       await deliverFile(
-        `ari-full-export-${today()}.json`,
+        `ari-account-and-bills-${today()}.json`,
         JSON.stringify(data, null, 2),
         'application/json',
-        'Ari Full Data Export',
+        copy.accountTitle,
       );
     } catch {
-      Alert.alert('Export Failed', 'Could not export your data. Please try again.');
+      Alert.alert(copy.failed, copy.retry);
       haptics.error();
     } finally {
       setExporting(null);
@@ -126,7 +134,7 @@ export default function ExportScreen({ onBack }: Props) {
         <TouchableOpacity onPress={onBack} accessibilityLabel={localizeCopy("Go back")} accessibilityRole="button">
           <Text style={styles.backText}>{localizeCopy("← Back")}</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>{localizeCopy("Export Data")}</Text>
+        <Text style={styles.title}>{copy.title}</Text>
         <View style={{ width: 60 }} />
       </View>
 
@@ -137,51 +145,48 @@ export default function ExportScreen({ onBack }: Props) {
         <AnimatedEntry delay={100}>
           <View style={styles.card}>
             <Icon name="pie-chart" size={48} color={color.forest} />
-            <Text style={styles.cardTitle}>Export as CSV</Text>
+            <Text style={styles.cardTitle}>{copy.csv}</Text>
             <Text style={styles.cardDesc}>
-              Save spreadsheet-ready transaction data or a 12-month P&L report.
+              {copy.csvHelp}
             </Text>
             <Text style={styles.txnCount}>
-              {transactions.length} transaction{transactions.length !== 1 ? 's' : ''} available
+              {copy.transactionCount}: {transactions.length}
             </Text>
           </View>
         </AnimatedEntry>
 
         <AnimatedEntry delay={250}>
-          <Button onPress={handleExport} loading={exporting === 'transactions'} disabled={exporting !== null} fullWidth accessibilityLabel="Export transactions as CSV" accessibilityRole="button">
-            Export Transactions (CSV)
+          <Button onPress={handleExport} loading={exporting === 'transactions'} disabled={exporting !== null} fullWidth accessibilityLabel={copy.transactionButton} accessibilityRole="button">
+            {copy.transactionButton}
           </Button>
         </AnimatedEntry>
 
         <AnimatedEntry delay={325}>
-          <Button onPress={handlePnlExport} loading={exporting === 'pnl'} disabled={exporting !== null} variant="secondary" fullWidth accessibilityLabel="Export profit and loss report as CSV" accessibilityRole="button">
-            Export P&L Report (CSV)
+          <Button onPress={handlePnlExport} loading={exporting === 'pnl'} disabled={exporting !== null} variant="secondary" fullWidth accessibilityLabel={copy.pnlButton} accessibilityRole="button">
+            {copy.pnlButton}
           </Button>
         </AnimatedEntry>
 
         <AnimatedEntry delay={350}>
           <View style={styles.card}>
             <Icon name="download" size={48} color={color.forest} />
-            <Text style={styles.cardTitle}>Full Account Export</Text>
+            <Text style={styles.cardTitle}>{copy.accountTitle}</Text>
             <Text style={styles.cardDesc}>
-              Everything we hold about you — profile, transactions, budgets,
-              goals, tax profile, and notes — as one JSON file. This is the
-              data-portability export from our privacy policy.
+              {copy.accountHelp}
             </Text>
           </View>
         </AnimatedEntry>
 
         <AnimatedEntry delay={450}>
-          <Button onPress={handleFullExport} loading={exporting === 'full'} disabled={exporting !== null} fullWidth accessibilityLabel="Export full account data" accessibilityRole="button">
-            Export Everything (JSON)
+          <Button onPress={handleFullExport} loading={exporting === 'full'} disabled={exporting !== null} fullWidth accessibilityLabel={copy.accountButton} accessibilityRole="button">
+            {copy.accountButton}
           </Button>
         </AnimatedEntry>
 
         <AnimatedEntry delay={400}>
           <View style={styles.infoBox}>
             <Text style={styles.infoText}>
-              Your data stays on your device. We never sell or share your
-              financial information.
+              {copy.fileWarning}
             </Text>
           </View>
         </AnimatedEntry>

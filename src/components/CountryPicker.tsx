@@ -1,3 +1,4 @@
+import { useLanguage } from '../i18n/LanguageContext';
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, TouchableOpacity, Modal, FlatList,
@@ -17,6 +18,7 @@ interface Props {
 }
 
 export default function CountryPicker({ value, onChange, compact }: Props) {
+  const { phrase } = useLanguage();
   const [visible, setVisible] = useState(false);
   const [locales, setLocales] = useState<LocaleInfo[]>(() =>
     SUPPORTED_COUNTRIES.map((c) => getLocale(c))
@@ -35,12 +37,13 @@ export default function CountryPicker({ value, onChange, compact }: Props) {
     return (
       <>
         <TouchableOpacity
+          accessibilityRole="button" accessibilityLabel={phrase("Select your country")}
           style={styles.compactPill}
           onPress={() => setVisible(true)}
           activeOpacity={0.7}
         >
           <Text style={styles.compactText}>
-            {current.name} ({current.symbol})
+            {phrase(current.name)} ({current.symbol})
           </Text>
           <Icon name="chevron-down" size={14} color={color.inkFaint} />
         </TouchableOpacity>
@@ -58,13 +61,14 @@ export default function CountryPicker({ value, onChange, compact }: Props) {
   return (
     <>
       <TouchableOpacity
+        accessibilityRole="button" accessibilityLabel={phrase("Select your country")}
         style={styles.fullPicker}
         onPress={() => setVisible(true)}
         activeOpacity={0.7}
       >
-        <Text style={styles.fullLabel}>Country</Text>
+        <Text style={styles.fullLabel}>{phrase("Country")}</Text>
         <View style={styles.fullRow}>
-          <Text style={styles.fullValue}>{current.name}</Text>
+          <Text style={styles.fullValue}>{phrase(current.name)}</Text>
           <Text style={styles.fullCurrency}>
             {current.currency} ({current.symbol})
           </Text>
@@ -91,13 +95,14 @@ function CountryModal({
   onSelect: (code: string) => void;
   onClose: () => void;
 }) {
+  const { phrase } = useLanguage();
   return (
     <Modal visible={visible} animationType="slide" transparent>
       <View style={styles.overlay}>
         <View style={styles.sheet}>
           <View style={styles.sheetHeader}>
-            <Text style={styles.sheetTitle}>Select your country</Text>
-            <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
+            <Text style={styles.sheetTitle}>{phrase("Select your country")}</Text>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel={phrase("Close")} onPress={onClose} style={styles.closeBtn}>
               <Icon name="x" size={20} color={color.inkFaint} />
             </TouchableOpacity>
           </View>
@@ -114,11 +119,12 @@ function CountryModal({
                     styles.countryRow,
                     item.code === selected && styles.countryRowActive,
                   ]}
+                  accessibilityRole="radio" accessibilityState={{ selected: item.code === selected }}
                   onPress={() => onSelect(item.code)}
                   activeOpacity={0.7}
                 >
                   <View style={{ flex: 1 }}>
-                    <Text style={styles.countryName}>{item.name}</Text>
+                    <Text style={styles.countryName}>{phrase(item.name)}</Text>
                     <Text style={styles.countryMeta}>
                       {item.currency} ({item.symbol})
                     </Text>

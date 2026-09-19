@@ -7,7 +7,7 @@ import ScreenShell from '../components/ScreenShell';
 import Icon from '../components/ui/Icon';
 import ProgressBar from '../components/ui/ProgressBar';
 import { getReferralStatus, recordReferralShare, redeemReferral, type ReferralStatus } from '../api/engagement';
-import { ApiError } from '../api/client';
+import EmptyState from '../components/ui/EmptyState';
 import { useHaptics } from '../hooks/useHaptics';
 import { track } from '../lib/analytics';
 import { color, font, type } from '../theme/tokens';
@@ -32,9 +32,10 @@ export default function InviteFriendsScreen() {
   const share = async () => {
     if (!status) return;
     haptics.light();
+    try {
     const result = await Share.share({
-      title: 'Try Ari with me',
-      message: `I use Ari for calm money tracking and visual reports. Join me with code ${status.code}: ${status.inviteUrl}`,
+      title: localizeCopy('Try Ari with me'),
+      message: localizeCopy("I use Ari for money tracking and reports. My invite code is {code}: {url}").replace("{code}", status.code).replace("{url}", status.inviteUrl),
       url: status.inviteUrl,
     });
     if (result.action !== Share.dismissedAction) {
@@ -43,6 +44,7 @@ export default function InviteFriendsScreen() {
       setStatus((value) => value ? { ...value, shares: value.shares + 1 } : value);
       haptics.success();
     }
+    } catch { Alert.alert(localizeCopy('Error'), localizeCopy('Could not share invite. Try again.')); }
   };
 
   const redeem = async () => {
@@ -54,10 +56,10 @@ export default function InviteFriendsScreen() {
       track('referral_redeemed');
       haptics.success();
       setCode('');
-      Alert.alert('Invite applied', `${response.inviterName} is now credited for welcoming you to Ari.`);
-    } catch (error) {
+      Alert.alert(localizeCopy('Invite applied'), localizeCopy('{name} is credited for your invitation.').replace('{name}', response.inviterName));
+    } catch {
       haptics.error();
-      Alert.alert('Could not apply code', error instanceof ApiError ? error.message : 'Try again in a moment.');
+      Alert.alert(localizeCopy('Could not apply code'), localizeCopy('Check the invite code and try again.'));
     } finally {
       setRedeeming(false);
     }
@@ -66,42 +68,42 @@ export default function InviteFriendsScreen() {
   return (
     <ScreenShell edges={['top']} scrollable contentContainerStyle={styles.content}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.back} accessibilityLabel={localizeCopy("Go back")}><Icon name="arrow-left" size={22} /></TouchableOpacity>
-        <View><Text style={styles.headerTitle}>Grow your circle</Text><Text style={styles.headerSub}>Invite people without pressure or spam</Text></View>
+        <TouchableOpacity accessibilityRole="button" onPress={() => navigation.goBack()} style={styles.back} accessibilityLabel={localizeCopy("Go back")}><Icon name="arrow-left" size={22} /></TouchableOpacity>
+        <View><Text style={styles.headerTitle}>{localizeCopy("Grow your circle")}</Text><Text style={styles.headerSub}>{localizeCopy("Invite people without pressure or spam")}</Text></View>
       </View>
 
-      {loading ? <ActivityIndicator style={styles.loader} color={color.forest} size="large" /> : status && (
+      {loading ? <ActivityIndicator style={styles.loader} color={color.forest} size="large" /> : !status ? <EmptyState emoji="📡" title={localizeCopy("Could not load invitations.")} actionLabel={localizeCopy("Retry")} onAction={load} /> : (
         <>
           <View style={styles.hero}>
             <View style={styles.gift}><Icon name="gift" size={28} color={color.card} /></View>
-            <Text style={styles.heroTitle}>Money habits are easier together</Text>
-            <Text style={styles.heroBody}>Share Ari when it feels useful. Your friend chooses whether to join and apply your code.</Text>
-            <View style={styles.codeBox}><Text style={styles.codeLabel}>Your invite code</Text><Text style={styles.code}>{status.code}</Text></View>
+            <Text style={styles.heroTitle}>{localizeCopy("Money habits are easier together")}</Text>
+            <Text style={styles.heroBody}>{localizeCopy("Share Ari when it feels useful. Your friend chooses whether to join and apply your code.")}</Text>
+            <View style={styles.codeBox}><Text style={styles.codeLabel}>{localizeCopy("Your invite code")}</Text><Text style={styles.code}>{status.code}</Text></View>
             <TouchableOpacity style={styles.shareButton} onPress={() => void share()} accessibilityRole="button">
-              <Icon name="share" size={18} color={color.forest} /><Text style={styles.shareText}>Invite a friend</Text>
+              <Icon name="share" size={18} color={color.forest} /><Text style={styles.shareText}>{localizeCopy("Invite a friend")}</Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.card}>
-            <View style={styles.row}><Text style={styles.sectionTitle}>Circle progress</Text><Text style={styles.progressCount}>{status.accepted}/{status.nextGoal}</Text></View>
+            <View style={styles.row}><Text style={styles.sectionTitle}>{localizeCopy("Circle progress")}</Text><Text style={styles.progressCount}>{status.accepted}/{status.nextGoal}</Text></View>
             <ProgressBar percentage={status.progress * 100} height={9} />
             <View style={styles.stats}>
-              <View><Text style={styles.statValue}>{status.accepted}</Text><Text style={styles.statLabel}>joined</Text></View>
+              <View><Text style={styles.statValue}>{status.accepted}</Text><Text style={styles.statLabel}>{localizeCopy("joined")}</Text></View>
               <View style={styles.divider} />
-              <View><Text style={styles.statValue}>{status.shares}</Text><Text style={styles.statLabel}>shares</Text></View>
+              <View><Text style={styles.statValue}>{status.shares}</Text><Text style={styles.statLabel}>{localizeCopy("shares")}</Text></View>
               <View style={styles.divider} />
-              <View><Text style={styles.statValue}>{status.badge ? '✓' : '—'}</Text><Text style={styles.statLabel}>circle badge</Text></View>
+              <View><Text style={styles.statValue}>{status.badge ? '✓' : '—'}</Text><Text style={styles.statLabel}>{localizeCopy("circle badge")}</Text></View>
             </View>
-            <Text style={styles.hint}>{status.nextGoal - status.accepted} more accepted {status.nextGoal - status.accepted === 1 ? 'invite' : 'invites'} to reach the next circle milestone.</Text>
+            <Text style={styles.hint}>{localizeCopy("{count} more accepted invites to reach the next milestone.").replace("{count}", String(Math.max(0, status.nextGoal - status.accepted)))}</Text>
           </View>
 
           <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Were you invited?</Text>
-            <Text style={styles.body}>Apply a friend’s code once. It credits the welcome; it never exposes your financial data.</Text>
+            <Text style={styles.sectionTitle}>{localizeCopy("Were you invited?")}</Text>
+            <Text style={styles.body}>{localizeCopy("Apply a friend’s code once. It credits the welcome; it never exposes your financial data.")}</Text>
             <View style={styles.redeemRow}>
-              <TextInput value={code} onChangeText={setCode} autoCapitalize="characters" placeholder="ARI123ABC" placeholderTextColor={color.inkFaint} style={styles.input} accessibilityLabel="Invite code" />
-              <TouchableOpacity style={styles.apply} onPress={() => void redeem()} disabled={redeeming || !code.trim()}>
-                {redeeming ? <ActivityIndicator color={color.card} /> : <Text style={styles.applyText}>Apply</Text>}
+              <TextInput value={code} onChangeText={setCode} autoCapitalize="characters" placeholder="ARI123ABC" placeholderTextColor={color.inkFaint} style={styles.input} accessibilityLabel={localizeCopy("Invite code")} />
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel={localizeCopy("Apply")} accessibilityState={{ disabled: redeeming || !code.trim(), busy: redeeming }} style={styles.apply} onPress={() => void redeem()} disabled={redeeming || !code.trim()}>
+                {redeeming ? <ActivityIndicator color={color.card} /> : <Text style={styles.applyText}>{localizeCopy("Apply")}</Text>}
               </TouchableOpacity>
             </View>
           </View>

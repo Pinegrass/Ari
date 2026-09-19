@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-require-imports -- Jest mock factories. */
 import React from 'react';
-import {render,fireEvent,waitFor} from '@testing-library/react-native';
+import {render,fireEvent,waitFor,act} from '@testing-library/react-native';
 import AddTransactionScreen from '../AddTransactionScreen';
 const mockAdd=jest.fn(),mockUpdate=jest.fn(),mockDelete=jest.fn(),mockBack=jest.fn();
 const mockFetch=jest.fn();
@@ -39,4 +39,19 @@ it('keeps the edit screen and shows an error when deletion fails',async()=>{
  fireEvent.press(view.getByLabelText('Confirm deletion'));
  await waitFor(()=>expect(view.getByText('Could not delete transaction.')).toBeTruthy());
  expect(mockBack).not.toHaveBeenCalled();
+});
+
+it('does not navigate when an in-flight save resolves after unmount',async()=>{
+ let resolveSave!: (value: {ok: boolean}) => void;
+ mockAdd.mockImplementation(()=>new Promise(resolve=>{resolveSave=resolve;}));
+ const view=screen();
+ fireEvent.press(view.getByRole('button',{name:'1'}));
+ fireEvent.press(view.getByLabelText('Save entry'));
+ await waitFor(()=>expect(mockAdd).toHaveBeenCalled());
+ view.unmount();
+ jest.useFakeTimers();
+ await act(async()=>{resolveSave({ok:true});await Promise.resolve();});
+ act(()=>{jest.advanceTimersByTime(1000);});
+ expect(mockBack).not.toHaveBeenCalled();
+ jest.useRealTimers();
 });

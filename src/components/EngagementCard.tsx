@@ -1,3 +1,4 @@
+import { useLanguage } from '../i18n/LanguageContext';
 import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -12,6 +13,7 @@ import { track } from '../lib/analytics';
 type Nav = StackNavigationProp<MainStackParamList>;
 
 export default function EngagementCard() {
+  const { phrase } = useLanguage();
   const navigation = useNavigation<Nav>();
   const [summary, setSummary] = useState<EngagementSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -41,23 +43,23 @@ export default function EngagementCard() {
       <View style={styles.headingRow}>
         <View style={styles.icon}><Icon name="sprout" size={20} color={color.forest} /></View>
         <View style={styles.headingText}>
-          <Text style={styles.kicker}>Your rhythm</Text>
+          <Text style={styles.kicker}>{phrase("Your rhythm")}</Text>
           <Text style={styles.title}>{summary.headline}</Text>
         </View>
       </View>
       <View style={styles.metrics}>
-        <View><Text style={styles.metricValue}>{summary.currentStreak}</Text><Text style={styles.metricLabel}>day streak</Text></View>
+        <View><Text style={styles.metricValue}>{summary.currentStreak}</Text><Text style={styles.metricLabel}>{phrase("day streak")}</Text></View>
         <View style={styles.divider} />
-        <View><Text style={styles.metricValue}>{summary.transactionCount}</Text><Text style={styles.metricLabel}>entries logged</Text></View>
+        <View><Text style={styles.metricValue}>{summary.transactionCount}</Text><Text style={styles.metricLabel}>{phrase("entries logged")}</Text></View>
       </View>
       <View style={styles.progressHead}>
-        <Text style={styles.progressLabel}>Next milestone</Text>
+        <Text style={styles.progressLabel}>{phrase("Next milestone")}</Text>
         <Text style={styles.progressValue}>{summary.transactionCount}/{summary.nextMilestone}</Text>
       </View>
       <ProgressBar percentage={summary.milestoneProgress * 100} height={7} />
       <TouchableOpacity style={styles.action} onPress={open} accessibilityRole="button">
         <Text style={styles.actionText}>
-          {summary.recommendedAction === 'open_report' ? 'See my report' : 'Log one small update'}
+          {summary.recommendedAction === 'open_report' ? phrase('See my report') : phrase('Log one small update')}
         </Text>
         <Icon name="chevron-right" size={17} color={color.card} />
       </TouchableOpacity>

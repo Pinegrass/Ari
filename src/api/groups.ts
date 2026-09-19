@@ -1,6 +1,7 @@
 import { apiRequest } from './client';
 
 export interface GroupSummary {
+  currency: string | null;
   id: string;
   name: string;
   emoji: string | null;
@@ -15,6 +16,7 @@ export interface GroupMember {
 }
 
 export interface GroupDetail {
+  currency: string | null;
   id: string;
   name: string;
   emoji: string | null;
@@ -32,6 +34,7 @@ export interface SharedExpenseSplit {
 }
 
 export interface SharedExpense {
+  currency: string | null;
   id: string;
   groupId: string;
   paidBy: string;
@@ -55,6 +58,7 @@ export interface BalanceNet {
 }
 
 export interface BalancesResponse {
+  currency: string | null;
   nets: BalanceNet[];
   pairs: BalancePair[];
 }
@@ -71,6 +75,11 @@ export const listGroups = () =>
 
 export const getGroupDetail = (gid: string) =>
   apiRequest<GroupDetail>(`/groups/${gid}`);
+
+export const confirmGroupCurrency = (gid: string, currency: string) =>
+  apiRequest<{currency: string; amountsConverted: false}>(`/groups/${gid}/currency`, {
+    method: 'PUT', body: JSON.stringify({currency, confirmExistingAmounts: true}),
+  });
 
 export const archiveGroup = (gid: string) =>
   apiRequest<{ ok: boolean }>(`/groups/${gid}`, { method: 'DELETE' });
@@ -90,7 +99,7 @@ export interface SplitInput { userId: string; amount: number | string }
 
 export const logSharedExpense = (
   gid: string,
-  payload: { amount: number; description: string; category: string; date: string; splits: SplitInput[] },
+  payload: { id?: string; currency: string; amount: number; description: string; category: string; date: string; splits: SplitInput[] },
 ) =>
   apiRequest<SharedExpense>(`/groups/${gid}/expenses`, {
     method: 'POST',
@@ -114,11 +123,11 @@ export interface SettleResponse {
   settledAt?: string;
 }
 
-export const settleSplit = (gid: string, sid: string, method: 'upi' | 'cash' | 'manual' | 'bank') =>
+export const settleSplit = (gid: string, sid: string, method: 'upi' | 'cash' | 'manual' | 'bank', currency: string) =>
   apiRequest<SettleResponse>(`/groups/${gid}/splits/${sid}/settle`, {
     method: 'POST',
-    body: JSON.stringify({ method }),
+    body: JSON.stringify({ method, currency }),
   });
 
-export const confirmUpiSettlement = (gid: string, sid: string) =>
-  apiRequest<SettleResponse>(`/groups/${gid}/splits/${sid}/settle/confirm`, { method: 'POST' });
+export const confirmUpiSettlement = (gid: string, sid: string, currency: string) =>
+  apiRequest<SettleResponse>(`/groups/${gid}/splits/${sid}/settle/confirm`, { method: 'POST', body: JSON.stringify({currency}) });

@@ -1,10 +1,13 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { track } from '../lib/analytics';
+import { useLanguage } from '../i18n/LanguageContext';
 import { phrase } from '../i18n/phrases';
+import { getNotificationCapabilities } from '../api/notificationPreferences';
+import { requestSessionRevision, requestAccountId } from '../lib/requestSession';
 
 const NOTIFICATIONS_ENABLED_KEY = 'ari_notifications_enabled';
 const REMINDER_TIME_KEY = 'ari_reminder_time'; // stored as "HH:MM" e.g. "20:00"
@@ -16,6 +19,14 @@ const DEFAULT_MINUTE = 0;
 const LEGACY_DAILY_REMINDER_ID = 'ari_daily_reminder';
 const CHECKIN_IDS = ['ari_tomo_checkin_tue', 'ari_tomo_checkin_fri'] as const;
 const CHECKIN_WEEKDAYS = [3, 6] as const; // Expo: Sunday=1, Tuesday=3, Friday=6
+// Legacy device-wide preferences remain untouched; they have no reliable owner.
+const accountKey = (key: string) => `${key}:${requestAccountId() ?? 'unbound'}`;
+let scheduling = Promise.resolve();
+function serializeSchedule(action: () => Promise<void>): Promise<void> {
+  const run = scheduling.catch(() => {}).then(action);
+  scheduling = run.catch(() => {});
+  return run;
+}
 
 // Check-in copy bank. Each foreground reschedule rotates the two messages.
 const REMINDER_MESSAGES = [
@@ -55,12 +66,13 @@ function formatReminderTime(hour: number, minute: number): string {
 
 /** Next message in the rotation; advances the persisted cursor. */
 async function nextReminderMessage(): Promise<{ title: string; body: string }> {
-  const raw = await AsyncStorage.getItem(REMINDER_INDEX_KEY);
+  const key = accountKey(REMINDER_INDEX_KEY);
+  const raw = await AsyncStorage.getItem(key);
   const idx = raw ? parseInt(raw, 10) : 0;
   const safeIdx = Number.isFinite(idx) && idx >= 0 ? idx : 0;
   const msg = REMINDER_MESSAGES[safeIdx % REMINDER_MESSAGES.length];
   await AsyncStorage.setItem(
-    REMINDER_INDEX_KEY,
+    key,
     String((safeIdx + 1) % REMINDER_MESSAGES.length)
   );
   const language = await AsyncStorage.getItem('ari_language');
@@ -74,17 +86,34 @@ async function nextReminderMessage(): Promise<{ title: string; body: string }> {
  * Cancels by id only — bill/EMI reminders are never collateral.
  */
 async function cancelCheckIns(): Promise<void> {
-  await Promise.all([
-    Notifications.cancelScheduledNotificationAsync(LEGACY_DAILY_REMINDER_ID).catch(() => {}),
-    ...CHECKIN_IDS.map((id) => Notifications.cancelScheduledNotificationAsync(id).catch(() => {})),
+  const results = await Promise.allSettled([
+    Notifications.cancelScheduledNotificationAsync(LEGACY_DAILY_REMINDER_ID),
+    ...CHECKIN_IDS.map((id) => Notifications.cancelScheduledNotificationAsync(id)),
   ]);
+  if (results.some(result => result.status === 'rejected')) throw new Error('Notification cancellation incomplete');
 }
 
-async function scheduleReminderAt(hour: number, minute: number): Promise<void> {
+export function cancelTomoCheckins(): Promise<void> {
+  return serializeSchedule(cancelCheckIns).catch(() => {});
+}
+
+async function scheduleReminderAt(hour: number, minute: number, revision = requestSessionRevision()): Promise<void> {
+  return serializeSchedule(async () => {
+  if (!requestAccountId() || revision !== requestSessionRevision()) return;
   await cancelCheckIns();
+  try {
+  // Fresh, authenticated ownership avoids scheduling a second generic channel.
+  // On unknown service state retain the user's choice but do not schedule blindly.
+  const capability = await getNotificationCapabilities();
+  if (revision !== requestSessionRevision()) return;
+  if (capability.genericCheckinOwner === 'server' && capability.dailyServiceEnabled === true) return;
+  if (capability.genericCheckinOwner !== 'device' || capability.dailyServiceEnabled !== false) throw new Error('Unavailable notification ownership');
+  if ((await Notifications.getPermissionsAsync()).status !== 'granted') throw new Error('Notification permission unavailable');
 
   for (let index = 0; index < CHECKIN_IDS.length; index += 1) {
+    if (revision !== requestSessionRevision()) return;
     const msg = await nextReminderMessage();
+    if (revision !== requestSessionRevision()) { await cancelCheckIns(); return; }
     const weekday = CHECKIN_WEEKDAYS[index];
     await Notifications.scheduleNotificationAsync({
       identifier: CHECKIN_IDS[index],
@@ -107,151 +136,155 @@ async function scheduleReminderAt(hour: number, minute: number): Promise<void> {
       },
     });
   }
+  if (revision !== requestSessionRevision()) await cancelCheckIns();
+  } catch (error) {
+    await cancelCheckIns().catch(() => {});
+    throw error;
+  }
+  });
 }
 
 /**
  * Rotate the twice-weekly check-in copy. On every app foreground we cancel +
  * reschedule the two weekly reminders with the next messages. No-op when
  * reminders are off or permission was revoked. Best-effort by design — a
- * failure just means the previous message repeats once more.
+ * failure cancels known generic schedules where the native platform permits.
  */
 export async function refreshTomoCheckins(): Promise<void> {
+  const revision = requestSessionRevision();
+  const enabledKey = accountKey(NOTIFICATIONS_ENABLED_KEY), timeKey = accountKey(REMINDER_TIME_KEY);
+  const cancelIfCurrent = () => serializeSchedule(async () => {
+    if (revision === requestSessionRevision()) await cancelCheckIns();
+  }).catch(() => {});
   try {
-    const enabled = await AsyncStorage.getItem(NOTIFICATIONS_ENABLED_KEY);
-    if (enabled !== 'true') return;
+    const enabled = await AsyncStorage.getItem(enabledKey);
+    if (revision !== requestSessionRevision()) return;
+    if (enabled !== 'true') { await cancelIfCurrent(); return; }
     const { status } = await Notifications.getPermissionsAsync();
-    if (status !== 'granted') return;
-    const { hour, minute } = parseReminderTime(await AsyncStorage.getItem(REMINDER_TIME_KEY));
-    await scheduleReminderAt(hour, minute);
+    if (status !== 'granted') { await cancelIfCurrent(); return; }
+    const { hour, minute } = parseReminderTime(await AsyncStorage.getItem(timeKey));
+    await scheduleReminderAt(hour, minute, revision);
   } catch {
-    // never let reminder housekeeping break app startup
+    await cancelIfCurrent();
   }
 }
 
 export function useNotifications() {
+  const { language } = useLanguage();
+  const mounted = useRef(false);
+  const busy = useRef(false);
   const [isEnabled, setIsEnabled] = useState(false);
   const [permissionGranted, setPermissionGranted] = useState(false);
   const [reminderHour, setReminderHour] = useState(DEFAULT_HOUR);
   const [reminderMinute, setReminderMinute] = useState(DEFAULT_MINUTE);
+  const current = useCallback((revision: number) => mounted.current && revision === requestSessionRevision() && !!requestAccountId(), []);
+  const failure = useCallback((revision: number) => {
+    if (current(revision)) Alert.alert(phrase(language, 'Notifications'), language === 'hi'
+      ? 'सूचनाएँ अपडेट नहीं हो सकीं। डिवाइस की अनुमति जाँचें और फिर कोशिश करें।'
+      : 'Notifications could not be updated. Check device permissions and try again.');
+  }, [current, language]);
 
   useEffect(() => {
-    (async () => {
-      const stored = await AsyncStorage.getItem(NOTIFICATIONS_ENABLED_KEY);
-      setIsEnabled(stored === 'true');
-
-      const rawTime = await AsyncStorage.getItem(REMINDER_TIME_KEY);
-      const { hour, minute } = parseReminderTime(rawTime);
-      setReminderHour(hour);
-      setReminderMinute(minute);
-
-      const { status } = await Notifications.getPermissionsAsync();
-      setPermissionGranted(status === 'granted');
+    mounted.current = true;
+    let active = true;
+    const revision = requestSessionRevision();
+    const enabledKey = accountKey(NOTIFICATIONS_ENABLED_KEY), timeKey = accountKey(REMINDER_TIME_KEY);
+    void (async () => {
+      try {
+        const [stored, rawTime, permission] = await Promise.all([
+          AsyncStorage.getItem(enabledKey), AsyncStorage.getItem(timeKey), Notifications.getPermissionsAsync(),
+        ]);
+        if (!active || !current(revision)) return;
+        const { hour, minute } = parseReminderTime(rawTime);
+        setIsEnabled(stored === 'true'); setReminderHour(hour); setReminderMinute(minute);
+        setPermissionGranted(permission.status === 'granted');
+      } catch { if (active) failure(revision); }
     })();
-  }, []);
+    return () => { active = false; mounted.current = false; };
+  }, [current, failure]);
 
   const requestPermission = useCallback(async (): Promise<boolean> => {
-    if (!Device.isDevice) {
-      Alert.alert('Notifications', 'Push notifications only work on physical devices.');
-      return false;
-    }
-
-    const { status: existing } = await Notifications.getPermissionsAsync();
-    if (existing === 'granted') {
-      setPermissionGranted(true);
-      return true;
-    }
-
-    const { status } = await Notifications.requestPermissionsAsync();
-    const granted = status === 'granted';
-    setPermissionGranted(granted);
-
-    if (!granted) {
-      Alert.alert(
-        'Permission Required',
-        'Please enable notifications in your device settings to receive reminders from Tomo.'
-      );
-    }
-
-    return granted;
-  }, []);
-
-  /**
-   * Cancel any prior reminder and (re)schedule for the given hour/minute.
-   * Each (re)schedule consumes the next message in the rotation, so toggling,
-   * changing the time, and foreground rotation all advance the copy.
-   */
-  const scheduleCheckIns = useCallback(
-    async (hour: number = reminderHour, minute: number = reminderMinute) => {
-      await scheduleReminderAt(hour, minute);
-    },
-    [reminderHour, reminderMinute]
-  );
+    const revision = requestSessionRevision();
+    if (!current(revision)) return false;
+    try {
+      if (!Device.isDevice) {
+        Alert.alert(phrase(language, 'Notifications'), phrase(language, 'Push notifications only work on physical devices.'));
+        return false;
+      }
+      let { status } = await Notifications.getPermissionsAsync();
+      if (!current(revision)) return false;
+      if (status !== 'granted') ({ status } = await Notifications.requestPermissionsAsync());
+      if (!current(revision)) return false;
+      const granted = status === 'granted';
+      setPermissionGranted(granted);
+      if (!granted) Alert.alert(phrase(language, 'Permission Required'), phrase(language,
+        'Please enable notifications in your device settings to receive reminders from Tomo.'));
+      return granted;
+    } catch { failure(revision); return false; }
+  }, [current, failure, language]);
 
   const toggleNotifications = useCallback(async () => {
-    if (!isEnabled) {
-      const granted = await requestPermission();
-      if (granted) {
-        await scheduleCheckIns();
-        await AsyncStorage.setItem(NOTIFICATIONS_ENABLED_KEY, 'true');
-        setIsEnabled(true);
-        track('nudge_checkins_enabled', { cadence: 'twice_weekly' });
+    const revision = requestSessionRevision(), key = accountKey(NOTIFICATIONS_ENABLED_KEY);
+    if (!current(revision) || busy.current) return;
+    busy.current = true;
+    try {
+      if (!isEnabled && !await requestPermission()) return;
+      if (!current(revision)) return;
+      await serializeSchedule(async () => {
+        if (revision !== requestSessionRevision()) return;
+        if (isEnabled) await cancelCheckIns();
+      });
+      if (!isEnabled) await scheduleReminderAt(reminderHour, reminderMinute, revision);
+      if (!current(revision)) return;
+      try { await AsyncStorage.setItem(key, isEnabled ? 'false' : 'true'); }
+      catch (error) {
+        await serializeSchedule(async () => { if (revision === requestSessionRevision()) await cancelCheckIns(); }).catch(() => {});
+        throw error;
       }
-    } else {
-      // Turn off only Tomo check-ins — bill reminders stay scheduled.
-      await cancelCheckIns();
-      await AsyncStorage.setItem(NOTIFICATIONS_ENABLED_KEY, 'false');
-      setIsEnabled(false);
-      track('nudge_checkins_disabled', { cadence: 'twice_weekly' });
-    }
-  }, [isEnabled, requestPermission, scheduleCheckIns]);
+      if (!current(revision)) return;
+      setIsEnabled(!isEnabled);
+      track(isEnabled ? 'nudge_checkins_disabled' : 'nudge_checkins_enabled', { cadence: 'twice_weekly' });
+    } catch { failure(revision); }
+    finally { busy.current = false; }
+  }, [current, failure, isEnabled, reminderHour, reminderMinute, requestPermission]);
 
-  /**
-   * Persist a new reminder time and re-schedule if reminders are on.
-   * If reminders are currently off we still persist the choice so toggling
-   * them on later uses the user's preferred time.
-   */
-  const setReminderTime = useCallback(
-    async (hour: number, minute: number) => {
-      const safeHour = Math.min(23, Math.max(0, Math.floor(hour)));
-      const safeMinute = Math.min(59, Math.max(0, Math.floor(minute)));
-      setReminderHour(safeHour);
-      setReminderMinute(safeMinute);
-      await AsyncStorage.setItem(REMINDER_TIME_KEY, formatReminderTime(safeHour, safeMinute));
-      if (isEnabled && permissionGranted) {
-        await scheduleCheckIns(safeHour, safeMinute);
-      }
-    },
-    [isEnabled, permissionGranted, scheduleCheckIns]
-  );
+  const setReminderTime = useCallback(async (hour: number, minute: number) => {
+    const revision = requestSessionRevision(), key = accountKey(REMINDER_TIME_KEY);
+    if (!current(revision) || busy.current) return;
+    if (!Number.isFinite(hour) || !Number.isFinite(minute)) { failure(revision); return; }
+    const safeHour = Math.min(23, Math.max(0, Math.floor(hour)));
+    const safeMinute = Math.min(59, Math.max(0, Math.floor(minute)));
+    busy.current = true;
+    try {
+      await AsyncStorage.setItem(key, formatReminderTime(safeHour, safeMinute));
+      if (!current(revision)) return;
+      setReminderHour(safeHour); setReminderMinute(safeMinute);
+      if (isEnabled) await scheduleReminderAt(safeHour, safeMinute, revision);
+    } catch { failure(revision); }
+    finally { busy.current = false; }
+  }, [current, failure, isEnabled]);
 
   const sendTestNotification = useCallback(async () => {
-    const granted = permissionGranted || await requestPermission();
-    if (!granted) return;
+    const revision = requestSessionRevision();
+    try {
+      if (!await requestPermission() || !current(revision)) return;
+      await serializeSchedule(async () => {
+        if (!current(revision)) return;
+        const identifier = await Notifications.scheduleNotificationAsync({
+          content: {
+            title: phrase(language, 'Tomo says hi! 🤖'),
+            body: phrase(language, 'Review your month, add an entry, or skip today—your choice.'),
+            sound: 'default',
+            data: { type: 'tomo_checkin', nudgeId: 'local_checkin:test', nudgeTrigger: 'test_checkin', experimentVariant: 'contextual_v1' },
+          },
+          trigger: null,
+        });
+        // Immediate OS delivery cannot be recalled; remove any still-pending request.
+        if (!current(revision)) await Notifications.cancelScheduledNotificationAsync(identifier);
+      });
+    } catch { failure(revision); }
+  }, [current, failure, language, requestPermission]);
 
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: 'Tomo says hi! 🤖',
-        body: 'Review your month, add an entry, or skip today—your choice.',
-        sound: 'default',
-        data: {
-          type: 'tomo_checkin',
-          nudgeId: 'local_checkin:test',
-          nudgeTrigger: 'test_checkin',
-          experimentVariant: 'contextual_v1',
-        },
-      },
-      trigger: null, // Send immediately
-    });
-  }, [permissionGranted, requestPermission]);
-
-  return {
-    isEnabled,
-    permissionGranted,
-    reminderHour,
-    reminderMinute,
-    toggleNotifications,
-    setReminderTime,
-    sendTestNotification,
-    requestPermission,
-  };
+  return { isEnabled, permissionGranted, reminderHour, reminderMinute,
+    toggleNotifications, setReminderTime, sendTestNotification, requestPermission };
 }

@@ -1,3 +1,4 @@
+import { useLanguage } from '../../i18n/LanguageContext';
 import React, { useEffect, useRef } from 'react';
 import { Animated, TouchableOpacity, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export default function AnimatedFAB({ onPress }: Props) {
+  const { phrase } = useLanguage();
   const insets = useSafeAreaInsets();
   const scale = useRef(new Animated.Value(0)).current;
 
@@ -41,7 +43,7 @@ export default function AnimatedFAB({ onPress }: Props) {
         onPress={onPress}
         activeOpacity={0.85}
         style={styles.touchable}
-        accessibilityLabel="Add new transaction"
+        accessibilityLabel={phrase("Add new transaction")}
         accessibilityRole="button"
       >
         <Icon name="plus" size={26} color={color.cream} />

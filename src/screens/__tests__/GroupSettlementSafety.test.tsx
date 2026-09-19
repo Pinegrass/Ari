@@ -1,0 +1,94 @@
+/* eslint-disable @typescript-eslint/no-require-imports -- Jest fixtures. */
+import React from 'react';
+import { Alert, Linking } from 'react-native';
+import { fireEvent, render, waitFor, act, configure } from '@testing-library/react-native';
+import GroupDetailScreen from '../GroupDetailScreen';
+import AddSharedExpenseScreen from '../AddSharedExpenseScreen';
+import {getGroupDetail, listSharedExpenses, getBalances, settleSplit, confirmUpiSettlement, logSharedExpense, confirmGroupCurrency} from '../../api/groups';
+import {formatGroupAmount} from '../../utils/groupCurrency';
+const mockBack=jest.fn(), mockSuccess=jest.fn();
+let mockUid='me';
+jest.setTimeout(30000);
+configure({asyncUtilTimeout:10000});
+jest.mock('../../api/groups',()=>({getGroupDetail:jest.fn(),listSharedExpenses:jest.fn(),getBalances:jest.fn(),settleSplit:jest.fn(),confirmUpiSettlement:jest.fn(),logSharedExpense:jest.fn(),createInvite:jest.fn(),confirmGroupCurrency:jest.fn()}));
+jest.mock('../../context/AuthContext',()=>({useAuth:()=>({user:{id:mockUid}})}));
+jest.mock('../../context/PrivacyContext',()=>({usePrivacy:()=>({formatAmount:(n:number)=>String(n)})}));
+jest.mock('../../hooks/useLocale',()=>({useLocale:()=>({formatDate:()=> '19 Sep',locale:{currency:'INR',symbol:'₹'}})}));
+jest.mock('../../hooks/useHaptics',()=>({useHaptics:()=>({light:jest.fn(),error:jest.fn(),success:mockSuccess})}));
+jest.mock('../../i18n/LanguageContext',()=>({useLanguage:()=>({language:'en'})}));
+jest.mock('../../components/ui/Icon',()=>()=>null);
+jest.mock('../../components/ScreenShell',()=>{const {View}=require('react-native');return function MockShell({children}:{children:React.ReactNode}) { return <View>{children}</View>; };});
+jest.mock('@react-navigation/native',()=>({useNavigation:()=>({goBack:mockBack,navigate:jest.fn()}),useRoute:()=>({params:{groupId:'g'}}),useFocusEffect:(effect:()=>void)=>require('react').useEffect(effect,[effect])}));
+jest.mock('expo-crypto',()=>({randomUUID:()=> 'fixed-draft-uuid'}));
+beforeEach(()=>{
+ jest.clearAllMocks();mockUid='me';
+ (getGroupDetail as jest.Mock).mockResolvedValue({id:'g',name:'Trip',currency:'INR',createdBy:'me',members:[{id:'me',name:'Me'},{id:'friend',name:'Friend'}]});
+ (listSharedExpenses as jest.Mock).mockResolvedValue({expenses:[{id:'e',paidBy:'friend',date:'2026-09-19',amount:10,description:'Dinner',splits:[{id:'s',owedBy:'me',amount:10,settledAt:null}]}]});
+ (getBalances as jest.Mock).mockResolvedValue({nets:[],pairs:[]});
+});
+it('does not offer or record cash after an ambiguous UPI request failure',async()=>{
+ const alert=jest.spyOn(Alert,'alert').mockImplementation(()=>{});
+ (settleSplit as jest.Mock).mockRejectedValue(new Error('private database detail'));
+ const view=render(<GroupDetailScreen/>);
+ await waitFor(()=>expect(view.getByText('Settle via UPI')).toBeTruthy());
+ fireEvent.press(view.getByText('Settle via UPI'));
+ await waitFor(()=>expect(alert).toHaveBeenCalled());
+ expect(alert.mock.calls[0][0]).toBe('Could not record settlement');
+ expect(JSON.stringify(alert.mock.calls)).not.toContain('private database detail');
+ expect((alert.mock.calls[0][2]??[]).map(b=>b.text)).toEqual(['Retry','Cancel']);
+ expect(settleSplit).toHaveBeenCalledTimes(1);expect(mockSuccess).not.toHaveBeenCalled();
+ alert.mockRestore();
+});
+it('opens a UPI intent without claiming payment until user and server confirm',async()=>{
+ const alert=jest.spyOn(Alert,'alert').mockImplementation(()=>{});
+ jest.spyOn(Linking,'canOpenURL').mockResolvedValue(true);jest.spyOn(Linking,'openURL').mockResolvedValue(undefined);
+ (settleSplit as jest.Mock).mockResolvedValue({upiLink:'upi://pay?pa=friend@upi',settled:false});
+ (confirmUpiSettlement as jest.Mock).mockResolvedValue({settled:false});
+ const view=render(<GroupDetailScreen/>);
+ await waitFor(()=>expect(view.getByText('Settle via UPI')).toBeTruthy());fireEvent.press(view.getByText('Settle via UPI'));
+ await waitFor(()=>expect(alert).toHaveBeenCalledWith('Record your payment?',expect.any(String),expect.any(Array)));
+ expect(confirmUpiSettlement).not.toHaveBeenCalled();expect(mockSuccess).not.toHaveBeenCalled();
+ await act(async()=>{alert.mock.calls[0][2]?.[1].onPress?.();});
+ await waitFor(()=>expect(confirmUpiSettlement).toHaveBeenCalledWith('g','s','INR'));
+ expect(mockSuccess).not.toHaveBeenCalled();alert.mockRestore();
+});
+it('requires explicit cash confirmation and discards it after account switch',async()=>{
+ const alert=jest.spyOn(Alert,'alert').mockImplementation(()=>{});
+ const view=render(<GroupDetailScreen/>);await waitFor(()=>expect(view.getByText('Record cash')).toBeTruthy());
+ fireEvent.press(view.getByText('Record cash'));expect(settleSplit).not.toHaveBeenCalled();
+ const confirm=alert.mock.calls[0][2]?.[1].onPress;
+ mockUid='other';view.rerender(<GroupDetailScreen/>);
+ await act(async()=>{confirm?.();});
+ expect(settleSplit).not.toHaveBeenCalled();alert.mockRestore();
+});
+it('keeps uncertain expense draft and retries exactly the same id and payload',async()=>{
+ (logSharedExpense as jest.Mock).mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce({id:'fixed-draft-uuid'});
+ const view=render(<AddSharedExpenseScreen/>);
+ await waitFor(()=>expect(view.getByLabelText('Amount')).toBeTruthy());
+ fireEvent.changeText(view.getByLabelText('Amount'),'10.25');fireEvent.changeText(view.getByLabelText('Description'),'Dinner');
+ fireEvent.press(view.getByText('Save'));
+ await waitFor(()=>expect(view.getByText(/Save is unconfirmed/)).toBeTruthy());
+ expect(view.getByDisplayValue('Dinner')).toBeTruthy();expect(mockBack).not.toHaveBeenCalled();
+ fireEvent.press(view.getByText('Retry'));
+ await waitFor(()=>expect(mockBack).toHaveBeenCalledTimes(1));
+ expect((logSharedExpense as jest.Mock).mock.calls[0]).toEqual((logSharedExpense as jest.Mock).mock.calls[1]);
+ expect((logSharedExpense as jest.Mock).mock.calls[0][1].currency).toBe('INR');
+});
+it('requires owner confirmation of unknown recorded units without converting amounts',async()=>{
+ const alert=jest.spyOn(Alert,'alert').mockImplementation(()=>{});
+ (getGroupDetail as jest.Mock).mockResolvedValue({id:'g',name:'Old group',currency:null,createdBy:'me',members:[{id:'me',name:'Me'}]});
+ (confirmGroupCurrency as jest.Mock).mockResolvedValue({currency:'USD',amountsConverted:false});
+ const view=render(<GroupDetailScreen/>);
+ await waitFor(()=>expect(view.getByText('Confirm recorded currency')).toBeTruthy());
+ fireEvent.press(view.getByText('USD'));
+ expect(confirmGroupCurrency).not.toHaveBeenCalled();
+ expect(alert.mock.calls[0][1]).toContain('does not convert');
+ await act(async()=>{await alert.mock.calls[0][2]?.[1].onPress?.();});
+ expect(confirmGroupCurrency).toHaveBeenCalledWith('g','USD');alert.mockRestore();
+});
+it('does not show an account currency for historical amounts and preserves privacy',()=>{
+ expect(formatGroupAmount(10,null,'en')).toContain('Recorded currency unknown');
+ expect(formatGroupAmount(10,'USD','en')).toContain('USD');
+ expect(formatGroupAmount(10,'INR','hi')).toContain('INR');
+ expect(formatGroupAmount(10,'USD','hi',true)).toBe('••••');
+});

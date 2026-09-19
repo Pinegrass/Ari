@@ -59,14 +59,14 @@ export default function AboutScreen({ onBack }: Props) {
               <Icon name="sprout" size={40} color={color.forest} />
             </View>
             <Text style={styles.appName}>Ari</Text>
-            <Text style={styles.version}>Version {APP_VERSION}</Text>
+            <Text style={styles.version}>{localizeCopy("Version")}{" "}{APP_VERSION}</Text>
             {runtimeVersion && (
-              <Text style={styles.meta}>Runtime: {runtimeVersion}</Text>
+              <Text style={styles.meta}>{localizeCopy("Runtime:")}{" "}{runtimeVersion}</Text>
             )}
-            {channel && <Text style={styles.meta}>Channel: {channel}</Text>}
-            <Text selectable style={styles.meta}>Bundle: {isEmbeddedLaunch ? 'embedded' : 'downloaded'}</Text>
-            {updateId && <Text selectable style={styles.meta}>Update: {updateId}</Text>}
-            <Text style={styles.tagline}>Your Money, Your Future</Text>
+            {channel && <Text style={styles.meta}>{localizeCopy("Channel:")}{" "}{channel}</Text>}
+            <Text selectable style={styles.meta}>{localizeCopy("Bundle:")}{" "}{isEmbeddedLaunch ? localizeCopy('embedded') : localizeCopy('downloaded')}</Text>
+            {updateId && <Text selectable style={styles.meta}>{localizeCopy("Update:")}{" "}{updateId}</Text>}
+            <Text style={styles.tagline}>{localizeCopy("Your Money, Your Future")}</Text>
           </View>
         </AnimatedEntry>
 
@@ -76,38 +76,32 @@ export default function AboutScreen({ onBack }: Props) {
             onPress={checkManually}
             disabled={isBusy}
             accessibilityRole="button"
-            accessibilityLabel="Check for updates"
+            accessibilityLabel={localizeCopy("Check for updates")}
           >
             {isBusy ? (
               <ActivityIndicator color={color.cream} />
             ) : (
-              <Text style={styles.checkBtnText}>Check for updates</Text>
+              <Text style={styles.checkBtnText}>{localizeCopy("Check for updates")}</Text>
             )}
           </TouchableOpacity>
           {message ? (
-            <Text style={[styles.statusText, { color: statusColor(status) }]}>{message}</Text>
+            <Text style={[styles.statusText, { color: statusColor(status) }]}>{localizeCopy(message)}</Text>
           ) : null}
         </AnimatedEntry>
 
         <AnimatedEntry delay={200}>
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>What is Ari?</Text>
+            <Text style={styles.cardTitle}>{localizeCopy("What is Ari?")}</Text>
             <Text style={styles.cardText}>
-              Ari is your personal finance companion built for India. Track expenses,
-              set budgets, and get AI-powered insights from Tomo — your financial coach
-              who understands the Indian context.
-            </Text>
+              {localizeCopy("Ari helps you record spending, review budgets and understand your recorded financial activity. Choose your supported country and currency in Settings.")}</Text>
           </View>
         </AnimatedEntry>
 
         <AnimatedEntry delay={300}>
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>Meet Tomo</Text>
+            <Text style={styles.cardTitle}>{localizeCopy("Meet Tomo")}</Text>
             <Text style={styles.cardText}>
-              Tomo is your AI finance coach. From SIP advice to spending analysis,
-              Tomo helps you build better money habits with personalized tips and
-              real-time insights.
-            </Text>
+              {localizeCopy("Tomo helps you review recorded spending and budgets. AI suggestions can be wrong; check the details. Tomo does not provide specific investment advice.")}</Text>
           </View>
         </AnimatedEntry>
 
@@ -118,11 +112,11 @@ export default function AboutScreen({ onBack }: Props) {
               { icon: 'target' as IconName, text: 'Category-based budgets' },
               { icon: 'bot' as IconName, text: 'AI-powered coaching' },
               { icon: 'lightbulb' as IconName, text: 'Personalized insights' },
-              { icon: 'flag' as IconName, text: 'Built for India' },
+              { icon: 'flag' as IconName, text: 'Supported countries and currencies' },
             ]).map((f) => (
-              <View key={f.text} style={styles.featureRow}>
+              <View key={localizeCopy(f.text)} style={styles.featureRow}>
                 <Icon name={f.icon} size={20} color={color.forest} />
-                <Text style={styles.featureText}>{f.text}</Text>
+                <Text style={styles.featureText}>{localizeCopy(f.text)}</Text>
               </View>
             ))}
           </View>
@@ -130,8 +124,7 @@ export default function AboutScreen({ onBack }: Props) {
 
         <AnimatedEntry delay={500}>
           <Text style={styles.madeWith}>
-            Made with love in India
-          </Text>
+            {localizeCopy("Made with love in India")}</Text>
         </AnimatedEntry>
       </ScrollView>
     </ScreenShell>

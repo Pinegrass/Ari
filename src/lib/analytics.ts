@@ -9,7 +9,19 @@ let privacyChoiceSet=false;
 let allowed=false;
 let generation=0;
 let accountId:string|null=null;
-export function setMeasurementAllowed(enabled:boolean,epoch:string|null=null):void{generation++;allowed=enabled&&!!epoch;setMeasurementEpoch(allowed?epoch:null);}
+// A single boot-only marker may wait for restored-session validation, never for opt-in.
+let startupOpen = true;
+const startupDeadline = Date.now() + 30_000;
+let startupDelivery: string | null = null;
+let restoredAccount: string | null = null;
+let privacyInitialized = false;
+function closeStartup(): void { startupOpen = false; startupDelivery = null; restoredAccount = null; }
+function applyAllowed(enabled: boolean, epoch: string | null): void {
+  generation++; allowed = enabled && !!epoch; setMeasurementEpoch(allowed ? epoch : null);
+}
+export function setMeasurementAllowed(enabled:boolean,epoch:string|null=null):void{
+  closeStartup(); applyAllowed(enabled, epoch);
+}
 export function measurementRevision():number{return generation;}
 export function applyMeasurementConsent(value:{enabled:boolean;consentEpoch:string|null},revision:number):boolean{
   if(revision!==generation)return false;
@@ -17,19 +29,45 @@ export function applyMeasurementConsent(value:{enabled:boolean;consentEpoch:stri
 }
 export async function syncMeasurementConsent():Promise<void>{
   const current=++generation;
-  try{const value=await apiRequest<{enabled:boolean;consentEpoch:string|null}>('/measurement/v2/consent');if(current===generation)setMeasurementAllowed(value.enabled,value.consentEpoch);}catch{if(current===generation)setMeasurementAllowed(false);}
+  try {
+    const value=await apiRequest<{enabled:boolean;consentEpoch:string|null}>('/measurement/v2/consent');
+    if(current!==generation)return;
+    applyAllowed(value.enabled,value.consentEpoch);
+    if(startupOpen && restoredAccount && restoredAccount===accountId && privacyInitialized){
+      const delivery=startupDelivery, withinDeadline=Date.now()<=startupDeadline;
+      closeStartup();
+      if(delivery && withinDeadline)trackNotificationOpen({measurementDeliveryId:delivery});
+    }
+  } catch { if(current===generation){applyAllowed(false,null);closeStartup();} }
 }
 export async function initAnalytics():Promise<void>{
-  try{const saved=await AsyncStorage.getItem('ari_private_mode');if(!privacyChoiceSet){privateMode=saved==='1';setMeasurementPrivate(privateMode);}}catch{return;}
-  await syncMeasurementConsent();
+  try {
+    const saved=await AsyncStorage.getItem('ari_private_mode');
+    if(!privacyChoiceSet){privateMode=saved==='1';setMeasurementPrivate(privateMode);}
+    privacyInitialized=true;
+  } catch {closeStartup();return;}
+  // AuthContext validates a restored identity first. Never fetch consent against
+  // an unbound boot token and later apply it to an interactive login.
+  if(accountId)await syncMeasurementConsent();
 }
-export function setPrivacyEnabled(enabled:boolean):void{privacyChoiceSet=true;privateMode=enabled;setMeasurementPrivate(enabled);}
+export function setPrivacyEnabled(enabled:boolean,source:'user'|'hydrate'='user'):void{
+  if(source==='user')closeStartup();
+  if(privateMode!==enabled)generation++;
+  privacyChoiceSet=true;privateMode=enabled;setMeasurementPrivate(enabled);
+}
 export function isPrivacyEnabled():boolean{return privateMode;}
 export function identifyUser(userId:string,_traits:Record<string,unknown>={}):void{
-  if(accountId!==userId){setMeasurementAllowed(false);accountId=userId;}
+  closeStartup();
+  if(accountId!==userId){applyAllowed(false,null);accountId=userId;}
   void syncMeasurementConsent();
 }
-export function resetAnalytics():void{accountId=null;setMeasurementAllowed(false);}
+/** Only the successful startup /auth/me path may bind the boot marker. */
+export function identifyRestoredUser(userId:string):void{
+  if(accountId && accountId!==userId){closeStartup();return;}
+  accountId=userId;restoredAccount=startupOpen ? userId : null;applyAllowed(false,null);
+  if(privacyInitialized)void syncMeasurementConsent();
+}
+export function resetAnalytics():void{closeStartup();accountId=null;applyAllowed(false,null);}
 export type AnalyticsEvent =
   | 'app_opened'
   | 'app_foregrounded'
@@ -116,6 +154,29 @@ export function track(event:AnalyticsEvent,_props:Record<string,unknown>={}):voi
   void send().catch(error=>{
     const status=(error as {status?:number})?.status;
     if(current===generation&&measurementEpoch()===epoch&&(status===0||status===undefined||status>=500))return send().catch(()=>{});
+  });
+}
+/** Records only a server-owned delivery marker observed while collection is allowed.
+ * Local reminders and generic inbox interactions cannot supply the delivery denominator.
+ * Never persist a tap or replay one after consent initialization/account changes.
+ */
+export function trackNotificationOpen(data: unknown): void {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return;
+  const deliveryId = (data as Record<string, unknown>).measurementDeliveryId;
+  if (typeof deliveryId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(deliveryId)) return;
+  if (startupOpen && Date.now() <= startupDeadline && (!privacyInitialized || !restoredAccount || !allowed)) {
+    if (!startupDelivery) startupDelivery = deliveryId;
+    return;
+  }
+  if (privateMode || !allowed) return;
+  const epoch = measurementEpoch(), current = generation;
+  if (!epoch) return;
+  const body = JSON.stringify({ deliveryId, consentEpoch: epoch });
+  const send = () => apiRequest('/measurement/v2/notification-open', { method: 'POST', body });
+  void send().catch(error => {
+    const status = (error as { status?: number })?.status;
+    if (!privateMode && allowed && current === generation && measurementEpoch() === epoch &&
+        (status === 0 || status === undefined || status >= 500)) return send().catch(() => {});
   });
 }
 // ─── Helpers ──────────────────────────────────────────────────────────────────

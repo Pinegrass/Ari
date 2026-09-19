@@ -23,6 +23,7 @@ export default function GroupsListScreen() {
   const haptics = useHaptics();
   const [groups, setGroups] = useState<GroupSummary[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [creating, setCreating] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
@@ -30,11 +31,13 @@ export default function GroupsListScreen() {
   const [code, setCode] = useState('');
 
   const load = useCallback(async () => {
+    setLoading(true);
+    setLoadError(false);
     try {
       const r = await listGroups();
       setGroups(r.groups);
-    } catch (e) {
-      console.warn('listGroups failed', e);
+    } catch {
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -50,9 +53,9 @@ export default function GroupsListScreen() {
       haptics.success();
       setName(''); setShowCreate(false);
       navigation.navigate('GroupDetail', { groupId: g.id });
-    } catch (e) {
+    } catch {
       haptics.error();
-      Alert.alert('Could not create group', e instanceof Error ? e.message : 'Try again');
+      Alert.alert(localizeCopy('Could not create group'), localizeCopy('Check your connection and try again.'));
     } finally {
       setCreating(false);
     }
@@ -66,16 +69,16 @@ export default function GroupsListScreen() {
       haptics.success();
       setCode(''); setShowJoin(false);
       navigation.navigate('GroupDetail', { groupId: r.groupId });
-    } catch (e) {
+    } catch {
       haptics.error();
-      Alert.alert('Could not join', e instanceof Error ? e.message : 'Check the code and try again');
+      Alert.alert(localizeCopy('Could not join'), localizeCopy('Check the code and try again'));
     }
   };
 
   return (
     <ScreenShell edges={['top']}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={8}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel={localizeCopy("Go back")} onPress={() => navigation.goBack()} hitSlop={8}>
           <Icon name="arrow-left" size={22} color={color.ink} />
         </TouchableOpacity>
         <Text style={styles.title}>{localizeCopy("Shared expenses")}</Text>
@@ -85,43 +88,47 @@ export default function GroupsListScreen() {
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.actions}>
           <TouchableOpacity
+            accessibilityRole="button"
             style={styles.actionCard}
             activeOpacity={0.8}
             onPress={() => { haptics.light(); setShowCreate((v) => !v); setShowJoin(false); }}
           >
             <Icon name="plus" size={20} color={color.forest} />
-            <Text style={styles.actionLabel}>Create group</Text>
+            <Text style={styles.actionLabel}>{localizeCopy("Create group")}</Text>
           </TouchableOpacity>
           <TouchableOpacity
+            accessibilityRole="button"
             style={styles.actionCard}
             activeOpacity={0.8}
             onPress={() => { haptics.light(); setShowJoin((v) => !v); setShowCreate(false); }}
           >
             <Icon name="user" size={20} color={color.gold} />
-            <Text style={styles.actionLabel}>Join by code</Text>
+            <Text style={styles.actionLabel}>{localizeCopy("Join by code")}</Text>
           </TouchableOpacity>
         </View>
 
         {showCreate && (
           <View style={styles.inlineForm}>
-            <Text style={styles.inputLabel}>Group name</Text>
+            <Text style={styles.inputLabel}>{localizeCopy("Group name")}</Text>
             <TextInput
               style={styles.input}
-              placeholder="Trip to Goa"
+              accessibilityLabel={localizeCopy("Group name")}
+              placeholder={localizeCopy("Trip to Goa")}
               placeholderTextColor={color.inkFaint}
               value={name}
               onChangeText={setName}
               autoFocus
             />
-            <Button onPress={handleCreate} loading={creating} fullWidth>Create</Button>
+            <Button onPress={handleCreate} loading={creating} fullWidth>{localizeCopy("Create")}</Button>
           </View>
         )}
 
         {showJoin && (
           <View style={styles.inlineForm}>
-            <Text style={styles.inputLabel}>Invite code</Text>
+            <Text style={styles.inputLabel}>{localizeCopy("Invite code")}</Text>
             <TextInput
               style={[styles.input, { letterSpacing: 4, fontFamily: font.bodyBold, textAlign: 'center' }]}
+              accessibilityLabel={localizeCopy("Invite code")}
               placeholder="XXXXXXXX"
               placeholderTextColor={color.inkFaint}
               value={code}
@@ -131,23 +138,26 @@ export default function GroupsListScreen() {
               maxLength={8}
               autoFocus
             />
-            <Button onPress={handleJoin} fullWidth>Join</Button>
+            <Button onPress={handleJoin} fullWidth>{localizeCopy("Join")}</Button>
           </View>
         )}
 
         {loading ? (
           <ActivityIndicator color={color.forest} style={{ marginTop: 40 }} />
+        ) : loadError ? (
+          <EmptyState emoji="📡" title={localizeCopy("Could not load groups.")} subtitle={localizeCopy("Check your connection and try again.")} actionLabel={localizeCopy("Retry")} onAction={() => void load()} />
         ) : groups.length === 0 ? (
           <View style={{ marginTop: 40 }}>
             <EmptyState
               emoji="👥"
-              title="No groups yet"
-              subtitle="Create a group for trips, roommates, or splits with friends. UPI settlement built in."
+              title={localizeCopy("No groups yet")}
+              subtitle={localizeCopy("Create a group for trips, roommates, or splits with friends.")}
             />
           </View>
         ) : (
           groups.map((g) => (
             <TouchableOpacity
+              accessibilityRole="button"
               key={g.id}
               style={styles.groupCard}
               activeOpacity={0.85}
@@ -159,7 +169,7 @@ export default function GroupsListScreen() {
               <View style={{ flex: 1 }}>
                 <Text style={styles.groupName}>{g.name}</Text>
                 <Text style={styles.groupSub}>
-                  {g.memberCount} {g.memberCount === 1 ? 'member' : 'members'}
+                  {g.memberCount} {localizeCopy(g.memberCount === 1 ? 'member' : 'members')}
                 </Text>
               </View>
               <Icon name="chevron-right" size={18} color={color.inkFaint} />

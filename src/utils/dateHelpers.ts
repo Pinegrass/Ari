@@ -26,7 +26,7 @@ export const formatDateShort = (dateStr: string): string => {
   return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
 };
 
-export const formatSectionDate = (dateStr: string): string => {
+export const formatSectionDate = (dateStr: string, language = 'en'): string => {
   const date = new Date(dateStr + 'T00:00:00');
   const today = new Date();
   const yesterday = new Date(today);
@@ -35,10 +35,10 @@ export const formatSectionDate = (dateStr: string): string => {
   const isToday = date.toDateString() === today.toDateString();
   const isYesterday = date.toDateString() === yesterday.toDateString();
 
-  if (isToday) return 'Today';
-  if (isYesterday) return 'Yesterday';
+  if (isToday) return language === 'hi' ? 'आज' : 'Today';
+  if (isYesterday) return language === 'hi' ? 'कल' : 'Yesterday';
 
-  return date.toLocaleDateString('en-IN', {
+  return date.toLocaleDateString(language === 'hi' ? 'hi-IN' : 'en-IN', {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
@@ -46,7 +46,8 @@ export const formatSectionDate = (dateStr: string): string => {
 };
 
 export const groupTransactionsByDate = (
-  transactions: Transaction[]
+  transactions: Transaction[],
+  language = 'en'
 ): { title: string; data: Transaction[] }[] => {
   const groups: Record<string, Transaction[]> = {};
 
@@ -59,7 +60,7 @@ export const groupTransactionsByDate = (
   return Object.entries(groups)
     .sort(([a], [b]) => b.localeCompare(a))
     .map(([date, data]) => ({
-      title: formatSectionDate(date),
+      title: formatSectionDate(date, language),
       data,
     }));
 };

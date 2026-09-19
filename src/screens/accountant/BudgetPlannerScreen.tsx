@@ -2,7 +2,7 @@ import {useLanguage as useCopyLanguage} from '../../i18n/LanguageContext';
 import React, { useState, useCallback } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, Modal, TextInput,
-  RefreshControl, KeyboardAvoidingView, Platform, StyleSheet,
+  RefreshControl, KeyboardAvoidingView, Platform, StyleSheet, Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ScreenShell from '../../components/ScreenShell';
@@ -26,7 +26,7 @@ import { effectiveProgress, hasRollover } from '../../utils/budgetRollover';
 import type { Budget, OverallBudget } from '../../types';
 
 export default function BudgetPlannerScreen() {
- const {phrase:localizeCopy}=useCopyLanguage();
+ const {phrase:localizeCopy, language}=useCopyLanguage();
   const navigation = useNavigation();
   const haptics = useHaptics();
   const insets = useSafeAreaInsets();
@@ -37,6 +37,7 @@ export default function BudgetPlannerScreen() {
   const [month, setMonth] = useState(getCurrentMonth());
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [overallBudget, setOverallBudget] = useState<OverallBudget | null>(null);
+  const [loadError, setLoadError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -59,6 +60,7 @@ export default function BudgetPlannerScreen() {
   const [deleting, setDeleting] = useState(false);
 
   const fetchBudgets = useCallback(async () => {
+    setLoadError(false);
     try {
       const [data, overall] = await Promise.all([
         budgetApi.getBudgets(month),
@@ -67,7 +69,7 @@ export default function BudgetPlannerScreen() {
       setBudgets(data);
       setOverallBudget(overall);
     } catch {
-      // silently fail
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -97,7 +99,7 @@ export default function BudgetPlannerScreen() {
     setMonth(`${newY}-${String(newM).padStart(2, '0')}`);
   };
 
-  const monthLabel = formatMonthLabel(month);
+  const monthLabel = formatMonthLabel(month, language);
   const isCurrentMonth = month === getCurrentMonth();
 
   // Summary — progress is measured against the rollover-adjusted available
@@ -202,6 +204,7 @@ export default function BudgetPlannerScreen() {
       haptics.success();
     } catch {
       haptics.error();
+      Alert.alert(localizeCopy("Error"), localizeCopy("Could not delete budget. Try again."));
     } finally {
       setDeleting(false);
       setDeleteTarget(null);
@@ -212,28 +215,28 @@ export default function BudgetPlannerScreen() {
     <ScreenShell edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel={localizeCopy("Go back")} onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Icon name="arrow-left" size={22} color={color.ink} />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
           <Text style={styles.headerTitle}>{localizeCopy("Budget Planner")}</Text>
           <Text style={styles.headerSub}>{localizeCopy("Monthly targets & tracking")}</Text>
         </View>
-        <TouchableOpacity onPress={openAdd} style={styles.addBtnHeader}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel={localizeCopy("Create Budget")} onPress={openAdd} style={styles.addBtnHeader}>
           <Icon name="plus" size={18} color={color.cream} />
         </TouchableOpacity>
       </View>
 
       {/* Month Navigator */}
       <View style={styles.monthNav}>
-        <TouchableOpacity onPress={() => changeMonth(-1)} style={styles.monthArrow}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel={localizeCopy("Previous month")} onPress={() => changeMonth(-1)} style={styles.monthArrow}>
           <Icon name="chevron-left" size={22} color={color.ink} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setMonth(getCurrentMonth())} activeOpacity={0.7}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel={localizeCopy("Current month")} onPress={() => setMonth(getCurrentMonth())} activeOpacity={0.7}>
           <Text style={styles.monthLabel}>{monthLabel}</Text>
           {!isCurrentMonth && <Text style={styles.monthHint}>{localizeCopy("Tap to go to current")}</Text>}
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => changeMonth(1)} style={styles.monthArrow}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel={localizeCopy("Next month")} onPress={() => changeMonth(1)} style={styles.monthArrow}>
           <Icon name="chevron-right" size={22} color={color.ink} />
         </TouchableOpacity>
       </View>
@@ -246,7 +249,9 @@ export default function BudgetPlannerScreen() {
             tintColor={color.forest} colors={[color.forest]} />
         }
       >
-        {loading ? <LoadingSpinner /> : (
+        {loading ? <LoadingSpinner /> : loadError ? (
+          <EmptyState emoji="📡" title={localizeCopy("Could not load budgets.")} actionLabel={localizeCopy("Retry")} onAction={() => { setLoading(true); void fetchBudgets(); }} />
+        ) : (
           <>
             {/* Overall monthly limit — intentionally lives in this navigable
                 planner instead of the retired, unreachable BudgetScreen. */}
@@ -279,8 +284,8 @@ export default function BudgetPlannerScreen() {
                   overallProgress.isOver && { color: color.clay },
                 ]}>
                   {overallProgress.isOver
-                    ? `${formatAmount(Math.abs(overallProgress.remaining))} over`
-                    : `${formatAmount(overallProgress.remaining)} left`}
+                    ? localizeCopy("{amount} over").replace("{amount}", formatAmount(Math.abs(overallProgress.remaining)))
+                    : localizeCopy("{amount} left").replace("{amount}", formatAmount(overallProgress.remaining))}
                 </Text>
               </TouchableOpacity>
             ) : (
@@ -325,7 +330,7 @@ export default function BudgetPlannerScreen() {
                   {totalAvailable !== totalBudget && (
                     <Text style={styles.carriedHint}>
                       {localizeCopy("Includes")}{formatAmount(Math.abs(totalAvailable - totalBudget))}{' '}
-                      {totalAvailable > totalBudget ? 'carried from last month' : 'overspend carried from last month'}
+                      {localizeCopy(totalAvailable > totalBudget ? 'carried from last month' : 'overspend carried from last month')}
                     </Text>
                   )}
 
@@ -341,7 +346,7 @@ export default function BudgetPlannerScreen() {
                   {overBudgetCount > 0 && (
                     <View style={styles.overWarning}>
                       <Text style={styles.overWarningText}>
-                        {overBudgetCount} {overBudgetCount === 1 ? 'category' : 'categories'} {localizeCopy("over budget")}</Text>
+                        {overBudgetCount} {localizeCopy(overBudgetCount === 1 ? 'category' : 'categories')} {localizeCopy("over budget")}</Text>
                     </View>
                   )}
                 </View>
@@ -352,9 +357,9 @@ export default function BudgetPlannerScreen() {
             {budgets.length === 0 ? (
               <EmptyState
                 emoji="🎯"
-                title={`No budgets for ${monthLabel}`}
-                subtitle="Set spending limits for each category to stay on track"
-                actionLabel="Create Budget"
+                title={localizeCopy("No budgets for {month}").replace("{month}", monthLabel)}
+                subtitle={localizeCopy("Set spending limits for each category to stay on track")}
+                actionLabel={localizeCopy("Create Budget")}
                 onAction={openAdd}
               />
             ) : (
@@ -378,8 +383,8 @@ export default function BudgetPlannerScreen() {
           <TouchableOpacity style={styles.modalOverlay} onPress={() => setShowModal(false)} activeOpacity={1} />
           <View style={[styles.modalSheet, { paddingBottom: Math.max(insets.bottom, 24) + 16 }]}>
             <View style={styles.modalHandle} />
-            <Text style={styles.modalTitle}>{editBudget ? 'Edit Budget' : 'New Budget'}</Text>
-            <ErrorBanner message={formError} />
+            <Text style={styles.modalTitle}>{localizeCopy(editBudget ? 'Edit Budget' : 'New Budget')}</Text>
+            <ErrorBanner message={localizeCopy(formError)} />
 
             <Text style={styles.fieldLabel}>{localizeCopy("Category")}</Text>
             <CategoryPicker selected={category} type="expense" onSelect={setCategory} />
@@ -389,7 +394,8 @@ export default function BudgetPlannerScreen() {
               <Text style={styles.rupee}>{locale.symbol}</Text>
               <TextInput
                 style={styles.amountInput}
-                value={limit}
+                accessibilityLabel={localizeCopy("Monthly Limit")}
+                  value={limit}
                 onChangeText={setLimit}
                 placeholder="5000"
                 placeholderTextColor={color.inkFaint}
@@ -401,7 +407,7 @@ export default function BudgetPlannerScreen() {
             </View>
 
             <Button onPress={handleSave} loading={saving} fullWidth style={{ marginTop: 24 }}>
-              {editBudget ? 'Update Budget' : 'Set Budget'}
+              {localizeCopy(editBudget ? 'Update Budget' : 'Set Budget')}
             </Button>
           </View>
         </KeyboardAvoidingView>
@@ -414,7 +420,7 @@ export default function BudgetPlannerScreen() {
           <View style={[styles.modalSheet, { paddingBottom: Math.max(insets.bottom, 24) + 16 }]}>
             <View style={styles.modalHandle} />
             <Text style={styles.modalTitle}>{localizeCopy("Overall Monthly Budget")}</Text>
-            <ErrorBanner message={overallError} />
+            <ErrorBanner message={localizeCopy(overallError)} />
 
             <Text style={styles.fieldLabel}>{localizeCopy("Total spending limit")}</Text>
             <View style={styles.amountRow}>
@@ -434,7 +440,7 @@ export default function BudgetPlannerScreen() {
             </View>
 
             <Button onPress={handleSaveOverall} loading={savingOverall} fullWidth style={{ marginTop: 24 }}>
-              {overallSet ? 'Update Overall Budget' : 'Set Overall Budget'}
+              {localizeCopy(overallSet ? 'Update Overall Budget' : 'Set Overall Budget')}
             </Button>
             {overallSet && (
               <TouchableOpacity
@@ -453,7 +459,7 @@ export default function BudgetPlannerScreen() {
       <DeleteConfirmSheet
         visible={!!deleteTarget}
         title={localizeCopy("Delete Budget?")}
-        message="This will remove the budget limit for this category."
+        message={localizeCopy("This will remove the budget limit for this category.")}
         onConfirm={handleDelete}
         onCancel={() => setDeleteTarget(null)}
         loading={deleting}
@@ -488,16 +494,16 @@ function BudgetCard({ budget, onEdit, onDelete }: { budget: Budget; onEdit: () =
           {carried && (
             <Text style={[styles.carried, { color: budget.rollover > 0 ? color.forest : color.clay }]}>
               {budget.rollover > 0
-                ? `+${formatAmount(budget.rollover)} carried`
-                : `−${formatAmount(Math.abs(budget.rollover))} over carried`}
+                ? localizeCopy("{amount} carried").replace("{amount}", `+${formatAmount(budget.rollover)}`)
+                : localizeCopy("{amount} over carried").replace("{amount}", `−${formatAmount(Math.abs(budget.rollover))}`)}
             </Text>
           )}
         </View>
         <View style={styles.budgetActions}>
-          <TouchableOpacity onPress={onEdit} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel={localizeCopy("Edit Budget")} onPress={onEdit} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
             <Icon name="edit" size={16} color={color.inkFaint} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={onDelete} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel={localizeCopy("Delete budget")} onPress={onDelete} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
             <Icon name="trash" size={16} color={color.inkFaint} />
           </TouchableOpacity>
         </View>
@@ -505,7 +511,7 @@ function BudgetCard({ budget, onEdit, onDelete }: { budget: Budget; onEdit: () =
 
       {/* Spending progress (against rollover-adjusted available) */}
       <View style={styles.budgetProgressRow}>
-        <Text style={styles.budgetSpent}>{formatAmount(budget.spent)} spent</Text>
+        <Text style={styles.budgetSpent}>{formatAmount(budget.spent)} {localizeCopy("spent")}</Text>
         <Text style={[styles.budgetPct, { color: barColor }]}>{progress.percentage}%</Text>
       </View>
 
@@ -515,8 +521,8 @@ function BudgetCard({ budget, onEdit, onDelete }: { budget: Budget; onEdit: () =
 
       <Text style={[styles.budgetRemaining, isOver && { color: color.clay }]}>
         {isOver
-          ? `Over by ${formatAmount(Math.abs(progress.remaining))}`
-          : `${formatAmount(progress.remaining)} remaining`}
+          ? localizeCopy("Over by {amount}").replace("{amount}", formatAmount(Math.abs(progress.remaining)))
+          : localizeCopy("{amount} remaining").replace("{amount}", formatAmount(progress.remaining))}
       </Text>
     </View>
   );
@@ -530,10 +536,9 @@ function getCurrentMonth(): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 }
 
-function formatMonthLabel(month: string): string {
-  const [y, m] = month.split('-').map(Number);
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return `${months[m - 1]} ${y}`;
+function formatMonthLabel(month: string, language: string): string {
+  const [year, number] = month.split('-').map(Number);
+  return new Date(year, number - 1, 1).toLocaleDateString(language === 'hi' ? 'hi-IN' : 'en-US', {month:'short', year:'numeric'});
 }
 
 // ---------------------------------------------------------------------------
