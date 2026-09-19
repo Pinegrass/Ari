@@ -72,8 +72,8 @@ These are not blocked merely because the phone, BillDesk or Play is unavailable:
 - Broader forecasting, predicted-vs-confirmed horizon handling and automated AI claim
   evaluation. Build only where inputs support the promise; unavailable balances should
   remain unavailable rather than filled by guesses.
-- Operational scale work: bounded/batched analytics maintenance and reporting as volume
-  grows; notification tombstone growth policy; full backup-restore execution and evidence.
+- Operational scale work: v2 account locks are now bounded to100-account pages (see
+  `maintenance-pages-2026-09-19.md`); global legacy/delivery cleanup and report scaling remain; notification tombstone growth policy; full backup-restore execution and evidence.
 
 ## External, owner-deferred, release or elapsed-time gates
 

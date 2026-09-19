@@ -99,3 +99,13 @@ invalid configuration fails clearly instead of assuming repository HEAD is live.
 `API_BASE_URL` may select the intended HTTPS origin. Workflow publication and variable
 configuration remain pending; no repository variables were changed here. A failed
 GitHub check is the operator signal, not an installed external alert integration.
+
+## Paged v2 cleanup candidate — 19 September
+
+Backend7209325 limits measurement cleanup to100 selected accounts per transaction;
+the scheduled-job runner follows UUID cursors and aggregates counts. Publish that
+runner before or with the backend: older runners stop after one maintenance page.
+Legacy count/delivery cleanup runs only on the first page and is still globally
+unbounded. A partial/failed sweep is not complete retention enforcement. See
+`maintenance-pages-2026-09-19.md` for415-test and isolated PostgreSQL race evidence.
+This candidate remains unpublished; do not invoke production jobs for acceptance.

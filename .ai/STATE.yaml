@@ -3,14 +3,14 @@ updated_at: '2026-09-19'
 active_branch: master
 active_task: ARI-SPRINT-ORCHESTRATION
 source_commit: 3035cb392df315c2f222068a7a4096d636c588cb
-backend_head: 22c360cb5659d4bf43bda8036bc932eddc760304
+backend_head: 7209325904a9814bceb5a44cad2bbee5d309563f
 web_head: 860b42006ce2cff300fc019453375b50ca9bd778
 development_stage: integrated_local_candidates_with_open_engineering_and_acceptance
 release_status: september19_candidates_local_unpublished_prior_live_artifacts_unchanged
 verification:
   mobile_tests: 570_pass
   mobile_suites: 53_pass
-  backend_tests: 403_pass
+  backend_tests: 415_pass
   web_tests: 113_pass
   lint: pass
   typecheck: pass
@@ -53,7 +53,7 @@ known_blockers:
 - actual backup restore and alert delivery acceptance
 - production helper verification and Auth password-protection setting
 - elapsed consented pilot outcomes
-evidence: docs/product-programme-2026-09/completion-audit-2026-09-19.md
+evidence: docs/product-programme-2026-09/maintenance-pages-2026-09-19.md
 continuity_schema_version: 2
 backend_deployment: ba6152e3-8e20-4495-bad9-6ba1260b8455
 backend_live_verification:
@@ -120,8 +120,8 @@ orchestration:
   daily_postgres_concurrency: pass_synthetic_provider
   pagination_fix: local_unpublished
   device_testing: pending_by_owner
-  latest_progress: S3/S4/S6/S7 integrated candidates committed; security/privacy/planning/account
-    races verified; original A-T remaining gaps mapped
+  latest_progress: V2 maintenance bounded to100 accounts per transaction; deletion/withdrawal races
+    and scheduler paging verified; local unpublished
 remaining_engineering:
 - notification attribution and full onboarding funnel
 - verified paid lifecycle measurement
@@ -130,10 +130,16 @@ remaining_engineering:
 - broader bounded forecasting and AI claim evaluation
 local_candidate:
   mobile: 3035cb392df315c2f222068a7a4096d636c588cb
-  backend: 22c360cb5659d4bf43bda8036bc932eddc760304
+  backend: 7209325904a9814bceb5a44cad2bbee5d309563f
   web: 860b42006ce2cff300fc019453375b50ca9bd778
   measurement_migration: 20260919132311_measurement_v2.sql
   helper_migration: 20260919134713_harden_internal_helpers.sql
   published: false
   devices_accessed: false
   notification_gates_changed: false
+latest_turn_verification:
+  backend_tests: 415_pass
+  measurement_maintenance_postgres: pass_synthetic
+  mobile_web: unchanged_not_rerun
+  devices: not_accessed
+  production: not_changed

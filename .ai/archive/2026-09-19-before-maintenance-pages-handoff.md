@@ -1,0 +1,11 @@
+# Latest handoff — integrated candidates and remaining evidence
+
+Source candidates: mobile3035cb392df315c2f222068a7a4096d636c588cb, backend22c360cb5659d4bf43bda8036bc932eddc760304, web860b42006ce2cff300fc019453375b50ca9bd778. Parent documentation commits may follow; do not mistake them for changed app source. Final570/403/113 tests, types/lint and14-page webbuild pass. Two isolated PostgreSQL migration/RLS/concurrency verifiers passed and containers removed. Planning11-test slice passed after import cleanup, with a non-failing delayed shutdown warning; fullmobile run passed normally.
+
+Read docs/product-programme-2026-09/completion-audit-2026-09-19.md and programme-gap-map-2026-09-19.md before repeating audits. S3/S4/S6/S7 now contain substantive implementations, not just design/reference documents. Final bounded agent work was reviewed and integrated. Planning retries use business UUID/base revision independently of analytics; delete removes inputs but retains minimal revision guard. Account-bound API guards prevent changed-session retries. Confirmed recurring mobile writes refresh DataContext. Backend daily candidate/export consumers ignore deleted plans.
+
+Release has NOT happened. Apply reviewed measurement schema before backend; new client planning protocol and tombstones need compatible rollback. New workflow requires ARI_EXPECTED_BACKEND_REVISION and alert acceptance. Live backendb855630/web7a1533f/Androiddfdaec1 unchanged. Read-only health matched backend; latest inspected receipt run was stale against2h threshold. Supabase helper candidate fixes observed exposures; password protection remains provider setting. No jobs triggered or provider permissions changed.
+
+Continue independent gaps from .ai/sprints.yaml / programme-gap-map; do not claim remaining work is exclusively external. Actual notification attribution/paid lifecycle/onboarding funnel and broader language/performance/operational scale remain engineering. Device hold and iOS deferral persist; daily/outbox sends remain off. No device access, deployments, pushes, live migrations or outreach this turn. No sprint newly accepted.
+
+Existing unrelated untracked historical docs and web AGENTS.md/CLAUDE.md were preserved. Do not stage them as this batch. Current candidate evidence documents and compact continuity are intentionally committed separately from app source.

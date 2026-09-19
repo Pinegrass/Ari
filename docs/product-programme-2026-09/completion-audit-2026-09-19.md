@@ -88,7 +88,9 @@ The [original A–T deliverable map](programme-gap-map-2026-09-19.md) also ident
 ## Exact local source candidates
 
 - Mobile: `3035cb392df315c2f222068a7a4096d636c588cb`
-- Backend: `22c360cb5659d4bf43bda8036bc932eddc760304`
+- Backend: `7209325904a9814bceb5a44cad2bbee5d309563f`
 - Authoritative nested web: `860b42006ce2cff300fc019453375b50ca9bd778`
 
 These are local commits, not published artifacts. Subsequent parent documentation commits record this audit without changing these source candidates. Existing unrelated untracked historical reports and web AGENTS/CLAUDE files were preserved.
+
+Backend follow-up: `7209325` supersedes `22c360c` with bounded v2 maintenance account locking and scheduler pagination.415 full backend tests and a new isolated PostgreSQL disappearing-account proof pass. Client sources/results above are unchanged. See [maintenance evidence](maintenance-pages-2026-09-19.md), including runner-first rollout and remaining global-cleanup limits.

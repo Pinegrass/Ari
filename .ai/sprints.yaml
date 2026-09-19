@@ -63,7 +63,7 @@ sprints:
   - Backend312 tests and changed-source Ruff F/E9 passed
   - 'Combined local/server source audit: local twice-weekly check-ins and bills outside server quota;
     runtime combined experience pending'
-  source: 22c360cb5659d4bf43bda8036bc932eddc760304
+  source: 7209325904a9814bceb5a44cad2bbee5d309563f
   release_status: concurrency/pagination/runner source locally verified; live backend remains b855630;
     real acceptance pending
 - id: S2
@@ -102,6 +102,7 @@ sprints:
   - docs/product-programme-2026-09/completion-audit-2026-09-19.md
   - docs/product-programme-2026-09/helper-hardening-2026-09-19.md
   - backend/tests/verify_helper_hardening_postgres.py
+  - docs/product-programme-2026-09/maintenance-pages-2026-09-19.md
   blockers: []
   completed_checks:
   - Observed maintenance34820989626 and receipts34816725158 actual successful HTTP200 job steps with
@@ -121,13 +122,16 @@ sprints:
     exceeded two-hour threshold
   - Account-bound API replay guards tested with paused requests on both clients; final backend403
     tests pass
-  source: 22c360cb5659d4bf43bda8036bc932eddc760304
+  - V2 expiry uses100-account keyset transactions with safe disappeared-account handling; scheduler
+    pages aggregate counts;415 backend tests and isolated PostgreSQL withdrawal/deletion races pass
+  source: 7209325904a9814bceb5a44cad2bbee5d309563f
   release_status: local unpublished security/monitoring/retention candidate; no live migration or
     alert configuration
   remaining_notes:
   - Authorized migration/live advisor acceptance; leaked-password protection provider configuration
   - Actual isolated backup restore and integrity verification; alert destination/recovery acceptance
-  - Bounded large-population measurement operations and notification tombstone growth policy
+  - Global legacy/delivery cleanup, report memory/scale and notification tombstone growth policy remain
+    unbounded
 - id: S4
   title: Hindi and accessibility
   status: in_progress
@@ -196,6 +200,7 @@ sprints:
   - docs/product-programme-2026-09/completion-audit-2026-09-19.md
   - backend/tests/verify_measurement_postgres.py
   - backend/tests/test_measurement_return_frequency.py
+  - docs/product-programme-2026-09/maintenance-pages-2026-09-19.md
   blockers:
   - paid metrics depend on S5
   - real outcomes require elapsed cohort time
@@ -213,12 +218,14 @@ sprints:
     activity and return-frequency buckets implemented
   - Retry IDs bounded to retained90days, minimal expired-activation consent state, no durable client
     queue; DST/population invariants verified
+  - V2 expiry uses100-account keyset transactions with safe disappeared-account handling; scheduler
+    pages aggregate counts;415 backend tests and isolated PostgreSQL withdrawal/deletion races pass
   remaining_notes:
   - Apply reviewed schema before backend and clients; synthetic fixtures are not live acceptance
   - Notification-owned attribution, verified paid lifecycle measurement and complete onboarding funnel
     remain engineering gaps
   - Real D1/D7/D30 and renewal outcomes require consented pilot and elapsed time; no legacy backfill
-  source: 22c360cb5659d4bf43bda8036bc932eddc760304
+  source: 7209325904a9814bceb5a44cad2bbee5d309563f
   release_status: integrated local v2 schema/API/mobile/web candidate; unpublished; no production
     cohorts
 - id: S7
@@ -239,7 +246,7 @@ sprints:
   - docs/product-programme-2026-09/planning-retry-2026-09-19.md
   blockers:
   - major repositioning or new paid restrictions requires owner decision
-  source: 22c360cb5659d4bf43bda8036bc932eddc760304
+  source: 7209325904a9814bceb5a44cad2bbee5d309563f
   release_status: implemented and locally verified across all three candidates; unpublished and live/device/provider
     acceptance pending
   completed_checks:

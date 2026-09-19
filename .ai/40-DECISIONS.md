@@ -112,3 +112,7 @@ Database helper hardening preserves authenticated group RLS and trigger behavior
 ## 19 September — planning retry and account boundaries
 
 Planning confirmation/deletion use business operation UUIDs and expected snapshot revisions independently of analytics consent. An unchanged retry cannot refresh a plan against newer ledger data; an old request cannot overwrite a newer confirmation. Deletion removes financial inputs/fingerprint/ledger data, retaining only a random revision/deleted marker to reject resurrection; export hides deleted plans and account deletion cascades the marker. Legacy request compatibility remains, without the new-client retry guarantee. Cross-account API retries must fail closed rather than acquire the next user's token.
+
+## 19 September — bounded v2 cleanup transactions
+
+Measurement expiry selects100 accounts per keyset page and commits between internal HTTP pages. Preserve the shared user-lock order; tolerate accounts deleted after selection and advance using selected IDs. Do not skip locked accounts silently. Scheduler summaries contain counts, not cursors, and ambiguous requests are not retried. New runner must precede/accompany backend rollout because old runners stop at one page. This bounds account locks only; global legacy/delivery cleanup and report scale remain open.
