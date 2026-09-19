@@ -1,3 +1,5 @@
 # Active task: ARI-SPRINT-ORCHESTRATION
 
-Backend localfa5b393 cohort scope verified343tests; web local9eeb356 verified29tests/types/lint/build. Both unpublished. S6 production storage remains pending; resolve finite retry/expiry and activation-state semantics, then implement coherent consent/ingestion/export/expiry with PostgreSQL races. Device/notification activation hold persists.
+Integrated local candidates: mobile3035cb3, backend22c360c, web860b420; final570/403/113 tests plus types/lint/build pass. No release. Read completion-audit-2026-09-19.md and programme-gap-map-2026-09-19.md.
+
+Next independent engineering: delivery-owned notification attribution, complete onboarding funnel/verified paid metrics, remaining language/accessibility/performance and operational scale policy. Prepare migration→backend→client release with compatible rollback; current general implementation request did not change recorded release boundaries. Actual device/provider/pilot gates remain separate. Device and daily/outbox activation hold persists. Do not rerun completed PostgreSQL proofs without relevant changes.

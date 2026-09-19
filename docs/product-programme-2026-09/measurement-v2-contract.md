@@ -1,6 +1,6 @@
 # Measurement v2 — engineering contract for S6
 
-14 September 2026. Source-grounded design proposal, not an implemented API, deployed schema, approved commercial policy or measured retention result. Review implementation against this contract before creating a migration. No live reads or mutations were used in this audit.
+14 September 2026 design, followed by dated implementation checkpoints below. The original gaps are historical. V2 is now implemented and locally verified as of 19 September; it is not deployed and there are no measured real-retention outcomes. See `completion-audit-2026-09-19.md` for current state.
 
 ## Existing evidence and gaps
 
@@ -42,3 +42,11 @@ measurement_cohorts.py implements pure calculation over current episode snapshot
 
 ## Scope clarification — 19 September
 The reference calculator reports rolling7/30 completed-local-day active counts only among current consented, non-excluded episodes with activation in (asOf minus90days, asOf]. Output now exposes these bounds and labels product-wide active users unavailable. Overall WAU/MAU needs separate production activity population/reporting; do not infer it from these cohort counts.
+
+## Integrated implementation — 19 September
+
+Backend `measurement_v2.py`, three additive server-only tables, versioned consent/event/report routes and both clients now implement explicit epochs, stable retry IDs, withdrawal/exclusion/export/expiry and consented server-confirmed transaction/planning/trial events. Reports retain the scoped reference cohorts and separately compute rolling7/30 completed local days across current v2 consented non-excluded accounts. Legacy records remain excluded.
+
+Retry identity is bounded to90days of retained receipts; clients do not maintain durable analytics queues. Exact expiry runs on ingestion, export and maintenance. The activation timestamp is erased at90days while a minimal activation-expired consent-state bit prevents silent reactivation. Current consent epoch/timezone/state persist until withdrawal. Storage is capped at1000new receipts/account/UTCday; duplicate acknowledgements still work at the cap.
+
+Actual migration and simultaneous retry/withdrawal/exclusion/business-write cases passed isolated PostgreSQL16 checks. Client tests cover epoch/session/private-mode guards and stable transport retries. These are local synthetic results, not production collection. Notification attribution and verified paid outcomes remain explicitly unavailable; real cohorts require release, consent and elapsed time.

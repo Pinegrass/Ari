@@ -65,3 +65,37 @@ Backend local f79ec76 detects reported batch errors despite HTTP200 and emits ag
 
 ## Prepared legacy retention boundary fix
 Local backend4d39f87 now deletes UTC dates on or before today−90, conservatively removing the boundary day.340tests pass; no live purge. Exact deletion timing still depends on job execution. See retention-boundary-2026-09-15.md.
+
+
+## Executable read-only readiness check — 19 September 2026
+
+From backend:
+
+```powershell
+.venv/Scripts/python.exe scripts/check_operational_readiness.py --expected-revision b8556303627323581193967e6cd97b7676aef066
+```
+
+Use the exact intended deployed SHA after each authorized release. The checker only
+reads `/api/health` and GitHub run/job metadata through the existing `gh` login. It
+never invokes a job, reads raw job logs, sends alerts or changes notification gates.
+It inspects actual non-skipped step completions within a bounded 32-hour/300-run window;
+a green workflow alone does not satisfy the check. Exit 0 means checks pass, 1 means
+unhealthy/mismatched/stale/failed or missing execution evidence, and 2 means inspection
+was unavailable. Sanitized output includes step ages and the next diagnostic action.
+
+Observed by the root operator on 19 September: health and expected revision passed;
+maintenance age was 365.6 minutes; receipt age was 120.3 minutes and therefore exceeded
+the two-hour threshold. This is a freshness warning requiring read-only scheduler
+inspection, not permission to rerun sending jobs. It proves neither an actual receipt
+backlog nor provider delivery failure. No external alert channel is configured by this
+tool; backup restoration and actual device delivery remain separate acceptance gates.
+
+
+Prepared workflow `.github/workflows/operational-readiness.yml` runs this read-only
+check hourly and on manual dispatch, with only `contents: read` and `actions: read`,
+a ten-minute timeout and one concurrent inspection. It requires repository variable
+`ARI_EXPECTED_BACKEND_REVISION` to contain the full approved deployed SHA; missing or
+invalid configuration fails clearly instead of assuming repository HEAD is live.
+`API_BASE_URL` may select the intended HTTPS origin. Workflow publication and variable
+configuration remain pending; no repository variables were changed here. A failed
+GitHub check is the operator signal, not an installed external alert integration.

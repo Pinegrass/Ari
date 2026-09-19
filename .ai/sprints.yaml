@@ -20,12 +20,10 @@ eligible_parallel_lanes:
 - S6
 - S7
 rules:
-- Advance only after prerequisite acceptance; pending device/provider gates do not
-  block independent code work
-- A sprint is accepted only when every criterion has evidence or owner explicitly
-  accepts scope deferral
-- No device work until owner resumes it; no automatic scheduler activation before
-  acceptance
+- Advance only after prerequisite acceptance; pending device/provider gates do not block independent
+  code work
+- A sprint is accepted only when every criterion has evidence or owner explicitly accepts scope deferral
+- No device work until owner resumes it; no automatic scheduler activation before acceptance
 - Source changes do not authorize deployment or store publication
 sprints:
 - id: S0
@@ -60,15 +58,14 @@ sprints:
   - real provider and receipt evidence missing
   - scheduler activation pending acceptance
   completed_checks:
-  - PostgreSQL16 reservation/slot/candidate/shared-quota and unknown-send concurrency
-    acceptance
-  - Scheduler 1100-page aggregation, repeated cursor failure and uncertain request
-    non-retry
+  - PostgreSQL16 reservation/slot/candidate/shared-quota and unknown-send concurrency acceptance
+  - Scheduler 1100-page aggregation, repeated cursor failure and uncertain request non-retry
   - Backend312 tests and changed-source Ruff F/E9 passed
-  - 'Combined local/server source audit: local twice-weekly check-ins and bills outside
-    server quota; runtime combined experience pending'
-  source: 79bf2c3c8b0bf1d1efa366e49dcd09e7b1d2010e
-  release_status: pagination fix local; live backend remains b855630
+  - 'Combined local/server source audit: local twice-weekly check-ins and bills outside server quota;
+    runtime combined experience pending'
+  source: 22c360cb5659d4bf43bda8036bc932eddc760304
+  release_status: concurrency/pagination/runner source locally verified; live backend remains b855630;
+    real acceptance pending
 - id: S2
   title: Released client acceptance
   status: pending
@@ -79,9 +76,13 @@ sprints:
   - Authenticated live web reviews/planning retry/consent/trial/preferences
   - English/Hindi and empty/mature narrow viewport states
   - Disposable fixture cleanup
-  evidence: []
+  evidence:
+  - docs/product-programme-2026-09/completion-audit-2026-09-19.md
   blockers:
   - physical Android testing pending by owner
+  remaining_notes:
+  - New three-repository candidate remains unpublished; latest Android physical acceptance still pending
+    by owner
 - id: S3
   title: Trust and operational readiness
   status: in_progress
@@ -98,22 +99,35 @@ sprints:
   - docs/product-programme-2026-09/heartbeat-2026-09-14-1735.md
   - docs/product-programme-2026-09/retention-boundary-2026-09-15.md
   - docs/product-programme-2026-09/heartbeat-2026-09-15-1004.md
+  - docs/product-programme-2026-09/completion-audit-2026-09-19.md
+  - docs/product-programme-2026-09/helper-hardening-2026-09-19.md
+  - backend/tests/verify_helper_hardening_postgres.py
   blockers: []
   completed_checks:
-  - Observed maintenance34820989626 and receipts34816725158 actual successful HTTP200
-    job steps with zero records
+  - Observed maintenance34820989626 and receipts34816725158 actual successful HTTP200 job steps with
+    zero records
   - Exact live health revision b855630 healthy; no endpoints manually triggered
-  - Read-only diagnostic and recovery runbook prepared; proposed thresholds not active
-    alerts
-  - Scheduler partial batch failures and sanitized aggregate logs verified:326 backend
-    tests; localf79ec76
-  - Conservative UTC90-day boundary cleanup verified with340 full backend tests; actual
-    purge timing still depends on scheduler
-  - Shared UTC boundary applied to ingestion and maintenance;342 tests including owner
-    isolation pass locally
-  source: d9575bd20bfed5db98d98a5c8bb2b046235ebf98
-  release_status: scheduler and retention fixes local unpublished; alert routing not
-    activated
+  - Read-only diagnostic and recovery runbook prepared; proposed thresholds not active alerts
+  - Scheduler partial batch failures and sanitized aggregate logs verified:326 backend tests; localf79ec76
+  - Conservative UTC90-day boundary cleanup verified with340 full backend tests; actual purge timing
+    still depends on scheduler
+  - Shared UTC boundary applied to ingestion and maintenance;342 tests including owner isolation pass
+    locally
+  - Reauthentication identity, refresh-session logout before deletion, sanitized provider errors and
+    account export covered by tests
+  - Actual helper migration on isolated PostgreSQL16 preserves triggers and own-group RLS, blocks
+    other-user probes and restricts execution
+  - Read-only exact-revision checker inspects actual job steps; one receipt freshness observation
+    exceeded two-hour threshold
+  - Account-bound API replay guards tested with paused requests on both clients; final backend403
+    tests pass
+  source: 22c360cb5659d4bf43bda8036bc932eddc760304
+  release_status: local unpublished security/monitoring/retention candidate; no live migration or
+    alert configuration
+  remaining_notes:
+  - Authorized migration/live advisor acceptance; leaked-password protection provider configuration
+  - Actual isolated backup restore and integrity verification; alert destination/recovery acceptance
+  - Bounded large-population measurement operations and notification tombstone growth policy
 - id: S4
   title: Hindi and accessibility
   status: in_progress
@@ -128,19 +142,25 @@ sprints:
   evidence:
   - docs/product-programme-2026-09/heartbeat-2026-09-14-1334.md
   - docs/product-programme-2026-09/heartbeat-2026-09-15-0530.md
+  - docs/product-programme-2026-09/completion-audit-2026-09-19.md
   blockers:
   - native tests pending by owner
   - human linguistic review required
   completed_checks:
   - Shared login/signup promotional copy localized via existing phrase catalog
   - Web12 tests, typecheck, scoped lint and14-page production build pass
-  - Safe localized email/Google/callback errors and async recovery;29 tests/types/lint/build
+  - Safe localized email/Google/callback errors and async recovery;29 tests/types/lint/build pass
+  - Localized operational errors/labels/statuses, skip navigation and page titles; final web113 tests/types/lint/build14
+    pages pass
+  - New bilingual report source, correction, history and recurrence panels; mobile570 tests/types/lint
     pass
-  source: 9eeb3563a1190befa8af57aa095a6268abbc37c5
+  source: 860b42006ce2cff300fc019453375b50ca9bd778
   release_status: local unpublished
   remaining_notes:
-  - Static English browser metadata; broader API error localization outside auth
-  - Browser/OAuth round-trip, broader Hindi/accessibility and human review pending
+  - Crawler metadata remains English; remaining secondary/legal/provider-copy inventory and human
+    Hindi review
+  - Native screen-reader/font-scale acceptance deferred with device hold; deployed performance/live
+    browser acceptance pending
 - id: S5
   title: Android distribution and commerce
   status: blocked_external
@@ -166,33 +186,44 @@ sprints:
   - Define meaningful activation and local-day cohorts before calculation
   - Resolve current UTC count dates vs local-day retention semantics
   - Consent, retry dedupe, staff/test exclusions, withdrawal/export/retention
-  - D1/D7/D30 WAU/MAU report/action notification-open trial/paid renewal/churn with
-    honest denominators
+  - D1/D7/D30 WAU/MAU report/action notification-open trial/paid renewal/churn with honest denominators
   - Validate transport and reports using synthetic fixtures
   evidence:
   - docs/product-programme-2026-09/measurement-v2-contract.md
   - docs/product-programme-2026-09/cohort-reference-2026-09-15.md
   - docs/product-programme-2026-09/heartbeat-2026-09-15-1004.md
   - docs/product-programme-2026-09/heartbeat-2026-09-19-1049.md
+  - docs/product-programme-2026-09/completion-audit-2026-09-19.md
+  - backend/tests/verify_measurement_postgres.py
+  - backend/tests/test_measurement_return_frequency.py
   blockers:
   - paid metrics depend on S5
   - real outcomes require elapsed cohort time
   completed_checks:
   - Source audit and proposed cohort/consent/dedupe/timezone contract prepared
-  - Pure cohort reference and10 local-day/DST/maturity/exclusion fixtures; full336
-    backend tests, scoped lint and independent review
-  - Explicit cohort-only active scope and unavailable product-wide metric;343 tests
-    and independent review pass
+  - Pure cohort reference and10 local-day/DST/maturity/exclusion fixtures; full336 backend tests,
+    scoped lint and independent review
+  - Explicit cohort-only active scope and unavailable product-wide metric;343 tests and independent
+    review pass
+  - Explicit v2 epochs, UUID receipt dedupe, withdrawal/re-consent/exclusion/export/exact expiry and
+    new client transport implemented
+  - Actual migration and simultaneous lifecycle/business-write races passed isolated PostgreSQL16
+    with disposable cleanup
+  - Server-confirmed creation/planning/trial events; scoped local-day cohorts, product-wide measured
+    activity and return-frequency buckets implemented
+  - Retry IDs bounded to retained90days, minimal expired-activation consent state, no durable client
+    queue; DST/population invariants verified
   remaining_notes:
-  - V2 schema, transport, retention/export and cohort reports not implemented
-  - Do not reinterpret legacy UTC counts as local-day retention
-  - Resolve finite retry dedupe vs90-day receipt deletion and expired activation state
-    before schema; reference WAU/MAU is cohort-scoped
-  source: fa5b393082ab4b051e8c67ba00c0d82e5e7815ae
-  release_status: isolated reference only, local unpublished, no production wiring
+  - Apply reviewed schema before backend and clients; synthetic fixtures are not live acceptance
+  - Notification-owned attribution, verified paid lifecycle measurement and complete onboarding funnel
+    remain engineering gaps
+  - Real D1/D7/D30 and renewal outcomes require consented pilot and elapsed time; no legacy backfill
+  source: 22c360cb5659d4bf43bda8036bc932eddc760304
+  release_status: integrated local v2 schema/API/mobile/web candidate; unpublished; no production
+    cohorts
 - id: S7
   title: Remaining product intelligence
-  status: pending
+  status: in_progress
   depends_on:
   - S0
   acceptance:
@@ -202,9 +233,30 @@ sprints:
   - History-dependent baseline, category and income consistency
   - Observed/calculated/predicted/AI distinctions and unknown balances preserved
   - Test edits/transfers/currencies/history and horizon limits
-  evidence: []
+  evidence:
+  - docs/product-programme-2026-09/completion-audit-2026-09-19.md
+  - docs/product-programme-2026-09/intelligence-evidence-2026-09-19.md
+  - docs/product-programme-2026-09/planning-retry-2026-09-19.md
   blockers:
   - major repositioning or new paid restrictions requires owner decision
+  source: 22c360cb5659d4bf43bda8036bc932eddc760304
+  release_status: implemented and locally verified across all three candidates; unpublished and live/device/provider
+    acceptance pending
+  completed_checks:
+  - Source-linked periodic evidence/corrections; conservative monthly recurrence/payday prediction
+    with explicit confirmation
+  - Fresh confirmed planning outlook and three-month recorded-history/category/income baselines on
+    mobile/web
+  - Tomo context interpolation fixed, future entries excluded, context provenance without generated-claim
+    verification
+  - Planning confirmation/deletion UUID+revision guards prevent stale retries and resurrection; deleted
+    inputs removed from export/nudges
+  - Competing transaction corrections serialize on PostgreSQL and preserve stale-edit conflict checks
+  remaining_notes:
+  - Real correction/recurrence/AI provider journeys not exercised; no per-entry currency/FX certainty
+  - Monthly-only detector, broader bounded forecasting and automated AI-claim evaluation remain limited
+  - Older backend rollback incompatible with new planning fields/tombstones; prepare compatible rollback
+    build
 - id: S8
   title: iOS acceptance
   status: deferred_owner
@@ -232,7 +284,9 @@ sprints:
   - Retention/correction burden/paid willingness evidence with elapsed time
   - Triage findings and map original A-T brief to evidence
   - Final implemented/released/verified verdict; owner-accepted scope deferrals
-  evidence: []
+  evidence:
+  - docs/product-programme-2026-09/completion-audit-2026-09-19.md
+  - docs/product-programme-2026-09/programme-gap-map-2026-09-19.md
   blockers:
   - paid assessment depends on S5
   - iOS completion depends on S8 or explicit scope deferral

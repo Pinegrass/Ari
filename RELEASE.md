@@ -70,26 +70,37 @@ For Android, drop your Google Play service-account JSON at
 Walk [DEVICE_TEST.md](DEVICE_TEST.md). 24 steps cover every shipped
 feature. Stop at any red flag and ping me.
 
-## 9. PostHog (mobile retention)
+## 9. First-party opt-in measurement
 
-Spec §2 calls for Day-1/7/30 + NL-log-count tracking. Wired but no-ops
-until you set the project key.
+The release candidate uses the backend measurement v2 API, not a PostHog project key.
+Apply the reviewed additive backend migration before deploying its code, then release
+compatible clients. Do not enable measurement for existing users automatically or
+backfill financial history into analytics.
 
-```bash
-# In Ari/.env (then rebuild + ship)
-EXPO_PUBLIC_POSTHOG_KEY=phc_...
-EXPO_PUBLIC_POSTHOG_HOST=https://app.posthog.com   # or your self-host
-```
+Clients explicitly enable `/api/measurement/v2/consent`, keep its epoch in memory,
+and post allowlisted names plus an opaque UUID and epoch to `/api/measurement/v2/events`.
+Transport retries preserve the UUID; retry deduplication covers retained receipts
+only (90 days). Account changes clear in-memory consent. Mobile Private Mode suppresses
+new measurement, including the consent header on confirmed server actions.
 
-Events fired by the app: `app_opened`, `login_success`, `register_success`,
-`expense_logged`, `expense_logged_voice`, `expense_parsed_local`,
-`expense_parsed_ai`, `budget_created`, `goal_created`, `paywall_viewed`,
-`subscription_started`, `group_created`, `group_joined`,
-`group_expense_added`, `split_settled_upi`, `split_settled_cash`,
-`brief_opened`, `brief_dismissed`, `private_mode_toggled`,
-`aa_consent_started`, `aa_consent_completed`. Identify is keyed by
-`ari_users.id` with `tier` + `age_group` traits. Session replay is
-intentionally OFF (spec §7 PII).
+The server records confirmed transaction creation, planning saves and trial starts
+only with a matching `X-Measurement-Consent-Epoch` header. Receipts contain no amounts,
+notes or merchant payloads. Trial starts are not meaningful retention activity or paid
+conversion evidence. Notification attribution and verified paid lifecycle metrics remain
+unavailable. Automatic daily/outbox sending remains gated off pending acceptance.
+
+The internal `/api/measurement/v2/report` requires the scheduler secret and returns
+aggregate exact-day D1/D7/D30 cohorts plus separately labelled completed-local-day
+WAU/MAU for currently consented non-excluded accounts. No eligible denominator returns
+an unavailable rate; these calculations do not establish actual elapsed retention.
+Legacy UTC counts are excluded from v2 cohorts.
+
+Reporting excludes receipts older than 90 days; maintenance and applicable measurement/
+export operations physically purge them. Current consent epoch, timezone and expired-
+activation state persist until withdrawal. Withdrawal purges events, legacy counts and
+current consent; re-consent creates a fresh epoch. Staff/test exclusion is explicit,
+server-managed and never inferred from email. Validate the migration, isolated races,
+export/withdrawal and both clients before claiming the feature released or accepted.
 
 ## 10. OTA Rollback
 

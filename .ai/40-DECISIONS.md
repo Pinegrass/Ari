@@ -100,3 +100,15 @@ Maintenance and ingestion use one conservative UTC90-day boundary; this does not
 
 ## 19 September — measured population
 Reference active counts describe recent activation cohorts only. Preserve explicit scope and mark product-wide WAU/MAU unavailable until separately implemented; no inference from recent-cohort counts.
+
+## 19 September — integrated measurement and intelligence
+
+V2 collection requires explicit consent and a memory-only epoch on both clients. Legacy consent is not promoted. Receipt UUID dedupe is bounded to90days; no durable analytics retry queue. Exact event/activation timestamps expire, while minimal current-consent epoch/timezone/activation-expired state prevents stale requests and false reactivation until withdrawal. Account exclusion purges analytics and removal does not opt in. Reports separately label recent activation cohorts and current-consented product-wide activity; notification attribution and paid outcomes remain unavailable.
+
+Historical comparisons use recorded data only, preserve missing months as unknown and expose source groups/correction routes. Recurring/payday predictions require explicit confirmation and do not become confirmed balances or planning inputs automatically. Tomo context provenance is not verification of generated claims. No per-entry currency or FX conversion is invented.
+
+Database helper hardening preserves authenticated group RLS and trigger behavior while constraining caller identity/search paths and direct function execution. New server-only measurement tables intentionally have no client policies. Apply additive measurement schema before backend code; source tests do not authorize or certify live migrations. Read-only monitoring needs an exact deployed SHA and actual job-step timestamps, not workflow-green status alone.
+
+## 19 September — planning retry and account boundaries
+
+Planning confirmation/deletion use business operation UUIDs and expected snapshot revisions independently of analytics consent. An unchanged retry cannot refresh a plan against newer ledger data; an old request cannot overwrite a newer confirmation. Deletion removes financial inputs/fingerprint/ledger data, retaining only a random revision/deleted marker to reject resurrection; export hides deleted plans and account deletion cascades the marker. Legacy request compatibility remains, without the new-client retry guarantee. Cross-account API retries must fail closed rather than acquire the next user's token.
