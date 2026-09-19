@@ -39,3 +39,6 @@ S6 definitions audited and proposed; implementation and reporting remain pending
 
 ## Reference milestone15September
 measurement_cohorts.py implements pure calculation over current episode snapshots; ten fixtures and independent review passed. Backend e57ab26,336 full tests. It is not a production adapter or consent/epoch implementation; remaining migration/ingestion work above still applies.
+
+## Scope clarification — 19 September
+The reference calculator reports rolling7/30 completed-local-day active counts only among current consented, non-excluded episodes with activation in (asOf minus90days, asOf]. Output now exposes these bounds and labels product-wide active users unavailable. Overall WAU/MAU needs separate production activity population/reporting; do not infer it from these cohort counts.

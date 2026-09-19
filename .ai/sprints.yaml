@@ -1,5 +1,5 @@
 version: 1
-updated_at: '2026-09-15'
+updated_at: '2026-09-19'
 owner: root orchestrator
 automation_id: ari-sprint-orchestrator
 cadence_hours: 4
@@ -173,6 +173,7 @@ sprints:
   - docs/product-programme-2026-09/measurement-v2-contract.md
   - docs/product-programme-2026-09/cohort-reference-2026-09-15.md
   - docs/product-programme-2026-09/heartbeat-2026-09-15-1004.md
+  - docs/product-programme-2026-09/heartbeat-2026-09-19-1049.md
   blockers:
   - paid metrics depend on S5
   - real outcomes require elapsed cohort time
@@ -180,12 +181,14 @@ sprints:
   - Source audit and proposed cohort/consent/dedupe/timezone contract prepared
   - Pure cohort reference and10 local-day/DST/maturity/exclusion fixtures; full336
     backend tests, scoped lint and independent review
+  - Explicit cohort-only active scope and unavailable product-wide metric;343 tests
+    and independent review pass
   remaining_notes:
   - V2 schema, transport, retention/export and cohort reports not implemented
   - Do not reinterpret legacy UTC counts as local-day retention
   - Resolve finite retry dedupe vs90-day receipt deletion and expired activation state
     before schema; reference WAU/MAU is cohort-scoped
-  source: e57ab26003ba9a4170b91ec78e552216ad2c318f
+  source: fa5b393082ab4b051e8c67ba00c0d82e5e7815ae
   release_status: isolated reference only, local unpublished, no production wiring
 - id: S7
   title: Remaining product intelligence

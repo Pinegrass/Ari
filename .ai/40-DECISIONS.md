@@ -97,3 +97,6 @@ Legacy date-only counts expire conservatively including UTCtoday−90 at mainten
 
 ## 15 September — shared legacy expiry
 Maintenance and ingestion use one conservative UTC90-day boundary; this does not guarantee continuous physical purge. S6 review records that deleted UUID receipts cannot support indefinite retry recognition. No new longer-lived identifier retention policy or production v2 schema was introduced.
+
+## 19 September — measured population
+Reference active counts describe recent activation cohorts only. Preserve explicit scope and mark product-wide WAU/MAU unavailable until separately implemented; no inference from recent-cohort counts.

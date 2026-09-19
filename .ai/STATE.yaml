@@ -1,16 +1,16 @@
 project: Ari
-updated_at: '2026-09-15'
+updated_at: '2026-09-19'
 active_branch: master
 active_task: ARI-SPRINT-ORCHESTRATION
 source_commit: d0093c50f08f96543fb89d8c0e5d09737420af34
-backend_head: d9575bd20bfed5db98d98a5c8bb2b046235ebf98
+backend_head: fa5b393082ab4b051e8c67ba00c0d82e5e7815ae
 web_head: 9eeb3563a1190befa8af57aa095a6268abbc37c5
 development_stage: notification_acceptance_and_parallel_sprint_work
 release_status: backend_and_web_live_android_home_nudges_internal_published_device_unverified
 verification:
   mobile_tests: 556_pass
   mobile_suites: 52_pass
-  backend_tests: 342_pass
+  backend_tests: 343_pass
   web_tests: 29_pass
   lint: pass
   typecheck: pass
@@ -49,7 +49,7 @@ known_blockers:
 - real purchase and restore
 - actual push delivery and receipts
 - full Hindi native review
-evidence: docs/product-programme-2026-09/heartbeat-2026-09-15-1004.md
+evidence: docs/product-programme-2026-09/heartbeat-2026-09-19-1049.md
 continuity_schema_version: 2
 backend_deployment: ba6152e3-8e20-4495-bad9-6ba1260b8455
 backend_live_verification:
@@ -116,5 +116,5 @@ orchestration:
   daily_postgres_concurrency: pass_synthetic_provider
   pagination_fix: local_unpublished
   device_testing: pending_by_owner
-  latest_progress: Shared ingestion/maintenance retention verified; S6 storage constraints
-    reviewed
+  latest_progress: Explicit cohort-only active reporting verified; production analytics
+    pending
