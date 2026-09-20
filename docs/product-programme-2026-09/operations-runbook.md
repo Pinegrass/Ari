@@ -1,5 +1,23 @@
 # Ari scheduled-job operations runbook
 
+## Current release checkpoint — 20 September
+
+The historical observations below are retained for traceability. Current backend is
+`05a856ffa4d64a5f2523a596ff2a620149620133`, Railway
+`9f4bb193-4abe-4e1b-a989-1b480b54a5be`. The paginating runner and hourly read-only
+readiness workflow are published; `ARI_EXPECTED_BACKEND_REVISION` matches this SHA.
+Run35524566660 passed health, revision and actual receipt/maintenance freshness.
+Seven reviewed migrations and logical public/auth backup restoration are verified;
+see `release-continuation-2026-09-20.md` and `backup-restore-acceptance-2026-09-20.md`.
+
+Daily/outbox schedules remain disabled. The outbox API itself has no environment
+gate: do not invoke manual `all` or `nudge-outbox` for diagnostics. No external
+alert delivery/recovery, managed PITR, complete infrastructure recovery or physical
+notification acceptance is claimed. Supabase leaked-password protection awaits
+dashboard access; authenticated group-helper execution is intentionally retained
+with caller identity restriction. Use the current SHA in the checker command,
+not the older examples retained below.
+
 Scope: inspect and diagnose existing jobs without sending notifications, generating paid content or altering user data. This is an operator procedure; no alert integration is installed by this document.
 
 ## Current service and evidence

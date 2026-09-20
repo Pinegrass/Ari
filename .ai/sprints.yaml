@@ -20,8 +20,7 @@ eligible_parallel_lanes:
 - S6
 - S7
 rules:
-- Advance only after prerequisite acceptance; pending device/provider gates do not block independent code
-  work
+- Advance only after prerequisite acceptance; pending device/provider gates do not block independent code work
 - A sprint is accepted only when every criterion has evidence or owner explicitly accepts scope deferral
 - No device work until owner resumes it; no automatic scheduler activation before acceptance
 - Source changes do not authorize deployment or store publication
@@ -54,6 +53,7 @@ sprints:
   - backend/tests/test_scheduled_jobs_script.py
   - docs/product-programme-2026-09/notification-channel-audit-2026-09-14.md
   - docs/product-programme-2026-09/completion-audit-2026-09-20.md
+  - docs/product-programme-2026-09/release-continuation-2026-09-20.md
   blockers:
   - device testing pending by owner
   - real provider and receipt evidence missing
@@ -62,18 +62,18 @@ sprints:
   - PostgreSQL16 reservation/slot/candidate/shared-quota and unknown-send concurrency acceptance
   - Scheduler 1100-page aggregation, repeated cursor failure and uncertain request non-retry
   - Backend312 tests and changed-source Ruff F/E9 passed
-  - 'Combined local/server source audit: local twice-weekly check-ins and bills outside server quota;
-    runtime combined experience pending'
-  - Owned dispatch/accepted/open attribution and mature 24h action association; generic device/server
-    ownership; account and failure-safe local scheduling
+  - 'Combined local/server source audit: local twice-weekly check-ins and bills outside server quota; runtime
+    combined experience pending'
+  - Owned dispatch/accepted/open attribution and mature 24h action association; generic device/server ownership;
+    account and failure-safe local scheduling
   - Exact PostgreSQL reservation/shared quota/unknown send/receipt-lock-order proofs passed; sending stays
     disabled
-  source: 1dcd5254c5e0822a1b3764a4d43014d7b6526c68
-  release_status: September20 local source candidate; unpublished; required live/provider/device gates
-    remain
+  source: 05a856ffa4d64a5f2523a596ff2a620149620133
+  release_status: Backend live verified; Android internal published/device pending; web candidate READY/public
+    promotion pending legal details
   remaining_notes:
-  - Device/provider delivery, receipts and tap acceptance remain pending; old/offline clients require
-    updated foreground refresh
+  - Device/provider delivery, receipts and tap acceptance remain pending; old/offline clients require updated
+    foreground refresh
   - Bill reminders remain separate from generic server three/day opportunity quota
 - id: S2
   title: Released client acceptance
@@ -87,11 +87,14 @@ sprints:
   - Disposable fixture cleanup
   evidence:
   - docs/product-programme-2026-09/completion-audit-2026-09-19.md
+  - docs/product-programme-2026-09/release-continuation-2026-09-20.md
   blockers:
   - physical Android testing pending by owner
   remaining_notes:
-  - New three-repository candidate remains unpublished; latest Android physical acceptance still pending
-    by owner
+  - Backend80checks pass; web candidate Hindi landing/login render; authenticated web awaits promotion, physical
+    Android acceptance remains on hold
+  release_status: Backend live verified; Android internal published/device pending; web candidate READY/public
+    promotion pending legal details
 - id: S3
   title: Trust and operational readiness
   status: in_progress
@@ -113,40 +116,47 @@ sprints:
   - backend/tests/verify_helper_hardening_postgres.py
   - docs/product-programme-2026-09/maintenance-pages-2026-09-19.md
   - docs/product-programme-2026-09/completion-audit-2026-09-20.md
+  - docs/product-programme-2026-09/release-continuation-2026-09-20.md
   blockers: []
   completed_checks:
-  - Observed maintenance34820989626 and receipts34816725158 actual successful HTTP200 job steps with zero
-    records
+  - Observed maintenance34820989626 and receipts34816725158 actual successful HTTP200 job steps with zero records
   - Exact live health revision b855630 healthy; no endpoints manually triggered
   - Read-only diagnostic and recovery runbook prepared; proposed thresholds not active alerts
   - Scheduler partial batch failures and sanitized aggregate logs verified:326 backend tests; localf79ec76
   - Conservative UTC90-day boundary cleanup verified with340 full backend tests; actual purge timing still
     depends on scheduler
-  - Shared UTC boundary applied to ingestion and maintenance;342 tests including owner isolation pass
-    locally
+  - Shared UTC boundary applied to ingestion and maintenance;342 tests including owner isolation pass locally
   - Reauthentication identity, refresh-session logout before deletion, sanitized provider errors and account
     export covered by tests
   - Actual helper migration on isolated PostgreSQL16 preserves triggers and own-group RLS, blocks other-user
     probes and restricts execution
   - Read-only exact-revision checker inspects actual job steps; one receipt freshness observation exceeded
     two-hour threshold
-  - Account-bound API replay guards tested with paused requests on both clients; final backend403 tests
-    pass
-  - V2 expiry uses100-account keyset transactions with safe disappeared-account handling; scheduler pages
-    aggregate counts;415 backend tests and isolated PostgreSQL withdrawal/deletion races pass
+  - Account-bound API replay guards tested with paused requests on both clients; final backend403 tests pass
+  - V2 expiry uses100-account keyset transactions with safe disappeared-account handling; scheduler pages aggregate
+    counts;415 backend tests and isolated PostgreSQL withdrawal/deletion races pass
   - Bounded legacy/delivery cleanup and opaque multiphase runner; streamed core and paid reports; read-only
     tombstone volume endpoint
-  - Verified-owner local bills, strict mutation reads, partial-scope export and captured-owner deletion
-    cleanup
-  - Five restricted measurement tables passed exact PostgreSQL migration/RLS/race proof; group currency
-    exact migration immutable-unit proof passed
-  source: 1dcd5254c5e0822a1b3764a4d43014d7b6526c68
-  release_status: September20 local source candidate; unpublished; required live/provider/device gates
-    remain
+  - Verified-owner local bills, strict mutation reads, partial-scope export and captured-owner deletion cleanup
+  - Five restricted measurement tables passed exact PostgreSQL migration/RLS/race proof; group currency exact
+    migration immutable-unit proof passed
+  - Consistent public/auth backup restored on isolatedPostgreSQL17;26tables/1809rows match; fixture container
+    removed
+  - Seven production migrations verified; helper anonymous/search-path warnings resolved; five new measurement
+    tables deny client access
+  - Consumed-invite FK and PostgreSQL UUID account-deletion fixes;623backend tests and80livechecks including
+    normal deletion/cleanup pass
+  - Hourly GitHub readiness published/configured; final-revision run35524566660 passes actual receipt/maintenance
+    freshness
+  source: 05a856ffa4d64a5f2523a596ff2a620149620133
+  release_status: Backend live verified; Android internal published/device pending; web candidate READY/public
+    promotion pending legal details
   remaining_notes:
-  - Authorized migration/live advisor and password-protection acceptance
-  - Actual backup restore/integrity, alert delivery/recovery and production query-plan/load evidence
-  - Tombstones remain retained until safe provider replay horizon is established
+  - Leaked-password protection requires Supabase dashboard sign-in; authenticated membership helper warning
+    is intentional and caller-restricted
+  - Actual alert delivery/recovery and representative query-plan/load acceptance remain
+  - Logical backup restore passed; complete role/ACL,Storage,Vault,PITR and infrastructure recovery not claimed
+  - Tombstone replay-horizon evidence remains pending
 - id: S4
   title: Hindi and accessibility
   status: in_progress
@@ -163,6 +173,7 @@ sprints:
   - docs/product-programme-2026-09/heartbeat-2026-09-15-0530.md
   - docs/product-programme-2026-09/completion-audit-2026-09-19.md
   - docs/product-programme-2026-09/completion-audit-2026-09-20.md
+  - docs/product-programme-2026-09/release-continuation-2026-09-20.md
   blockers:
   - native tests pending by owner
   - human linguistic review required
@@ -172,17 +183,16 @@ sprints:
   - Safe localized email/Google/callback errors and async recovery;29 tests/types/lint/build pass
   - Localized operational errors/labels/statuses, skip navigation and page titles; final web113 tests/types/lint/build14
     pages pass
-  - New bilingual report source, correction, history and recurrence panels; mobile570 tests/types/lint
-    pass
-  - Secondary core/accountant/group/bank/notes copy and accessible labels, safe failures/retry, private
-    amount masking
+  - New bilingual report source, correction, history and recurrence panels; mobile570 tests/types/lint pass
+  - Secondary core/accountant/group/bank/notes copy and accessible labels, safe failures/retry, private amount
+    masking
   - Static Hindi landing and localized metadata; app-owned policy/terms copy updated; human review distinct
     from source coverage
   - Final 678 mobile/68suites and 120 web/10files, types/scopedlint and 15-page build pass; bilingual legal/support/invite
     source included
   source: 736b927cf0a186d8ac86a0e2a12d9442fdf56061
-  release_status: September20 local source candidate; unpublished; required live/provider/device gates
-    remain
+  release_status: Backend live verified; Android internal published/device pending; web candidate READY/public
+    promotion pending legal details
   remaining_notes:
   - Human Hindi/legal review, provider-hosted and arbitrary AI/user text coverage not certified
   - Native screen reader/font scale and released performance acceptance remain pending
@@ -199,6 +209,7 @@ sprints:
   - Server entitlement parity and usable free/trial-expiry flows
   evidence:
   - docs/product-programme-2026-09/completion-audit-2026-09-20.md
+  - docs/product-programme-2026-09/release-continuation-2026-09-20.md
   blockers:
   - Play submission permission
   - BillDesk verification incomplete
@@ -210,13 +221,12 @@ sprints:
   - Immutable group currency, explicit legacy confirmation, exact split settlements and idempotent expense
     drafts
   remaining_notes:
-  - Store/provider permissions/catalogue/BillDesk and real purchase/restore/renewal/refund evidence still
-    external
-  - Legacy paid accounts need verified provider reconciliation; local unknown-state preservation is not
-    provider acceptance
-  release_status: September20 local source candidate; unpublished; required live/provider/device gates
-    remain
-  source: 1dcd5254c5e0822a1b3764a4d43014d7b6526c68
+  - Store/provider permissions/catalogue/BillDesk and real purchase/restore/renewal/refund evidence still external
+  - Legacy paid accounts need verified provider reconciliation; local unknown-state preservation is not provider
+    acceptance
+  release_status: Backend live verified; Android internal published/device pending; web candidate READY/public
+    promotion pending legal details
+  source: 05a856ffa4d64a5f2523a596ff2a620149620133
 - id: S6
   title: Measurement and pilot reporting
   status: in_progress
@@ -238,39 +248,42 @@ sprints:
   - backend/tests/test_measurement_return_frequency.py
   - docs/product-programme-2026-09/maintenance-pages-2026-09-19.md
   - docs/product-programme-2026-09/completion-audit-2026-09-20.md
+  - docs/product-programme-2026-09/release-continuation-2026-09-20.md
   blockers:
   - real paid/provider outcomes depend on S5
   - real outcomes require elapsed cohort time
   completed_checks:
   - Source audit and proposed cohort/consent/dedupe/timezone contract prepared
-  - Pure cohort reference and10 local-day/DST/maturity/exclusion fixtures; full336 backend tests, scoped
-    lint and independent review
+  - Pure cohort reference and10 local-day/DST/maturity/exclusion fixtures; full336 backend tests, scoped lint
+    and independent review
   - Explicit cohort-only active scope and unavailable product-wide metric;343 tests and independent review
     pass
-  - Explicit v2 epochs, UUID receipt dedupe, withdrawal/re-consent/exclusion/export/exact expiry and new
-    client transport implemented
-  - Actual migration and simultaneous lifecycle/business-write races passed isolated PostgreSQL16 with
-    disposable cleanup
+  - Explicit v2 epochs, UUID receipt dedupe, withdrawal/re-consent/exclusion/export/exact expiry and new client
+    transport implemented
+  - Actual migration and simultaneous lifecycle/business-write races passed isolated PostgreSQL16 with disposable
+    cleanup
   - Server-confirmed creation/planning/trial events; scoped local-day cohorts, product-wide measured activity
     and return-frequency buckets implemented
-  - Retry IDs bounded to retained 90 days, minimal expired-activation consent state, no durable client
-    queue; DST/population invariants verified
-  - V2 expiry uses100-account keyset transactions with safe disappeared-account handling; scheduler pages
-    aggregate counts;415 backend tests and isolated PostgreSQL withdrawal/deletion races pass
-  - Notification firstopen plus mature 24h association, ordered 7/30-day observation funnels, verified
-    paid trial/renewal/recovery/reactivation windows
-  - All optional measurement follows current consent/exclusion/withdrawal/export/90-day expiry; no raw
-    provider identifiers or amounts
+  - Retry IDs bounded to retained 90 days, minimal expired-activation consent state, no durable client queue;
+    DST/population invariants verified
+  - V2 expiry uses100-account keyset transactions with safe disappeared-account handling; scheduler pages aggregate
+    counts;415 backend tests and isolated PostgreSQL withdrawal/deletion races pass
+  - Notification firstopen plus mature 24h association, ordered 7/30-day observation funnels, verified paid
+    trial/renewal/recovery/reactivation windows
+  - All optional measurement follows current consent/exclusion/withdrawal/export/90-day expiry; no raw provider
+    identifiers or amounts
   - 618 integrated backend tests passed; actual PostgreSQL five-table schema/RLS/concurrency and 100/3-page
     lifecycle checks passed
+  - Schema/backend/runner released; live consent/dedupe/export/withdrawal and fixture cleanup verified; client
+    and elapsed-outcome gates remain
   remaining_notes:
-  - Reviewed schema→backend/runner→clients release and live acceptance pending
+  - Schema/backend/runner released; web promotion and real client/provider outcomes remain pending
   - Full preconsent signup population, net paid churn/revenue/refunds unavailable from collected evidence;
     annual history can expire
   - Real D1/D7/D30/renewals require consented elapsed pilot; no backfill or invented outcomes
-  source: 1dcd5254c5e0822a1b3764a4d43014d7b6526c68
-  release_status: September20 local source candidate; unpublished; required live/provider/device gates
-    remain
+  source: 05a856ffa4d64a5f2523a596ff2a620149620133
+  release_status: Backend live verified; Android internal published/device pending; web candidate READY/public
+    promotion pending legal details
 - id: S7
   title: Remaining product intelligence
   status: in_progress
@@ -288,26 +301,26 @@ sprints:
   - docs/product-programme-2026-09/intelligence-evidence-2026-09-19.md
   - docs/product-programme-2026-09/planning-retry-2026-09-19.md
   - docs/product-programme-2026-09/completion-audit-2026-09-20.md
+  - docs/product-programme-2026-09/release-continuation-2026-09-20.md
   blockers:
   - major repositioning or new paid restrictions requires owner decision
-  source: 1dcd5254c5e0822a1b3764a4d43014d7b6526c68
-  release_status: September20 local source candidate; unpublished; required live/provider/device gates
-    remain
+  source: 05a856ffa4d64a5f2523a596ff2a620149620133
+  release_status: Backend live verified; Android internal published/device pending; web candidate READY/public
+    promotion pending legal details
   completed_checks:
-  - Source-linked periodic evidence/corrections; conservative monthly recurrence/payday prediction with
-    explicit confirmation
+  - Source-linked periodic evidence/corrections; conservative monthly recurrence/payday prediction with explicit
+    confirmation
   - Fresh confirmed planning outlook and three-month recorded-history/category/income baselines on mobile/web
-  - Tomo context interpolation fixed, future entries excluded, context provenance without generated-claim
-    verification
-  - Planning confirmation/deletion UUID+revision guards prevent stale retries and resurrection; deleted
-    inputs removed from export/nudges
+  - Tomo context interpolation fixed, future entries excluded, context provenance without generated-claim verification
+  - Planning confirmation/deletion UUID+revision guards prevent stale retries and resurrection; deleted inputs
+    removed from export/nudges
   - Competing transaction corrections serialize on PostgreSQL and preserve stale-edit conflict checks
   - Five-cadence conservative recurring detector with1,100-day/2,000-row bound and abstention; confirmed-only
     horizon
   - Locale/date/currency-aware parse contract; strict malformed chat rejection; recorded-only matched-month
     insight calculations
-  - Provider-free adversarial/currency/boundary and source ownership fixtures pass; arbitrary generated
-    claims remain unverified
+  - Provider-free adversarial/currency/boundary and source ownership fixtures pass; arbitrary generated claims
+    remain unverified
   - Shared capture preserves decimals; post-save callbacks ignore unmounted screens
   remaining_notes:
   - Live provider/correction/recurrence journeys and deployed acceptance remain unverified
@@ -350,6 +363,14 @@ sprints:
   - D30 and renewal require real elapsed time
 local_candidates:
   mobile: 9ed8a704e3904c71b4ce1cbcb8604a7a4c634985
-  backend: 1dcd5254c5e0822a1b3764a4d43014d7b6526c68
+  backend: 05a856ffa4d64a5f2523a596ff2a620149620133
   web: 736b927cf0a186d8ac86a0e2a12d9442fdf56061
-  published: false
+  published: partial_see_release_report
+released_candidates:
+  backend: 05a856ffa4d64a5f2523a596ff2a620149620133
+  android_app_source: 9ed8a704e3904c71b4ce1cbcb8604a7a4c634985
+  android_update: 01a0bfc7-b47d-75e9-aefa-494c1c8207b9
+  android_group: b0b1612f-9344-4af6-8559-0d6de6a3a6b4
+  web_candidate_deployment: dpl_GtsgkRhNqHL3ojSrh1xreAG7BMim
+  web_public_promoted: false
+  device_verified: false

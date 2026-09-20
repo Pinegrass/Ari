@@ -129,3 +129,15 @@ Local bills require verified account binding and account-specific storage. Histo
 Groups use an immutable recorded currency. Historical NULL needs explicit creator confirmation without converting amounts. Group writes require captured currency, so older clients receive a conflict until upgraded. New expense UUID retry safety requires backend-first release. UPI launch is not payment evidence; settlement records only explicitly confirmed exact splits.
 
 Structured/parser and recorded-data calculations have synthetic regression evidence; freeform AI prose remains labelled interpretation with unverified claims. Do not turn manual net cash flow into actual savings/bank balance. Legal/data-handling copy changes are unpublished factual drafts, not legal compliance certification. Device hold, no new release authority and independent repository records persist.
+
+## 20 September — owner-authorized release continuation
+
+After the remaining-work report, owner said “Go ahead, do the pending works.” Proceed with reviewed schema, backend/runner, compatible internal Android and web release/operational verification. This does not resume physical Android/iPhone testing, broad notifications, store spending or outreach. Existing price/trial approval persists.
+
+Private consistent public/auth backup restored successfully before production migrations; preserve the protected dump outside Git. Seven migrations applied with explicit local-to-remote version mapping in release-continuation-2026-09-20.md. Do not replay timestamp-different migration files.
+
+Release smoke identified two production-only account deletion gaps: consumed invite recipient FK needed SET NULL while retaining used_at, and provider string identity needed normalization against PostgreSQL UUID. Both fixes have regression/live evidence. Do not infer live correctness solely from SQLite tests.
+
+Restore drifted native dependencies from verified lockfile artifacts and recompute fingerprint; never override runtime compatibility. Root master pushes automatically request paid native preview builds, so this OTA continuation does not push root master merely to archive source. Backend runner/code pushes and per-deployment Railway approvals are authorized; no permission expansion was made.
+
+Web public-domain promotion awaits missing registered business address/contact confirmation. Supabase leaked-password protection awaits dashboard sign-in; database connector access alone does not supply auth-setting capability. Questions are already pending; do not repeatedly ask. No direct external alert/outreach message is authorized. The hourly readiness workflow is active, while actual alert receipt/recovery remains a separate gate.

@@ -3,14 +3,14 @@ updated_at: '2026-09-20'
 active_branch: master
 active_task: ARI-SPRINT-ORCHESTRATION
 source_commit: 9ed8a704e3904c71b4ce1cbcb8604a7a4c634985
-backend_head: 1dcd5254c5e0822a1b3764a4d43014d7b6526c68
+backend_head: 05a856ffa4d64a5f2523a596ff2a620149620133
 web_head: 736b927cf0a186d8ac86a0e2a12d9442fdf56061
-development_stage: local_code_candidates_verified_acceptance_open
-release_status: september20_candidates_local_unpublished_prior_live_artifacts_unchanged
+development_stage: backend_live_android_internal_web_promotion_pending_acceptance_open
+release_status: backend_live_android_internal_published_web_candidate_pending_public_promotion
 verification:
   mobile_tests: 678_pass
   mobile_suites: 68_pass
-  backend_tests: 618_pass
+  backend_tests: 623_pass
   web_tests: 120_pass
   web_files: 10_pass
   lint: changed_source_pass_zero_client_warnings
@@ -23,9 +23,10 @@ android:
   runtime: f82b9c561785202f8057920d7a8a052d15c1ed33
   channel: internal-release
   published_artifact:
-    update_id: 01a09ba2-b520-7bc6-a812-ca4382a245f2
-    group: 860cb92d-cb0c-4ab1-8dee-15e7dd150c97
-    source: dfdaec15bccd87e5287e9a9cac3927adbc53c2f9
+    update_id: 01a0bfc7-b47d-75e9-aefa-494c1c8207b9
+    group: b0b1612f-9344-4af6-8559-0d6de6a3a6b4
+    source: 9ed8a704e3904c71b4ce1cbcb8604a7a4c634985
+    publication_head: bbf82c4e8213d8671b905a1041393c9865b45709
     physically_verified: false
   physically_verified_artifact:
     update_id: 01a09995-993e-741b-9fff-f2e8c017a182
@@ -34,7 +35,7 @@ android:
     date: '2026-09-13'
   testing: pending_by_owner_2026-09-14
   submission_status: failed_missing_service_account_permission
-live_backend: b8556303627323581193967e6cd97b7676aef066
+live_backend: 05a856ffa4d64a5f2523a596ff2a620149620133
 live_web: 7a1533f2e82ad69b61960d753f1d2832e8f8800a
 commercial:
   monthly_inr: 149
@@ -51,20 +52,22 @@ known_blockers:
 - real purchase and restore
 - actual push delivery and receipts
 - full Hindi native review
-- coordinated release and live acceptance of September20 candidates
-- actual backup restore and alert delivery acceptance
-- production helper verification and Auth password-protection setting
 - elapsed consented pilot outcomes
 - legal publication review including existing registered-address placeholder and verified contacts
 - production query-plan/load acceptance
-evidence: docs/product-programme-2026-09/completion-audit-2026-09-20.md
+- web public promotion needs registered address/contact details
+- Supabase dashboard sign-in for leaked-password protection
+- actual alert delivery/recovery and full infrastructure recovery remain unverified
+evidence: docs/product-programme-2026-09/release-continuation-2026-09-20.md
 continuity_schema_version: 2
-backend_deployment: ba6152e3-8e20-4495-bad9-6ba1260b8455
+backend_deployment: 9f4bb193-4abe-4e1b-a989-1b480b54a5be
 backend_live_verification:
-  api_checks: 40_pass
+  api_checks: 80_pass
   supabase_persistence: verified
   fixture_cleanup: verified
   health: exact_revision_healthy
+  operational_readiness_run: 35524566660
+  operational_readiness: pass
 android_usability_update:
   update_id: 01a09995-993e-741b-9fff-f2e8c017a182
   group: c6c1a184-e6fe-4873-942c-8ebb7f7f958a
@@ -124,21 +127,20 @@ orchestration:
   daily_postgres_concurrency: pass_synthetic_provider
   pagination_fix: local_unpublished
   device_testing: pending_by_owner
-  latest_progress: September20 coding candidates committed and verified; required release/device/provider/human/elapsed
-    acceptance remains open
+  latest_progress: Backend80livechecks,7migrations,backuprestore,securityhelpers,hourlymonitor verified; Android
+    internal published; web legal details and Supabase dashboard sign-in pending
 remaining_engineering:
-- No known assigned coding fix remains pending in September20 audit; new findings require source evidence
-- Production load/query plans, backup restore and alerts require operational acceptance
-- Tombstone deletion awaits safe provider replay horizon; broad unsupported AI forecasting remains outside
-  evidence
-- Uncollected preconsent census and incomplete provider churn/refunds remain unavailable, not fabricated
+- Known deletion blockers fixed and live verified; see release report for new evidence
+- Representative load/query plans and actual alert delivery/recovery remain operational gates
+- Full disaster recovery exceeds completed logical public/auth restore scope
+- Tombstone replay horizon, preconsent population and unobserved provider outcomes remain unavailable
 local_candidate:
   mobile: 9ed8a704e3904c71b4ce1cbcb8604a7a4c634985
-  backend: 1dcd5254c5e0822a1b3764a4d43014d7b6526c68
+  backend: 05a856ffa4d64a5f2523a596ff2a620149620133
   web: 736b927cf0a186d8ac86a0e2a12d9442fdf56061
   measurement_migration: 20260919132311_measurement_v2.sql
   helper_migration: 20260919134713_harden_internal_helpers.sql
-  published: false
+  published: partial_see_release_report
   devices_accessed: false
   notification_gates_changed: false
   new_backend_migrations:
@@ -146,12 +148,23 @@ local_candidate:
   - 20260919175703_measurement_notification_attribution.sql
   - 20260919183206_immutable_group_currency.sql
   - 20260919184208_consented_billing_lifecycle.sql
+  - 20260920164749_invite_consumption_survives_account_deletion.sql
+  mobile_published_internal: true
+  backend_published: true
+  web_public_promoted: false
 latest_turn_verification:
-  backend_tests: 618_pass
-  mobile_tests: 678_pass_68_suites
-  web_tests: 120_pass_10_files
-  types_lint_build: pass_15_web_pages
-  postgres: five_table_measurement_lifecycle_maintenance_daily_receipt_group_currency_pass
-  fixtures: removed
+  backend_tests: 623_pass
+  live_api: 80_pass_cleanup_verified
+  backup_restore: 26_public_tables_1809_rows_match
+  security: helper_and_RLS_verified_live
+  monitor: hourly_workflow_live_verified
   devices: not_accessed
-  production: not_changed
+  production: seven_migrations_and_backend_deployed
+  notifications: daily_and_outbox_schedules_off
+web_candidate_deployment:
+  source: 736b927cf0a186d8ac86a0e2a12d9442fdf56061
+  deployment: dpl_GtsgkRhNqHL3ojSrh1xreAG7BMim
+  url: https://aritomo-2kzqfhiso-pinegrass.vercel.app
+  status: READY
+  public_domain_promoted: false
+  authenticated_web_acceptance: false

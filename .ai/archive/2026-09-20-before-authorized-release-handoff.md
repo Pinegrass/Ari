@@ -1,0 +1,11 @@
+# Latest handoff — completed coding continuation
+
+Owner asked to carry coding through completion. Reviewed/integrated source commits: mobile 9ed8a704e3904c71b4ce1cbcb8604a7a4c634985; backend 1dcd5254c5e0822a1b3764a4d43014d7b6526c68; web 736b927cf0a186d8ac86a0e2a12d9442fdf56061. Final 678 mobile / 618 backend / 120 web tests, types/scoped lint,15-page build pass. Exact PostgreSQL migration/RLS/race/maintenance/daily/group-currency proofs pass; all owned fixtures removed. No source changes remain uncommitted. Root documentation checkpoint follows these code commits.
+
+Audit:docs/product-programme-2026-09/completion-audit-2026-09-20.md. Lane reports cover notification attribution/ownership, paid lifecycle, ordered observation funnel, operations scale, five-cadence recurrence, group settlement/currency, account bills/timezones and localization/legal language. Known app-owned copy inventory closed; remaining candidates are technical/user identifiers, render-translated source values or English branches of bilingual text. Human acceptance is separate.
+
+Rollout is schema→updated runner/backend→compatible clients, separately authorized and recorded. New migrations:20260919175629,20260919175703,20260919183206,20260919184208; prior measurement-v2/helper-hardening migrations remain required. Old group-write clients intentionally fail without currency confirmation; old backend cannot ensure new UUID expense retry semantics. Preserve compatible rollback and user data.
+
+No devices, production/store/provider actions, outreach, spending or rollout/gate changes. Owner Android hold and separate iPhone deferral persist; daily/outbox remain disabled. Existing pricing/trial approval persists. Remaining real notification/payment/store, live security/restore/alerts/load, legal-address/contact/human Hindi/native and elapsed-pilot gates stay explicit in sprints.yaml. No sprint newly accepted; no claim all programme outcomes complete. Automation remains ACTIVE.
+
+Next: inspect new evidence; prepare concrete authorized release/acceptance work without repeating unchanged requests or synthetic checks. Do not treat unavailable preconsent metrics, expired annual baselines or incomplete records as zero outcomes. Preserve historical untracked documentation and untracked nested web AGENTS/CLAUDE.
