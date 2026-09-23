@@ -1,5 +1,5 @@
 version: 1
-updated_at: '2026-09-20'
+updated_at: '2026-09-24'
 owner: root orchestrator
 automation_id: ari-sprint-orchestrator
 cadence_hours: 4
@@ -54,6 +54,7 @@ sprints:
   - docs/product-programme-2026-09/notification-channel-audit-2026-09-14.md
   - docs/product-programme-2026-09/completion-audit-2026-09-20.md
   - docs/product-programme-2026-09/release-continuation-2026-09-20.md
+  - docs/product-programme-2026-09/web-auth-acceptance-2026-09-20.md
   blockers:
   - device testing pending by owner
   - real provider and receipt evidence missing
@@ -68,16 +69,16 @@ sprints:
     account and failure-safe local scheduling
   - Exact PostgreSQL reservation/shared quota/unknown send/receipt-lock-order proofs passed; sending stays
     disabled
-  source: 05a856ffa4d64a5f2523a596ff2a620149620133
-  release_status: Backend live verified; Android internal published/device pending; web candidate READY/public
-    promotion pending legal details
+  - Independent default-off outbox API guard deployed; daily/outbox server variables false
+  source: 1673c1479a1dc9c579a94af5b2cd6cdfb61154aa
+  release_status: Backend and web live; Android internal published/device pending
   remaining_notes:
   - Device/provider delivery, receipts and tap acceptance remain pending; old/offline clients require updated
     foreground refresh
   - Bill reminders remain separate from generic server three/day opportunity quota
 - id: S2
   title: Released client acceptance
-  status: pending
+  status: in_progress
   depends_on:
   - S0
   acceptance:
@@ -88,13 +89,17 @@ sprints:
   evidence:
   - docs/product-programme-2026-09/completion-audit-2026-09-19.md
   - docs/product-programme-2026-09/release-continuation-2026-09-20.md
+  - docs/product-programme-2026-09/web-auth-acceptance-2026-09-20.md
   blockers:
   - physical Android testing pending by owner
   remaining_notes:
-  - Backend80checks pass; web candidate Hindi landing/login render; authenticated web awaits promotion, physical
-    Android acceptance remains on hold
-  release_status: Backend live verified; Android internal published/device pending; web candidate READY/public
-    promotion pending legal details
+  - Core authenticated browser flows and fixture cleanup pass; physical Android remains held; mature-history/narrow
+    viewport/accessibility acceptance remains separate
+  - 'Final cold reload on d39ad2c and live Hindi fallback on1673c14 remain UNVERIFIED: browser-control access
+    ended during the final check. Both disposable fixtures were cleaned with absence verified. Next: finish
+    those bounded browser checks without redeploying unchanged code. Readiness35909949244 passes, but earlier
+    receipt freshness breach35891197530 (186.5min) remains an operational gap.'
+  release_status: Backend and web live; Android internal published/device pending
 - id: S3
   title: Trust and operational readiness
   status: in_progress
@@ -117,6 +122,7 @@ sprints:
   - docs/product-programme-2026-09/maintenance-pages-2026-09-19.md
   - docs/product-programme-2026-09/completion-audit-2026-09-20.md
   - docs/product-programme-2026-09/release-continuation-2026-09-20.md
+  - docs/product-programme-2026-09/web-auth-acceptance-2026-09-20.md
   blockers: []
   completed_checks:
   - Observed maintenance34820989626 and receipts34816725158 actual successful HTTP200 job steps with zero records
@@ -148,15 +154,18 @@ sprints:
     normal deletion/cleanup pass
   - Hourly GitHub readiness published/configured; final-revision run35524566660 passes actual receipt/maintenance
     freshness
-  source: 05a856ffa4d64a5f2523a596ff2a620149620133
-  release_status: Backend live verified; Android internal published/device pending; web candidate READY/public
-    promotion pending legal details
+  - Supabase leaked-password protection enabled and dashboard/advisor verified
+  - 642 backend tests and current CI/readiness pass; report UUID fix live; weekly failures now classified without
+    sensitive logs
+  source: 1673c1479a1dc9c579a94af5b2cd6cdfb61154aa
+  release_status: Backend and web live; Android internal published/device pending
   remaining_notes:
-  - Leaked-password protection requires Supabase dashboard sign-in; authenticated membership helper warning
-    is intentional and caller-restricted
   - Actual alert delivery/recovery and representative query-plan/load acceptance remain
   - Logical backup restore passed; complete role/ACL,Storage,Vault,PITR and infrastructure recovery not claimed
   - Tombstone replay-horizon evidence remains pending
+  - Weekly run35526286124 historical one-item failure unclassified; malformed provider responses observed but
+    causation unproven
+  - Receipt freshness breach35891197530 persists as operational reliability evidence despite later pass35909949244
 - id: S4
   title: Hindi and accessibility
   status: in_progress
@@ -174,6 +183,7 @@ sprints:
   - docs/product-programme-2026-09/completion-audit-2026-09-19.md
   - docs/product-programme-2026-09/completion-audit-2026-09-20.md
   - docs/product-programme-2026-09/release-continuation-2026-09-20.md
+  - docs/product-programme-2026-09/web-auth-acceptance-2026-09-20.md
   blockers:
   - native tests pending by owner
   - human linguistic review required
@@ -191,8 +201,7 @@ sprints:
   - Final 678 mobile/68suites and 120 web/10files, types/scopedlint and 15-page build pass; bilingual legal/support/invite
     source included
   source: 736b927cf0a186d8ac86a0e2a12d9442fdf56061
-  release_status: Backend live verified; Android internal published/device pending; web candidate READY/public
-    promotion pending legal details
+  release_status: Backend and web live; Android internal published/device pending
   remaining_notes:
   - Human Hindi/legal review, provider-hosted and arbitrary AI/user text coverage not certified
   - Native screen reader/font scale and released performance acceptance remain pending
@@ -224,9 +233,8 @@ sprints:
   - Store/provider permissions/catalogue/BillDesk and real purchase/restore/renewal/refund evidence still external
   - Legacy paid accounts need verified provider reconciliation; local unknown-state preservation is not provider
     acceptance
-  release_status: Backend live verified; Android internal published/device pending; web candidate READY/public
-    promotion pending legal details
-  source: 05a856ffa4d64a5f2523a596ff2a620149620133
+  release_status: Backend and web live; Android internal published/device pending
+  source: 1673c1479a1dc9c579a94af5b2cd6cdfb61154aa
 - id: S6
   title: Measurement and pilot reporting
   status: in_progress
@@ -249,6 +257,7 @@ sprints:
   - docs/product-programme-2026-09/maintenance-pages-2026-09-19.md
   - docs/product-programme-2026-09/completion-audit-2026-09-20.md
   - docs/product-programme-2026-09/release-continuation-2026-09-20.md
+  - docs/product-programme-2026-09/web-auth-acceptance-2026-09-20.md
   blockers:
   - real paid/provider outcomes depend on S5
   - real outcomes require elapsed cohort time
@@ -277,13 +286,12 @@ sprints:
   - Schema/backend/runner released; live consent/dedupe/export/withdrawal and fixture cleanup verified; client
     and elapsed-outcome gates remain
   remaining_notes:
-  - Schema/backend/runner released; web promotion and real client/provider outcomes remain pending
+  - Schema/backend/runner released; real client/provider outcomes remain pending
   - Full preconsent signup population, net paid churn/revenue/refunds unavailable from collected evidence;
     annual history can expire
   - Real D1/D7/D30/renewals require consented elapsed pilot; no backfill or invented outcomes
-  source: 05a856ffa4d64a5f2523a596ff2a620149620133
-  release_status: Backend live verified; Android internal published/device pending; web candidate READY/public
-    promotion pending legal details
+  source: 1673c1479a1dc9c579a94af5b2cd6cdfb61154aa
+  release_status: Backend and web live; Android internal published/device pending
 - id: S7
   title: Remaining product intelligence
   status: in_progress
@@ -302,11 +310,11 @@ sprints:
   - docs/product-programme-2026-09/planning-retry-2026-09-19.md
   - docs/product-programme-2026-09/completion-audit-2026-09-20.md
   - docs/product-programme-2026-09/release-continuation-2026-09-20.md
+  - docs/product-programme-2026-09/web-auth-acceptance-2026-09-20.md
   blockers:
   - major repositioning or new paid restrictions requires owner decision
-  source: 05a856ffa4d64a5f2523a596ff2a620149620133
-  release_status: Backend live verified; Android internal published/device pending; web candidate READY/public
-    promotion pending legal details
+  source: 1673c1479a1dc9c579a94af5b2cd6cdfb61154aa
+  release_status: Backend and web live; Android internal published/device pending
   completed_checks:
   - Source-linked periodic evidence/corrections; conservative monthly recurrence/payday prediction with explicit
     confirmation
@@ -323,7 +331,8 @@ sprints:
     remain unverified
   - Shared capture preserves decimals; post-save callbacks ignore unmounted screens
   remaining_notes:
-  - Live provider/correction/recurrence journeys and deployed acceptance remain unverified
+  - Browser report correction and planning pass; live generated-provider/recurrence and device journeys remain
+    pending
   - Unknown bank balances and unrestricted AI forecasts remain unsupported; no inventedFX or actualsavings
   - Compatible planning/group/currency backend/client rollout and rollback required
 - id: S8
@@ -363,14 +372,15 @@ sprints:
   - D30 and renewal require real elapsed time
 local_candidates:
   mobile: 9ed8a704e3904c71b4ce1cbcb8604a7a4c634985
-  backend: 05a856ffa4d64a5f2523a596ff2a620149620133
-  web: 736b927cf0a186d8ac86a0e2a12d9442fdf56061
-  published: partial_see_release_report
+  backend: 1673c1479a1dc9c579a94af5b2cd6cdfb61154aa
+  web: d39ad2c5607357c87432ada9ed327c58f3fdfc0a
+  published: authorized_candidates_released_acceptance_open
 released_candidates:
-  backend: 05a856ffa4d64a5f2523a596ff2a620149620133
+  backend: 1673c1479a1dc9c579a94af5b2cd6cdfb61154aa
   android_app_source: 9ed8a704e3904c71b4ce1cbcb8604a7a4c634985
   android_update: 01a0bfc7-b47d-75e9-aefa-494c1c8207b9
   android_group: b0b1612f-9344-4af6-8559-0d6de6a3a6b4
-  web_candidate_deployment: dpl_GtsgkRhNqHL3ojSrh1xreAG7BMim
-  web_public_promoted: false
+  web_candidate_deployment: dpl_5QkwZBza1UPEVEtoXdXJqoncNp6J
+  web_public_promoted: true
   device_verified: false
+  web: d39ad2c5607357c87432ada9ed327c58f3fdfc0a

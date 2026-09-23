@@ -141,3 +141,13 @@ Release smoke identified two production-only account deletion gaps: consumed inv
 Restore drifted native dependencies from verified lockfile artifacts and recompute fingerprint; never override runtime compatibility. Root master pushes automatically request paid native preview builds, so this OTA continuation does not push root master merely to archive source. Backend runner/code pushes and per-deployment Railway approvals are authorized; no permission expansion was made.
 
 Web public-domain promotion awaits missing registered business address/contact confirmation. Supabase leaked-password protection awaits dashboard sign-in; database connector access alone does not supply auth-setting capability. Questions are already pending; do not repeatedly ask. No direct external alert/outreach message is authorized. The hourly readiness workflow is active, while actual alert receipt/recovery remains a separate gate.
+
+## 20 September — supplied legal details and Supabase access
+
+Owner supplied Pinegrass Technologies, Al Haj Jalal Manzil, Hatta Mana Ingkhol, Imphal, Manipur, 795001 and +91 7629001131. Publish these exact address/contact facts on bilingual legal/support pages; retain existing legal entity and email contacts. Publication does not certify legal/linguistic review.
+
+Existing GitHub sign-in successfully opened Supabase; enable only the pending leaked-password protection setting, then verify persisted state and advisor. No account upgrade or new provider permissions needed.
+
+Live browser acceptance outranks local tests: decimal HTML constraints, PostgreSQL UUID report provenance, Hindi settings/payment copy and repeated Supabase client construction were discovered during actual signed-in journeys. Fix and retest before acceptance. Default-off server outbox guard now complements scheduler gating; direct worker calls and other jobs are not covered. Both server gates remain false.
+
+Weekly brief run35526286124 had one unclassified failure. Malformed provider responses were observed concurrently but do not prove its cause. Future logs use fixed job name and allowlisted exception class only; do not rerun sending/content jobs merely to reproduce or log account data.

@@ -3,18 +3,19 @@
 ## Current release checkpoint — 20 September
 
 The historical observations below are retained for traceability. Current backend is
-`05a856ffa4d64a5f2523a596ff2a620149620133`, Railway
-`9f4bb193-4abe-4e1b-a989-1b480b54a5be`. The paginating runner and hourly read-only
+`1673c1479a1dc9c579a94af5b2cd6cdfb61154aa`, Railway
+`099478be-67d6-4e15-9992-8a0481aebe79`. The paginating runner and hourly read-only
 readiness workflow are published; `ARI_EXPECTED_BACKEND_REVISION` matches this SHA.
-Run35524566660 passed health, revision and actual receipt/maintenance freshness.
+Run35909949244 passed health/revision/freshness. Prior35891197530 failed receipt freshness at186.5minutes; preserve this reliability gap.
 Seven reviewed migrations and logical public/auth backup restoration are verified;
 see `release-continuation-2026-09-20.md` and `backup-restore-acceptance-2026-09-20.md`.
 
-Daily/outbox schedules remain disabled. The outbox API itself has no environment
-gate: do not invoke manual `all` or `nudge-outbox` for diagnostics. No external
+Daily/outbox schedules remain disabled. Both server gates are explicitly false;
+the outbox API now has an independent default-off guard. Do not invoke manual `all`
+for diagnostics because other jobs can generate content or send. No external
 alert delivery/recovery, managed PITR, complete infrastructure recovery or physical
-notification acceptance is claimed. Supabase leaked-password protection awaits
-dashboard access; authenticated group-helper execution is intentionally retained
+notification acceptance is claimed. Supabase leaked-password protection was enabled
+and independently verified in the dashboard/advisor; authenticated group-helper execution is intentionally retained
 with caller identity restriction. Use the current SHA in the checker command,
 not the older examples retained below.
 

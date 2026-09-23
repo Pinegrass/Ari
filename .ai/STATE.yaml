@@ -1,18 +1,18 @@
 project: Ari
-updated_at: '2026-09-20'
+updated_at: '2026-09-24'
 active_branch: master
 active_task: ARI-SPRINT-ORCHESTRATION
 source_commit: 9ed8a704e3904c71b4ce1cbcb8604a7a4c634985
-backend_head: 05a856ffa4d64a5f2523a596ff2a620149620133
-web_head: 736b927cf0a186d8ac86a0e2a12d9442fdf56061
-development_stage: backend_live_android_internal_web_promotion_pending_acceptance_open
-release_status: backend_live_android_internal_published_web_candidate_pending_public_promotion
+backend_head: 1673c1479a1dc9c579a94af5b2cd6cdfb61154aa
+web_head: d39ad2c5607357c87432ada9ed327c58f3fdfc0a
+development_stage: backend_and_web_live_android_internal_acceptance_open
+release_status: backend_web_live_android_internal_device_pending
 verification:
   mobile_tests: 678_pass
   mobile_suites: 68_pass
-  backend_tests: 623_pass
-  web_tests: 120_pass
-  web_files: 10_pass
+  backend_tests: 642_pass
+  web_tests: 132_pass
+  web_files: 13_pass
   lint: changed_source_pass_zero_client_warnings
   typecheck: pass
   web_build: 15_pages_pass
@@ -35,8 +35,8 @@ android:
     date: '2026-09-13'
   testing: pending_by_owner_2026-09-14
   submission_status: failed_missing_service_account_permission
-live_backend: 05a856ffa4d64a5f2523a596ff2a620149620133
-live_web: 7a1533f2e82ad69b61960d753f1d2832e8f8800a
+live_backend: 1673c1479a1dc9c579a94af5b2cd6cdfb61154aa
+live_web: d39ad2c5607357c87432ada9ed327c58f3fdfc0a
 commercial:
   monthly_inr: 149
   yearly_inr: 1499
@@ -53,20 +53,22 @@ known_blockers:
 - actual push delivery and receipts
 - full Hindi native review
 - elapsed consented pilot outcomes
-- legal publication review including existing registered-address placeholder and verified contacts
 - production query-plan/load acceptance
-- web public promotion needs registered address/contact details
-- Supabase dashboard sign-in for leaked-password protection
 - actual alert delivery/recovery and full infrastructure recovery remain unverified
-evidence: docs/product-programme-2026-09/release-continuation-2026-09-20.md
+- human legal/linguistic review
+- weekly brief35526286124 one historical unclassified failure; future classification
+  deployed
+- final cold reload and Hindi fallback browser acceptance
+- receipt scheduler exceeded freshness threshold on35891197530
+evidence: docs/product-programme-2026-09/web-auth-acceptance-2026-09-20.md
 continuity_schema_version: 2
-backend_deployment: 9f4bb193-4abe-4e1b-a989-1b480b54a5be
+backend_deployment: 099478be-67d6-4e15-9992-8a0481aebe79
 backend_live_verification:
-  api_checks: 80_pass
+  api_checks: prior80_on05a856f; reports_on_b322ac6; current_health_pass
   supabase_persistence: verified
   fixture_cleanup: verified
   health: exact_revision_healthy
-  operational_readiness_run: 35524566660
+  operational_readiness_run: 35909949244
   operational_readiness: pass
 android_usability_update:
   update_id: 01a09995-993e-741b-9fff-f2e8c017a182
@@ -125,22 +127,25 @@ orchestration:
   cadence_hours: 4
   ledger: .ai/sprints.yaml
   daily_postgres_concurrency: pass_synthetic_provider
-  pagination_fix: local_unpublished
+  pagination_fix: released_live_verified
   device_testing: pending_by_owner
-  latest_progress: Backend80livechecks,7migrations,backuprestore,securityhelpers,hourlymonitor verified; Android
-    internal published; web legal details and Supabase dashboard sign-in pending
+  latest_progress: Latest web/backend fixes deployed; final cold reload/Hindi browser
+    acceptance pending; fixtures cleaned
 remaining_engineering:
-- Known deletion blockers fixed and live verified; see release report for new evidence
-- Representative load/query plans and actual alert delivery/recovery remain operational gates
+- Known live report/decimal/session/guard gaps fixed; see current browser acceptance
+  report
+- Representative load/query plans and actual alert delivery/recovery remain operational
+  gates
 - Full disaster recovery exceeds completed logical public/auth restore scope
-- Tombstone replay horizon, preconsent population and unobserved provider outcomes remain unavailable
+- Tombstone replay horizon, preconsent population and unobserved provider outcomes
+  remain unavailable
 local_candidate:
   mobile: 9ed8a704e3904c71b4ce1cbcb8604a7a4c634985
-  backend: 05a856ffa4d64a5f2523a596ff2a620149620133
-  web: 736b927cf0a186d8ac86a0e2a12d9442fdf56061
+  backend: 1673c1479a1dc9c579a94af5b2cd6cdfb61154aa
+  web: d39ad2c5607357c87432ada9ed327c58f3fdfc0a
   measurement_migration: 20260919132311_measurement_v2.sql
   helper_migration: 20260919134713_harden_internal_helpers.sql
-  published: partial_see_release_report
+  published: all_authorized_candidates_released_acceptance_open
   devices_accessed: false
   notification_gates_changed: false
   new_backend_migrations:
@@ -151,20 +156,21 @@ local_candidate:
   - 20260920164749_invite_consumption_survives_account_deletion.sql
   mobile_published_internal: true
   backend_published: true
-  web_public_promoted: false
+  web_public_promoted: true
 latest_turn_verification:
-  backend_tests: 623_pass
-  live_api: 80_pass_cleanup_verified
+  backend_tests: 642_pass
+  live_api: current_health_pass; prior_EN_HI_reports_on_b322ac6
   backup_restore: 26_public_tables_1809_rows_match
-  security: helper_and_RLS_verified_live
-  monitor: hourly_workflow_live_verified
+  security: leaked_password_protection_enabled_verified
+  monitor: 35909949244_pass
   devices: not_accessed
-  production: seven_migrations_and_backend_deployed
-  notifications: daily_and_outbox_schedules_off
+  production: backend_and_web_deployed
+  notifications: daily_and_outbox_server_and_scheduler_off
+  web_tests: 132_pass
 web_candidate_deployment:
-  source: 736b927cf0a186d8ac86a0e2a12d9442fdf56061
-  deployment: dpl_GtsgkRhNqHL3ojSrh1xreAG7BMim
-  url: https://aritomo-2kzqfhiso-pinegrass.vercel.app
+  source: d39ad2c5607357c87432ada9ed327c58f3fdfc0a
+  deployment: dpl_5QkwZBza1UPEVEtoXdXJqoncNp6J
+  url: https://aritomo-mzdlp0wdh-pinegrass.vercel.app
   status: READY
-  public_domain_promoted: false
-  authenticated_web_acceptance: false
+  public_domain_promoted: true
+  authenticated_web_acceptance: prior_core_flows_pass; final_cold_reload_UNVERIFIED

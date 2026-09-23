@@ -17,7 +17,7 @@ The authoritative release record is `.ai/20-CURRENT-STATE.md` and the linked dat
 
 Daily nudges have three local-time opportunities (09:00, 14:00, 19:00) when deliberately enabled. Saved lower limits remain effective; bill reminders are separate. Old/offline clients need acceptance of the combined experience.
 
-Keep Railway `DAILY_NUDGES_ENABLED=false` and GitHub daily/outbox schedule variables disabled until actual acceptance. The outbox endpoint has no independent environment gate: a manual `--job all` or outbox invocation can send. Never use those as release diagnostics. Receipt lookup does not resend, but receipt success alone does not prove device display.
+Keep Railway `DAILY_NUDGES_ENABLED=false`, `NUDGE_OUTBOX_ENABLED=false`, and GitHub daily/outbox schedule variables disabled until actual acceptance. The outbox API now has an independent default-off server guard. Manual `--job all` can still invoke other content/sending jobs: never use it as a release diagnostic. Receipt lookup does not resend, but receipt success alone does not prove device display. See backend `docs/notification-rollout-gates.md` for guard scope and in-flight limitations.
 
 Follow `docs/product-programme-2026-09/operations-runbook.md` for scoped read-only checks. Verify actual job steps, latest revision and freshness; investigate failures without blind reruns.
 
