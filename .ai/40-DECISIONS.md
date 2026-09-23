@@ -151,3 +151,6 @@ Existing GitHub sign-in successfully opened Supabase; enable only the pending le
 Live browser acceptance outranks local tests: decimal HTML constraints, PostgreSQL UUID report provenance, Hindi settings/payment copy and repeated Supabase client construction were discovered during actual signed-in journeys. Fix and retest before acceptance. Default-off server outbox guard now complements scheduler gating; direct worker calls and other jobs are not covered. Both server gates remain false.
 
 Weekly brief run35526286124 had one unclassified failure. Malformed provider responses were observed concurrently but do not prove its cause. Future logs use fixed job name and allowlisted exception class only; do not rerun sending/content jobs merely to reproduce or log account data.
+
+
+24 September acceptance: fresh sign-in and full Hindi/English cold reloads passed on live web d39ad2c; empty-account Hindi fallback passed on backend1673c14. Disposable fixture cleanup verified. Local web candidate a060351 corrects mixed Inbox cards being labelled as transaction entries; scoped ESLint and diff check pass, not deployed. Receipt freshness failed again on35914460602 (135.4min); observed receipt gaps257.15/215.25min precede execution. Threshold unchanged; no jobs or releases triggered. See docs/product-programme-2026-09/browser-scheduler-acceptance-2026-09-24.md.

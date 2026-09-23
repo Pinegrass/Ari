@@ -1,4 +1,4 @@
-# Current state — 24 September 2026, web and authentication continuation
+# Latest handoff — web/auth fixes released
 
 Owner supplied the registered Imphal address/+91 7629001131 and authorized Supabase sign-in/completion. Contact details are live in English/Hindi terms, privacy and support. Supabase existing GitHub sign-in succeeded; leaked-password protection enabled, persisted dashboard state and security advisor verified. Existing membership helper warning is intentional/caller-restricted.
 
@@ -14,4 +14,4 @@ Remaining: actual device/push/tap and combined-channel acceptance; BillDesk/Play
 
 Latest evidence: docs/product-programme-2026-09/web-auth-acceptance-2026-09-20.md. Prior release-continuation and backup-restore reports retain exact migration and older artifact evidence.
 
-24 September acceptance: fresh sign-in and full Hindi/English cold reloads passed on live web d39ad2c; empty-account Hindi fallback passed on backend1673c14. Disposable fixture cleanup verified. Local web candidate a060351 corrects mixed Inbox cards being labelled as transaction entries; scoped ESLint and diff check pass, not deployed. Receipt freshness failed again on35914460602 (135.4min); observed receipt gaps257.15/215.25min precede execution. Threshold unchanged; no jobs or releases triggered. See docs/product-programme-2026-09/browser-scheduler-acceptance-2026-09-24.md.
+Final cold reload on d39ad2c and live Hindi fallback on1673c14 remain UNVERIFIED: browser-control access ended during the final check. Both disposable fixtures were cleaned with absence verified. Next: finish those bounded browser checks without redeploying unchanged code. Readiness35909949244 passes, but earlier receipt freshness breach35891197530 (186.5min) remains an operational gap.

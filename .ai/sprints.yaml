@@ -90,16 +90,15 @@ sprints:
   - docs/product-programme-2026-09/completion-audit-2026-09-19.md
   - docs/product-programme-2026-09/release-continuation-2026-09-20.md
   - docs/product-programme-2026-09/web-auth-acceptance-2026-09-20.md
+  - docs/product-programme-2026-09/browser-scheduler-acceptance-2026-09-24.md
   blockers:
   - physical Android testing pending by owner
   remaining_notes:
   - Core authenticated browser flows and fixture cleanup pass; physical Android remains held; mature-history/narrow
     viewport/accessibility acceptance remains separate
-  - 'Final cold reload on d39ad2c and live Hindi fallback on1673c14 remain UNVERIFIED: browser-control access
-    ended during the final check. Both disposable fixtures were cleaned with absence verified. Next: finish
-    those bounded browser checks without redeploying unchanged code. Readiness35909949244 passes, but earlier
-    receipt freshness breach35891197530 (186.5min) remains an operational gap.'
   release_status: Backend and web live; Android internal published/device pending
+  completed_checks:
+  - Fresh login and full EN/HI cold reload passed on d39ad2c; empty-account Hindi fallback passed on1673c14; disposable cleanup verified
 - id: S3
   title: Trust and operational readiness
   status: in_progress
@@ -123,6 +122,7 @@ sprints:
   - docs/product-programme-2026-09/completion-audit-2026-09-20.md
   - docs/product-programme-2026-09/release-continuation-2026-09-20.md
   - docs/product-programme-2026-09/web-auth-acceptance-2026-09-20.md
+  - docs/product-programme-2026-09/browser-scheduler-acceptance-2026-09-24.md
   blockers: []
   completed_checks:
   - Observed maintenance34820989626 and receipts34816725158 actual successful HTTP200 job steps with zero records
@@ -166,6 +166,7 @@ sprints:
   - Weekly run35526286124 historical one-item failure unclassified; malformed provider responses observed but
     causation unproven
   - Receipt freshness breach35891197530 persists as operational reliability evidence despite later pass35909949244
+  - Readiness35914460602 receipt stale135.4min; receipt gaps257.15/215.25min before execution; scheduler reliability open
 - id: S4
   title: Hindi and accessibility
   status: in_progress
@@ -184,6 +185,7 @@ sprints:
   - docs/product-programme-2026-09/completion-audit-2026-09-20.md
   - docs/product-programme-2026-09/release-continuation-2026-09-20.md
   - docs/product-programme-2026-09/web-auth-acceptance-2026-09-20.md
+  - docs/product-programme-2026-09/browser-scheduler-acceptance-2026-09-24.md
   blockers:
   - native tests pending by owner
   - human linguistic review required
@@ -200,12 +202,12 @@ sprints:
     from source coverage
   - Final 678 mobile/68suites and 120 web/10files, types/scopedlint and 15-page build pass; bilingual legal/support/invite
     source included
+  - Supplied legal address/contact live; empty-account Hindi fallback browser verified; local mixed Inbox copy correction a060351 not deployed
   source: 736b927cf0a186d8ac86a0e2a12d9442fdf56061
   release_status: Backend and web live; Android internal published/device pending
   remaining_notes:
   - Human Hindi/legal review, provider-hosted and arbitrary AI/user text coverage not certified
   - Native screen reader/font scale and released performance acceptance remain pending
-  - Existing registered-address placeholder and contact details need publication review
 - id: S5
   title: Android distribution and commerce
   status: blocked_external
@@ -373,8 +375,8 @@ sprints:
 local_candidates:
   mobile: 9ed8a704e3904c71b4ce1cbcb8604a7a4c634985
   backend: 1673c1479a1dc9c579a94af5b2cd6cdfb61154aa
-  web: d39ad2c5607357c87432ada9ed327c58f3fdfc0a
-  published: authorized_candidates_released_acceptance_open
+  web: a0603515ea3895596d98fc63faaa10654f71e6bc
+  published: prior_candidates_released_new_inbox_copy_local_only
 released_candidates:
   backend: 1673c1479a1dc9c579a94af5b2cd6cdfb61154aa
   android_app_source: 9ed8a704e3904c71b4ce1cbcb8604a7a4c634985

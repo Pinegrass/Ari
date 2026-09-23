@@ -4,7 +4,7 @@ active_branch: master
 active_task: ARI-SPRINT-ORCHESTRATION
 source_commit: 9ed8a704e3904c71b4ce1cbcb8604a7a4c634985
 backend_head: 1673c1479a1dc9c579a94af5b2cd6cdfb61154aa
-web_head: d39ad2c5607357c87432ada9ed327c58f3fdfc0a
+web_head: a0603515ea3895596d98fc63faaa10654f71e6bc
 development_stage: backend_and_web_live_android_internal_acceptance_open
 release_status: backend_web_live_android_internal_device_pending
 verification:
@@ -58,9 +58,8 @@ known_blockers:
 - human legal/linguistic review
 - weekly brief35526286124 one historical unclassified failure; future classification
   deployed
-- final cold reload and Hindi fallback browser acceptance
 - receipt scheduler exceeded freshness threshold on35891197530
-evidence: docs/product-programme-2026-09/web-auth-acceptance-2026-09-20.md
+evidence: docs/product-programme-2026-09/browser-scheduler-acceptance-2026-09-24.md
 continuity_schema_version: 2
 backend_deployment: 099478be-67d6-4e15-9992-8a0481aebe79
 backend_live_verification:
@@ -129,8 +128,8 @@ orchestration:
   daily_postgres_concurrency: pass_synthetic_provider
   pagination_fix: released_live_verified
   device_testing: pending_by_owner
-  latest_progress: Latest web/backend fixes deployed; final cold reload/Hindi browser
-    acceptance pending; fixtures cleaned
+  latest_progress: Cold reload and Hindi fallback accepted on live releases; copy
+    correction local only; scheduler gaps confirmed
 remaining_engineering:
 - Known live report/decimal/session/guard gaps fixed; see current browser acceptance
   report
@@ -142,10 +141,10 @@ remaining_engineering:
 local_candidate:
   mobile: 9ed8a704e3904c71b4ce1cbcb8604a7a4c634985
   backend: 1673c1479a1dc9c579a94af5b2cd6cdfb61154aa
-  web: d39ad2c5607357c87432ada9ed327c58f3fdfc0a
+  web: a0603515ea3895596d98fc63faaa10654f71e6bc
   measurement_migration: 20260919132311_measurement_v2.sql
   helper_migration: 20260919134713_harden_internal_helpers.sql
-  published: all_authorized_candidates_released_acceptance_open
+  published: prior_candidates_released_new_inbox_copy_local_only
   devices_accessed: false
   notification_gates_changed: false
   new_backend_migrations:
@@ -162,15 +161,17 @@ latest_turn_verification:
   live_api: current_health_pass; prior_EN_HI_reports_on_b322ac6
   backup_restore: 26_public_tables_1809_rows_match
   security: leaked_password_protection_enabled_verified
-  monitor: 35909949244_pass
+  monitor: 35914460602_failed_receipt_freshness135.4min
   devices: not_accessed
-  production: backend_and_web_deployed
+  production: no_new_release
   notifications: daily_and_outbox_server_and_scheduler_off
   web_tests: 132_pass
+  browser: fresh_login_EN_HI_cold_reload_empty_Hindi_fallback_pass
+  copy_candidate: scoped_eslint_and_diff_check_pass_not_deployed
 web_candidate_deployment:
   source: d39ad2c5607357c87432ada9ed327c58f3fdfc0a
   deployment: dpl_5QkwZBza1UPEVEtoXdXJqoncNp6J
   url: https://aritomo-mzdlp0wdh-pinegrass.vercel.app
   status: READY
   public_domain_promoted: true
-  authenticated_web_acceptance: prior_core_flows_pass; final_cold_reload_UNVERIFIED
+  authenticated_web_acceptance: fresh_login_EN_HI_cold_reload_and_empty_Hindi_fallback_pass
