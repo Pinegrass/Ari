@@ -3,14 +3,14 @@ updated_at: '2026-09-24'
 active_branch: master
 active_task: ARI-SPRINT-ORCHESTRATION
 source_commit: 9ed8a704e3904c71b4ce1cbcb8604a7a4c634985
-backend_head: c2b09ec41bd768ad0a8518ba8e73528fa256718c
+backend_head: 57ff836f278af2d507e93e938c86519162a879fe
 web_head: a0603515ea3895596d98fc63faaa10654f71e6bc
 development_stage: backend_and_web_live_android_internal_acceptance_open
 release_status: backend_web_live_android_internal_device_pending
 verification:
   mobile_tests: 678_pass
   mobile_suites: 68_pass
-  backend_tests: 650_pass_local_candidate
+  backend_tests: 668_full_pass_plus20_focused_after_two_test_additions
   web_tests: 132_pass
   web_files: 13_pass
   lint: changed_source_pass_zero_client_warnings
@@ -59,7 +59,7 @@ known_blockers:
 - weekly brief35526286124 one historical unclassified failure; future classification
   deployed
 - receipt scheduler exceeded freshness threshold on35891197530
-evidence: docs/product-programme-2026-09/report-query-candidate-2026-09-24.md
+evidence: docs/product-programme-2026-09/local-verification-2026-09-24.md
 continuity_schema_version: 2
 backend_deployment: 099478be-67d6-4e15-9992-8a0481aebe79
 backend_live_verification:
@@ -128,8 +128,7 @@ orchestration:
   daily_postgres_concurrency: pass_synthetic_provider
   pagination_fix: released_live_verified
   device_testing: pending_by_owner
-  latest_progress: Local report date-range fix650tests; scheduler recovery plan prepared;
-    no release
+  latest_progress: Receipt scoped auth local;36isolated SQL comparisons pass; no release
 remaining_engineering:
 - Known live report/decimal/session/guard gaps fixed; see current browser acceptance
   report
@@ -140,11 +139,11 @@ remaining_engineering:
   remain unavailable
 local_candidate:
   mobile: 9ed8a704e3904c71b4ce1cbcb8604a7a4c634985
-  backend: c2b09ec41bd768ad0a8518ba8e73528fa256718c
+  backend: 57ff836f278af2d507e93e938c86519162a879fe
   web: a0603515ea3895596d98fc63faaa10654f71e6bc
   measurement_migration: 20260919132311_measurement_v2.sql
   helper_migration: 20260919134713_harden_internal_helpers.sql
-  published: backend_report_query_and_web_copy_local_only_prior_releases_unchanged
+  published: backend_auth_report_and_web_copy_local_only_prior_releases_unchanged
   devices_accessed: false
   notification_gates_changed: false
   new_backend_migrations:
@@ -157,14 +156,13 @@ local_candidate:
   backend_published: true
   web_public_promoted: true
 latest_turn_verification:
-  backend_tests: 650_pass_local
-  focused_tests: 25_pass
-  compileall: pass
-  diff_check: pass
+  backend_tests: 668_full_pass
+  auth_focused: 20_pass_after_two_test_only_additions
+  postgres_predicates: 36_equal_comparisons_pass_synthetic
+  cleanup: exact_isolated_container_removed
   production: no_release_or_writes
   devices: not_accessed
   notifications: gates_unchanged_disabled
-  monitor: 35934437044_failed_receipt_freshness122.9min
 web_candidate_deployment:
   source: d39ad2c5607357c87432ada9ed327c58f3fdfc0a
   deployment: dpl_5QkwZBza1UPEVEtoXdXJqoncNp6J

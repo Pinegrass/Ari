@@ -55,11 +55,13 @@ sprints:
   - docs/product-programme-2026-09/completion-audit-2026-09-20.md
   - docs/product-programme-2026-09/release-continuation-2026-09-20.md
   - docs/product-programme-2026-09/web-auth-acceptance-2026-09-20.md
+  - docs/product-programme-2026-09/local-verification-2026-09-24.md
   blockers:
   - device testing pending by owner
   - real provider and receipt evidence missing
   - scheduler activation pending acceptance
   completed_checks:
+  - Local receipt-only auth671dc8d verified;668full tests and20focused pass; no live credential/activation
   - PostgreSQL16 reservation/slot/candidate/shared-quota and unknown-send concurrency acceptance
   - Scheduler 1100-page aggregation, repeated cursor failure and uncertain request non-retry
   - Backend312 tests and changed-source Ruff F/E9 passed
@@ -125,8 +127,11 @@ sprints:
   - docs/product-programme-2026-09/browser-scheduler-acceptance-2026-09-24.md
   - docs/product-programme-2026-09/report-query-candidate-2026-09-24.md
   - docs/product-programme-2026-09/receipt-scheduler-recovery-plan-2026-09-24.md
+  - docs/product-programme-2026-09/local-verification-2026-09-24.md
   blockers: []
   completed_checks:
+  - Local57ff836 isolated PostgreSQL36old/new predicate comparisons equal; indexed large-fixture plans; cleanup verified; production load still open
+  - Local receipt-only auth671dc8d verified;668full tests and20focused pass; no live credential/activation
   - Local c2b09ec direct report date filters;650tests pass; not deployed and production query-plan/load acceptance open
   - Observed maintenance34820989626 and receipts34816725158 actual successful HTTP200 job steps with zero records
   - Exact live health revision b855630 healthy; no endpoints manually triggered
@@ -318,11 +323,13 @@ sprints:
   - docs/product-programme-2026-09/release-continuation-2026-09-20.md
   - docs/product-programme-2026-09/web-auth-acceptance-2026-09-20.md
   - docs/product-programme-2026-09/report-query-candidate-2026-09-24.md
+  - docs/product-programme-2026-09/local-verification-2026-09-24.md
   blockers:
   - major repositioning or new paid restrictions requires owner decision
   source: 1673c1479a1dc9c579a94af5b2cd6cdfb61154aa
   release_status: Backend and web live; Android internal published/device pending
   completed_checks:
+  - Local57ff836 isolated PostgreSQL36old/new predicate comparisons equal; indexed large-fixture plans; cleanup verified; production load still open
   - Local c2b09ec direct report date filters;650tests pass; not deployed and production query-plan/load acceptance open
   - Source-linked periodic evidence/corrections; conservative monthly recurrence/payday prediction with explicit
     confirmation
@@ -380,9 +387,9 @@ sprints:
   - D30 and renewal require real elapsed time
 local_candidates:
   mobile: 9ed8a704e3904c71b4ce1cbcb8604a7a4c634985
-  backend: c2b09ec41bd768ad0a8518ba8e73528fa256718c
+  backend: 57ff836f278af2d507e93e938c86519162a879fe
   web: a0603515ea3895596d98fc63faaa10654f71e6bc
-  published: backend_report_query_and_web_copy_local_only_prior_releases_unchanged
+  published: backend_auth_report_and_web_copy_local_only_prior_releases_unchanged
 released_candidates:
   backend: 1673c1479a1dc9c579a94af5b2cd6cdfb61154aa
   android_app_source: 9ed8a704e3904c71b4ce1cbcb8604a7a4c634985

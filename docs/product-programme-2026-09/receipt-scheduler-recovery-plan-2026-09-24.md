@@ -28,4 +28,4 @@ The latest inspected readiness run35934437044 finished23September2026 at23:36:57
 
 ## Decision and unresolved work
 
-No infrastructure action is taken in this heartbeat. Next implementation candidate is narrowly scoped receipt authentication plus scheduler-independent aggregate execution evidence, followed by isolated verification and a reviewed deployment/cost decision. External alert receipt, physical push acceptance, and representative production load remain separate gates.
+No infrastructure action is taken in this heartbeat. Receipt-only authentication is now prepared locally in backend671dc8d; see `backend/docs/receipt-scoped-auth.md`. It is disabled unless a separate secret is configured, and no such configuration or release occurred. Existing broad scheduler access remains compatible. Scheduler-independent aggregate execution evidence and a narrowly scoped caller are still required, followed by isolated verification and a reviewed deployment/cost decision. External alert receipt, physical push acceptance, and representative production load remain separate gates.
