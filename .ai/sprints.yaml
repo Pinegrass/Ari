@@ -123,8 +123,11 @@ sprints:
   - docs/product-programme-2026-09/release-continuation-2026-09-20.md
   - docs/product-programme-2026-09/web-auth-acceptance-2026-09-20.md
   - docs/product-programme-2026-09/browser-scheduler-acceptance-2026-09-24.md
+  - docs/product-programme-2026-09/report-query-candidate-2026-09-24.md
+  - docs/product-programme-2026-09/receipt-scheduler-recovery-plan-2026-09-24.md
   blockers: []
   completed_checks:
+  - Local c2b09ec direct report date filters;650tests pass; not deployed and production query-plan/load acceptance open
   - Observed maintenance34820989626 and receipts34816725158 actual successful HTTP200 job steps with zero records
   - Exact live health revision b855630 healthy; no endpoints manually triggered
   - Read-only diagnostic and recovery runbook prepared; proposed thresholds not active alerts
@@ -160,6 +163,7 @@ sprints:
   source: 1673c1479a1dc9c579a94af5b2cd6cdfb61154aa
   release_status: Backend and web live; Android internal published/device pending
   remaining_notes:
+  - Readiness35934437044 receipt stale122.9min; recovery plan prepared but no new scheduler/monitor activated
   - Actual alert delivery/recovery and representative query-plan/load acceptance remain
   - Logical backup restore passed; complete role/ACL,Storage,Vault,PITR and infrastructure recovery not claimed
   - Tombstone replay-horizon evidence remains pending
@@ -313,11 +317,13 @@ sprints:
   - docs/product-programme-2026-09/completion-audit-2026-09-20.md
   - docs/product-programme-2026-09/release-continuation-2026-09-20.md
   - docs/product-programme-2026-09/web-auth-acceptance-2026-09-20.md
+  - docs/product-programme-2026-09/report-query-candidate-2026-09-24.md
   blockers:
   - major repositioning or new paid restrictions requires owner decision
   source: 1673c1479a1dc9c579a94af5b2cd6cdfb61154aa
   release_status: Backend and web live; Android internal published/device pending
   completed_checks:
+  - Local c2b09ec direct report date filters;650tests pass; not deployed and production query-plan/load acceptance open
   - Source-linked periodic evidence/corrections; conservative monthly recurrence/payday prediction with explicit
     confirmation
   - Fresh confirmed planning outlook and three-month recorded-history/category/income baselines on mobile/web
@@ -374,9 +380,9 @@ sprints:
   - D30 and renewal require real elapsed time
 local_candidates:
   mobile: 9ed8a704e3904c71b4ce1cbcb8604a7a4c634985
-  backend: 1673c1479a1dc9c579a94af5b2cd6cdfb61154aa
+  backend: c2b09ec41bd768ad0a8518ba8e73528fa256718c
   web: a0603515ea3895596d98fc63faaa10654f71e6bc
-  published: prior_candidates_released_new_inbox_copy_local_only
+  published: backend_report_query_and_web_copy_local_only_prior_releases_unchanged
 released_candidates:
   backend: 1673c1479a1dc9c579a94af5b2cd6cdfb61154aa
   android_app_source: 9ed8a704e3904c71b4ce1cbcb8604a7a4c634985

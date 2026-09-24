@@ -18,3 +18,6 @@ When blocked, work on another eligible criterion. Do not repeatedly prompt for t
 
 
 24 September acceptance: fresh sign-in and full Hindi/English cold reloads passed on live web d39ad2c; empty-account Hindi fallback passed on backend1673c14. Disposable fixture cleanup verified. Local web candidate a060351 corrects mixed Inbox cards being labelled as transaction entries; scoped ESLint and diff check pass, not deployed. Receipt freshness failed again on35914460602 (135.4min); observed receipt gaps257.15/215.25min precede execution. Threshold unchanged; no jobs or releases triggered. See docs/product-programme-2026-09/browser-scheduler-acceptance-2026-09-24.md.
+
+
+24 September engineering continuation: local backend c2b09ec replaces text month filters with indexed date ranges in P&L/category-trends/heatmap; 650 tests pass including eight new boundary/isolation/SQL-predicate cases. No measured production speedup claimed; no deployment. Backend live remains1673c14, web live d39ad2c/local a060351, Android source9ed8a704 unchanged. Readiness35934437044 failed receipt freshness122.9min while health/revision/maintenance passed. Recovery plan prepared, no infrastructure activated. See docs/product-programme-2026-09/report-query-candidate-2026-09-24.md and docs/product-programme-2026-09/receipt-scheduler-recovery-plan-2026-09-24.md.

@@ -1,12 +1,12 @@
 # Ari scheduled-job operations runbook
 
-## Current release checkpoint — 20 September
+## Current release checkpoint — 24 September
 
 The historical observations below are retained for traceability. Current backend is
 `1673c1479a1dc9c579a94af5b2cd6cdfb61154aa`, Railway
 `099478be-67d6-4e15-9992-8a0481aebe79`. The paginating runner and hourly read-only
 readiness workflow are published; `ARI_EXPECTED_BACKEND_REVISION` matches this SHA.
-Run35909949244 passed health/revision/freshness. Prior35891197530 failed receipt freshness at186.5minutes; preserve this reliability gap.
+Run35909949244 passed health/revision/freshness. Later scheduled checks failed receipt freshness:35891197530 at186.5minutes,35914460602 at135.4minutes, and35934437044 at122.9minutes (23September23:36:57UTC). Health/revision/maintenance passed on the latest failure. These are historical observations, not a claim about current freshness. The receipt cadence gap remains unresolved.
 Seven reviewed migrations and logical public/auth backup restoration are verified;
 see `release-continuation-2026-09-20.md` and `backup-restore-acceptance-2026-09-20.md`.
 
@@ -21,9 +21,9 @@ not the older examples retained below.
 
 Scope: inspect and diagnose existing jobs without sending notifications, generating paid content or altering user data. This is an operator procedure; no alert integration is installed by this document.
 
-## Current service and evidence
+## Current service and historical evidence
 
-API health: https://web-production-7c65f.up.railway.app/api/health. Expected deployed revision b8556303627323581193967e6cd97b7676aef066 as last checked14 September 2026; update this reference with each authorized release. Health currently reports healthy. Local backend 79bf2c3 is newer and unpublished.
+API health: https://web-production-7c65f.up.railway.app/api/health. Compare against the exact deployed revision in the current checkpoint above. Do not use historical source references below as rollback targets without checking migrations and client contracts.
 
 GitHub workflow: Pinegrass/ari-backend, scheduled-jobs.yml. Inspect the actual step and its HTTP result, not just the workflow conclusion. A run can succeed while every job step is skipped because daily/outbox gates are disabled.
 
@@ -48,9 +48,9 @@ Inspect logs privately. Receipt and maintenance endpoints return aggregate count
 
 Read /api/health and compare the exact revision to the recorded deployed artifact. A health response alone does not prove authentication, database persistence, payment entitlement or notification delivery.
 
-## Proposed alert criteria
+## Active check thresholds and pending external alerts
 
-These are operational thresholds for review, not currently active alerts. Poll read-only evidence without triggering jobs. Record last successful execution per actual job step and timestamp, plus source revision.
+The readiness workflow checks health, revision and receipt/maintenance freshness. External alert delivery and recovery are still unverified. Poll read-only evidence without triggering jobs. Record last successful execution per actual job step and timestamp, plus source revision.
 
 | Condition | Severity / response |
 |---|---|
@@ -73,16 +73,16 @@ Thresholds are initial engineering proposals. An empty queue is not an incident.
 5. A delayed DeviceNotRegistered receipt must not remove a newer token; existing token-hash matching protects this. Do not manually clear account tokens.
 6. Maintenance expires queued work, clears old terminal metadata, resolves stale pending outcomes and removes old consented counts. It retains event tombstones. A bounded tombstone-retention policy and growth monitoring remain open work.
 7. Do not run --job all as a diagnostic: it includes generation/sending endpoints. Do not enable DAILY_NUDGES_ENABLED or NUDGE_OUTBOX_ENABLED until actual receipt/display/tap acceptance is complete and activation is authorized.
-8. For an application rollback, use the exact references in coordinated-release-2026-09-13.md and assess client contracts first. Older backend lacks acknowledged Home dismissal. Rollback is an incident action, not a read-only check.
+8. For an application rollback, choose a reviewed compatible artifact from the latest release record and assess applied migrations and client contracts first. The September13 release is historical, not a default rollback target. Rollback is an incident action, not a read-only check.
 
 ## Open operational gates
 
-Alert delivery/channel ownership is not configured or verified here. Backup restore, existing database security-advisor findings, session revocation and full export/deletion isolation require separate acceptance. S3 remains in progress. All device testing remains pending by owner; do not resume through this runbook.
+External alert delivery/recovery, scheduler reliability, representative load/query plans and full infrastructure recovery remain open. Logical public/auth restore, reviewed security hardening and scoped session/export/deletion checks have evidence in the current checkpoint reports; do not repeat them merely because older entries below predate completion. S3 remains in progress. All device testing remains pending by owner; do not resume through this runbook.
 
-## Prepared runner improvement — not live
+## Historical checkpoint — prepared runner improvement (now superseded)
 Backend local f79ec76 detects reported batch errors despite HTTP200 and emits aggregate-only summaries. Policy skips remain non-failures; receipt failed/unknown counters fail without retries. Historical live logs still use the old runner until release.326 backend tests passed; no external alert route configured.
 
-## Prepared legacy retention boundary fix
+## Historical checkpoint — prepared legacy retention boundary fix (now superseded)
 Local backend4d39f87 now deletes UTC dates on or before today−90, conservatively removing the boundary day.340tests pass; no live purge. Exact deletion timing still depends on job execution. See retention-boundary-2026-09-15.md.
 
 
@@ -91,7 +91,7 @@ Local backend4d39f87 now deletes UTC dates on or before today−90, conservative
 From backend:
 
 ```powershell
-.venv/Scripts/python.exe scripts/check_operational_readiness.py --expected-revision b8556303627323581193967e6cd97b7676aef066
+.venv/Scripts/python.exe scripts/check_operational_readiness.py --expected-revision 1673c1479a1dc9c579a94af5b2cd6cdfb61154aa
 ```
 
 Use the exact intended deployed SHA after each authorized release. The checker only
@@ -110,16 +110,16 @@ backlog nor provider delivery failure. No external alert channel is configured b
 tool; backup restoration and actual device delivery remain separate acceptance gates.
 
 
-Prepared workflow `.github/workflows/operational-readiness.yml` runs this read-only
+Published workflow `.github/workflows/operational-readiness.yml` requests this read-only
 check hourly and on manual dispatch, with only `contents: read` and `actions: read`,
 a ten-minute timeout and one concurrent inspection. It requires repository variable
 `ARI_EXPECTED_BACKEND_REVISION` to contain the full approved deployed SHA; missing or
 invalid configuration fails clearly instead of assuming repository HEAD is live.
 `API_BASE_URL` may select the intended HTTPS origin. Workflow publication and variable
-configuration remain pending; no repository variables were changed here. A failed
+configuration were completed on September20. Observed execution is sparser than the configured cadence. A failed
 GitHub check is the operator signal, not an installed external alert integration.
 
-## Paged v2 cleanup candidate — 19 September
+## Historical checkpoint — paged v2 cleanup candidate, 19 September (now superseded)
 
 Backend7209325 limits measurement cleanup to100 selected accounts per transaction;
 the scheduled-job runner follows UUID cursors and aggregates counts. Publish that
