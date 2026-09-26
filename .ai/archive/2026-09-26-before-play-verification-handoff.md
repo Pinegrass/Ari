@@ -1,0 +1,7 @@
+# Latest handoff — receipt-scoped caller complete locally
+
+26 September: backend `ed2af90` completes the local receipt-only caller. Dedicated receipt runs require `RECEIPT_SCHEDULER_TOKEN`, send only `X-Receipt-Token`, and do not fall back to broad scheduler access. GitHub receipt steps expose only the scoped secret. Full674backend tests pass; workflow YAML and diff checks pass. Weba060351 recheck passes132tests, scoped ESLint, TypeScript and15-page build. No push, deployment, credential, schedule, provider call or user-data action occurred. See docs/product-programme-2026-09/receipt-caller-finalization-2026-09-26.md.
+
+Next: scheduler-independent aggregate execution evidence and monitor adapter; GitHub-only readiness cannot verify a replacement scheduler. Activation still requires a reviewed infrastructure/cost decision, exact secret/configuration and cutover plan, then24-hour cadence/recovery acceptance. Remaining report work is SQL aggregation/ORM materialization and representative end-to-end load; do not repeat the completed predicate proof unchanged.
+
+Keep notification gates disabled and physical/iPhone testing deferred. No live settings, releases, provider calls or user records changed. All wider commerce/human review/alert/pilot/DR gates remain; no sprint fully newly accepted. Preserve historical untracked files and the web checkout's generated AGENTS.md/CLAUDE.md. Exact deployed artifacts remain in STATE.yaml.
