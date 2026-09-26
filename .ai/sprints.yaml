@@ -1,5 +1,5 @@
 version: 1
-updated_at: '2026-09-24'
+updated_at: '2026-09-26'
 owner: root orchestrator
 automation_id: ari-sprint-orchestrator
 cadence_hours: 4
@@ -56,11 +56,13 @@ sprints:
   - docs/product-programme-2026-09/release-continuation-2026-09-20.md
   - docs/product-programme-2026-09/web-auth-acceptance-2026-09-20.md
   - docs/product-programme-2026-09/local-verification-2026-09-24.md
+  - docs/product-programme-2026-09/receipt-caller-finalization-2026-09-26.md
   blockers:
   - device testing pending by owner
   - real provider and receipt evidence missing
   - scheduler activation pending acceptance
   completed_checks:
+  - Local ed2af90 receipt-only caller fails closed without scoped secret; workflow receipt steps expose only scoped secret;674 tests pass; no activation
   - Local receipt-only auth671dc8d verified;668full tests and20focused pass; no live credential/activation
   - PostgreSQL16 reservation/slot/candidate/shared-quota and unknown-send concurrency acceptance
   - Scheduler 1100-page aggregation, repeated cursor failure and uncertain request non-retry
@@ -128,8 +130,10 @@ sprints:
   - docs/product-programme-2026-09/report-query-candidate-2026-09-24.md
   - docs/product-programme-2026-09/receipt-scheduler-recovery-plan-2026-09-24.md
   - docs/product-programme-2026-09/local-verification-2026-09-24.md
+  - docs/product-programme-2026-09/receipt-caller-finalization-2026-09-26.md
   blockers: []
   completed_checks:
+  - Local ed2af90 completes scoped receipt caller/workflow boundary;674 tests and YAML validation pass; independent evidence/monitor still pending
   - Local57ff836 isolated PostgreSQL36old/new predicate comparisons equal; indexed large-fixture plans; cleanup verified; production load still open
   - Local receipt-only auth671dc8d verified;668full tests and20focused pass; no live credential/activation
   - Local c2b09ec direct report date filters;650tests pass; not deployed and production query-plan/load acceptance open
@@ -387,9 +391,9 @@ sprints:
   - D30 and renewal require real elapsed time
 local_candidates:
   mobile: 9ed8a704e3904c71b4ce1cbcb8604a7a4c634985
-  backend: 57ff836f278af2d507e93e938c86519162a879fe
+  backend: ed2af90ec0c0d2791f2e10448612a83646a6feb8
   web: a0603515ea3895596d98fc63faaa10654f71e6bc
-  published: backend_auth_report_and_web_copy_local_only_prior_releases_unchanged
+  published: backend_receipt_caller_report_and_web_copy_local_only_prior_releases_unchanged
 released_candidates:
   backend: 1673c1479a1dc9c579a94af5b2cd6cdfb61154aa
   android_app_source: 9ed8a704e3904c71b4ce1cbcb8604a7a4c634985

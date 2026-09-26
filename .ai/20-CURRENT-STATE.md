@@ -1,4 +1,4 @@
-# Current state — 24 September 2026, web and authentication continuation
+# Current state — 26 September 2026, receipt caller finalization
 
 Owner supplied the registered Imphal address/+91 7629001131 and authorized Supabase sign-in/completion. Contact details are live in English/Hindi terms, privacy and support. Supabase existing GitHub sign-in succeeded; leaked-password protection enabled, persisted dashboard state and security advisor verified. Existing membership helper warning is intentional/caller-restricted.
 
@@ -21,3 +21,5 @@ Latest evidence: docs/product-programme-2026-09/web-auth-acceptance-2026-09-20.m
 
 
 24 September local verification: backend57ff836 contains receipt-only authentication671dc8d (no configured credential or release) and isolated PostgreSQL report predicate proof. Full668tests passed, then20focused auth tests passed including two test-only additions. All36synthetic old/new SQL comparisons passed; large-fixture new plans use owner/date index bounds; exact temporary database removed. No production performance/ORM memory/concurrency claim. Livebackend1673c14, livewebd39ad2c/localweba060351 and Androidsource9ed8a704 unchanged. See docs/product-programme-2026-09/local-verification-2026-09-24.md.
+
+26 September finalization: reviewed the local backend/web candidates with no blocking finding. Backended2af90 completes a fail-closed receipt-only runner and scopes GitHub receipt steps to RECEIPT_SCHEDULER_TOKEN; other single-job steps retain only the broad scheduler secret. Full674backend tests pass. Weba060351 recheck passes132tests, scoped ESLint, TypeScript and15-page build. Nothing pushed/deployed/configured or executed against providers/users; live artifacts and disabled notification gates are unchanged. Scheduler-independent evidence/monitoring, infrastructure/cost review and24-hour cadence acceptance remain. See docs/product-programme-2026-09/receipt-caller-finalization-2026-09-26.md.
