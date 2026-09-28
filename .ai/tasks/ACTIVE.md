@@ -1,5 +1,7 @@
-# Active task: ARI-SPRINT-ORCHESTRATION
+# Active task: ARI release acceptance
 
-26 September local finalization: backended2af90 completes the receipt-scoped caller and workflow secret boundary. Full674backend tests pass. Weba060351 recheck passes132tests, scoped ESLint, TypeScript and15-page build. No push, deployment, credential/schedule change, provider call, sending or device access. See docs/product-programme-2026-09/receipt-caller-finalization-2026-09-26.md.
+28 September remediation is implemented locally for mobile and live for backend/web. Backend `ed2af90` is healthy; the scoped manual receipt run passed. Web `b85c656` has green CI and a successful Vercel production deployment. Mobile `b1e732f` passes all local gates and fixes the stale Maestro selectors.
 
-Next eligible source work: scheduler-independent aggregate receipt execution evidence and monitor adapter; report SQL aggregation/ORM materialization after the completed predicate proof. Deployment/activation, cost approval,24-hour cadence acceptance, production load and external acceptance remain separate. Automation ACTIVE.
+Immediate acceptance: push the mobile/continuity commits once; require green mobile CI and remote Maestro; monitor GitHub's automatic receipt cadence; treat any EAS artifact as build evidence only. Do not submit or publish OTA before device acceptance.
+
+Owner/provider gates: create approved Play/App Store subscription catalogue entries, complete BillDesk merchant/payout verification, validate RevenueCat purchase/restore in sandbox, and perform physical Android acceptance. iOS remains deferred. Notification sending gates stay off.

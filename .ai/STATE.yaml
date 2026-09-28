@@ -1,10 +1,10 @@
 project: Ari
-updated_at: '2026-09-26'
+updated_at: '2026-09-28'
 active_branch: master
 active_task: ARI-SPRINT-ORCHESTRATION
-source_commit: 9ed8a704e3904c71b4ce1cbcb8604a7a4c634985
+source_commit: b1e732f88990779eb1dbeeb6c381f2659e4f59bf
 backend_head: ed2af90ec0c0d2791f2e10448612a83646a6feb8
-web_head: a0603515ea3895596d98fc63faaa10654f71e6bc
+web_head: b85c656ad2a285185e621fff3c68e6ad1758bd23
 development_stage: backend_and_web_live_android_internal_acceptance_open
 release_status: backend_web_live_android_internal_device_pending
 verification:
@@ -13,7 +13,7 @@ verification:
   backend_tests: 674_full_pass
   web_tests: 132_pass
   web_files: 13_pass
-  lint: changed_source_pass_zero_client_warnings
+  lint: mobile_and_web_pass
   typecheck: pass
   web_build: 15_pages_pass
   postgres: exact_migrations_and_four_isolated_proofs_pass
@@ -35,8 +35,8 @@ android:
     date: '2026-09-13'
   testing: pending_by_owner_2026-09-14
   submission_status: failed_missing_service_account_permission
-live_backend: 1673c1479a1dc9c579a94af5b2cd6cdfb61154aa
-live_web: d39ad2c5607357c87432ada9ed327c58f3fdfc0a
+live_backend: ed2af90ec0c0d2791f2e10448612a83646a6feb8
+live_web: b85c656ad2a285185e621fff3c68e6ad1758bd23
 commercial:
   monthly_inr: 149
   yearly_inr: 1499
@@ -58,16 +58,16 @@ known_blockers:
 - human legal/linguistic review
 - weekly brief35526286124 one historical unclassified failure; future classification
   deployed
-- receipt scheduler exceeded freshness threshold on35891197530
+- GitHub automatic receipt cadence timing remains unverified; scheduled-event rerun passed
 evidence: docs/product-programme-2026-09/local-verification-2026-09-24.md
 continuity_schema_version: 2
-backend_deployment: 099478be-67d6-4e15-9992-8a0481aebe79
+backend_deployment: 2b39f50e-bc8a-4253-a6af-140ab19ec3ae
 backend_live_verification:
   api_checks: prior80_on05a856f; reports_on_b322ac6; current_health_pass
   supabase_persistence: verified
   fixture_cleanup: verified
   health: exact_revision_healthy
-  operational_readiness_run: 35909949244
+  operational_readiness_run: 36454247809
   operational_readiness: pass
 android_usability_update:
   update_id: 01a09995-993e-741b-9fff-f2e8c017a182
@@ -128,7 +128,7 @@ orchestration:
   daily_postgres_concurrency: pass_synthetic_provider
   pagination_fix: released_live_verified
   device_testing: pending_by_owner
-  latest_progress: Receipt scoped caller local;674 backend tests pass; no release
+  latest_progress: Backend/web live; mobile dependency and Maestro remediation locally verified
 remaining_engineering:
 - Known live report/decimal/session/guard gaps fixed; see current browser acceptance
   report
@@ -138,12 +138,12 @@ remaining_engineering:
 - Tombstone replay horizon, preconsent population and unobserved provider outcomes
   remain unavailable
 local_candidate:
-  mobile: 9ed8a704e3904c71b4ce1cbcb8604a7a4c634985
+  mobile: b1e732f88990779eb1dbeeb6c381f2659e4f59bf
   backend: ed2af90ec0c0d2791f2e10448612a83646a6feb8
-  web: a0603515ea3895596d98fc63faaa10654f71e6bc
+  web: b85c656ad2a285185e621fff3c68e6ad1758bd23
   measurement_migration: 20260919132311_measurement_v2.sql
   helper_migration: 20260919134713_harden_internal_helpers.sql
-  published: backend_receipt_caller_report_and_web_copy_local_only_prior_releases_unchanged
+  published: backend_and_web_live_mobile_push_pending
   devices_accessed: false
   notification_gates_changed: false
   new_backend_migrations:
@@ -162,9 +162,9 @@ latest_turn_verification:
   web_typecheck: pass
   web_build: 15_pages_pass
   workflow_yaml: parsed
-  production: no_release_or_writes
+  production: backend_and_web_verified_live
   devices: not_accessed
-  notifications: gates_unchanged_disabled
+  notifications: sending_gates_unchanged_disabled_receipt_auth_configured
 web_candidate_deployment:
   source: d39ad2c5607357c87432ada9ed327c58f3fdfc0a
   deployment: dpl_5QkwZBza1UPEVEtoXdXJqoncNp6J
