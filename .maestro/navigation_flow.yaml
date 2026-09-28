@@ -15,7 +15,9 @@ tags:
 - tapOn: "Accountant"
 - assertVisible: "Ari Accountant"
 - tapOn: "Trends & Insights"
-- assertVisible: "Trends"
+- assertVisible: "Transactions"
+- tapOn: "Show trends"
+- assertVisible: "Hide trends"
 
 # Tomo
 - tapOn: "Tomo"
