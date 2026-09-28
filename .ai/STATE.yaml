@@ -143,7 +143,7 @@ local_candidate:
   web: b85c656ad2a285185e621fff3c68e6ad1758bd23
   measurement_migration: 20260919132311_measurement_v2.sql
   helper_migration: 20260919134713_harden_internal_helpers.sql
-  published: backend_and_web_live_mobile_push_pending
+  published: backend_web_live_mobile_source_pushed_preview_build_and_maestro_pass_store_unsubmitted
   devices_accessed: false
   notification_gates_changed: false
   new_backend_migrations:
@@ -161,6 +161,9 @@ latest_turn_verification:
   web_lint: scoped_pass
   web_typecheck: pass
   web_build: 15_pages_pass
+  mobile_ci: run_36456409771_pass
+  maestro_e2e: run_36456502171_five_flows_pass
+  eas_preview: build_3fbbdd34-f3c6-4c1f-bc8a-39fb04ef3926_finished_unsubmitted
   workflow_yaml: parsed
   production: backend_and_web_verified_live
   devices: not_accessed
