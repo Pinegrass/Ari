@@ -2,7 +2,7 @@ project: Ari
 updated_at: '2026-09-28'
 active_branch: master
 active_task: ARI-SPRINT-ORCHESTRATION
-source_commit: b1e732f88990779eb1dbeeb6c381f2659e4f59bf
+source_commit: d180073ce12bdde9c86a281fe5ca62696f83da92
 backend_head: ed2af90ec0c0d2791f2e10448612a83646a6feb8
 web_head: b85c656ad2a285185e621fff3c68e6ad1758bd23
 development_stage: backend_and_web_live_android_internal_acceptance_open
@@ -138,7 +138,7 @@ remaining_engineering:
 - Tombstone replay horizon, preconsent population and unobserved provider outcomes
   remain unavailable
 local_candidate:
-  mobile: b1e732f88990779eb1dbeeb6c381f2659e4f59bf
+  mobile: d180073ce12bdde9c86a281fe5ca62696f83da92
   backend: ed2af90ec0c0d2791f2e10448612a83646a6feb8
   web: b85c656ad2a285185e621fff3c68e6ad1758bd23
   measurement_migration: 20260919132311_measurement_v2.sql
