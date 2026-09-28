@@ -37,5 +37,5 @@ tags:
 # Back to Home — dashboard sections fade in via AnimatedEntry; wait.
 - tapOn: "Home"
 - extendedWaitUntil:
-    visible: "Add an entry"
+    visible: "Add entry"
     timeout: 15000

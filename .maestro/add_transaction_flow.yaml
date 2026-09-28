@@ -1,13 +1,13 @@
 appId: com.pinegrass.ari
 name: Add / Edit Transaction Flow
 # Refreshed for v1.1.0 (2026-07-05). Fast Entry reskin: amount is entered on an
-# in-app numeric keypad (no text field), the CTA is "Add an entry", and the
+# in-app numeric keypad (no text field), the CTA is "Add entry", and the
 # button reads "Save entry" / "Update entry".
 tags:
   - requires_auth
 ---
 # From the Home tab
-- tapOn: "Add an entry"
+- tapOn: "Add entry"
 
 # Fast-entry screen — tap keypad digits for ₹500
 - tapOn: "5"
