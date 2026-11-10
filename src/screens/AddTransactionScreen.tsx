@@ -56,7 +56,6 @@ const KEYS_DECIMAL = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', 'de
  * local-first (Commit 2), so Save returns instantly and works offline.
  */
 export default function AddTransactionScreen({ navigation, route }: Props) {
- const {phrase:localizeCopy}=useLanguage();
   const { phrase, language } = useLanguage();
   const params = route.params as
     | { type?: 'expense' | 'income'; prefill?: { amount?: number; description?: string; category?: string } }
@@ -102,7 +101,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
     if(!editTxn || saving)return;
     setSaving(true);
     try{await deleteTransaction(editTxn.id);setConfirmDelete(false);navigation.goBack();}
-    catch{setConfirmDelete(false);setError(phrase('Could not delete transaction.'));}
+    catch{setConfirmDelete(false);setError('Could not delete transaction.');}
     finally{setSaving(false);}
   };
   const [error, setError] = useState('');
@@ -381,7 +380,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
         >
           <Text style={styles.closeText}>✕</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>{isEdit ? 'Edit entry' : 'New entry'}</Text>
+        <Text style={styles.title}>{phrase(isEdit ? 'Edit entry' : 'New entry')}</Text>
         {isEdit && !editingTemplate ? <TouchableOpacity accessibilityRole="button" accessibilityLabel={phrase('Delete entry')} disabled={saving} onPress={()=>setConfirmDelete(true)} style={{padding:12}}><Text style={{color:c.clay}}>{phrase('Delete')}</Text></TouchableOpacity> : <View style={{ width: 38 }} />}
       </View>
 
@@ -406,7 +405,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
       {/* Amount */}
       <View style={styles.amountBox}>
         <Text style={styles.amountLabel}>
-          {type === 'expense' ? 'Amount spent' : 'Amount received'}
+          {phrase(type === 'expense' ? 'Amount spent' : 'Amount received')}
         </Text>
         <View style={styles.amountRow}>
           <Text style={[styles.amountValue, type === 'income' && { color: c.forest2 }]}>
@@ -415,7 +414,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
           </Text>
           <Animated.View style={[styles.caret, { opacity: caretOpacity }]} />
         </View>
-        {!!error && <Text style={styles.error}>{error}</Text>}
+        {!!error && <Text style={styles.error}>{phrase(error)}</Text>}
       </View>
 
       {/* Optional chips */}
@@ -441,10 +440,10 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
             haptics.light();
             setShowNote(true);
           }}
-          accessibilityLabel={localizeCopy("Add a note")}
+          accessibilityLabel={phrase("Add a note")}
           accessibilityRole="button"
         >
-          <Text style={styles.chipText}>{description ? '✎ Note' : '＋ Note'}</Text>
+          <Text style={styles.chipText}>{description ? '✎ ' : '＋ '}{phrase('Note')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -453,7 +452,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
             haptics.light();
             setShowDatePicker(true);
           }}
-          accessibilityLabel="Date"
+          accessibilityLabel={phrase('Date')}
           accessibilityRole="button"
         >
           <Text style={styles.chipText}>{dateLabel}</Text>
@@ -471,7 +470,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
                 onValueChange={(v) => { haptics.light(); setIsRecurring(v); }}
                 trackColor={{ false: c.line, true: c.forest2 }}
                 thumbColor={c.cream}
-                accessibilityLabel={localizeCopy("Repeat this transaction")}
+                accessibilityLabel={phrase("Repeat this transaction")}
               />
             </View>
           )}
@@ -535,9 +534,9 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
         onPress={handleSave}
         disabled={!canSave}
         accessibilityRole="button"
-        accessibilityLabel={isEdit ? 'Update entry' : 'Save entry'}
+        accessibilityLabel={phrase(isEdit ? 'Update entry' : 'Save entry')}
       >
-        <Text style={styles.saveText}>{isEdit ? 'Update entry' : 'Save entry'}</Text>
+        <Text style={styles.saveText}>{phrase(isEdit ? 'Update entry' : 'Save entry')}</Text>
       </TouchableOpacity>
       </ScrollView>
       </KeyboardAvoidingView>
@@ -545,7 +544,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
       {/* Toast */}
       {toast && (
         <Animated.View style={[styles.toast, { transform: [{ translateX: -70 }, { translateY: toastY }] }]}>
-          <Text style={styles.toastText}>{isEdit ? '✓ Entry updated' : '✓ Entry saved'}</Text>
+          <Text style={styles.toastText}>✓ {phrase(isEdit ? 'Entry updated' : 'Entry saved')}</Text>
         </Animated.View>
       )}
 
@@ -586,7 +585,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
                         if (voice.isListening) voice.stop();
                         else voice.start();
                       }}
-                      accessibilityLabel={voice.isListening ? 'Stop voice' : 'Start voice'}
+                      accessibilityLabel={phrase(voice.isListening ? 'Stop voice' : 'Start voice')}
                       accessibilityRole="button"
                     >
                       <Icon

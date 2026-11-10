@@ -2,6 +2,10 @@ import { catalogs, entryCount, translate } from '../catalog';
 import type { MessageKey } from '../catalog';
 import { isLanguage, preferredLanguage } from '../languages';
 import { phrase } from '../phrases';
+import ar from '../localized/ar.json';
+import es from '../localized/es.json';
+import fr from '../localized/fr.json';
+import ptBR from '../localized/pt-BR.json';
 describe('Hindi catalog', () => {
   it('renders every bottom-tab key in both languages', () => {
     for (const language of ['en', 'hi'] as const) {
@@ -26,6 +30,16 @@ describe('Hindi catalog', () => {
 });
 
 describe('global release locales', () => {
+  const numberLimit = 'Enter an amount from 0 to 999,999,999.99, with up to two decimal places.';
+
+  it.each(Object.entries({ ar, es, fr, 'pt-BR': ptBR }))('%s preserves source variables and financial limits', (_language, messages) => {
+    for (const [source, localized] of Object.entries(messages)) {
+      expect(localized).not.toMatch(/[▁⁇]/u);
+      expect((localized.match(/\{\w+\}/g) ?? []).sort()).toEqual((source.match(/\{\w+\}/g) ?? []).sort());
+    }
+    expect(messages[numberLimit].replace(/\D/g, '')).toBe('099999999999');
+  });
+
   it('selects supported device languages without treating Portuguese variants as interchangeable', () => {
     expect(preferredLanguage('es-MX')).toBe('es');
     expect(preferredLanguage('ar-EG')).toBe('ar');
