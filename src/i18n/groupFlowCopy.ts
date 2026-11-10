@@ -1,3 +1,5 @@
+import { phrase } from './phrases';
+
 const hi: Record<string, string> = {
   'Recorded currency unknown': 'दर्ज राशि की मुद्रा अज्ञात है',
   'The group creator must confirm the original currency before adding expenses or recording payments.': 'खर्च जोड़ने या भुगतान दर्ज करने से पहले समूह बनाने वाले को मूल मुद्रा की पुष्टि करनी होगी।',
@@ -39,5 +41,6 @@ const hi: Record<string, string> = {
   'Save is unconfirmed. Your draft is kept. Retry the same draft safely, or go back to check the group.': 'सहेजने की पुष्टि नहीं हुई। आपका ड्राफ़्ट सुरक्षित है। उसी ड्राफ़्ट को फिर भेजें या समूह में जाकर जाँचें।',
 };
 export function groupCopy(language: string, text: string, values: Record<string, string | number> = {}) {
-  return (language === 'hi' ? hi[text] ?? text : text).replace(/\{(\w+)\}/g, (_, key: string) => String(values[key] ?? `{${key}}`));
+  const message = language === 'hi' ? hi[text] ?? text : phrase(language, text);
+  return message.replace(/\{(\w+)\}/g, (_, key: string) => String(values[key] ?? `{${key}}`));
 }

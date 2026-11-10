@@ -40,6 +40,15 @@
     "plugins": [
       "expo-font",
       [
+        "expo-localization",
+        {
+          "supportsRTL": true,
+          "supportedLocales": {
+            "android": ["en", "hi", "es", "fr", "pt-BR", "ar"]
+          }
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "backgroundColor": "#061313",

@@ -1,4 +1,6 @@
 import type { Transaction } from '../types';
+import { displayLocale, type Language } from '../i18n/languages';
+import { phrase } from '../i18n/phrases';
 
 export const getCurrentMonth = (): string => {
   const now = new Date();
@@ -26,7 +28,7 @@ export const formatDateShort = (dateStr: string): string => {
   return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
 };
 
-export const formatSectionDate = (dateStr: string, language = 'en'): string => {
+export const formatSectionDate = (dateStr: string, language: Language = 'en'): string => {
   const date = new Date(dateStr + 'T00:00:00');
   const today = new Date();
   const yesterday = new Date(today);
@@ -35,10 +37,10 @@ export const formatSectionDate = (dateStr: string, language = 'en'): string => {
   const isToday = date.toDateString() === today.toDateString();
   const isYesterday = date.toDateString() === yesterday.toDateString();
 
-  if (isToday) return language === 'hi' ? 'आज' : 'Today';
-  if (isYesterday) return language === 'hi' ? 'कल' : 'Yesterday';
+  if (isToday) return language === 'hi' ? 'आज' : phrase(language, 'Today');
+  if (isYesterday) return language === 'hi' ? 'कल' : phrase(language, 'Yesterday');
 
-  return date.toLocaleDateString(language === 'hi' ? 'hi-IN' : 'en-IN', {
+  return date.toLocaleDateString(displayLocale(language, 'en-IN'), {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
@@ -47,7 +49,7 @@ export const formatSectionDate = (dateStr: string, language = 'en'): string => {
 
 export const groupTransactionsByDate = (
   transactions: Transaction[],
-  language = 'en'
+  language: Language = 'en'
 ): { title: string; data: Transaction[] }[] => {
   const groups: Record<string, Transaction[]> = {};
 

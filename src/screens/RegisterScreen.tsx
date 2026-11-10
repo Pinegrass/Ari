@@ -23,7 +23,7 @@ import { color, font } from '../theme/tokens';
 import Icon from '../components/ui/Icon';
 import CountryPicker from '../components/CountryPicker';
 import { getLocale } from '../utils/locale';
-import { getDefaultCountry } from '../utils/detectCountry';
+import { detectCountryFromDevice } from '../utils/detectCountry';
 
 type Props = StackScreenProps<AuthStackParamList, 'Register'>;
 
@@ -66,7 +66,7 @@ export default function RegisterScreen({ navigation, route }: Props) {
     ageGroup: '25-35',
     incomeBracket: '15k-30k',
     mainGoal: 'save_more',
-    country: getDefaultCountry(),
+    country: detectCountryFromDevice() ?? '',
     referralCode: route.params?.referralCode ?? '',
   });
   const [loading, setLoading] = useState(false);
@@ -78,7 +78,7 @@ export default function RegisterScreen({ navigation, route }: Props) {
   };
 
   // Derive locale-aware income options from selected country
-  const incomeOptions = getLocale(form.country).incomeBrackets;
+  const incomeOptions = form.country ? getLocale(form.country).incomeBrackets : [];
 
   const animateProgress = (targetPct: number) => {
     Animated.spring(progressAnim, {
@@ -99,6 +99,7 @@ export default function RegisterScreen({ navigation, route }: Props) {
       setStep(2);
       animateProgress(66);
     } else if (step === 2) {
+      if (!form.country) { setError('Select your country'); return; }
       setStep(3);
       animateProgress(100);
     }
@@ -155,7 +156,7 @@ export default function RegisterScreen({ navigation, route }: Props) {
             <Text style={styles.backText}>← {step === 1 ? localizeCopy("Back") : 'Previous'}</Text>
           </TouchableOpacity>
 
-          <ErrorBanner message={error} />
+          <ErrorBanner message={phrase(error)} />
 
           {/* Step 1: Account Info */}
           {step === 1 && (
@@ -230,7 +231,7 @@ export default function RegisterScreen({ navigation, route }: Props) {
                       form.ageGroup === opt.value && styles.optionSelected,
                     ]}
                     activeOpacity={0.75}
-                    accessibilityLabel={`Age group: ${opt.label}`}
+                    accessibilityLabel={`${phrase('Age Group')} ${phrase(opt.label)}`}
                     accessibilityRole="button"
                   >
                     <Icon name={opt.icon} size={22} color={color.forest} />
@@ -240,7 +241,7 @@ export default function RegisterScreen({ navigation, route }: Props) {
                         form.ageGroup === opt.value && styles.optionLabelSelected,
                       ]}
                     >
-                      {opt.label}
+                      {phrase(opt.label)}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -257,7 +258,7 @@ export default function RegisterScreen({ navigation, route }: Props) {
                       form.incomeBracket === opt.value && styles.incomeRowSelected,
                     ]}
                     activeOpacity={0.75}
-                    accessibilityLabel={`Income: ${opt.label}`}
+                    accessibilityLabel={`${phrase('Income')} ${phrase(opt.label)}`}
                     accessibilityRole="button"
                   >
                     <Text
@@ -266,7 +267,7 @@ export default function RegisterScreen({ navigation, route }: Props) {
                         form.incomeBracket === opt.value && styles.incomeLabelSelected,
                       ]}
                     >
-                      {opt.label}
+                      {phrase(opt.label)}
                     </Text>
                     {form.incomeBracket === opt.value && (
                       <Text style={styles.checkmark}>✓</Text>
@@ -297,7 +298,7 @@ export default function RegisterScreen({ navigation, route }: Props) {
                       form.mainGoal === opt.value && styles.goalSelected,
                     ]}
                     activeOpacity={0.75}
-                    accessibilityLabel={`Goal: ${opt.label}`}
+                    accessibilityLabel={phrase(opt.label)}
                     accessibilityRole="button"
                   >
                     <Icon name={opt.icon} size={24} color={color.forest} />
@@ -307,7 +308,7 @@ export default function RegisterScreen({ navigation, route }: Props) {
                         form.mainGoal === opt.value && styles.goalLabelSelected,
                       ]}
                     >
-                      {opt.label}
+                      {phrase(opt.label)}
                     </Text>
                   </TouchableOpacity>
                 ))}

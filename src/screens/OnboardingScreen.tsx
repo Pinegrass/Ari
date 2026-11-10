@@ -15,7 +15,7 @@ import type { IconName } from '../components/ui/Icon';
 import { track } from '../lib/analytics';
 import { useHaptics } from '../hooks/useHaptics';
 import { getLocale } from '../utils/locale';
-import { getDefaultCountry } from '../utils/detectCountry';
+import { detectCountryFromDevice } from '../utils/detectCountry';
 import LanguageControl from '../components/LanguageControl';
 
 /**
@@ -50,7 +50,8 @@ const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'del'];
 export default function OnboardingScreen({ onComplete }: Props) {
   const { phrase } = useLanguage();
   const haptics = useHaptics();
-  const loc = getLocale(getDefaultCountry());
+  const country = detectCountryFromDevice();
+  const loc = getLocale(country);
   const [step, setStep] = useState(0);
   const [amount, setAmount] = useState('');
   const [logged, setLogged] = useState(false);
@@ -163,7 +164,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
               <Text style={styles.h1}>{phrase("Try it — log a spend")}</Text>
               <Text style={styles.sub}>{phrase("This is the whole flow. Punch in an amount.")}</Text>
 
-              <Text style={styles.amount}>{loc.symbol}{amount ? Number(amount).toLocaleString(loc.localeTag) : '0'}</Text>
+              <Text style={styles.amount}>{country ? loc.symbol : ''}{amount ? Number(amount).toLocaleString(loc.localeTag) : '0'}</Text>
 
               {logged ? (
                 <View style={styles.doneRow}>

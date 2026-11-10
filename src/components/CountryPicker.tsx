@@ -26,7 +26,9 @@ export default function CountryPicker({ value, onChange, compact }: Props) {
 
   useEffect(() => {
     // Fetch full list from backend (gets any newly added countries)
-    localesApi.getSupportedLocales().then(setLocales).catch(() => {
+    localesApi.getSupportedLocales().then((supported) => {
+      setLocales(supported.filter((locale) => SUPPORTED_COUNTRIES.includes(locale.code)));
+    }).catch(() => {
       // Fallback to the built-in list — already loaded above
     });
   }, []);
@@ -68,10 +70,10 @@ export default function CountryPicker({ value, onChange, compact }: Props) {
       >
         <Text style={styles.fullLabel}>{phrase("Country")}</Text>
         <View style={styles.fullRow}>
-          <Text style={styles.fullValue}>{phrase(current.name)}</Text>
-          <Text style={styles.fullCurrency}>
+          <Text style={styles.fullValue}>{phrase(value ? current.name : 'Select your country')}</Text>
+          {!!value && <Text style={styles.fullCurrency}>
             {current.currency} ({current.symbol})
-          </Text>
+          </Text>}
           <Icon name="chevron-down" size={16} color={color.inkFaint} />
         </View>
       </TouchableOpacity>
