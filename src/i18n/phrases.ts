@@ -3,6 +3,12 @@
  */
 import { secondaryHindi } from './secondaryHindi';
 import {extraHindi} from './phrasesExtra';
+import es from './localized/es.json';
+import fr from './localized/fr.json';
+import ptBR from './localized/pt-BR.json';
+import ar from './localized/ar.json';
+
+const translatedPhrases: Record<string, Record<string, string>> = { es, fr, 'pt-BR': ptBR, ar };
 export const hindiPhrases: Record<string, string> = {
   'Show trends': 'रुझान दिखाएँ', 'Hide trends': 'रुझान छिपाएँ', 'Clear date filter': 'तारीख का फ़िल्टर हटाएँ', 'Delete entry': 'एंट्री हटाएँ', 'Delete entry?': 'एंट्री हटाएँ?', 'Could not load transactions.': 'एंट्री लोड नहीं हुईं।',
 
@@ -116,12 +122,23 @@ export const hindiPhrases: Record<string, string> = {
   'Save more every month': 'हर महीने ज़्यादा बचाएँ', 'Plan taxes and freelance income': 'टैक्स और फ़्रीलांस आमदनी का हिसाब करें',
   'Bill reminders': 'बिल रिमाइंडर', 'Rent, EMI & bills — nudged the day before': 'किराया, EMI और बिल — एक दिन पहले याद दिलाएँ',
   'Tomo, your AI coach': 'टोमो, आपका AI साथी', 'Ask anything about your money': 'अपने पैसों के बारे में पूछें',
+  'Report this response': 'इस जवाब की रिपोर्ट करें',
+  'Ari support will receive this response. It may contain financial details.': 'यह जवाब Ari सहायता टीम को भेजा जाएगा। इसमें वित्तीय जानकारी हो सकती है।',
+  'Send report': 'रिपोर्ट भेजें',
+  'Report sent': 'रिपोर्ट भेज दी गई',
+  'Could not send the report. Please try again.': 'रिपोर्ट भेजी नहीं जा सकी। दोबारा कोशिश करें।',
+  'Tax estimator unavailable': 'टैक्स कैलकुलेटर उपलब्ध नहीं है',
+  'We are reviewing the tax rules for each supported year and region. Saved tax profiles remain available when the estimator returns.': 'हम हर समर्थित वर्ष और क्षेत्र के टैक्स नियमों की समीक्षा कर रहे हैं। कैलकुलेटर लौटने पर सेव किए गए टैक्स प्रोफ़ाइल फिर उपलब्ध होंगे।',
   'Know your money': 'अपने पैसों को समझें', 'Budgets, goals & smart insights': 'बजट, लक्ष्य और काम की जानकारी',
   'Money, tracked\nin seconds': 'कुछ सेकंड में\nपैसों का हिसाब', 'Everything your\nmoney needs': 'पैसों के हिसाब की\nज़रूरी सुविधाएँ',
   'Spent today': 'आज का खर्च', "Let's change that in a moment →": 'चलिए, एक एंट्री जोड़ते हैं →',
   'Try it — log a spend': 'आज़माएँ — एक खर्च दर्ज करें', 'This is the whole flow. Punch in an amount.': 'शुरुआत आसान है। एक रकम डालें।',
   'That fast. Create your account to save it.': 'बस इतना ही। सेव करने के लिए खाता बनाएँ।', 'Log it': 'दर्ज करें', 'Delete': 'मिटाएँ',
   'Spent': 'खर्च', 'Received': 'मिला', 'Repeat': 'दोहराएँ', 'Repeats': 'दोहराव', 'What was this for?': 'यह किस लिए था?',
+  'Edit entry': 'एंट्री बदलें', 'New entry': 'नई एंट्री', 'Amount spent': 'खर्च की रकम', 'Amount received': 'मिली हुई रकम',
+  'Note': 'नोट', 'Date': 'तारीख', 'Update entry': 'एंट्री अपडेट करें', 'Save entry': 'एंट्री सेव करें',
+  'Entry updated': 'एंट्री अपडेट हो गई', 'Entry saved': 'एंट्री सेव हो गई', 'Enter an amount': 'रकम डालें',
+  'Stop voice': 'माइक बंद करें', 'Start voice': 'माइक चालू करें',
   'Listening…': 'सुन रहे हैं…', 'e.g. groceries, auto, electricity': 'जैसे राशन, ऑटो, बिजली',
   'Extra note (optional)': 'अतिरिक्त नोट (वैकल्पिक)', 'Done': 'हो गया', 'Category': 'श्रेणी',
   'Settings': 'सेटिंग्स', 'Save': 'सेव करें', 'Cancel': 'रद्द करें', 'Edit': 'बदलें',
@@ -132,4 +149,8 @@ export const hindiPhrases: Record<string, string> = {
   'Home': 'होम', 'Accountant': 'हिसाब-किताब', 'Reports': 'रिपोर्ट', 'Goals': 'लक्ष्य',
   'Notes': 'नोट्स', 'Taxes': 'टैक्स', 'Inbox': 'हिसाब', 'Tomo': 'टोमो',
 };
-export const phrase = (language: string, text: string) => language === 'hi' ? (hindiPhrases[text] ?? text) : text;
+export function phrase(language: string, text: string): string {
+  const messages = language === 'hi' ? hindiPhrases
+    : Object.prototype.hasOwnProperty.call(translatedPhrases, language) ? translatedPhrases[language] : undefined;
+  return messages && Object.prototype.hasOwnProperty.call(messages, text) ? messages[text] : text;
+}

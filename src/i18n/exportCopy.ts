@@ -1,3 +1,6 @@
+import { phrase } from './phrases';
+import type { Language } from './languages';
+
 export const exportCopy = {
   en: {
     complete: 'Export complete', saved: 'File saved. Open it in your spreadsheet or files app.',
@@ -22,3 +25,9 @@ export const exportCopy = {
     fileWarning: 'निर्यात की गई फ़ाइलों में वित्तीय जानकारी होती है। उन्हें सेव या साझा करने की जगह सावधानी से चुनें।',
   },
 } as const;
+
+export function getExportCopy(language: Language) {
+  if (language === 'hi') return exportCopy.hi;
+  return Object.fromEntries(Object.entries(exportCopy.en).map(([key, value]) => [key, phrase(language, value)])) as
+    Record<keyof typeof exportCopy.en, string>;
+}

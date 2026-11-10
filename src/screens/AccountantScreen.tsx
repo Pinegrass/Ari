@@ -67,16 +67,6 @@ const MODULES: ModuleItem[] = [
     subtitle: 'Track goals & contributions',
   },
   {
-    key: 'TaxEstimator',
-    icon: 'briefcase',
-    iconColor: color.moss,
-    title: 'Tax Estimator',
-    subtitle: 'Old vs New regime, 80C/80D, HRA, GST',
-    // Indian tax law (FY slabs, 80C/80D, HRA, GST) — meaningless elsewhere.
-    // Other markets get their own estimator when tax rules are modelled.
-    countries: ['IN'],
-  },
-  {
     key: 'PeriodicReports',
     icon: 'activity',
     iconColor: color.forest,

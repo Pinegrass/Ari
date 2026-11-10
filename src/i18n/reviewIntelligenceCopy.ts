@@ -1,3 +1,6 @@
+import { phrase } from './phrases';
+import type { Language } from './languages';
+
 export const reviewIntelligenceCopy = {
   en: {
     reviewCurrent: 'Review current recorded entries', aiLimit: 'AI interpretation can be wrong. Check the recorded entries; future payments and balances are not verified.',
@@ -40,3 +43,13 @@ export const reviewIntelligenceCopy = {
     save: 'सुधार सेव करें', amount: 'रकम', date: 'तारीख', saved: 'एंट्री सुधर गई। समीक्षा रीफ़्रेश हो गई।',
   },
 } as const;
+
+export function getReviewCopy(language: Language) {
+  if (language === 'hi') return reviewIntelligenceCopy.hi;
+  const { cadences, ...messages } = reviewIntelligenceCopy.en;
+  const labels = Object.fromEntries(Object.entries(messages).map(([key, value]) => [key, phrase(language, value)])) as
+    Record<keyof typeof messages, string>;
+  const localizedCadences = Object.fromEntries(Object.entries(cadences).map(([key, value]) => [key, phrase(language, value)])) as
+    Record<keyof typeof cadences, string>;
+  return { ...labels, cadences: localizedCadences };
+}

@@ -19,7 +19,7 @@ import { useHaptics } from '../hooks/useHaptics';
 import Button from '../components/ui/Button';
 import AnimatedEntry from '../components/ui/AnimatedEntry';
 import Icon from '../components/ui/Icon';
-import { exportCopy } from '../i18n/exportCopy';
+import { getExportCopy } from '../i18n/exportCopy';
 import { requestSessionRevision } from '../lib/requestSession';
 
 interface Props {
@@ -28,7 +28,7 @@ interface Props {
 
 export default function ExportScreen({ onBack }: Props) {
  const {phrase:localizeCopy,language}=useCopyLanguage();
- const copy = exportCopy[language];
+ const copy = getExportCopy(language);
   const { transactions } = useData();
   const haptics = useHaptics();
   const [exporting, setExporting] = useState<'transactions' | 'pnl' | 'full' | null>(null);

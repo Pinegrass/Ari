@@ -17,7 +17,7 @@ import AccountantScreen from '../screens/AccountantScreen';
 import SmartLedgerScreen from '../screens/accountant/SmartLedgerScreen';
 import BudgetPlannerScreen from '../screens/accountant/BudgetPlannerScreen';
 import SavingsGoalsScreen from '../screens/accountant/SavingsGoalsScreen';
-import TaxEstimatorScreen from '../screens/accountant/TaxEstimatorScreen';
+import TaxEstimatorScreen from '../screens/accountant/TaxUnavailableScreen';
 import PnlReportScreen from '../screens/accountant/PnlReportScreen';
 import TodoNotesScreen from '../screens/TodoNotesScreen';
 import BillsScreen from '../screens/BillsScreen';

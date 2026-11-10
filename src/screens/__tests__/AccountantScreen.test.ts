@@ -13,16 +13,7 @@ describe('visibleModules', () => {
     });
   });
 
-  it('shows the Indian Tax Estimator to Indian users', () => {
-    expect(visibleModules('IN').some((m) => m.key === 'TaxEstimator')).toBe(true);
-  });
-
-  it('defaults to the Indian module set when country is unknown', () => {
-    expect(visibleModules(undefined).some((m) => m.key === 'TaxEstimator')).toBe(true);
-    expect(visibleModules(null).some((m) => m.key === 'TaxEstimator')).toBe(true);
-  });
-
-  it.each(['US', 'GB', 'AU'])('hides the Indian Tax Estimator for %s users', (country) => {
+  it.each(['IN', 'US', 'GB', 'AU', undefined, null])('keeps unverified tax estimates out of navigation for %s', (country) => {
     const mods = visibleModules(country);
     expect(mods.some((m) => m.key === 'TaxEstimator')).toBe(false);
     // Universal modules stay visible.

@@ -1,4 +1,9 @@
-/** Language is independent of country/currency. New languages extend this registry. */
+import type { Language } from './languages';
+import { phrase } from './phrases';
+
+export type { Language } from './languages';
+
+/** Language is independent of country and currency. */
 export const en = {
   dailyNudgeSchedule: 'Up to three useful nudges at 9 AM, 2 PM and 7 PM in your timezone. Quiet hours and your weekly limit apply.',
   homeTomoNoticed: 'Tomo noticed', homeDismissNudge: 'Hide this Tomo nudge for 24 hours', homeNotNow: 'Not now',
@@ -129,9 +134,8 @@ export const hi: Record<MessageKey, string> = {
 };
 
 export const catalogs = { en, hi };
-export type Language = keyof typeof catalogs;
 export function translate(language: Language, key: MessageKey, values: Record<string, string | number> = {}): string {
-  const message = catalogs[language]?.[key] ?? en[key] ?? String(key);
+  const message = language === 'hi' ? hi[key] ?? String(key) : phrase(language, en[key] ?? String(key));
   return message.replace(/\{(\w+)\}/g, (token, name) => values[name] === undefined ? token : String(values[name]));
 }
 export function entryCount(language: Language, count: number): string {
