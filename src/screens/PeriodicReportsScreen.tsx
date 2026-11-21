@@ -11,10 +11,20 @@ import ScreenShell from '../components/ScreenShell';
 import { useLocale } from '../hooks/useLocale';
 import { usePrivacy } from '../context/PrivacyContext';
 import { useLanguage } from '../i18n/LanguageContext';
+import type { MessageKey } from '../i18n/catalog';
+import { displayLocale } from '../i18n/languages';
+import { categoryDisplayLabel, getCategoryDef } from '../constants/categories';
+import { reportHabits, type ReportHabit } from '../utils/reportHabits';
 import { color, font, onForest, type } from '../theme/tokens';
 import { track } from '../lib/analytics';
 
 const PERIODS: ReportPeriod[] = ['daily', 'weekly', 'monthly', 'quarterly', 'yearly'];
+const HABIT_COPY: Record<ReportHabit, MessageKey> = {
+  start: 'habitStart', income: 'habitIncome', category: 'habitCategory', changes: 'habitChanges', review: 'habitReview',
+};
+const HABIT_ACTION: Record<ReportHabit, MessageKey> = {
+  start: 'addEntry', income: 'addIncome', category: 'setBudget', changes: 'reviewEntries', review: 'reviewEntries',
+};
 
 export default function PeriodicReportsScreen() {
   const route = useRoute<RouteProp<MainStackParamList, 'PeriodicReports'>>();
@@ -22,19 +32,23 @@ export default function PeriodicReportsScreen() {
   const { locale } = useLocale();
   const { fetchTransactions } = useData();
   const { isPrivate } = usePrivacy();
-  const { language, t } = useLanguage();
+  const { language, t, phrase } = useLanguage();
   const [period, setPeriod] = useState<ReportPeriod>(route.params?.period ?? 'weekly');
   const [report, setReport] = useState<PeriodicReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [refreshError, setRefreshError] = useState(false);
   const [anchor, setAnchor] = useState<string | undefined>(route.params?.anchor);
   useEffect(() => { if (route.params) { setPeriod(route.params.period); setAnchor(route.params.anchor); } }, [route.params]);
   const requestId = useRef(0);
   const measuredView = useRef<string|null>(null);
-  const money = (value: number) => isPrivate ? '••••' : new Intl.NumberFormat(language === 'hi' ? 'hi-IN' : locale.localeTag, { style: 'currency', currency: locale.currency, maximumFractionDigits: locale.usesDecimalAmounts ? 2 : 0 }).format(value);
-  const day = (value: string) => new Date(`${value}T12:00:00`).toLocaleDateString(language === 'hi' ? 'hi-IN' : locale.localeTag, { day: 'numeric', month: 'short', year: 'numeric' });
+  const numberLocale = displayLocale(language, locale.localeTag);
+  const money = (value: number) => isPrivate ? '••••' : new Intl.NumberFormat(numberLocale, { style: 'currency', currency: report?.currency ?? locale.currency, maximumFractionDigits: locale.usesDecimalAmounts ? 2 : 0 }).format(value);
+  const day = (value: string) => new Date(`${value}T12:00:00`).toLocaleDateString(numberLocale, { day: 'numeric', month: 'short', year: 'numeric', calendar: 'gregory' });
+  const habits = report ? reportHabits(report) : null;
   const load = useCallback(async (refresh = false) => {
     const id = ++requestId.current;
+    setRefreshError(false);
     if (refresh) setRefreshing(true); else setLoading(true);
     try {
       const value = await getPeriodicReport(period, language, anchor);
@@ -42,7 +56,11 @@ export default function PeriodicReportsScreen() {
       setReport(value);
       const viewKey = `${period}:${value.start}:${value.end}`;
       if(measuredView.current!==viewKey){measuredView.current=viewKey;track('periodic_report_viewed');}
-    } catch { if (id === requestId.current) setReport(null); }
+    } catch {
+      if (id === requestId.current) {
+        if (refresh) setRefreshError(true); else setReport(null);
+      }
+    }
     finally { if (id === requestId.current) { setLoading(false); setRefreshing(false); } }
   }, [period, language, anchor]);
   useFocusEffect(useCallback(() => { void load(); return () => { requestId.current += 1; measuredView.current=null; }; }, [load]));
@@ -58,6 +76,10 @@ export default function PeriodicReportsScreen() {
             <Text style={styles.segmentText}>{t(key)}</Text>
           </TouchableOpacity>
         ))}</View>
+        {refreshError && report && <View style={styles.card}>
+          <Text accessibilityRole="alert">{t('reportRefreshFailed')}</Text>
+          <TouchableOpacity accessibilityRole="button" style={{ minHeight: 44, justifyContent: 'center' }} onPress={() => void load(true)}><Text>{t('retry')}</Text></TouchableOpacity>
+        </View>}
         {loading ? <ActivityIndicator accessibilityLabel={t('loading')} /> : !report ? (
           <View style={styles.card}><Text>{t('unavailable')}</Text><TouchableOpacity onPress={() => void load()} accessibilityRole="button" style={{ paddingVertical: 16 }}><Text>{t('retry')}</Text></TouchableOpacity></View>
         ) : <>
@@ -77,9 +99,35 @@ export default function PeriodicReportsScreen() {
               <Metric label={t('entries')} value={isPrivate ? '••••' : String(report.totals.transactionCount)} />
             </View>
           </View>
+          {!isPrivate && habits && <View style={styles.card}>
+            <Text accessibilityRole="header" style={styles.sectionTitle}>{t('habitsTitle')}</Text>
+            <Text style={styles.muted}>{t('recordedDays', {
+              count: report.totals.transactionCount.toLocaleString(numberLocale),
+              days: habits.recordedDays.toLocaleString(numberLocale),
+            })}</Text>
+            <Text style={styles.muted}>{t('habitsIntro')}</Text>
+            {habits.habits.map(habit => <View key={habit}>
+              <Text style={styles.muted}>{t(HABIT_COPY[habit], {
+                category: categoryDisplayLabel(getCategoryDef(report.categories[0]?.name ?? ''), phrase),
+                share: (report.categories[0]?.share ?? 0).toLocaleString(numberLocale),
+                change: (report.comparison.expensesChange ?? 0).toLocaleString(numberLocale),
+              })}</Text>
+              <TouchableOpacity accessibilityRole="button" style={{ minHeight: 44, justifyContent: 'center' }} onPress={() => {
+                if (habit === 'start' || habit === 'income') {
+                  navigation.navigate('AddTransaction', { type: habit === 'income' ? 'income' : 'expense' });
+                } else if (habit === 'category') {
+                  navigation.navigate('BudgetPlanner');
+                } else {
+                  navigation.navigate('SmartLedger', { start: report.start, end: report.end });
+                }
+              }}><Text style={{ fontFamily: font.bodySemi, color: color.forest }}>{t(HABIT_ACTION[habit])} →</Text></TouchableOpacity>
+            </View>)}
+            {(period === 'weekly' || period === 'monthly') && <Text style={styles.muted}>{t(period === 'weekly' ? 'habitWeeklyReturn' : 'habitMonthlyReturn')}</Text>}
+          </View>}
           <View style={styles.card}>
             <Text style={styles.sectionTitle}>{t('evidence')}</Text>
             <Text style={styles.muted}>{t('limits')}</Text>
+            {language !== 'en' && language !== 'hi' && <Text style={styles.muted}>{t('reportEnglishDetail')}</Text>}
             {isPrivate ? <Text style={styles.muted}>{t('private')}</Text> : <>
               {report.evidence?.map(item => <Text key={item.code} style={styles.muted}>{t(item.kind)} · {item.text}</Text>)}
               {report.comparison.start && report.comparison.end && <Text style={styles.muted}>{t('comparison', { start: day(report.comparison.start), end: day(report.comparison.end) })}</Text>}

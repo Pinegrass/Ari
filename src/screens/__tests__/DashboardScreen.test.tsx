@@ -54,6 +54,14 @@ it('keeps an explicit first-entry action only for an empty ledger', () => {
   fireEvent.press(screen.getByText('Add entry'));
   expect(mockNavigate).toHaveBeenCalledWith('AddTransaction', { type: 'expense' });
 });
+
+it('opens weekly and monthly reviews directly from Home', () => {
+ const screen = render(<DashboardScreen />);
+ fireEvent.press(screen.getByText('Weekly →'));
+ expect(mockNavigate).toHaveBeenLastCalledWith('PeriodicReports', { period: 'weekly' });
+ fireEvent.press(screen.getByText('Monthly →'));
+ expect(mockNavigate).toHaveBeenLastCalledWith('PeriodicReports', { period: 'monthly' });
+});
 it('shows a single compact nudge and preserves open/dismiss', () => {
   mockData.nudge = { id: 'n1', title: 'Review your entries', message: 'Long sensitive detail', actionPrompt: 'Review', trigger: 'review' };
   const screen = render(<DashboardScreen />);

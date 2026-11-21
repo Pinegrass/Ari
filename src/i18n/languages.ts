@@ -25,6 +25,6 @@ export function preferredLanguage(localeTag: string): Language {
 }
 
 /** Older notification APIs accept only the original two message catalogs. */
-export function notificationLanguage(language: Language): 'en' | 'hi' {
+export function notificationLanguage(language: string): 'en' | 'hi' {
   return language === 'hi' ? 'hi' : 'en';
 }

@@ -218,6 +218,14 @@ export default function DashboardScreen() {
         </View>
         <Icon name="chevron-right" size={20} color={c.forest} />
       </TouchableOpacity>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16 }}>
+        {(['weekly', 'monthly'] as const).map(period => (
+          <TouchableOpacity key={period} accessibilityRole="button" style={styles.textLink}
+            onPress={() => navigation.navigate('PeriodicReports', { period })}>
+            <Text style={styles.reviewTitle}>{t(period)} →</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
     </ScreenShell>
   );
 }

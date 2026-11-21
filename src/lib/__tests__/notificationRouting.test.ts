@@ -17,17 +17,17 @@ describe('routeForNotificationData', () => {
     ).toEqual({ kind: 'stack', screen: 'BudgetPlanner' });
   });
 
-  it('routes weekly_brief to the Dashboard tab (brief card lives there)', () => {
+  it('routes weekly_brief to the report inbox', () => {
     expect(routeForNotificationData({ type: 'weekly_brief', briefId: 'abc' })).toEqual({
-      kind: 'tab',
-      tab: 'Dashboard',
+      kind: 'stack',
+      screen: 'NudgeInbox',
     });
   });
 
-  it('routes monthly_review to the Dashboard tab', () => {
+  it('routes monthly_review to the report inbox', () => {
     expect(routeForNotificationData({ type: 'monthly_review', briefId: 'abc' })).toEqual({
-      kind: 'tab',
-      tab: 'Dashboard',
+      kind: 'stack',
+      screen: 'NudgeInbox',
     });
   });
 
