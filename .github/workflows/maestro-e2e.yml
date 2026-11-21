@@ -11,6 +11,12 @@ on:
         description: Reuse a finished Android EAS build instead of creating another one
         required: false
         type: string
+      scenario:
+        description: Flows to exercise against the selected artifact
+        required: false
+        default: all
+        type: choice
+        options: [all, reports, languages]
   schedule:
     # Run E2E nightly at 2 AM UTC
     - cron: '0 2 * * *'
@@ -169,6 +175,7 @@ jobs:
       - name: Install APK and run Maestro flows
         env:
           MAESTRO_DRIVER_STARTUP_TIMEOUT: 120000
+          E2E_SCENARIO: ${{ inputs.scenario || 'all' }}
         run: |
           adb shell input keyevent 82
           # Let the freshly booted system settle (the Pixel Launcher ANR'd
@@ -180,11 +187,19 @@ jobs:
           sleep 30
           adb install -r ./app.apk
           maestro test .maestro/login_flow.yaml
-          maestro test .maestro/navigation_flow.yaml
-          maestro test .maestro/add_transaction_flow.yaml
-          maestro test .maestro/tomo_chat_flow.yaml
-          maestro test .maestro/export_flow.yaml
-          maestro test .maestro/reports_flow.yaml
+          case "$E2E_SCENARIO" in
+            all)
+              maestro test .maestro/navigation_flow.yaml
+              maestro test .maestro/add_transaction_flow.yaml
+              maestro test .maestro/tomo_chat_flow.yaml
+              maestro test .maestro/export_flow.yaml
+              maestro test .maestro/reports_flow.yaml
+              maestro test .maestro/language_flow.yaml
+              ;;
+            reports) maestro test .maestro/reports_flow.yaml ;;
+            languages) maestro test .maestro/language_flow.yaml ;;
+            *) exit 1 ;;
+          esac
 
       - name: Upload E2E results
         if: always()
