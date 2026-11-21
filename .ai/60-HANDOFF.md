@@ -1,10 +1,10 @@
-# Latest handoff â€” 22 November 2026
+# Latest handoff — 22 November 2026
 
 Navigation fixed and worldwide dependency audit is zero. Application source e17c6c1
 passes 711tests, typecheck/lint and 21Doctor checks; a7619e1 adds only test/workflow.
 EAS build 541b5b79-fa8a-4dac-bdbc-5d808860b164 finished. Core Maestro 44938263716
 and report/privacy 44940046041 pass. Arabic restart/persistence 44940729174 also passes;
-inspect its screenshots for layout acceptance. Reuse the finished artifact, no new build.
+screenshots confirm RTL mirroring and English restoration. Reuse the finished artifact, no new build.
 
 Reports OTA PR11 targets public-maintenance branch codex/ari-public-v57.
 Source 87298ab passes 508tests and matches public 84cc2859 after clean npm ci.

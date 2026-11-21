@@ -1,4 +1,4 @@
-# Current state â€” 22 November 2026
+# Current state — 22 November 2026
 
 Ari remains free. Public Play is 1.3.0 (57). Worldwide draft PR10 adds English,
 Hindi, Spanish, French, Brazilian Portuguese and Arabic. Navigation7 and patched

@@ -1,4 +1,4 @@
-# Active task â€” reports OTA and worldwide release
+# Active task — reports OTA and worldwide release
 
 Keep Ari free. Navigation7, a clean dependency audit and a successful native build
 are verified. Core, report/privacy and Arabic restart/persistence native checks pass using
