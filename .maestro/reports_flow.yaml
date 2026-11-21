@@ -1,0 +1,54 @@
+appId: com.pinegrass.ari
+name: Personal Report Navigation and Privacy
+tags:
+  - requires_auth
+---
+- tapOn: "Home"
+- scrollUntilVisible:
+    element:
+      text: "Weekly →"
+    direction: DOWN
+- tapOn: "Weekly →"
+- extendedWaitUntil:
+    visible: "Recorded net cash flow"
+    timeout: 30000
+- tapOn: "Previous period"
+- extendedWaitUntil:
+    visible: "Current period"
+    timeout: 30000
+- tapOn: "Monthly"
+- extendedWaitUntil:
+    visible: "Recorded net cash flow"
+    timeout: 30000
+- assertNotVisible: "Current period"
+- scrollUntilVisible:
+    element:
+      text: "Your next money habit"
+    direction: DOWN
+- assertVisible: "Your next money habit"
+- tapOn: "Go back"
+- scrollUntilVisible:
+    element:
+      text: "Hide amounts"
+    direction: UP
+- tapOn: "Hide amounts"
+- scrollUntilVisible:
+    element:
+      text: "Monthly →"
+    direction: DOWN
+- tapOn: "Monthly →"
+- extendedWaitUntil:
+    visible: "Recorded net cash flow"
+    timeout: 30000
+- scrollUntilVisible:
+    element:
+      text: "Amounts hidden in Private Mode"
+    direction: DOWN
+- assertNotVisible: "Your next money habit"
+- takeScreenshot: reports-private-mode
+- tapOn: "Go back"
+- scrollUntilVisible:
+    element:
+      text: "Show amounts"
+    direction: UP
+- tapOn: "Show amounts"

@@ -21,6 +21,7 @@ concurrency:
 
 jobs:
   e2e:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     name: Maestro E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 90
@@ -183,6 +184,7 @@ jobs:
           maestro test .maestro/add_transaction_flow.yaml
           maestro test .maestro/tomo_chat_flow.yaml
           maestro test .maestro/export_flow.yaml
+          maestro test .maestro/reports_flow.yaml
 
       - name: Upload E2E results
         if: always()
