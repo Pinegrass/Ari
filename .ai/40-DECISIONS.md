@@ -1,4 +1,13 @@
 # Durable Decisions
+
+## 21 November 2026 — Free personal report reviews
+
+Ari remains free for this release. Weekly and monthly reviews use recorded
+ledger activity to offer a small number of actionable habits. Display
+language and ledger currency are independent. New report UI can use OTA
+after compatibility with the installed native runtime is verified. Native
+localization and Arabic configuration need a Play build.
+
 ## DEC-001 — Independent mobile, web and backend repositories
 Status: ACCEPTED
 Date: unknown

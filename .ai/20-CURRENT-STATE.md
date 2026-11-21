@@ -1,11 +1,32 @@
-# Current state — 28 September 2026, release audit remediation
+# Current state — 21 November 2026
 
-The three canonical repositories were fetched and audited independently. Mobile source commit `d180073` contains Expo SDK 57-compatible patch updates, the `js-yaml` security override update, removal of obsolete audit exceptions, and corrected Maestro selectors for the center `Add entry` action and current Transactions trends toggle. Local verification passes: 678 tests in 68 suites, TypeScript, Expo lint, Expo Doctor 21/21, Expo dependency compatibility, and the CI high-severity dependency gate. Seven moderate React Navigation transitive advisories remain because npm's only automated remediation is a breaking navigation major upgrade; no forced upgrade was applied.
+Ari stays free. Google Play confirms production 1.3.0 (57). Mobile PR #10
+is an open draft for the worldwide candidate with English, Hindi, Spanish,
+French, Brazilian Portuguese and Arabic.
 
-Backend `ed2af90ec0c0d2791f2e10448612a83646a6feb8` is live on Railway deployment `2b39f50e-bc8a-4253-a6af-140ab19ec3ae`; `/api/health` reports that exact healthy revision. The stale `RELEASE_REVISION` pin was corrected. A new random receipt-only credential is configured consistently in Railway and GitHub Actions, while `DAILY_NUDGES_ENABLED` and `NUDGE_OUTBOX_ENABLED` remain off. Manual receipt run `36450551605` passed; rerun `36419180368` preserved the original schedule event and passed the real `Push receipts` step; read-only readiness `36454247809` is fully green. GitHub did not emit the expected new cron run on time, so automatic cadence timeliness remains an external operational risk even though auth and execution now pass.
+Source `05b10c43a89506e0af50143781ae7e24ce38e3ba` adds personal report
+habits, direct weekly/monthly review actions, notification routing to the
+dated report inbox and refresh recovery. A full suite passed 707 tests,
+followed by 33 targeted checks on the final changes. TypeScript and lint
+pass. Android bundling passed. The high-severity navigation audit and native
+language acceptance remain open.
 
-Web `b85c656ad2a285185e621fff3c68e6ad1758bd23` updates Next.js from 16.3.2 to 16.3.6 and Sharp to the patched transitive release. Production dependency audit is zero, 132 tests pass, lint and TypeScript pass, and the 15-route production build passes. GitHub CI run `36450317163` is green and Vercel production deployment `6714939181` succeeded at `https://aritomo-dzj9nb6aa-pinegrass.vercel.app`.
+Play build 57 embeds channel `internal-release` and runtime
+`84cc28590bb0a1fffcf4a346d97bd40e18faac45`. Its update request returned
+204. Report logic can use OTA after a compatible patch is verified against
+that runtime. The worldwide branch includes native localization changes
+and requires a new Play build.
 
-The previous Maestro failures were stale journey selectors, not login or rendering defects: run `36454396524` proved login and `Add entry`, then showed that `Trends & Insights` now opens Transactions and requires `Show trends`. Final rerun `36456502171` passed all five emulator flows using E2E build `55b5f324-d0a4-4ff3-b883-b73efba762bf`. Preview build `3fbbdd34-f3c6-4c1f-bc8a-39fb04ef3926` also finished; neither artifact was submitted or published. No Play/App Store submission, OTA publication, store-catalog mutation, user-data mutation, or notification sending was performed.
+The live backend reports healthy revision `fdd03c4`. Receipt execution is
+fresh with 49 successful runs in the last 24 hours. Maintenance is stale
+at about 1,918 minutes. GitHub jobs are being rejected before startup due
+to failed account payments or spending limits. The weekly/monthly report
+cache has no recent generated content. Daily and outbox sending remain off.
 
-Commercial launch blockers remain owner/provider-facing: the Play subscription catalogue is empty, RevenueCat therefore cannot resolve the approved monthly/yearly products, BillDesk verification/payout setup is incomplete, real purchase/restore needs sandbox acceptance, and iOS is deferred. Device acceptance, actual push delivery/recovery, human Hindi/native accessibility/legal review, production load evidence, and disaster-recovery acceptance also remain open.
+Evidence and the remaining release gates are in
+[the report checkpoint](../docs/audits/2026-11-21/reports-and-worldwide-release.md).
+The canonical checkouts contain separate uncommitted remediation.
+
+Previous worktree continuity is archived in
+`archive/2026-11-21-before-report-review/`. The canonical 10 November record
+is at `D:/Codex/Workex/Ari/docs/audits/2026-11-10/android-worldwide.md`.

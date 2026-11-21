@@ -1,177 +1,40 @@
 project: Ari
-updated_at: '2026-09-28'
-active_branch: master
-active_task: ARI-SPRINT-ORCHESTRATION
-source_commit: d180073ce12bdde9c86a281fe5ca62696f83da92
-backend_head: ed2af90ec0c0d2791f2e10448612a83646a6feb8
-web_head: b85c656ad2a285185e621fff3c68e6ad1758bd23
-development_stage: backend_and_web_live_android_internal_acceptance_open
-release_status: backend_web_live_android_internal_device_pending
+updated_at: '2026-11-21'
+active_branch: codex/ari-global-android
+active_task: ARI-PERSONAL-REPORTS-WORLDWIDE-RELEASE
+source_commit: 05b10c43a89506e0af50143781ae7e24ce38e3ba
+release_status: candidate_tested_worldwide_gates_open
+pricing: free
 verification:
-  mobile_tests: 678_pass
-  mobile_suites: 68_pass
-  backend_tests: 674_full_pass
-  web_tests: 132_pass
-  web_files: 13_pass
-  lint: mobile_and_web_pass
+  full_mobile_tests: 707_pass
+  final_focused_tests: 33_pass
   typecheck: pass
-  web_build: 15_pages_pass
-  postgres: exact_migrations_and_four_isolated_proofs_pass
-latest_turn_device_testing: not_run
+  lint: pass
+  android_bundle: pass
+  dependency_audit: seven_high_six_moderate_production
 android:
-  version_code: 61
-  runtime: f82b9c561785202f8057920d7a8a052d15c1ed33
-  channel: internal-release
-  published_artifact:
-    update_id: 01a0bfc7-b47d-75e9-aefa-494c1c8207b9
-    group: b0b1612f-9344-4af6-8559-0d6de6a3a6b4
-    source: 9ed8a704e3904c71b4ce1cbcb8604a7a4c634985
-    publication_head: bbf82c4e8213d8671b905a1041393c9865b45709
-    physically_verified: false
-  physically_verified_artifact:
-    update_id: 01a09995-993e-741b-9fff-f2e8c017a182
-    source: 5ba6d31614ee6ee93fa03cd3461ad210af181e2f
-    phone: SM_M166P_API36
-    date: '2026-09-13'
-  testing: pending_by_owner_2026-09-14
-  submission_status: failed_missing_service_account_permission
-live_backend: ed2af90ec0c0d2791f2e10448612a83646a6feb8
-live_web: b85c656ad2a285185e621fff3c68e6ad1758bd23
-commercial:
-  monthly_inr: 149
-  yearly_inr: 1499
-  trial_days: 14
-  card_required: false
-  owner_approved: true
-ios: deferred_by_owner
-outbox_scheduler: gated_off
-known_blockers:
-- Google Play submission permission
-- BillDesk verification
-- store catalog
-- real purchase and restore
-- actual push delivery and receipts
-- full Hindi native review
-- elapsed consented pilot outcomes
-- production query-plan/load acceptance
-- actual alert delivery/recovery and full infrastructure recovery remain unverified
-- human legal/linguistic review
-- weekly brief35526286124 one historical unclassified failure; future classification
-  deployed
-- GitHub automatic receipt cadence timing remains unverified; scheduled-event rerun passed
-evidence: docs/product-programme-2026-09/local-verification-2026-09-24.md
-continuity_schema_version: 2
-backend_deployment: 2b39f50e-bc8a-4253-a6af-140ab19ec3ae
-backend_live_verification:
-  api_checks: prior80_on05a856f; reports_on_b322ac6; current_health_pass
-  supabase_persistence: verified
-  fixture_cleanup: verified
-  health: exact_revision_healthy
-  operational_readiness_run: 36454247809
-  operational_readiness: pass
-android_usability_update:
-  update_id: 01a09995-993e-741b-9fff-f2e8c017a182
-  group: c6c1a184-e6fe-4873-942c-8ebb7f7f958a
-  source: 5ba6d31614ee6ee93fa03cd3461ad210af181e2f
-  channel: internal-release
-  published: true
-  phone_verified: true
-  regression: five_targeted_journeys_pass
-  cleanup: qa_entry_and_planning_deleted_networks_restored
-  remaining_finding: net_sign_fixed_in_new_internal_update_device_unverified
-net_sign_fix:
-  source: 0f70898880f93e25075b9ed7f3b0203593e21eaa
-  update: 01a09a28-cb33-785d-8ab3-61e14353ee89
-  group: ea93b358-a687-4c4d-9ab6-a60d32c67317
-  channel: internal-release
-  published: true
-  phone_verified: false
-  focused_verification:
-    suites: 4
-    tests: 32
-    new_tests: 6
-    typecheck: pass
-    changed_source_lint: pass
-implementation_audit: docs/product-programme-2026-09/implementation-audit-2026-09-13.md
-calm_home:
-  source: c02374a227d45b9cf82c5aed352721965a9e0b1a
-  published: true
-  device_tested: false
-  verification: full_mobile_suite_types_lint_pass_synthetic_browser_preview
-  evidence: docs/product-programme-2026-09/calm-home-2026-09-13.md
-daily_nudges:
-  implemented: true
-  published: true
-  live_enabled: false
-  local_hours:
-  - 9
-  - 14
-  - 19
-  max_per_local_day: 3
-  default_per_rolling_week: 21
-  preserve_saved_lower_limits: true
-  actual_delivery_verified: false
-  evidence: docs/product-programme-2026-09/daily-nudges-2026-09-13.md
-coordinated_release:
-  android_source: dfdaec15bccd87e5287e9a9cac3927adbc53c2f9
-  android_update: 01a09ba2-b520-7bc6-a812-ca4382a245f2
-  android_group: 860cb92d-cb0c-4ab1-8dee-15e7dd150c97
-  android_device_verified: false
-  web_deployment: dpl_12kGaGyRybh341rWWq9HH5r2YwpA
-  daily_gate_verified_disabled: true
-  evidence: docs/product-programme-2026-09/coordinated-release-2026-09-13.md
-orchestration:
-  automation_id: ari-sprint-orchestrator
-  status: ACTIVE
-  cadence_hours: 4
-  ledger: .ai/sprints.yaml
-  daily_postgres_concurrency: pass_synthetic_provider
-  pagination_fix: released_live_verified
-  device_testing: pending_by_owner
-  latest_progress: Backend/web live; mobile dependency and Maestro remediation locally verified
-remaining_engineering:
-- Known live report/decimal/session/guard gaps fixed; see current browser acceptance
-  report
-- Representative load/query plans and actual alert delivery/recovery remain operational
-  gates
-- Full disaster recovery exceeds completed logical public/auth restore scope
-- Tombstone replay horizon, preconsent population and unobserved provider outcomes
-  remain unavailable
-local_candidate:
-  mobile: d180073ce12bdde9c86a281fe5ca62696f83da92
-  backend: ed2af90ec0c0d2791f2e10448612a83646a6feb8
-  web: b85c656ad2a285185e621fff3c68e6ad1758bd23
-  measurement_migration: 20260919132311_measurement_v2.sql
-  helper_migration: 20260919134713_harden_internal_helpers.sql
-  published: backend_web_live_mobile_source_pushed_preview_build_and_maestro_pass_store_unsubmitted
-  devices_accessed: false
-  notification_gates_changed: false
-  new_backend_migrations:
-  - 20260919175629_billing_measurement_consent_start.sql
-  - 20260919175703_measurement_notification_attribution.sql
-  - 20260919183206_immutable_group_currency.sql
-  - 20260919184208_consented_billing_lifecycle.sql
-  - 20260920164749_invite_consumption_survives_account_deletion.sql
-  mobile_published_internal: true
-  backend_published: true
-  web_public_promoted: true
-latest_turn_verification:
-  backend_tests: 674_full_pass
-  web_tests: 132_pass
-  web_lint: scoped_pass
-  web_typecheck: pass
-  web_build: 15_pages_pass
-  mobile_ci: run_36456409771_pass
-  maestro_e2e: run_36456502171_five_flows_pass
-  eas_preview: build_3fbbdd34-f3c6-4c1f-bc8a-39fb04ef3926_finished_unsubmitted
-  workflow_yaml: parsed
-  production: backend_and_web_verified_live
-  devices: not_accessed
-  notifications: sending_gates_unchanged_disabled_receipt_auth_configured
-web_candidate_deployment:
-  source: d39ad2c5607357c87432ada9ed327c58f3fdfc0a
-  deployment: dpl_5QkwZBza1UPEVEtoXdXJqoncNp6J
-  url: https://aritomo-mzdlp0wdh-pinegrass.vercel.app
-  status: READY
-  public_domain_promoted: true
-  authenticated_web_acceptance: fresh_login_EN_HI_cold_reload_and_empty_Hindi_fallback_pass
+  public_version: '1.3.0'
+  public_version_code: 57
+  public_build: babe43bf-4a4f-4dc9-aacf-c9e31eb27841
+  public_source_metadata: 4b4ae8e0a5139e3cfb3b61d80d9e4124f6cdb15c
+  public_channel: internal-release
+  public_runtime: 84cc28590bb0a1fffcf4a346d97bd40e18faac45
+  update_lookup_status: 204
+  languages: [en, hi, es, fr, pt-BR, ar]
+  new_play_submission: pending
+  ota_publication: pending_compatible_runtime_candidate
+backend:
+  live_revision: fdd03c4db0871521335c04a24d2c65e76f50f97b
+  health: pass
+  receipt_runs_last_24h: 49_succeeded
+  receipt_freshness: pass
+  maintenance_freshness: stale
+  github_job_blocker: failed_account_payments_or_spending_limit
+  monthly_scheduled_acceptance: '2026-12-01T09:00:00+05:30'
+  daily_sending: disabled
+  outbox_sending: disabled
+web:
+  canonical_head: b85c656ad2a285185e621fff3c68e6ad1758bd23
+  remote_master: f87145694db3ba7f5c3c66595ffe9b7fcff74265
+  current_deployment: not_reverified_this_check
+evidence: docs/audits/2026-11-21/reports-and-worldwide-release.md

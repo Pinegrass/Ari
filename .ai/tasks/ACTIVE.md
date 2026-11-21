@@ -1,7 +1,15 @@
-# Active task: ARI release acceptance
+# Active task — Personal reports and worldwide release
 
-28 September remediation is implemented locally for mobile and live for backend/web. Backend `ed2af90` is healthy; the scoped manual and scheduled-event receipt runs passed. Web `b85c656` has green CI and a successful Vercel production deployment. Mobile `d180073` passes all local gates and refreshes both stale Maestro journey assumptions.
+Keep Ari free. Deliver useful weekly/monthly reviews and grounded habit
+suggestions. The implementation is in source `05b10c4` and draft PR #10.
 
-Immediate acceptance: monitor GitHub's automatic receipt cadence and perform physical Android acceptance against the completed preview artifact. Treat EAS artifacts as build evidence only. Do not submit or publish OTA before device acceptance.
+The report feature uses JavaScript, but the current worldwide branch has
+native localization changes. Prepare any public OTA from the installed
+version 57 runtime `84cc2859` and channel `internal-release`.
 
-Owner/provider gates: create approved Play/App Store subscription catalogue entries, complete BillDesk merchant/payout verification, validate RevenueCat purchase/restore in sandbox, and perform physical Android acceptance. iOS remains deferred. Notification sending gates stay off.
+Resolve GitHub Actions billing/spending restrictions, the navigation
+dependency advisory, native QA, translation review and additional market
+currency coverage before worldwide acceptance. Recheck maintenance freshness
+and scheduled report generation after Actions recovers.
+
+Read docs/audits/2026-11-21/reports-and-worldwide-release.md.
