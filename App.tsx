@@ -1,6 +1,6 @@
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import React, { useEffect, useRef, useState } from 'react';
-import { AppState, type AppStateStatus } from 'react-native';
+import { AppState, I18nManager, type AppStateStatus } from 'react-native';
 import * as Linking from 'expo-linking';
 import { StatusBar } from 'expo-status-bar';
 import {
@@ -166,7 +166,7 @@ function navigateToInvite(code: string) {
     _pendingInviteCode = code;
     return;
   }
-  const rootRoutes = navigationRef.getRootState().routeNames;
+  const rootRoutes = navigationRef.getRootState()?.routeNames ?? [];
   if (rootRoutes.includes('Main')) {
     (navigationRef as any).navigate('Main', { screen: 'InviteFriends', params: { code } });
   } else if (rootRoutes.includes('Auth')) {
@@ -399,6 +399,7 @@ function App() {
         <SafeAreaProvider>
           <NavigationContainer
             ref={navigationRef}
+            direction={I18nManager.isRTL ? 'rtl' : 'ltr'}
             onReady={() => {
               if (_pendingShareText) {
                 navigateToShare(_pendingShareText);

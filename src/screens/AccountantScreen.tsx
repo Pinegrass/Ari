@@ -155,7 +155,7 @@ export default function AccountantScreen({ embedded = false }: AccountantScreenP
             onPress={() => {
               haptics.light();
               if (mod.key === 'Transactions') {
-                navigation.navigate('Tabs', { screen: 'Transactions' });
+                navigation.navigate('Tabs', { screen: 'Transactions' }, { pop: true });
               } else {
                 navigation.navigate(mod.key as any);
               }

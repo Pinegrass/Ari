@@ -321,7 +321,7 @@ export default function RegisterScreen({ navigation, route }: Props) {
 
           {/* Login link */}
           <TouchableOpacity
-            onPress={() => navigation.navigate('Login')}
+            onPress={() => navigation.navigate('Login', undefined, { pop: true })}
             style={styles.loginLink}
           >
             <Text style={styles.loginLinkText}>

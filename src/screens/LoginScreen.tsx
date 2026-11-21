@@ -275,7 +275,7 @@ export default function LoginScreen({ navigation }: Props) {
 
           {/* Footer */}
           <TouchableOpacity
-            onPress={() => navigation.navigate('Register')}
+            onPress={() => navigation.navigate('Register', undefined, { pop: true })}
             style={styles.footer}
             accessibilityRole="button"
           >

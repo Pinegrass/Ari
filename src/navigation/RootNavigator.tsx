@@ -95,7 +95,7 @@ export default function RootNavigator() {
   }
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false, animationEnabled: false }}>
+    <Stack.Navigator screenOptions={{ headerShown: false, animation: 'none' }}>
       {user ? (
         <Stack.Screen navigationKey={user.id} name="Main" component={MainNavigator} />
       ) : (
