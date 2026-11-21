@@ -7,8 +7,9 @@ loaded content. The English/Hindi server report API is preserved. Four new
 interface languages use English detailed explanations with an explicit
 coverage note.
 
-707 full-suite tests and 33 final focused checks passed. TypeScript, lint
-and Android bundling passed. PR #10 remains a worldwide candidate.
+708 tests, TypeScript and lint passed in remote CI. Android bundling passed
+locally. PR #10 remains a worldwide candidate. EAS free Android builds
+are exhausted until the provider's 1 December reset, blocking Maestro.
 
 Public Play version 57 is EAS `babe43bf-4a4f-4dc9-aacf-c9e31eb27841`,
 source metadata `4b4ae8e`, channel `internal-release` and runtime
@@ -18,7 +19,7 @@ runtime. The six-language branch includes native changes and needs a
 new store build.
 
 Backend health and receipt freshness pass at `fdd03c4`; maintenance is
-stale beyond 30 hours. GitHub rejects jobs for payment/spending limits.
+stale beyond 30 hours. Backend GitHub rejects jobs for payment/spending limits.
 Automatic weekly reporting and independent readiness need that provider
 gate resolved. Monthly Railway acceptance is due 1 December at 09:00 IST.
 

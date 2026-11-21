@@ -7,7 +7,8 @@ The report feature uses JavaScript, but the current worldwide branch has
 native localization changes. Prepare any public OTA from the installed
 version 57 runtime `84cc2859` and channel `internal-release`.
 
-Resolve GitHub Actions billing/spending restrictions, the navigation
+Resolve backend GitHub Actions billing/spending restrictions, EAS Android
+build quota, the navigation
 dependency advisory, native QA, translation review and additional market
 currency coverage before worldwide acceptance. Recheck maintenance freshness
 and scheduled report generation after Actions recovers.

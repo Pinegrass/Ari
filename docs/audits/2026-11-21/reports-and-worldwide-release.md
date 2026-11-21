@@ -24,9 +24,10 @@ Portuguese and Arabic. The client requests English explanations for the four
 new languages because the live report API only accepts English and Hindi.
 The screen discloses this partial language coverage.
 
-The full suite passed 707 tests before the final refresh-recovery change.
-The final report, language and notification checks passed 33 tests.
-TypeScript and lint pass. Android JavaScript bundling also passed.
+The final source passed 708 tests across 71 suites in GitHub Actions.
+TypeScript and lint passed remotely. Android JavaScript bundling passed
+locally. The dependency gate remains failed.
+[Mobile CI](https://github.com/Pinegrass/Ari/actions/runs/44935901186)
 
 ## OTA compatibility
 
@@ -64,9 +65,12 @@ receipt freshness. It failed the 30-hour maintenance threshold at about
 
 GitHub readiness run `44929664822` failed before running any job steps.
 Its annotation reports failed account payments or an insufficient spending
-limit. This is a provider billing gate. Scheduled weekly jobs and independent
-readiness need normal GitHub Actions operation.
+limit. A fresh manual read-only run also failed before any steps with the
+same annotation. Mobile CI runs successfully, so this is confirmed for the
+backend workflow. Scheduled weekly jobs and independent readiness need
+normal backend GitHub Actions operation.
 [GitHub run](https://github.com/Pinegrass/ari-backend/actions/runs/44929664822)
+[Fresh check](https://github.com/Pinegrass/ari-backend/actions/runs/44936029703)
 
 Only one weekly brief and one monthly review exist in the live coaching cache.
 Their most recent generation dates are 20 September and 1 September,
@@ -81,9 +85,11 @@ scheduled production acceptance is 1 December.
 ## Remaining worldwide gates
 
 The dependency audit still contains seven high findings through navigation's
-query decoder, plus six moderate production findings. The earlier Maestro job
-failed while waiting for an EAS cloud build. Native report and Arabic layout
-acceptance remain open.
+query decoder, plus six moderate production findings. The fresh Maestro job
+stopped before emulator testing because the Expo account has exhausted its
+monthly free Android builds. The provider reports a reset on 1 December.
+Native report and Arabic layout acceptance remain open.
+[Emulator job](https://github.com/Pinegrass/Ari/actions/runs/44935901172)
 
 The ledger contract covers India, the US, the UK and Australia. Additional
 country/currency support, complete localized explanations and legal text,

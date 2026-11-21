@@ -6,12 +6,14 @@ source_commit: 05b10c43a89506e0af50143781ae7e24ce38e3ba
 release_status: candidate_tested_worldwide_gates_open
 pricing: free
 verification:
-  full_mobile_tests: 707_pass
-  final_focused_tests: 33_pass
+  full_mobile_tests: 708_remote_pass
   typecheck: pass
   lint: pass
   android_bundle: pass
   dependency_audit: seven_high_six_moderate_production
+  mobile_ci: 44935901186
+  native_e2e: blocked_eas_free_android_build_quota
+  native_e2e_run: 44935901172
 android:
   public_version: '1.3.0'
   public_version_code: 57
