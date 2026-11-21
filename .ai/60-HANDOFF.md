@@ -1,28 +1,26 @@
-# Latest handoff — 21 November 2026
+# Latest handoff â€” 22 November 2026
 
-Mobile source `05b10c4` on `codex/ari-global-android` adds deterministic,
-personal report habits to weekly/monthly reviews. Home has direct period
-actions, push taps open the dated report inbox and failed refreshes preserve
-loaded content. The English/Hindi server report API is preserved. Four new
-interface languages use English detailed explanations with an explicit
-coverage note.
+Navigation fixed and worldwide dependency audit is zero. Application source e17c6c1
+passes 711tests, typecheck/lint and 21Doctor checks; a7619e1 adds only test/workflow.
+EAS build 541b5b79-fa8a-4dac-bdbc-5d808860b164 finished. Core Maestro 44938263716
+and report/privacy 44940046041 pass. Arabic restart/persistence 44940729174 also passes;
+inspect its screenshots for layout acceptance. Reuse the finished artifact, no new build.
 
-708 tests, TypeScript and lint passed in remote CI. Android bundling passed
-locally. PR #10 remains a worldwide candidate. EAS free Android builds
-are exhausted until the provider's 1 December reset, blocking Maestro.
+Reports OTA PR11 targets public-maintenance branch codex/ari-public-v57.
+Source 87298ab passes 508tests and matches public 84cc2859 after clean npm ci.
+QA group 2633d53d-8a59-4732-8e33-4ec8e8a5dec1 is on an unreferenced QA branch.
+Public internal-release still returns204. Do not publish worldwide native changes
+against that runtime or override fingerprint. Retained native XML build-tool
+advisory and installed-v57 canary are release gates. Detailed evidence is in
+D:/Codex/Artifacts/Ari/2026-11-22/ and PR11's docs/reports-ota-v57-2026-11-22.md.
 
-Public Play version 57 is EAS `babe43bf-4a4f-4dc9-aacf-c9e31eb27841`,
-source metadata `4b4ae8e`, channel `internal-release` and runtime
-`84cc28590bb0a1fffcf4a346d97bd40e18faac45`. Its update lookup returns
-204. A reports-only OTA must be ported and tested against that native
-runtime. The six-language branch includes native changes and needs a
-new store build.
+Backend PR23/d24d921 prevents unit relabeling,705 local tests pass, undeployed.
+Live remains fdd03c4. Owner confirmed Expo upgraded, GitHub still pending. Private
+backend jobs 44939774769 fail before steps for payment/spending limits. Recheck
+CI/readiness/maintenance after owner resolves it; do not rerun sending jobs to
+manufacture evidence. Separate backend staging gate remains. Monthly acceptance
+is 1December09IST. Daily/outbox flags stay off. Web remote remains f871456.
 
-Backend health and receipt freshness pass at `fdd03c4`; maintenance is
-stale beyond 30 hours. Backend GitHub rejects jobs for payment/spending limits.
-Automatic weekly reporting and independent readiness need that provider
-gate resolved. Monthly Railway acceptance is due 1 December at 09:00 IST.
-
-See
-[release evidence](../docs/audits/2026-11-21/reports-and-worldwide-release.md)
-for exact artifacts and outstanding worldwide gates.
+Not globally released: signup verification, broader country/currency contracts,
+prior sync/data-safety integration and fluent/legal/store review remain open.
+See docs/audits/2026-11-22/navigation-reports-release.md. Preserve canonical dirt.

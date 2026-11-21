@@ -173,3 +173,18 @@ Weekly brief run35526286124 had one unclassified failure. Malformed provider res
 ## 26 September — receipt caller credential boundary
 
 A dedicated `--job push-receipts` invocation must fail closed without `RECEIPT_SCHEDULER_TOKEN`; it never falls back to the general scheduler credential. Scheduled/manual receipt-only workflow steps receive only the scoped secret. Explicit operator `all` remains a broad action and prefers the scoped receipt credential when available. Source completion does not authorize configuring secrets, deploying, changing scheduler ownership or triggering reconciliation. Those require a reviewed cutover plus independent execution evidence and cadence acceptance.
+
+
+## 22 November — navigation, billing and compatible report OTA
+
+Owner confirms Expo upgraded and GitHub billing pending. Native testing resumes
+using cloud/emulator artifacts; physical-device pause remains. Ari remains free.
+Ordinary npm peer resolution must agree between CI and EAS. Reuse verified native
+artifacts for test-only changes and avoid automatic builds for draft PRs.
+
+Public version57 uses internal-release and runtime84cc2859. Compatible report
+source is isolated from the new six-language/native branch and has a reproduced
+fingerprint, not an override. QA group2633d53d is unreferenced by the public channel.
+The retained XML config-plugin advisory is documented and its audit not waived.
+Worldwide native dependencies are fully patched. Do not claim QA/staged artifacts
+as public, waive installed-v57 acceptance, or mark future scheduled runs accepted.

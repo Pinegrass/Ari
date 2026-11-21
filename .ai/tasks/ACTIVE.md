@@ -1,16 +1,17 @@
-# Active task — Personal reports and worldwide release
+# Active task â€” reports OTA and worldwide release
 
-Keep Ari free. Deliver useful weekly/monthly reviews and grounded habit
-suggestions. The implementation is in source `05b10c4` and draft PR #10.
+Keep Ari free. Navigation7, a clean dependency audit and a successful native build
+are verified. Core, report/privacy and Arabic restart/persistence native checks pass using
+build 541b5b79-fa8a-4dac-bdbc-5d808860b164.
 
-The report feature uses JavaScript, but the current worldwide branch has
-native localization changes. Prepare any public OTA from the installed
-version 57 runtime `84cc2859` and channel `internal-release`.
+Report OTA PR11 has exact 84cc2859 compatibility and a staged isolated QA group.
+Resolve its retained native XML tooling advisory and installed-v57 canary gate
+before changing public internal-release. Do not force native compatibility.
 
-Resolve backend GitHub Actions billing/spending restrictions, EAS Android
-build quota, the navigation
-dependency advisory, native QA, translation review and additional market
-currency coverage before worldwide acceptance. Recheck maintenance freshness
-and scheduled report generation after Actions recovers.
+Backend PR23 prevents currency relabeling and passes705 local tests. GitHub billing
+is pending, Expo is upgraded. After Actions recovers, run normal CI/readiness and
+staging acceptance; verify maintenance and report generation. Daily/outbox stays off.
 
-Read docs/audits/2026-11-21/reports-and-worldwide-release.md.
+Worldwide still needs signup verification, broader currency/country contracts,
+previous sync/data-safety integration, fluent/legal review and Play listing acceptance.
+Record exact commits/artifacts; do not describe local or staged work as deployed.
