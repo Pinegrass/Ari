@@ -22,3 +22,7 @@ billing:
   expo: upgraded_build_verified
   github: owner_pending_payment_or_actions_budget
 reference: docs/reports-ota-v57-2026-11-22.md
+qa_group: 2633d53d-8a59-4732-8e33-4ec8e8a5dec1
+qa_branch: ari-reports-v57-87298ab-qa
+remote_ci: 44940420540
+public_update_lookup: 204_unchanged

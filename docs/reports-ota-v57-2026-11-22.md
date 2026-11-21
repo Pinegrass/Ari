@@ -44,6 +44,20 @@ Artifacts are under `D:/Codex/Artifacts/Ari/2026-11-22/`.
 
 ## Remaining release gates
 
+QA artifact staged from source `87298ab391f0804ae262af0403f43a13724bc3a2`:
+
+- Branch `ari-reports-v57-87298ab-qa`
+- Update group `2633d53d-8a59-4732-8e33-4ec8e8a5dec1`
+- Android update `01a1ff8f-06bf-7fb6-b8b9-a8efb4d533a5`
+- Runtime `84cc28590bb0a1fffcf4a346d97bd40e18faac45`
+
+The public channel remains mapped to its original internal-release branch and
+its runtime update lookup still returns HTTP 204. The QA branch is not attached
+to the public channel. A clean `npm ci` also reproduced the public fingerprint.
+Remote CI run44940420540 passed TypeScript, all tests and lint; the dependency
+audit failed on the retained native XML toolchain described below. PR #11 targets
+the public-baseline maintenance branch `codex/ari-public-v57`, not worldwide master.
+
 The old native fingerprint includes the `@xmldom/xmldom` 0.8.13 config-plugin
 toolchain. Updating it changes the native fingerprint. The compatible candidate
 retains this known high-severity build-tool advisory; it is absent from the

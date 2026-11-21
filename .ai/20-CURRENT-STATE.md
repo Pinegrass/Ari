@@ -19,3 +19,10 @@ Backend live fdd03c4 and web remote f871456 remain independent. Backend candidat
 PR #23 prevents account-unit relabeling and passes 705 local tests. Its private
 GitHub jobs still fail before startup for payment/spending limits. Expo is upgraded
 and builds work. Preserve the canonical checkouts' unrelated prepared changes.
+
+QA group 2633d53d-8a59-4732-8e33-4ec8e8a5dec1 is staged on unreferenced
+ari-reports-v57-87298ab-qa at runtime84cc2859. Public internal-release still
+returns204 and its channel mapping is unchanged. Clean npm ci reproduces84cc.
+Remote CI44940420540 passed tests/typecheck/lint, failed retained XML audit.
+Worldwide native report/privacy flow passed in44940046041; public-v57 canary
+acceptance remains pending. PR11 targets codex/ari-public-v57 maintenance branch.
