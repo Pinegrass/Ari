@@ -1,0 +1,14 @@
+project: Ari
+updated_at: 2026-09-05
+active_branch: master
+head_commit: ac641b622586
+last_verified_commit: ac641b622586
+active_task: external cross-repository release verification
+development_stage: release_candidate
+release_status: local_gates_verified_external_release_unverified
+last_full_audit: 2026-09-04
+last_handoff: 2026-09-05
+verification: {lint: passed, typecheck: passed, tests: passed, build: passed}
+known_blockers: [Apple Railway Razorpay and deployment access]
+important_paths: [src, supabase, backend, aritomo-web, docs]
+continuity_schema_version: 1

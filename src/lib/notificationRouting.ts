@@ -14,7 +14,8 @@
  */
 
 export type NotificationRouteTarget =
-  | { kind: 'stack'; screen: 'BudgetPlanner' | 'SmartLedger' | 'PeriodicReports' }
+  | { kind: 'stack'; screen: 'BudgetPlanner' | 'SmartLedger' }
+  | { kind: 'stack'; screen: 'PeriodicReports'; params?: { period: 'weekly' | 'monthly'; anchor?: string } }
   | { kind: 'tab'; tab: 'Dashboard' | 'Tomo' };
 
 /** Extract the discriminator from an arbitrary push data payload. */
@@ -54,6 +55,21 @@ export function routeForNotificationData(data: unknown): NotificationRouteTarget
       return { kind: 'stack', screen: 'BudgetPlanner' };
     case 'weekly_brief':
     case 'monthly_review':
+      {
+        const type = notificationTypeOf(data)!;
+        const id = (data as Record<string, unknown>).nudgeId;
+        const anchor = typeof id === 'string' && id.startsWith(`${type}:`) ? id.slice(type.length + 1) : '';
+        // Older payloads without dates retain their coaching-card destination.
+        // Never open today's period for a notification about an older report.
+        if (/^\d{4}-\d{2}-\d{2}$/.test(anchor)) {
+          const value = new Date(`${anchor}T12:00:00Z`);
+          if (!Number.isNaN(value.valueOf()) && value.toISOString().slice(0, 10) === anchor) {
+            return { kind: 'stack', screen: 'PeriodicReports', params: {
+              period: type === 'weekly_brief' ? 'weekly' : 'monthly', anchor,
+            } };
+          }
+        }
+      }
       return { kind: 'tab', tab: 'Dashboard' };
     case 'subscription_leak':
       return { kind: 'stack', screen: 'SmartLedger' };

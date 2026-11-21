@@ -5,6 +5,21 @@ import {
 } from '../notificationRouting';
 
 describe('routeForNotificationData', () => {
+  it.each([
+    ['weekly_brief', 'weekly', '2026-11-02'],
+    ['monthly_review', 'monthly', '2026-10-01'],
+  ])('opens the dated %s report instead of the current period', (type, period, anchor) => {
+    expect(routeForNotificationData({ type, nudgeId: `${type}:${anchor}` })).toEqual({
+      kind: 'stack', screen: 'PeriodicReports', params: { period, anchor },
+    });
+  });
+
+  it('keeps malformed report dates on the coaching-card destination', () => {
+    for (const anchor of ['2026-02-30', '2026-13-01', '2026-1-1', '../settings']) {
+      expect(routeForNotificationData({ type: 'monthly_review', nudgeId: `monthly_review:${anchor}` }))
+        .toEqual({ kind: 'tab', tab: 'Dashboard' });
+    }
+  });
   it('routes budget_alert to BudgetPlanner', () => {
     expect(
       routeForNotificationData({

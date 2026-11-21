@@ -223,6 +223,14 @@ export default function DashboardScreen() {
         <AnimatedEntry delay={220}>
           <CoachingBriefCard />
         </AnimatedEntry>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16, marginVertical: 12 }}>
+          {(['weekly', 'monthly'] as const).map(period => (
+            <TouchableOpacity key={period} accessibilityRole="button" style={{ minHeight: 44, justifyContent: 'center' }}
+              onPress={() => navigation.navigate('PeriodicReports', { period })}>
+              <Text style={{ color: c.forest, fontFamily: font.bodySemi }}>{period === 'weekly' ? 'Weekly review' : 'Monthly review'} →</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
 
         {nudge && (
           <AnimatedEntry delay={230}>

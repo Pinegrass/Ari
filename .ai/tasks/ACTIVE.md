@@ -1,23 +1,11 @@
-# Active Task
-ID: ARI-RELEASE-VERIFY
-Title: Verify mobile, web and backend release state
-Status: REPORTED ACTIVE MILESTONE
+# Active task — compatible personal report OTA
 
-## Goal
-Prove TestFlight/mobile and Razorpay web subscription behavior against current code/deployments.
-## Why
-Recent handoffs report readiness, but live state was not independently checked here.
-## Included
-Three-repo gates, auth/API/billing contracts, entitlement webhook/reconcile, mobile build smoke.
-## Excluded
-New finance features.
-## Acceptance Criteria
-Gates pass; deployed commits/config are recorded; payment/entitlement succeeds; mobile build is installable.
-## Relevant Areas
-Parent `src/`; `backend/`; `aritomo-web/`; release docs.
-## Required Verification
-Parent tests/typecheck/lint; web quality/build; backend tests; staging/live smoke.
-## Dependencies / Blockers
-External service/release access.
-## Next Executable Step
-With all three local repository gates green, obtain authorized staging/release access and verify TestFlight install plus Razorpay entitlement/webhook reconciliation. Do not claim these external checks from local evidence.
+Keep Ari free. Prepare and review the version-57 report/navigation update with
+exact runtime compatibility. Retain the public internal-release channel mapping
+until canary and security acceptance. Do not publish the worldwide native branch
+to version57 or override its fingerprint.
+
+Validate the unchanged native baseline, source/lockfile, signed cash flow,
+privacy, refresh recovery and dated report navigation. Record staged OTA IDs,
+artifacts and remaining release gates. Recheck backend CI only after the owner
+resolves GitHub payment/spending restrictions. Expo upgrade is already confirmed.
