@@ -18,7 +18,7 @@ backend_ci: 46124695819_all_three_jobs_pass
 backend_tests: 728_pass
 staging_supabase: fzrlbodokgisxcyblmhm
 staging_railway_environment: 491faae0-506a-45e1-bf29-84e3652c2634
-staging_status: bootstrap_repaired_hosted_api_pending
+staging_status: hosted_api_passes_smtp_permission_pending
 web_source: 5611f643bc57ca739720b66f4a0a0c94f393b4a8
 web_pr: 6
 web_tests: 137_pass_and_4_browser_pass
@@ -30,3 +30,12 @@ daily_outbox_sending: disabled
 monthly_acceptance: '2026-12-01T09:00:00+05:30'
 production_publication: pending
 evidence: docs/audits/2026-11-28/verified-registration-release.md
+mobile_ci: 46124985134_all_four_pass
+ota_ci: 46125037946_tests_types_lint_pass_xml_audit_fail
+web_ci: 46124765506_pass
+staging_deployment: ec7b4a54-9f42-4be9-928c-c5cd7f6685ad
+staging_checks: 15_pass_no_mail
+staging_fixture_cleanup: zero_auth_users_and_profiles
+smtp_delivery: permission_pending
+backend_branch_head: a2f8f341e85fc20af26a9a9b55ef0cd653a72bc7
+backend_deployed_staging_application: 8bc977592412df0cae97648a54ad121075ca53e9

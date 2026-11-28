@@ -68,3 +68,26 @@ ari-backend PR24. Web evidence has the same path in aritomo-web PR6. Shared cont
 SHA256901dfaab270eb5be7961ebb74b76d61996c8d04a7cb32f0b59e3786f6ffd9915.
 Production migration and hosted SMTP delivery remain pending; captured local mail
 is not evidence of actual sender delivery. No all-user sending jobs were rerun.
+
+
+## Final hosted checkpoint
+
+Staging deployment ec7b4a54-9f42-4be9-928c-c5cd7f6685ad succeeded, pinned8bc9775.
+Fifteen hosted checks pass using an owned synthetic account: provider confirmation,
+legacy426 and country400 guards, unconfirmed-login denial, token_hash confirmation,
+confirmed API access, protected initial USD/free/user metadata, country-change409,
+currency preservation, direct RLS privilege denial and confirmation replay denial.
+Admin generate_link sent no mail. Fixture deletion verified auth.users=0/profiles=0.
+Production remains unchanged. Actual SMTP delivery is awaiting owner authorization
+for one test to dev@pinegrass.in; no mail is sent while permission is pending.
+
+Worldwide CI46124985134 passes all four jobs (fd405d3). Web CI46124765506 passes
+all checks and automatic preview5611f64 is READY at
+https://aritomo-2zgt4inl4-pinegrass.vercel.app ; preview interactions remain unverified.
+OTA CI46125037946 on434b1de passes tests/types/lint and fails retained XML audit.
+This is an open release gate. No public channel mapping or Play build was changed.
+
+Backend documentation head a2f8f341e85fc20af26a9a9b55ef0cd653a72bc7 records the
+hosted proof. Staging remains pinned to application8bc9775; documentation changes
+do not silently advance the deployed source. OTA audit reports eight advisories
+for the retained xmldom package. New native dependency tree remains audit0.
