@@ -21,6 +21,7 @@ concurrency:
 
 jobs:
   e2e:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     name: Maestro E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 90
@@ -38,7 +39,7 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - run: npm ci --legacy-peer-deps
+      - run: npm ci
 
       - name: Install Maestro
         env:
@@ -62,7 +63,7 @@ jobs:
 
       # Local Gradle builds on the free runner proved flaky at ~25 min
       # (Metaspace OOM in lint workers, then packageRelease failing under
-      # resource pressure — different failure each run). The EAS cloud
+      # resource pressure â€” different failure each run). The EAS cloud
       # build is proven green; download the APK artifact and spend the
       # job budget on the emulator and flows instead.
       - name: Build release APK (EAS cloud) and download
@@ -100,7 +101,7 @@ jobs:
           # sufficient for email/password login flows.
           sdkmanager --install "system-images;android-34;default;x86_64" "emulator" "platform-tools"
           # avdmanager create silently no-ops (exits 0, creates nothing)
-          # with this runner's cmdline-tools, so create the AVD by hand —
+          # with this runner's cmdline-tools, so create the AVD by hand â€”
           # an AVD is just an .ini + config.ini; the emulator fills in
           # the rest on first boot.
           mkdir -p "$ANDROID_AVD_HOME/maestro.avd"

@@ -25,6 +25,9 @@ export const getDailyAnalytics = (month: string) =>
 export type ReportPeriod = 'daily' | 'weekly' | 'monthly';
 
 export interface PeriodicReport {
+  currency?: string;
+  evidence?: { code: string; kind: 'observed' | 'calculated' | 'predicted' | 'interpretation'; text: string }[];
+  categoryChanges?: { name: string; current: number; previous: number; delta: number }[];
   period: ReportPeriod;
   label: string;
   start: string;
@@ -37,6 +40,9 @@ export interface PeriodicReport {
     transactionCount: number;
   };
   comparison: {
+    start?: string;
+    end?: string;
+    transactionCount?: number;
     expensesChange: number | null;
     incomeChange: number | null;
     previousExpenses: number;
@@ -48,5 +54,5 @@ export interface PeriodicReport {
   goals: { id: string; name: string; current: number; target: number; progress: number }[];
 }
 
-export const getPeriodicReport = (period: ReportPeriod) =>
-  apiRequest<PeriodicReport>(`/reports/periodic?period=${period}`);
+export const getPeriodicReport = (period: ReportPeriod, language = 'en', anchor?: string) =>
+  apiRequest<PeriodicReport>(`/reports/periodic?period=${period}&language=${language === 'hi' ? 'hi' : 'en'}${anchor ? `&anchor=${encodeURIComponent(anchor)}` : ''}`);

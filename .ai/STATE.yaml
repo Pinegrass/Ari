@@ -1,14 +1,41 @@
 project: Ari
-updated_at: 2026-09-05
-active_branch: master
-head_commit: ac641b622586
-last_verified_commit: ac641b622586
-active_task: external cross-repository release verification
-development_stage: release_candidate
-release_status: local_gates_verified_external_release_unverified
-last_full_audit: 2026-09-04
-last_handoff: 2026-09-05
-verification: {lint: passed, typecheck: passed, tests: passed, build: passed}
-known_blockers: [Apple Railway Razorpay and deployment access]
-important_paths: [src, supabase, backend, aritomo-web, docs]
-continuity_schema_version: 1
+updated_at: '2026-11-28'
+pricing: free
+commit_email: dev@pinegrass.in
+github_actor: dev-pinegrass
+release_status: candidates_verified_hosted_acceptance_pending
+mobile_worldwide_source: 66de4ce272ce811ac5d2e170acd77caf0c3659ec
+mobile_worldwide_tests: 720_pass_74_suites
+ota_source: 58657425b14a2201f623e413cfc1bf6d94129ecc
+ota_tests: 517_pass_41_suites
+public_runtime: 84cc28590bb0a1fffcf4a346d97bd40e18faac45
+public_channel: internal-release
+ota_fingerprint: exact_match_no_override
+ota_gate: retained_xml_advisory_and_public_native_canary
+backend_source: 8bc977592412df0cae97648a54ad121075ca53e9
+backend_live: fdd03c4db0871521335c04a24d2c65e76f50f97b
+backend_ci: 46124695819_all_three_jobs_pass
+backend_tests: 728_pass
+staging_supabase: fzrlbodokgisxcyblmhm
+staging_railway_environment: 491faae0-506a-45e1-bf29-84e3652c2634
+staging_status: hosted_api_passes_smtp_permission_pending
+web_source: 5611f643bc57ca739720b66f4a0a0c94f393b4a8
+web_pr: 6
+web_tests: 137_pass_and_4_browser_pass
+web_deployment: unverified
+billing_expo: resolved
+billing_github: resolved_and_ci_exercised
+maintenance: missing_execution_evidence
+daily_outbox_sending: disabled
+monthly_acceptance: '2026-12-01T09:00:00+05:30'
+production_publication: pending
+evidence: docs/audits/2026-11-28/verified-registration-release.md
+mobile_ci: 46124985134_all_four_pass
+ota_ci: 46125037946_tests_types_lint_pass_xml_audit_fail
+web_ci: 46124765506_pass
+staging_deployment: ec7b4a54-9f42-4be9-928c-c5cd7f6685ad
+staging_checks: 15_pass_no_mail
+staging_fixture_cleanup: zero_auth_users_and_profiles
+smtp_delivery: permission_pending
+backend_branch_head: a2f8f341e85fc20af26a9a9b55ef0cd653a72bc7
+backend_deployed_staging_application: 8bc977592412df0cae97648a54ad121075ca53e9

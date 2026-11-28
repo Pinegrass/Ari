@@ -29,7 +29,7 @@ interface AuthContextValue {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (payload: RegisterFormData) => Promise<void>;
+  register: (payload: RegisterFormData) => Promise<'authenticated' | 'verification_required'>;
   logout: () => Promise<void>;
   /** PATCH profile fields (name, country, monthlyIncome, upiVpa) and keep
    * context + cache in sync with the server-returned user. */
@@ -40,6 +40,7 @@ interface AuthContextValue {
 }
 
 export interface RegisterFormData {
+  referralCode?: string;
   name: string;
   email: string;
   password: string;
@@ -91,6 +92,7 @@ function buildRegisterPayload(data: RegisterFormData): RegisterPayload {
       MAIN_GOAL_TO_API[data.primary_goal ?? ''] ||
       'save_more',
     country: data.country || 'IN',
+    referralCode: data.referralCode?.trim().toUpperCase(),
   };
 }
 
@@ -291,7 +293,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = useCallback(async (formData: RegisterFormData) => {
     addBreadcrumb('auth', 'register: attempt');
     const payload = buildRegisterPayload(formData);
-    const { token, refresh_token, user: u } = await authApi.register(payload);
+    const result = await authApi.register(payload);
+    if (result.verificationRequired === true) return 'verification_required' as const;
+    const { token, refresh_token, user: u } = result;
     await secureStorage.setItem('ari_token', token);
     await adoptSessionIntoSupabase(token, refresh_token);
     setUserAndCache(u);
@@ -300,6 +304,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     track('register_success');
     addBreadcrumb('auth', 'register: success');
     attemptPushRegister();
+    return 'authenticated' as const;
   }, [setUserAndCache]);
 
   const logout = useCallback(async () => {

@@ -114,7 +114,10 @@ function navigateForPushPayload(data: unknown) {
         },
       });
     } else {
-      (navigationRef as any).navigate('Main', { screen: target.screen });
+      (navigationRef as any).navigate('Main', {
+        screen: target.screen,
+        ...(target.screen === 'PeriodicReports' && target.params ? { params: target.params } : {}),
+      });
     }
     track('push_opened', {
       type: notificationTypeOf(data) ?? 'unknown',
@@ -162,7 +165,7 @@ function navigateToInvite(code: string) {
     _pendingInviteCode = code;
     return;
   }
-  const rootRoutes = navigationRef.getRootState().routeNames;
+  const rootRoutes = navigationRef.getRootState()?.routeNames ?? [];
   if (rootRoutes.includes('Main')) {
     (navigationRef as any).navigate('Main', { screen: 'InviteFriends', params: { code } });
   } else if (rootRoutes.includes('Auth')) {

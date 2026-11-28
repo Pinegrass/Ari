@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { getLatestBrief, type CoachingBrief, type BriefContent } from '../api/coaching';
 import { color, font, type } from '../theme/tokens';
 import Icon from './ui/Icon';
+import { usePrivacy } from '../context/PrivacyContext';
 
 /**
  * Weekly brief card on the Dashboard (spec §5.2). Renders whatever the backend
@@ -30,6 +31,7 @@ function TomoGlyph() {
 }
 
 export default function CoachingBriefCard() {
+  const { isPrivate } = usePrivacy();
   const [brief, setBrief] = useState<CoachingBrief | null>(null);
   const [expanded, setExpanded] = useState(false);
 
@@ -46,7 +48,7 @@ export default function CoachingBriefCard() {
     load();
   }, [load]);
 
-  if (!brief || !isStructuredBrief(brief.content)) return null;
+  if (isPrivate || !brief || !isStructuredBrief(brief.content)) return null;
   if (brief.type !== 'weekly_brief' && brief.type !== 'monthly_review') return null;
 
   const { summary, insights, actions } = brief.content;
