@@ -6,10 +6,13 @@ import type { User, RegisterPayload } from '../types';
 // auto-refresh path is a no-op in that case; user just sees the legacy 1h
 // access_token TTL until backend catches up.
 export interface AuthSessionResponse {
+  verificationRequired?: false;
   token: string;
   refresh_token?: string;
   user: User;
 }
+
+export interface VerificationRequiredResponse { verificationRequired: true; }
 
 export const login = (email: string, password: string) =>
   apiRequest<AuthSessionResponse>('/auth/login', {
@@ -17,11 +20,17 @@ export const login = (email: string, password: string) =>
     body: JSON.stringify({ email, password }),
   });
 
-export const register = (payload: RegisterPayload) =>
-  apiRequest<AuthSessionResponse>('/auth/register', {
+export const register = async (payload: RegisterPayload): Promise<AuthSessionResponse | VerificationRequiredResponse> => {
+  const result = await apiRequest<AuthSessionResponse | VerificationRequiredResponse>('/auth/register', {
     method: 'POST',
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ ...payload, registrationContract: 'email-verification-v1' }),
   });
+  if (result?.verificationRequired === true) return { verificationRequired: true };
+  if (!result || typeof result.token !== 'string' || !result.token || typeof result.user?.id !== 'string') {
+    throw new Error('Invalid registration response');
+  }
+  return result;
+};
 
 export const getMe = () => apiRequest<User>('/auth/me');
 

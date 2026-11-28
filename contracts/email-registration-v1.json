@@ -1,0 +1,36 @@
+{
+  "contract": "email-verification-v1",
+  "request": {
+    "name": "Fixture User",
+    "email": "fixture@example.test",
+    "password": "fixture-not-real-password",
+    "ageGroup": "25-35",
+    "incomeBracket": "bracket_1",
+    "mainGoal": "save_more",
+    "country": "IN",
+    "registrationContract": "email-verification-v1"
+  },
+  "pending": {
+    "verificationRequired": true,
+    "message": "If this address can be registered, check its inbox before signing in."
+  },
+  "unexpectedSession": {
+    "verificationRequired": true,
+    "token": "fixture.eyJzdWIiOiAiMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMDAxIn0.not-a-real-signature",
+    "user": {
+      "id": "00000000-0000-4000-8000-000000000001"
+    }
+  },
+  "legacySession": {
+    "token": "fixture.eyJzdWIiOiAiMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMDAxIn0.not-a-real-signature",
+    "refresh_token": "fixture-not-real-refresh",
+    "user": {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "name": "Fixture User",
+      "email": "fixture@example.test",
+      "tier": "free",
+      "country": "IN",
+      "currency": "INR"
+    }
+  }
+}
