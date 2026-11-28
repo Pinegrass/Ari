@@ -52,7 +52,7 @@ export type MainStackParamList = {
   Bills: undefined;
   RecurringPayments: undefined;
   DailyHeatmap: undefined;
-  PeriodicReports: {period: 'weekly'|'monthly'; anchor: string} | undefined;
+  PeriodicReports: {period: 'weekly'|'monthly'; anchor?: string} | undefined;
   NudgeInbox: undefined;
   Planning: undefined;
   InviteFriends: { code?: string } | undefined;

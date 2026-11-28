@@ -11,6 +11,12 @@ on:
         description: Reuse a finished Android EAS build instead of creating another one
         required: false
         type: string
+      scenario:
+        description: Flows to exercise against the selected artifact
+        required: false
+        default: all
+        type: choice
+        options: [all, reports, languages]
   schedule:
     # Run E2E nightly at 2 AM UTC
     - cron: '0 2 * * *'
@@ -21,6 +27,7 @@ concurrency:
 
 jobs:
   e2e:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     name: Maestro E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 90
@@ -38,7 +45,7 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - run: npm ci --legacy-peer-deps
+      - run: npm ci
 
       - name: Install Maestro
         env:
@@ -73,7 +80,17 @@ jobs:
           if [ -n "$EAS_BUILD_ID" ]; then
             eas build:view "$EAS_BUILD_ID" --json > build.json
           else
-            eas build --platform android --profile e2e --non-interactive --json > build.json
+            # Nightly checks can reuse the exact source artifact instead of
+            # spending another Android build on an unchanged commit.
+            eas build:list --platform android --build-profile e2e \
+              --git-commit-hash "$(git rev-parse HEAD)" --status finished \
+              --limit 5 --non-interactive --json > candidates.json
+            REUSABLE=$(node -e "const a=require('./candidates.json');const b=a.find(b=>(b.artifacts?.buildUrl||b.artifacts?.applicationArchiveUrl)&&(!b.expirationDate||Date.parse(b.expirationDate)>Date.now()));if(b)process.stdout.write(b.id)")
+            if [ -n "$REUSABLE" ]; then
+              eas build:view "$REUSABLE" --json > build.json
+            else
+              eas build --platform android --profile e2e --non-interactive --json > build.json
+            fi
           fi
           URL=$(node -e "const b=require('./build.json');const a=Array.isArray(b)?b[0]:b;const u=a.artifacts&&(a.artifacts.buildUrl||a.artifacts.applicationArchiveUrl);if(!u){console.error('No artifact URL in build.json');process.exit(1)}console.log(u)")
           curl -fL "$URL" -o app.apk
@@ -158,6 +175,7 @@ jobs:
       - name: Install APK and run Maestro flows
         env:
           MAESTRO_DRIVER_STARTUP_TIMEOUT: 120000
+          E2E_SCENARIO: ${{ inputs.scenario || 'all' }}
         run: |
           adb shell input keyevent 82
           # Let the freshly booted system settle (the Pixel Launcher ANR'd
@@ -169,10 +187,19 @@ jobs:
           sleep 30
           adb install -r ./app.apk
           maestro test .maestro/login_flow.yaml
-          maestro test .maestro/navigation_flow.yaml
-          maestro test .maestro/add_transaction_flow.yaml
-          maestro test .maestro/tomo_chat_flow.yaml
-          maestro test .maestro/export_flow.yaml
+          case "$E2E_SCENARIO" in
+            all)
+              maestro test .maestro/navigation_flow.yaml
+              maestro test .maestro/add_transaction_flow.yaml
+              maestro test .maestro/tomo_chat_flow.yaml
+              maestro test .maestro/export_flow.yaml
+              maestro test .maestro/reports_flow.yaml
+              maestro test .maestro/language_flow.yaml
+              ;;
+            reports) maestro test .maestro/reports_flow.yaml ;;
+            languages) maestro test .maestro/language_flow.yaml ;;
+            *) exit 1 ;;
+          esac
 
       - name: Upload E2E results
         if: always()

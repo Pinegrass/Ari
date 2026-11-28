@@ -50,7 +50,6 @@ import CountryPicker from '../components/CountryPicker';
 import LanguageControl from '../components/LanguageControl';
 import NotificationPreferences from '../components/NotificationPreferences';
 import MeasurementConsent from '../components/MeasurementConsent';
-import TrialCard from '../components/TrialCard';
 import { getLocale } from '../utils/locale';
 
 const AGE_LABELS: Record<string, string> = {
@@ -365,9 +364,6 @@ export default function SettingsScreen() {
     return <TermsScreen onBack={() => setSubScreen('main')} />;
   }
 
-  const tier = user?.tier ?? 'free';
-  const isSubscribed = tier !== 'free';
-
   const menuItems: MenuItem[] = [
     {
       icon: 'gift',
@@ -382,32 +378,17 @@ export default function SettingsScreen() {
       onPress: () => { haptics.light(); navigation.navigate('RecurringPayments'); },
     },
     {
-      icon: 'sparkles',
-      label: isSubscribed ? `Ari ${tier[0].toUpperCase() + tier.slice(1)}` : 'Upgrade to Ari Pro',
-      subtitle: isSubscribed
-        ? 'Manage your subscription'
-        : 'Review current plans and store terms',
-      onPress: () => { haptics.light(); navigation.navigate('Paywall', { source: 'settings' }); },
-    },
-    {
       icon: 'send',
       label: user?.upiVpa ? `UPI: ${user.upiVpa}` : 'Set UPI VPA',
       subtitle: 'Receive shared-expense settlements via UPI',
       onPress: () => { haptics.light(); setSubScreen('upi'); },
     },
-    {
+    ...(user?.country === 'IN' && (user.tier ?? 'free') !== 'free' ? [{
       icon: 'wallet',
       label: 'Link bank account',
       subtitle: 'Auto-import bank transactions via Setu',
-      onPress: () => {
-        haptics.light();
-        if (isSubscribed) {
-          navigation.navigate('LinkBank');
-        } else {
-          navigation.navigate('Paywall', { source: 'aa_gate' });
-        }
-      },
-    },
+      onPress: () => { haptics.light(); navigation.navigate('LinkBank'); },
+    } as MenuItem] : []),
     {
       icon: 'user',
       label: 'Shared expenses',
@@ -434,7 +415,6 @@ export default function SettingsScreen() {
         <LanguageControl />
         <NotificationPreferences />
         <MeasurementConsent />
-        <TrialCard />
 
         {/* Profile Card */}
         <AnimatedEntry delay={0}>

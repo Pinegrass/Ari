@@ -3,6 +3,7 @@ import { ActivityIndicator, Text, TextInput, TouchableOpacity, View } from 'reac
 import { getNotificationPreferences, getNotificationCapabilities, saveNotificationPreferences, type NotificationPreferences as Preferences } from '../api/notificationPreferences';
 import { notificationAvailability } from '../i18n/notificationAvailability';
 import { useLanguage } from '../i18n/LanguageContext';
+import { notificationLanguage } from '../i18n/languages';
 import { track } from '../lib/analytics';
 
 export default function NotificationPreferences() {
@@ -29,7 +30,7 @@ export default function NotificationPreferences() {
       <Text>{t('timezone')}</Text><TextInput editable={!busy} accessibilityLabel={t('timezone')} autoCapitalize="none" value={value.timezone} onChangeText={timezone => setValue({ ...value, timezone })} style={{ borderWidth: 1, borderColor: '#aaa', padding: 12, borderRadius: 8 }} />
       <TouchableOpacity disabled={busy} accessibilityRole="button" onPress={async () => {
         setBusy(true); setMessage('');
-        try { setValue(await saveNotificationPreferences({ ...value, language })); setMessage('saved'); track('notification_preferences_updated', {}); }
+        try { setValue(await saveNotificationPreferences({ ...value, language: notificationLanguage(language) })); setMessage('saved'); track('notification_preferences_updated', {}); }
         catch { setMessage('error'); } finally { setBusy(false); }
       }} style={{ padding: 16, backgroundColor: '#e8eddf', borderRadius: 8 }}><Text>{t('save')}</Text></TouchableOpacity>
     </>}

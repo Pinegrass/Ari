@@ -1,0 +1,42 @@
+appId: com.pinegrass.ari
+name: Arabic Direction and Language Persistence
+tags:
+  - requires_auth
+---
+- tapOn: "More"
+- scrollUntilVisible:
+    element:
+      text: "العربية"
+    direction: UP
+- tapOn: "العربية"
+- extendedWaitUntil:
+    visible: "المزيد"
+    timeout: 30000
+- tapOn: "المزيد"
+- scrollUntilVisible:
+    element:
+      text: "تُحفظ اللغة على هذا الجهاز. تظل العملة كما هي."
+    direction: UP
+- assertVisible: "الإعدادات"
+- takeScreenshot: arabic-settings
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible: "المزيد"
+    timeout: 30000
+- tapOn: "المزيد"
+- scrollUntilVisible:
+    element:
+      text: "English"
+    direction: UP
+- tapOn: "English"
+- extendedWaitUntil:
+    visible: "More"
+    timeout: 30000
+- tapOn: "More"
+- scrollUntilVisible:
+    element:
+      text: "Language is saved on this device. Currency stays unchanged."
+    direction: UP
+- assertVisible: "Settings"
+- takeScreenshot: english-settings-restored

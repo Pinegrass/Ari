@@ -1,72 +1,38 @@
-# Maestro E2E Flows
+# Android release regression flows
 
-End-to-end flows for Ari, run with [Maestro](https://maestro.mobile.dev/) against
-a release build on an emulator or device.
+This candidate passed core journeys in run44938263716, report/privacy checks in
+44940046041, and Arabic restart/persistence in44940729174. The verified EAS artifact
+is541b5b79-fa8a-4dac-bdbc-5d808860b164. These checks cover the new native candidate;
+they do not establish installed-version57 OTA canary acceptance.
 
-```bash
-npm run e2e                       # runs every flow in .maestro/
-maestro test .maestro/login_flow.yaml   # a single flow
-```
+The workflow uses the e2e release APK and an API34 AOSP x86_64 emulator. Draft PRs
+skip automatic native builds. Manual dispatch accepts a finished build_id and
+scenario all/reports/languages. Reuse an artifact only when application source,
+native configuration and lockfile match; flow/documentation-only changes do not
+require rebuilding. Nightly tests reuse unexpired finished builds for the exact
+source commit.
 
-## ⚠️ Status: fix in progress
+Scenarios always start with login. The full suite covers:
 
-The suite was last green on 2026-07-26 (run 30209575108). Two subsequent changes
-broke it:
+- Onboarding and demo sign-in.
+- Tabs, the Accountant hub and transaction trends.
+- Transaction entry and edit.
+- Tomo conversation rendering.
+- Export navigation and return.
+- Weekly/monthly report navigation, personal habits and Private Mode.
+- Arabic switch/restart/persistence, RTL screenshots and English restoration.
 
-1. **RevenueCat paywall gating** — Tomo chat is now Pro-only, so the E2E build
-   is treated as Pro via `EXPO_PUBLIC_MAESTRO_E2E=1` (see below).
-2. **Dashboard line chart** — `MonthSpendChart` uses `LineChart`; `isAnimated`
-   was removed and the chart is wrapped in an `ErrorBoundary` to avoid release
-   crashes under Fabric.
+The demo account persists server-side; entry flows add/edit demo records. The
+e2e profile's MAESTRO flag is test-only and must not become production entitlement
+truth. Ari's worldwide candidate remains free; server-verified entitlements and
+payment-provider reconciliation remain independent contracts.
 
-The suite runs on pushes/PRs to `master` and nightly via
-`.github/workflows/maestro-e2e.yml`: an EAS **cloud** build of the `e2e` profile
-(release APK), then a manually brought-up emulator (plain
-`sdkmanager`/`emulator`/`adb` shell steps — the org Actions policy blocks
-third-party emulator actions), then all 5 flows.
+First launch may show onboarding and a software-rendered launcher ANR. The flows
+skip onboarding and handle the known dialog. Wait for animated content; prefer
+accessibility labels for back buttons and switches. Scroll to targets in Settings
+and Home. AOSP default images avoid the heavier Google launcher. The workflow
+pins driver startup timeout, waits for boot and uploads logs/screenshots on failure.
 
-## Harness gotchas (hard-won, don't rediscover)
-
-- **Paywall-gated features are Pro in E2E** — The `e2e` build sets
-  `EXPO_PUBLIC_MAESTRO_E2E=1`; `src/lib/revenuecat.ts` treats this as an Ari Pro
-  entitlement and skips RevenueCat SDK initialization so the release APK is not
-  blocked by the "Wrong API Key" test-key dialog. Do not set this in production
-  builds.
-- **AVD is hand-written** (`maestro.ini` + `config.ini`) — `avdmanager create`
-  silently no-ops on the current runner cmdline-tools. `hw.cpu.arch=x86_64` is
-  mandatory (emulator defaults the AVD to arm and dies), as are real
-  `hw.lcd.*` metrics (default 320x480 pushes dashboard content below the fold).
-- **AOSP `default` image, not `google_apis`** — the Pixel Launcher ANR'd
-  repeatedly under swiftshader and its dialog intercepted taps.
-- **First launch after `clearState` shows Onboarding**, not Splash — flows must
-  tap Skip first.
-- **Maestro matches element text exactly** — `₹500` ≠ `500`, and `← Back` ≠
-  `Back`. Prefer `accessibilityLabel`s (e.g. `Go back`).
-- **TextInput placeholders are invisible to Maestro** (RN doesn't expose hints
-  to the a11y tree). Assert rendered text instead.
-- **Fade-in animations race assertions** (splash tagline, dashboard
-  AnimatedEntry) — use `extendedWaitUntil`, not immediate `assertVisible`.
-- **Recent list is windowed** — rows enter the hierarchy only when scrolled on
-  screen; scrolling to the section header is not enough.
-- **Test data persists server-side** on `demo@ari.app` (clearState is local
-  only); each login_flow+add_transaction run adds entries. Flows are written to
-  tolerate this; a cleanup step or dedicated E2E account is a future
-  improvement.
-
-## Flows
-
-| Flow | Covers |
-|------|--------|
-| `login_flow.yaml` | onboarding skip → splash → email/password demo login → Home |
-| `navigation_flow.yaml` | Home / Trends / Tomo / More tab smoke |
-| `add_transaction_flow.yaml` | keypad add ₹500 → save → scroll to Recent → long-press edit → update |
-| `tomo_chat_flow.yaml` | quick-prompt send → transcript render |
-| `export_flow.yaml` | More → scroll → Export Data → back via `Go back` |
-
-## Deferred flows (write once, verified)
-
-- **Budget create** — Budget is no longer a tab; confirm the nav path first.
-- **Bill create → notification assert** — needs reminder permission +
-  scheduled-notification assertion validated on-device.
-- **Offline add → airplane-mode → sync verify** — needs device airplane-mode
-  toggling; highest-value flow to add next.
+Read docs/audits/2026-11-22/navigation-reports-release.md for remaining launch gates.
+Native smoke does not establish translation fluency, legal acceptance, scheduled
+report delivery, backend staging correctness or worldwide currency coverage.

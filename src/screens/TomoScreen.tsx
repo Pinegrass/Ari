@@ -1,4 +1,4 @@
-import { reviewIntelligenceCopy } from '../i18n/reviewIntelligenceCopy';
+import { getReviewCopy } from '../i18n/reviewIntelligenceCopy';
 
 import { useLanguage } from '../i18n/LanguageContext';
 import React, { useRef, useEffect, useState, useMemo } from 'react';
@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Animated,
+  Alert,
   StyleSheet,
 } from 'react-native';
 import ScreenShell from '../components/ScreenShell';
@@ -25,6 +26,8 @@ import { useNavigation, useRoute, type RouteProp } from '@react-navigation/nativ
 import type { StackNavigationProp } from '@react-navigation/stack';
 import type { MainStackParamList, TabParamList } from '../navigation/navigationTypes';
 import { ApiError } from '../api/client';
+import { submitFeedback } from '../api/feedback';
+import { scrubPII } from '../utils/piiFilter';
 import { track } from '../lib/analytics';
 
 const QUICK_PROMPTS = [
@@ -143,8 +146,7 @@ export default function TomoScreen() {
     setInput('');
     haptics.light();
     try {
-      // Free users get a small daily quota, enforced server-side. The paywall
-      // shows only when the server says today's free messages are used up.
+      // The server enforces a daily quota for free accounts.
       const answered = await askTomo(text);
       if (answered && pendingNudge.current) {
         track('nudge_action_completed', {
@@ -161,11 +163,30 @@ export default function TomoScreen() {
         (err.body as { code?: string } | undefined)?.code === 'tomo_free_limit_reached'
       ) {
         haptics.warning();
-        track('paywall_viewed', { source_screen: 'tomo_limit' });
-        navigation.navigate('Paywall', { source: 'tomo_limit' });
+        Alert.alert(phrase('Daily Tomo limit reached'), phrase('You can ask Tomo again tomorrow.'));
       }
     }
   };
+
+  const reportResponse = (content: string) => {
+    Alert.alert(
+      phrase('Report this response'),
+      phrase('Ari support will receive this response. It may contain financial details.'),
+      [
+        { text: phrase('Cancel'), style: 'cancel' },
+        {
+          text: phrase('Send report'),
+          onPress: () => {
+            void submitFeedback({ message: `[Tomo response report]\n${scrubPII(content).slice(0, 2000)}` })
+              .then(() => Alert.alert(phrase('Report sent')))
+              .catch(() => Alert.alert(phrase('Could not send the report. Please try again.')));
+          },
+        },
+      ],
+    );
+  };
+
+  const reviewCopy = getReviewCopy(language);
 
   return (
     <ScreenShell edges={['top']} backgroundColor={c.cream}>
@@ -194,9 +215,9 @@ export default function TomoScreen() {
         </View>
 
         <View style={{ paddingHorizontal: 16, paddingVertical: 8 }}>
-          <Text style={{ color: c.inkSoft, fontSize: 12 }}>{reviewIntelligenceCopy[language].aiLimit}</Text>
+          <Text style={{ color: c.inkSoft, fontSize: 12 }}>{reviewCopy.aiLimit}</Text>
           <TouchableOpacity accessibilityRole="button" style={{ minHeight: 44, justifyContent: 'center' }} onPress={() => navigation.navigate('SmartLedger')}>
-            <Text style={{ color: c.forest }}>{reviewIntelligenceCopy[language].reviewCurrent}</Text>
+            <Text style={{ color: c.forest }}>{reviewCopy.reviewCurrent}</Text>
           </TouchableOpacity>
         </View>
         {/* Chat List */}
@@ -204,7 +225,7 @@ export default function TomoScreen() {
           ref={listRef}
           data={chatHistory}
           keyExtractor={(_, i) => String(i)}
-          renderItem={({ item }) => <ChatBubble message={item} />}
+          renderItem={({ item }) => <ChatBubble message={item} reportLabel={phrase('Report this response')} onReport={() => reportResponse(item.content)} />}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           onContentSizeChange={scrollToBottom}

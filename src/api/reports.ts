@@ -1,5 +1,6 @@
 import type { HistoryBaseline, PlanningOutlook, ReviewProvenance } from './reviewIntelligence';
 import { apiRequest } from './client';
+import { notificationLanguage } from '../i18n/languages';
 import type { PnlReport } from '../types';
 
 export const getPnlReport = (months = 6) =>
@@ -46,6 +47,7 @@ export interface PeriodicReport {
     transactionCount: number;
   };
   comparison: {
+    transactionCount?: number;
     start?: string;
     end?: string;
     expensesChange: number | null;
@@ -60,4 +62,4 @@ export interface PeriodicReport {
 }
 
 export const getPeriodicReport = (period: ReportPeriod, language = 'en', anchor?: string) =>
-  apiRequest<PeriodicReport>(`/reports/periodic?period=${period}&language=${language}${anchor ? `&anchor=${encodeURIComponent(anchor)}` : ''}`);
+  apiRequest<PeriodicReport>(`/reports/periodic?period=${period}&language=${notificationLanguage(language)}${anchor ? `&anchor=${encodeURIComponent(anchor)}` : ''}`);

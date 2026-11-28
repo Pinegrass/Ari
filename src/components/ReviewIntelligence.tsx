@@ -1,15 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, Text, TouchableOpacity, View } from 'react-native';
 import { confirmRecurringCandidate, getRecurringCandidates, type HistoryBaseline, type PlanningOutlook, type RecurringCandidate, type ReviewEntry, type ReviewProvenance } from '../api/reviewIntelligence';
-import { reviewIntelligenceCopy } from '../i18n/reviewIntelligenceCopy';
+import { getReviewCopy } from '../i18n/reviewIntelligenceCopy';
+import { displayLocale, type Language } from '../i18n/languages';
 import { color } from '../theme/tokens';
 
 export function ReviewIntelligence({ provenance, outlook, baseline, language, money, day, onEdit, onPlanning, onChanged }: {
-  provenance?: ReviewProvenance; outlook?: PlanningOutlook; baseline?: HistoryBaseline; language: 'en' | 'hi';
+  provenance?: ReviewProvenance; outlook?: PlanningOutlook; baseline?: HistoryBaseline; language: Language;
   money: (value: number) => string; day: (value: string) => string;
   onEdit: (entry: ReviewEntry) => void; onPlanning: () => void; onChanged: () => void | Promise<void>;
 }) {
-  const copy = reviewIntelligenceCopy[language];
+  const copy = getReviewCopy(language);
   const [expanded, setExpanded] = useState(false);
   const [limit, setLimit] = useState(20);
   const [candidates, setCandidates] = useState<RecurringCandidate[] | null>(null);
@@ -59,8 +60,8 @@ export function ReviewIntelligence({ provenance, outlook, baseline, language, mo
         <Text selectable>{copy.payday}: {day(outlook.payday)}</Text>
         {outlook.horizon && <><Text selectable>{copy.horizon}: {day(outlook.horizon.start)} – {day(outlook.horizon.end)}</Text><Text>{copy.horizonHelp}</Text></>}
         {outlook.obligations?.map((item, index) => <Text selectable key={index}>{copy.obligation}: {day(item.dueOn)} · {money(Number(item.amount))}</Text>)}
-        {outlook.asOf && <Text selectable>{copy.confirmedAt}: {new Date(outlook.asOf).toLocaleString(language === 'hi' ? 'hi-IN' : undefined)}</Text>}
-        {outlook.expiresAt && <Text selectable>{copy.expires}: {new Date(outlook.expiresAt).toLocaleString(language === 'hi' ? 'hi-IN' : undefined)}</Text>}
+        {outlook.asOf && <Text selectable>{copy.confirmedAt}: {new Date(outlook.asOf).toLocaleString(displayLocale(language))}</Text>}
+        {outlook.expiresAt && <Text selectable>{copy.expires}: {new Date(outlook.expiresAt).toLocaleString(displayLocale(language))}</Text>}
       </> : <Text>{outlook.status === 'historical_unavailable' ? copy.historical : copy.planMissing}</Text>}
       {button(copy.outlook, onPlanning)}
     </>}

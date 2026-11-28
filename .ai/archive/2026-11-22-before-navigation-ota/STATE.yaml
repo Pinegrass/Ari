@@ -1,0 +1,42 @@
+project: Ari
+updated_at: '2026-11-21'
+active_branch: codex/ari-global-android
+active_task: ARI-PERSONAL-REPORTS-WORLDWIDE-RELEASE
+source_commit: 05b10c43a89506e0af50143781ae7e24ce38e3ba
+release_status: candidate_tested_worldwide_gates_open
+pricing: free
+verification:
+  full_mobile_tests: 708_remote_pass
+  typecheck: pass
+  lint: pass
+  android_bundle: pass
+  dependency_audit: seven_high_six_moderate_production
+  mobile_ci: 44935901186
+  native_e2e: blocked_eas_free_android_build_quota
+  native_e2e_run: 44935901172
+android:
+  public_version: '1.3.0'
+  public_version_code: 57
+  public_build: babe43bf-4a4f-4dc9-aacf-c9e31eb27841
+  public_source_metadata: 4b4ae8e0a5139e3cfb3b61d80d9e4124f6cdb15c
+  public_channel: internal-release
+  public_runtime: 84cc28590bb0a1fffcf4a346d97bd40e18faac45
+  update_lookup_status: 204
+  languages: [en, hi, es, fr, pt-BR, ar]
+  new_play_submission: pending
+  ota_publication: pending_compatible_runtime_candidate
+backend:
+  live_revision: fdd03c4db0871521335c04a24d2c65e76f50f97b
+  health: pass
+  receipt_runs_last_24h: 49_succeeded
+  receipt_freshness: pass
+  maintenance_freshness: stale
+  github_job_blocker: failed_account_payments_or_spending_limit
+  monthly_scheduled_acceptance: '2026-12-01T09:00:00+05:30'
+  daily_sending: disabled
+  outbox_sending: disabled
+web:
+  canonical_head: b85c656ad2a285185e621fff3c68e6ad1758bd23
+  remote_master: f87145694db3ba7f5c3c66595ffe9b7fcff74265
+  current_deployment: not_reverified_this_check
+evidence: docs/audits/2026-11-21/reports-and-worldwide-release.md

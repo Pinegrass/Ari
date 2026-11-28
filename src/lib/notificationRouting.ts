@@ -3,8 +3,8 @@
  *
  * Backend pushes carry a `data.type` discriminator (see backend/jobs/*.py):
  *   budget_alert      → BudgetPlanner (budgets surface; there is no Budget tab)
- *   weekly_brief      → Dashboard tab (CoachingBriefCard renders the brief)
- *   monthly_review    → Dashboard tab (same card)
+ *   weekly_brief      → NudgeInbox (opens the report with its saved period)
+ *   monthly_review    → NudgeInbox (same report selection)
  *   subscription_leak → SmartLedger (recurring view)
  *   bill_reminder     → NOT handled here — App.tsx opens fast entry prefilled
  *                       (see billDataFromResponse), which is more useful.
@@ -14,7 +14,7 @@
  */
 
 export type NotificationRouteTarget =
-  | { kind: 'stack'; screen: 'BudgetPlanner' | 'SmartLedger' | 'PeriodicReports' | 'Planning'; params?: { period: 'weekly' | 'monthly'; anchor: string } }
+  | { kind: 'stack'; screen: 'BudgetPlanner' | 'SmartLedger' | 'PeriodicReports' | 'Planning' | 'NudgeInbox'; params?: { period: 'weekly' | 'monthly'; anchor: string } }
   | { kind: 'tab'; tab: 'Dashboard' | 'Tomo' };
 
 /** Extract the discriminator from an arbitrary push data payload. */
@@ -66,7 +66,7 @@ export function routeForNotificationData(data: unknown): NotificationRouteTarget
       return { kind: 'stack', screen: 'BudgetPlanner' };
     case 'weekly_brief':
     case 'monthly_review':
-      return { kind: 'tab', tab: 'Dashboard' };
+      return { kind: 'stack', screen: 'NudgeInbox' };
     case 'subscription_leak':
       return { kind: 'stack', screen: 'SmartLedger' };
     case 'tomo_checkin':

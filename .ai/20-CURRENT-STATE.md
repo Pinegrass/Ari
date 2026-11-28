@@ -1,11 +1,50 @@
-# Current state — 28 September 2026, release audit remediation
+# Current state - 28 November 2026
 
-The three canonical repositories were fetched and audited independently. Mobile source commit `d180073` contains Expo SDK 57-compatible patch updates, the `js-yaml` security override update, removal of obsolete audit exceptions, and corrected Maestro selectors for the center `Add entry` action and current Transactions trends toggle. Local verification passes: 678 tests in 68 suites, TypeScript, Expo lint, Expo Doctor 21/21, Expo dependency compatibility, and the CI high-severity dependency gate. Seven moderate React Navigation transitive advisories remain because npm's only automated remediation is a breaking navigation major upgrade; no forced upgrade was applied.
+Worldwide source66de4ce passes720tests/74suites, TypeScript, lint and audit0.
+New signup UI still needs native acceptance; earlier native flows remain historical.
 
-Backend `ed2af90ec0c0d2791f2e10448612a83646a6feb8` is live on Railway deployment `2b39f50e-bc8a-4253-a6af-140ab19ec3ae`; `/api/health` reports that exact healthy revision. The stale `RELEASE_REVISION` pin was corrected. A new random receipt-only credential is configured consistently in Railway and GitHub Actions, while `DAILY_NUDGES_ENABLED` and `NUDGE_OUTBOX_ENABLED` remain off. Manual receipt run `36450551605` passed; rerun `36419180368` preserved the original schedule event and passed the real `Push receipts` step; read-only readiness `36454247809` is fully green. GitHub did not emit the expected new cron run on time, so automatic cadence timeliness remains an external operational risk even though auth and execution now pass.
+Ari remains free. New commits and GitHub operations use dev@pinegrass.in;
+active gh identity is dev-pinegrass. Expo and GitHub billing are resolved.
+Backend CI46124695819 on8bc9775 passes pytest(728), blocking pip-audit and real
+GoTrue/PostgreSQL fixture proofs. Production remains fdd03c4; candidate PR24
+includes PR23 account-currency protection. Existing canonical dirty work is preserved.
 
-Web `b85c656ad2a285185e621fff3c68e6ad1758bd23` updates Next.js from 16.3.2 to 16.3.6 and Sharp to the patched transitive release. Production dependency audit is zero, 132 tests pass, lint and TypeScript pass, and the 15-route production build passes. GitHub CI run `36450317163` is green and Vercel production deployment `6714939181` succeeded at `https://aritomo-dzj9nb6aa-pinegrass.vercel.app`.
+Email registration now supports202 pending verification without adopting a session;
+mobile/web send email-verification-v1. Explicit IN/US/GB/AU country remains the
+supported financial contract. Backend trigger protects roles and existing profiles;
+clients must ship first before old registration receives426. Sign-in stays compatible.
 
-The previous Maestro failures were stale journey selectors, not login or rendering defects: run `36454396524` proved login and `Add entry`, then showed that `Trends & Insights` now opens Transactions and requires `Show trends`. Final rerun `36456502171` passed all five emulator flows using E2E build `55b5f324-d0a4-4ff3-b883-b73efba762bf`. Preview build `3fbbdd34-f3c6-4c1f-bc8a-39fb04ef3926` also finished; neither artifact was submitted or published. No Play/App Store submission, OTA publication, store-catalog mutation, user-data mutation, or notification sending was performed.
+Supabase schema-only staging fzrlbodokgisxcyblmhm has no copied production rows.
+Initial replay failed because the manually added country column was missing from
+history. Applied an idempotent country repair, exact entitlement protection and
+signup trigger only to staging. Initial branch status remains MIGRATIONS_FAILED;
+no status override or production history mutation. Hosted API acceptance passes
+in isolated Railway environment491faae0-506a-45e1-bf29-84e3652c2634, service
+f009c736-594f-4f6a-8a6e-4cbe07ba9f8e, pinned8bc9775. AI/sending/cron stay off.
 
-Commercial launch blockers remain owner/provider-facing: the Play subscription catalogue is empty, RevenueCat therefore cannot resolve the approved monthly/yearly products, BillDesk verification/payout setup is incomplete, real purchase/restore needs sandbox acceptance, and iOS is deferred. Device acceptance, actual push delivery/recovery, human Hindi/native accessibility/legal review, production load evidence, and disaster-recovery acceptance also remain open.
+Production receipts show48 successful completions in24hours. Maintenance readiness
+still lacks actual execution evidence; green no-op workflows do not count. Daily/
+outbox remains off. Monthly acceptance is1December09IST and is not accepted early.
+
+World release gates: hosted SMTP/confirmation and client-first rollout; new-market
+currency/country contracts; prior sync/data-safety integration; fluent translations,
+legal and Play listing acceptance. Personal-device/iOS testing remains paused.
+No public OTA/native store release is claimed. Never force an OTA runtime.
+
+
+## Final hosted checkpoint
+
+Staging deployment ec7b4a54-9f42-4be9-928c-c5cd7f6685ad succeeded, pinned8bc9775.
+Fifteen hosted checks pass using an owned synthetic account: provider confirmation,
+legacy426 and country400 guards, unconfirmed-login denial, token_hash confirmation,
+confirmed API access, protected initial USD/free/user metadata, country-change409,
+currency preservation, direct RLS privilege denial and confirmation replay denial.
+Admin generate_link sent no mail. Fixture deletion verified auth.users=0/profiles=0.
+Production remains unchanged. Actual SMTP delivery is awaiting owner authorization
+for one test to dev@pinegrass.in; no mail is sent while permission is pending.
+
+Worldwide CI46124985134 passes all four jobs (fd405d3). Web CI46124765506 passes
+all checks and automatic preview5611f64 is READY at
+https://aritomo-2zgt4inl4-pinegrass.vercel.app ; preview interactions remain unverified.
+OTA CI46125037946 on434b1de passes tests/types/lint and fails retained XML audit.
+This is an open release gate. No public channel mapping or Play build was changed.

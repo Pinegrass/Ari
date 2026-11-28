@@ -1,0 +1,50 @@
+project: Ari
+updated_at: '2026-11-22'
+active_branch: codex/ari-global-android
+active_task: reports_ota_and_worldwide_release
+application_commit: e17c6c138087ad85f693c2280dbec338ac6ca234
+source_commit: a7619e1
+release_status: verified_candidates_worldwide_gates_open
+pricing: free
+verification:
+  tests: 711_pass_72_suites
+  typecheck: pass
+  lint: pass
+  dependency_audit: zero_vulnerabilities
+  expo_doctor: 21_pass
+  mobile_ci: 44940662856
+  native_core: 44938263716_pass
+  native_reports_privacy: 44940046041_pass
+  native_arabic: 44940729174_pass
+android:
+  candidate_build: 541b5b79-fa8a-4dac-bdbc-5d808860b164
+  candidate_fingerprint: 330e09cece8ffc2f6cf2f361361174537b088d6b
+  public_version_code: 57
+  public_runtime: 84cc28590bb0a1fffcf4a346d97bd40e18faac45
+  public_channel: internal-release
+  public_lookup: 204_unchanged
+  ota_pr: 11
+  ota_source: 87298ab391f0804ae262af0403f43a13724bc3a2
+  ota_tests: 508_pass
+  ota_fingerprint: exact_match_after_clean_ci
+  ota_qa_group: 2633d53d-8a59-4732-8e33-4ec8e8a5dec1
+  ota_security: retained_native_xml_config_plugin_advisory
+  new_play_submission: pending
+  public_ota: pending
+backend:
+  live: fdd03c4db0871521335c04a24d2c65e76f50f97b
+  candidate: d24d921
+  candidate_pr: 23
+  local_tests: 705_pass
+  ci: 44939774769_blocked_before_steps
+  staging: pending
+  maintenance: stale_pending_actions_recovery
+  daily_outbox_sending: disabled
+  monthly_acceptance: '2026-12-01T09:00:00+05:30'
+web:
+  remote_master: f87145694db3ba7f5c3c66595ffe9b7fcff74265
+  deployment: not_reverified
+billing:
+  expo: upgraded_build_verified
+  github: owner_pending_payment_or_private_actions_budget
+evidence: docs/audits/2026-11-22/navigation-reports-release.md
