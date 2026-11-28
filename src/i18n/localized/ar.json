@@ -1180,5 +1180,8 @@
   "{name} paid": "{name} paid",
   "· due": "المستحقات",
   "— so answers are about": "- لذا الأجوبة حول",
-  "← Back": "♪ ♪"
+  "← Back": "♪ ♪",
+  "Check your email": "تحقق من بريدك الإلكتروني",
+  "If this address can be registered, check its inbox to verify your email before signing in.": "إذا كان من الممكن إنشاء حساب بهذا العنوان، فتحقق من بريدك الوارد وأكّد عنوانك قبل تسجيل الدخول.",
+  "Use another email": "استخدام بريد إلكتروني آخر"
 }

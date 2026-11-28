@@ -1180,5 +1180,8 @@
   "{name} paid": "{name} payé",
   "· due": "· à recevoir",
   "— so answers are about": "— donc les réponses sont sur",
-  "← Back": "← Retour"
+  "← Back": "← Retour",
+  "Check your email": "Consultez votre messagerie",
+  "If this address can be registered, check its inbox to verify your email before signing in.": "Si cette adresse permet de créer un compte, consultez votre boîte de réception et confirmez votre adresse avant de vous connecter.",
+  "Use another email": "Utiliser une autre adresse"
 }

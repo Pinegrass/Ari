@@ -55,6 +55,7 @@ interface FormData {
 }
 
 export default function RegisterScreen({ navigation, route }: Props) {
+  const [verificationSent, setVerificationSent] = useState(false);
  const {phrase:localizeCopy}=useLanguage();
   const { phrase } = useLanguage();
   const { register } = useAuth();
@@ -116,14 +117,28 @@ export default function RegisterScreen({ navigation, route }: Props) {
     setError('');
     setLoading(true);
     try {
-      await register(form);
+      const outcome = await register(form);
+      if (outcome === 'verification_required') {
+        setForm(current => ({ ...current, password: '' }));
+        setVerificationSent(true);
+      }
     } catch (err) {
       setError(
         err instanceof ApiError ? err.message : 'Registration failed. Please try again.'
       );
+    } finally {
       setLoading(false);
     }
   };
+
+  if (verificationSent) return <ScreenShell edges={['top', 'bottom']}>
+    <ScrollView contentContainerStyle={[styles.container, { gap: 20 }]}>
+      <Text accessibilityRole="header" style={styles.title}>{phrase('Check your email')}</Text>
+      <Text accessibilityRole="alert">{phrase('If this address can be registered, check its inbox to verify your email before signing in.')}</Text>
+      <Button onPress={() => navigation.navigate('Login', undefined, { pop: true })} fullWidth>{phrase('Sign in')}</Button>
+      <Button onPress={() => { setVerificationSent(false); setStep(1); animateProgress(33); }} fullWidth>{phrase('Use another email')}</Button>
+    </ScrollView>
+  </ScreenShell>;
 
   return (
     <ScreenShell edges={['top', 'bottom']}>

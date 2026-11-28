@@ -33,6 +33,8 @@ import LanguageControl from '../components/LanguageControl';
 // we can grow the lookup table without leaking raw 502 bodies to users.
 function humanizeLoginError(err: unknown): string {
   if (err instanceof ApiError) {
+    if (err.body && typeof err.body === 'object'
+        && (err.body as { code?: unknown }).code === 'email_not_confirmed') return 'Check your email';
     if (err.status === 401) return 'Wrong email or password. Please try again.';
     if (err.status === 400) return 'Please enter a valid email and password.';
     if (err.status === 404) return 'No account found for this email. Please sign up first.';

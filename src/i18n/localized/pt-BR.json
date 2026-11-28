@@ -1180,5 +1180,8 @@
   "{name} paid": "{name} pago",
   "· due": "· devido",
   "— so answers are about": "- Então as respostas são sobre",
-  "← Back": "← Voltar"
+  "← Back": "← Voltar",
+  "Check your email": "Verifique seu e-mail",
+  "If this address can be registered, check its inbox to verify your email before signing in.": "Se for possível criar uma conta com este endereço, verifique sua caixa de entrada e confirme seu e-mail antes de entrar.",
+  "Use another email": "Usar outro e-mail"
 }

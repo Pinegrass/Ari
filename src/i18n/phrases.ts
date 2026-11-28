@@ -10,6 +10,9 @@ import ar from './localized/ar.json';
 
 const translatedPhrases: Record<string, Record<string, string>> = { es, fr, 'pt-BR': ptBR, ar };
 export const hindiPhrases: Record<string, string> = {
+  "Check your email": "अपना ईमेल देखें",
+  "If this address can be registered, check its inbox to verify your email before signing in.": "अगर इस पते से खाता बनाया जा सकता है, तो साइन इन करने से पहले अपना इनबॉक्स खोलकर ईमेल की पुष्टि करें।",
+  "Use another email": "दूसरा ईमेल इस्तेमाल करें",
   'Show trends': 'रुझान दिखाएँ', 'Hide trends': 'रुझान छिपाएँ', 'Clear date filter': 'तारीख का फ़िल्टर हटाएँ', 'Delete entry': 'एंट्री हटाएँ', 'Delete entry?': 'एंट्री हटाएँ?', 'Could not load transactions.': 'एंट्री लोड नहीं हुईं।',
 
   ...extraHindi,
