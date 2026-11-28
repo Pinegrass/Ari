@@ -188,3 +188,13 @@ fingerprint, not an override. QA group2633d53d is unreferenced by the public cha
 The retained XML config-plugin advisory is documented and its audit not waived.
 Worldwide native dependencies are fully patched. Do not claim QA/staged artifacts
 as public, waive installed-v57 acceptance, or mark future scheduled runs accepted.
+
+
+## 28 November - Git identity and verified registration
+
+New Git author/committer email is dev@pinegrass.in, active gh actor dev-pinegrass.
+User confirms GitHub billing resolved; actual backend CI now passes. Keep Ari free.
+Email verification requires a client-first contract rollout; pending registration
+never grants a session. Separate schema-only staging is required before production.
+Preserve existing profiles, financial currencies and backend entitlement truth.
+Never hide a failed migration replay by overriding its branch status.

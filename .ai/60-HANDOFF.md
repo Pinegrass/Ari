@@ -1,26 +1,38 @@
-# Latest handoff — 22 November 2026
+# Latest handoff - 28 November 2026
 
-Navigation fixed and worldwide dependency audit is zero. Application source e17c6c1
-passes 711tests, typecheck/lint and 21Doctor checks; a7619e1 adds only test/workflow.
-EAS build 541b5b79-fa8a-4dac-bdbc-5d808860b164 finished. Core Maestro 44938263716
-and report/privacy 44940046041 pass. Arabic restart/persistence 44940729174 also passes;
-screenshots confirm RTL mirroring and English restoration. Reuse the finished artifact, no new build.
+Worldwide source66de4ce passes720tests/74suites, TypeScript, lint and audit0.
+New signup UI still needs native acceptance; earlier native flows remain historical.
 
-Reports OTA PR11 targets public-maintenance branch codex/ari-public-v57.
-Source 87298ab passes 508tests and matches public 84cc2859 after clean npm ci.
-QA group 2633d53d-8a59-4732-8e33-4ec8e8a5dec1 is on an unreferenced QA branch.
-Public internal-release still returns204. Do not publish worldwide native changes
-against that runtime or override fingerprint. Retained native XML build-tool
-advisory and installed-v57 canary are release gates. Detailed evidence is in
-D:/Codex/Artifacts/Ari/2026-11-22/ and PR11's docs/reports-ota-v57-2026-11-22.md.
+Read docs/audits/2026-11-28/verified-registration-release.md for exact commits,
+artifacts, staging repair and release gates. Finish hosted isolated API acceptance,
+record deployment/artifact IDs and CI, then client-first rollout. Never deploy strict
+registration before compatible mobile/web clients are available. Do not use the old
+QA group as acceptance for new signup changes.
 
-Backend PR23/d24d921 prevents unit relabeling,705 local tests pass, undeployed.
-Live remains fdd03c4. Owner confirmed Expo upgraded, GitHub still pending. Private
-backend jobs 44939774769 fail before steps for payment/spending limits. Recheck
-CI/readiness/maintenance after owner resolves it; do not rerun sending jobs to
-manufacture evidence. Separate backend staging gate remains. Monthly acceptance
-is 1December09IST. Daily/outbox flags stay off. Web remote remains f871456.
+Ari remains free. New commits and GitHub operations use dev@pinegrass.in;
+active gh identity is dev-pinegrass. Expo and GitHub billing are resolved.
+Backend CI46124695819 on8bc9775 passes pytest(728), blocking pip-audit and real
+GoTrue/PostgreSQL fixture proofs. Production remains fdd03c4; candidate PR24
+includes PR23 account-currency protection. Existing canonical dirty work is preserved.
 
-Not globally released: signup verification, broader country/currency contracts,
-prior sync/data-safety integration and fluent/legal/store review remain open.
-See docs/audits/2026-11-22/navigation-reports-release.md. Preserve canonical dirt.
+Email registration now supports202 pending verification without adopting a session;
+mobile/web send email-verification-v1. Explicit IN/US/GB/AU country remains the
+supported financial contract. Backend trigger protects roles and existing profiles;
+clients must ship first before old registration receives426. Sign-in stays compatible.
+
+Supabase schema-only staging fzrlbodokgisxcyblmhm has no copied production rows.
+Initial replay failed because the manually added country column was missing from
+history. Applied an idempotent country repair, exact entitlement protection and
+signup trigger only to staging. Initial branch status remains MIGRATIONS_FAILED;
+no status override or production history mutation. Hosted API acceptance is underway
+in isolated Railway environment491faae0-506a-45e1-bf29-84e3652c2634, service
+f009c736-594f-4f6a-8a6e-4cbe07ba9f8e, pinned8bc9775. AI/sending/cron stay off.
+
+Production receipts show48 successful completions in24hours. Maintenance readiness
+still lacks actual execution evidence; green no-op workflows do not count. Daily/
+outbox remains off. Monthly acceptance is1December09IST and is not accepted early.
+
+World release gates: hosted SMTP/confirmation and client-first rollout; new-market
+currency/country contracts; prior sync/data-safety integration; fluent translations,
+legal and Play listing acceptance. Personal-device/iOS testing remains paused.
+No public OTA/native store release is claimed. Never force an OTA runtime.

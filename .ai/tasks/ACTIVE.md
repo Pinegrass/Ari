@@ -1,17 +1,32 @@
-# Active task — reports OTA and worldwide release
+# Active task - free worldwide release and compatible reports OTA
 
-Keep Ari free. Navigation7, a clean dependency audit and a successful native build
-are verified. Core, report/privacy and Arabic restart/persistence native checks pass using
-build 541b5b79-fa8a-4dac-bdbc-5d808860b164.
+Worldwide source66de4ce passes720tests/74suites, TypeScript, lint and audit0.
+New signup UI still needs native acceptance; earlier native flows remain historical.
 
-Report OTA PR11 has exact 84cc2859 compatibility and a staged isolated QA group.
-Resolve its retained native XML tooling advisory and installed-v57 canary gate
-before changing public internal-release. Do not force native compatibility.
+Ari remains free. New commits and GitHub operations use dev@pinegrass.in;
+active gh identity is dev-pinegrass. Expo and GitHub billing are resolved.
+Backend CI46124695819 on8bc9775 passes pytest(728), blocking pip-audit and real
+GoTrue/PostgreSQL fixture proofs. Production remains fdd03c4; candidate PR24
+includes PR23 account-currency protection. Existing canonical dirty work is preserved.
 
-Backend PR23 prevents currency relabeling and passes705 local tests. GitHub billing
-is pending, Expo is upgraded. After Actions recovers, run normal CI/readiness and
-staging acceptance; verify maintenance and report generation. Daily/outbox stays off.
+Email registration now supports202 pending verification without adopting a session;
+mobile/web send email-verification-v1. Explicit IN/US/GB/AU country remains the
+supported financial contract. Backend trigger protects roles and existing profiles;
+clients must ship first before old registration receives426. Sign-in stays compatible.
 
-Worldwide still needs signup verification, broader currency/country contracts,
-previous sync/data-safety integration, fluent/legal review and Play listing acceptance.
-Record exact commits/artifacts; do not describe local or staged work as deployed.
+Supabase schema-only staging fzrlbodokgisxcyblmhm has no copied production rows.
+Initial replay failed because the manually added country column was missing from
+history. Applied an idempotent country repair, exact entitlement protection and
+signup trigger only to staging. Initial branch status remains MIGRATIONS_FAILED;
+no status override or production history mutation. Hosted API acceptance is underway
+in isolated Railway environment491faae0-506a-45e1-bf29-84e3652c2634, service
+f009c736-594f-4f6a-8a6e-4cbe07ba9f8e, pinned8bc9775. AI/sending/cron stay off.
+
+Production receipts show48 successful completions in24hours. Maintenance readiness
+still lacks actual execution evidence; green no-op workflows do not count. Daily/
+outbox remains off. Monthly acceptance is1December09IST and is not accepted early.
+
+World release gates: hosted SMTP/confirmation and client-first rollout; new-market
+currency/country contracts; prior sync/data-safety integration; fluent translations,
+legal and Play listing acceptance. Personal-device/iOS testing remains paused.
+No public OTA/native store release is claimed. Never force an OTA runtime.

@@ -1,50 +1,32 @@
 project: Ari
-updated_at: '2026-11-22'
-active_branch: codex/ari-global-android
-active_task: reports_ota_and_worldwide_release
-application_commit: e17c6c138087ad85f693c2280dbec338ac6ca234
-source_commit: a7619e1
-release_status: verified_candidates_worldwide_gates_open
+updated_at: '2026-11-28'
 pricing: free
-verification:
-  tests: 711_pass_72_suites
-  typecheck: pass
-  lint: pass
-  dependency_audit: zero_vulnerabilities
-  expo_doctor: 21_pass
-  mobile_ci: 44940662856
-  native_core: 44938263716_pass
-  native_reports_privacy: 44940046041_pass
-  native_arabic: 44940729174_pass
-android:
-  candidate_build: 541b5b79-fa8a-4dac-bdbc-5d808860b164
-  candidate_fingerprint: 330e09cece8ffc2f6cf2f361361174537b088d6b
-  public_version_code: 57
-  public_runtime: 84cc28590bb0a1fffcf4a346d97bd40e18faac45
-  public_channel: internal-release
-  public_lookup: 204_unchanged
-  ota_pr: 11
-  ota_source: 87298ab391f0804ae262af0403f43a13724bc3a2
-  ota_tests: 508_pass
-  ota_fingerprint: exact_match_after_clean_ci
-  ota_qa_group: 2633d53d-8a59-4732-8e33-4ec8e8a5dec1
-  ota_security: retained_native_xml_config_plugin_advisory
-  new_play_submission: pending
-  public_ota: pending
-backend:
-  live: fdd03c4db0871521335c04a24d2c65e76f50f97b
-  candidate: d24d921
-  candidate_pr: 23
-  local_tests: 705_pass
-  ci: 44939774769_blocked_before_steps
-  staging: pending
-  maintenance: stale_pending_actions_recovery
-  daily_outbox_sending: disabled
-  monthly_acceptance: '2026-12-01T09:00:00+05:30'
-web:
-  remote_master: f87145694db3ba7f5c3c66595ffe9b7fcff74265
-  deployment: not_reverified
-billing:
-  expo: upgraded_build_verified
-  github: owner_pending_payment_or_private_actions_budget
-evidence: docs/audits/2026-11-22/navigation-reports-release.md
+commit_email: dev@pinegrass.in
+github_actor: dev-pinegrass
+release_status: candidates_verified_hosted_acceptance_pending
+mobile_worldwide_source: 66de4ce272ce811ac5d2e170acd77caf0c3659ec
+mobile_worldwide_tests: 720_pass_74_suites
+ota_source: 58657425b14a2201f623e413cfc1bf6d94129ecc
+ota_tests: 517_pass_41_suites
+public_runtime: 84cc28590bb0a1fffcf4a346d97bd40e18faac45
+public_channel: internal-release
+ota_fingerprint: exact_match_no_override
+ota_gate: retained_xml_advisory_and_public_native_canary
+backend_source: 8bc977592412df0cae97648a54ad121075ca53e9
+backend_live: fdd03c4db0871521335c04a24d2c65e76f50f97b
+backend_ci: 46124695819_all_three_jobs_pass
+backend_tests: 728_pass
+staging_supabase: fzrlbodokgisxcyblmhm
+staging_railway_environment: 491faae0-506a-45e1-bf29-84e3652c2634
+staging_status: bootstrap_repaired_hosted_api_pending
+web_source: 5611f643bc57ca739720b66f4a0a0c94f393b4a8
+web_pr: 6
+web_tests: 137_pass_and_4_browser_pass
+web_deployment: unverified
+billing_expo: resolved
+billing_github: resolved_and_ci_exercised
+maintenance: missing_execution_evidence
+daily_outbox_sending: disabled
+monthly_acceptance: '2026-12-01T09:00:00+05:30'
+production_publication: pending
+evidence: docs/audits/2026-11-28/verified-registration-release.md
