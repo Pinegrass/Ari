@@ -4,7 +4,7 @@ Worldwide source66de4ce passes720tests/74suites, TypeScript, lint and audit0.
 New signup UI still needs native acceptance; earlier native flows remain historical.
 
 Read docs/audits/2026-11-28/verified-registration-release.md for exact commits,
-artifacts, staging repair and release gates. Finish hosted isolated API acceptance,
+artifacts, staging repair and release gates. Read the passed hosted isolated API acceptance,
 record deployment/artifact IDs and CI, then client-first rollout. Never deploy strict
 registration before compatible mobile/web clients are available. Do not use the old
 QA group as acceptance for new signup changes.
@@ -24,7 +24,7 @@ Supabase schema-only staging fzrlbodokgisxcyblmhm has no copied production rows.
 Initial replay failed because the manually added country column was missing from
 history. Applied an idempotent country repair, exact entitlement protection and
 signup trigger only to staging. Initial branch status remains MIGRATIONS_FAILED;
-no status override or production history mutation. Hosted API acceptance is underway
+no status override or production history mutation. Hosted API acceptance passes
 in isolated Railway environment491faae0-506a-45e1-bf29-84e3652c2634, service
 f009c736-594f-4f6a-8a6e-4cbe07ba9f8e, pinned8bc9775. AI/sending/cron stay off.
 
@@ -36,3 +36,21 @@ World release gates: hosted SMTP/confirmation and client-first rollout; new-mark
 currency/country contracts; prior sync/data-safety integration; fluent translations,
 legal and Play listing acceptance. Personal-device/iOS testing remains paused.
 No public OTA/native store release is claimed. Never force an OTA runtime.
+
+
+## Final hosted checkpoint
+
+Staging deployment ec7b4a54-9f42-4be9-928c-c5cd7f6685ad succeeded, pinned8bc9775.
+Fifteen hosted checks pass using an owned synthetic account: provider confirmation,
+legacy426 and country400 guards, unconfirmed-login denial, token_hash confirmation,
+confirmed API access, protected initial USD/free/user metadata, country-change409,
+currency preservation, direct RLS privilege denial and confirmation replay denial.
+Admin generate_link sent no mail. Fixture deletion verified auth.users=0/profiles=0.
+Production remains unchanged. Actual SMTP delivery is awaiting owner authorization
+for one test to dev@pinegrass.in; no mail is sent while permission is pending.
+
+Worldwide CI46124985134 passes all four jobs (fd405d3). Web CI46124765506 passes
+all checks and automatic preview5611f64 is READY at
+https://aritomo-2zgt4inl4-pinegrass.vercel.app ; preview interactions remain unverified.
+OTA CI46125037946 on434b1de passes tests/types/lint and fails retained XML audit.
+This is an open release gate. No public channel mapping or Play build was changed.
