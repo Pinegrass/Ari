@@ -1,0 +1,28 @@
+project: Ari
+updated_at: '2026-11-22'
+active_branch: codex/ari-reports-ota-v57
+active_task: compatible_personal_reports_ota
+base_commit: 4b4ae8e0a5139e3cfb3b61d80d9e4124f6cdb15c
+pricing: free
+public_runtime: 84cc28590bb0a1fffcf4a346d97bd40e18faac45
+public_channel: internal-release
+fingerprint: exact_verified_no_override
+verification:
+  tests: 508_pass_39_suites
+  typecheck: pass
+  android_hermes_export: pass
+  public_native_canary: pending
+  audit: retained_native_xml_config_plugin_advisory
+production_publication: pending
+backend_live: fdd03c4db0871521335c04a24d2c65e76f50f97b
+backend_candidate_pr: 23
+backend_tests: 705_pass
+web_remote_master: f87145694db3ba7f5c3c66595ffe9b7fcff74265
+billing:
+  expo: upgraded_build_verified
+  github: owner_pending_payment_or_actions_budget
+reference: docs/reports-ota-v57-2026-11-22.md
+qa_group: 2633d53d-8a59-4732-8e33-4ec8e8a5dec1
+qa_branch: ari-reports-v57-87298ab-qa
+remote_ci: 44940420540
+public_update_lookup: 204_unchanged

@@ -32,3 +32,13 @@ establish compatibility. Keep original eas.json: even adding a QA build profile
 changes its fingerprint. Preserve the public internal-release channel mapping.
 The old XML config-plugin advisory is retained and documented; its audit gate is
 not waived. Native worldwide builds carry the fully patched toolchain.
+
+
+## 28 November - Git identity and verified registration
+
+New Git author/committer email is dev@pinegrass.in, active gh actor dev-pinegrass.
+User confirms GitHub billing resolved; actual backend CI now passes. Keep Ari free.
+Email verification requires a client-first contract rollout; pending registration
+never grants a session. Separate schema-only staging is required before production.
+Preserve existing profiles, financial currencies and backend entitlement truth.
+Never hide a failed migration replay by overriding its branch status.

@@ -1,28 +1,32 @@
-# Current state — 22 November 2026
+# Current state - 28 November 2026
 
-Focused compatible report OTA candidate on codex/ari-reports-ota-v57, based on
-public version-57 source 4b4ae8e. The public runtime is
-84cc28590bb0a1fffcf4a346d97bd40e18faac45 and its channel is internal-release.
-Both baseline and report candidate fingerprints reproduce it without overrides.
+OTA source5865742 passes517tests/41suites, TypeScript, lint and Android export.
+Exact public84cc2859 fingerprint reproduced. XML tooling/canary gates remain open.
 
-Reports have personal ledger-based habits, weekly/monthly Home shortcuts,
-privacy protection, signed net cash flow, refresh recovery and dated push routes.
-Navigation 7 removes the vulnerable query decoder. TypeScript and 508 tests pass;
-production Android Hermes export passes. Details: docs/reports-ota-v57-2026-11-22.md.
+Ari remains free. New commits and GitHub operations use dev@pinegrass.in;
+active gh identity is dev-pinegrass. Expo and GitHub billing are resolved.
+Backend CI46124695819 on8bc9775 passes pytest(728), blocking pip-audit and real
+GoTrue/PostgreSQL fixture proofs. Production remains fdd03c4; candidate PR24
+includes PR23 account-currency protection. Existing canonical dirty work is preserved.
 
-The XML config-plugin dependency remains at the installed native version and has
-a known high build-tool advisory. It is absent from the application source map.
-The security gate remains open. No production OTA, Play submission or notification
-sending was performed. Worldwide six-language/native work remains in PR #10.
+Email registration now supports202 pending verification without adopting a session;
+mobile/web send email-verification-v1. Explicit IN/US/GB/AU country remains the
+supported financial contract. Backend trigger protects roles and existing profiles;
+clients must ship first before old registration receives426. Sign-in stays compatible.
 
-Backend live fdd03c4 and web remote f871456 remain independent. Backend candidate
-PR #23 prevents account-unit relabeling and passes 705 local tests. Its private
-GitHub jobs still fail before startup for payment/spending limits. Expo is upgraded
-and builds work. Preserve the canonical checkouts' unrelated prepared changes.
+Supabase schema-only staging fzrlbodokgisxcyblmhm has no copied production rows.
+Initial replay failed because the manually added country column was missing from
+history. Applied an idempotent country repair, exact entitlement protection and
+signup trigger only to staging. Initial branch status remains MIGRATIONS_FAILED;
+no status override or production history mutation. Hosted API acceptance is underway
+in isolated Railway environment491faae0-506a-45e1-bf29-84e3652c2634, service
+f009c736-594f-4f6a-8a6e-4cbe07ba9f8e, pinned8bc9775. AI/sending/cron stay off.
 
-QA group 2633d53d-8a59-4732-8e33-4ec8e8a5dec1 is staged on unreferenced
-ari-reports-v57-87298ab-qa at runtime84cc2859. Public internal-release still
-returns204 and its channel mapping is unchanged. Clean npm ci reproduces84cc.
-Remote CI44940420540 passed tests/typecheck/lint, failed retained XML audit.
-Worldwide native report/privacy flow passed in44940046041; public-v57 canary
-acceptance remains pending. PR11 targets codex/ari-public-v57 maintenance branch.
+Production receipts show48 successful completions in24hours. Maintenance readiness
+still lacks actual execution evidence; green no-op workflows do not count. Daily/
+outbox remains off. Monthly acceptance is1December09IST and is not accepted early.
+
+World release gates: hosted SMTP/confirmation and client-first rollout; new-market
+currency/country contracts; prior sync/data-safety integration; fluent translations,
+legal and Play listing acceptance. Personal-device/iOS testing remains paused.
+No public OTA/native store release is claimed. Never force an OTA runtime.
